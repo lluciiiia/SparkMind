@@ -1,17 +1,19 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest } from "next";
 import axios from "axios";
+import { NextResponse } from "next/server";
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const { query } = req.query;
-
-  if (!query) {
-    return res.status(400).json({ error: "Query parameter is required" });
-  }
-
+export async function GET(req: NextApiRequest) {
   try {
+    const url = new URL(req.url!, `http://${req.headers.host}`);
+    const query = url.searchParams.get("query");
+
+    if (!query) {
+      return NextResponse.json(
+        { error: "Error extracting text" },
+        { status: 400 }
+      );
+    }
+
     const response = await axios.get(
       "https://www.googleapis.com/youtube/v3/search",
       {
@@ -24,9 +26,12 @@ export default async function handler(
         },
       }
     );
-
-    res.status(200).json(response.data.items);
+    return NextResponse.json({ body: response.data.items }, { status: 200 });
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch data from YouTube" });
+    console.error("Error fetching data from YouTube:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch data from YouTube" },
+      { status: 500 }
+    );
   }
 }
