@@ -2,14 +2,22 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-export default function VideoRecommendations() {
-  const [videos, setVideos] = useState<any[]>([]);
+interface VideoItem {
+  id: { videoId: string };
+  snippet: {
+    title: string;
+    description: string;
+  };
+}
+
+const VideoRecommendations: React.FC = () => {
+  const [videos, setVideos] = useState<VideoItem[]>([]);
   const [query, setQuery] = useState<string>("");
 
   const fetchVideos = async () => {
     try {
-      const response = await axios.get(`/api/youtube`, { params: { query } });
-      setVideos(response.data);
+      const response = await axios.get("/api/youtube", { params: { query } });
+      setVideos(response.data.body);
     } catch (error) {
       console.error("Error fetching videos:", error);
     }
@@ -33,19 +41,27 @@ export default function VideoRecommendations() {
         Search
       </button>
       <div>
-        {videos.map((video) => (
-          <div key={video.id.videoId}>
-            <h3>{video.snippet.title}</h3>
-            <iframe
-              width="560"
-              height="315"
-              src={`https://www.youtube.com/embed/${video.id.videoId}`}
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen></iframe>
-          </div>
-        ))}
+        {Array.isArray(videos) && videos.length > 0 ? (
+          videos.map((video) => (
+            <div key={video.id.videoId} className="my-4">
+              <h3>{video.snippet.title}</h3>
+              <p>{video.snippet.description}</p>
+              <iframe
+                width="560"
+                height="315"
+                src={`https://www.youtube.com/embed/${video.id.videoId}`}
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="my-4"></iframe>
+            </div>
+          ))
+        ) : (
+          <p>No videos found</p>
+        )}
       </div>
     </div>
   );
-}
+};
+
+export default VideoRecommendations;

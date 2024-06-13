@@ -26,6 +26,7 @@ export async function GET(req: NextApiRequest) {
         },
       }
     );
+
     return NextResponse.json({ body: response.data.items }, { status: 200 });
   } catch (error) {
     console.error("Error fetching data from YouTube:", error);
