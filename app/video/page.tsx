@@ -25,7 +25,7 @@ export default function VideoRecommendations() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Enter a topic"
-        className="px-4 text-center"
+        className="px-4 text-center text-black"
       />
       <button
         onClick={fetchVideos}
