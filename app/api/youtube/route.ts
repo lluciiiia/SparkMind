@@ -1,10 +1,9 @@
-import type { NextApiRequest } from "next";
 import axios from "axios";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   try {
-    const url = new URL(req.url!, `http://${req.headers.host}`);
+    const url = new URL(req.url);
     const query = url.searchParams.get("query");
 
     if (!query) {
