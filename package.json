@@ -3,26 +3,75 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "npx biome check --write ./ || true && npx stylelint src/styles/**/*.{css,scss,sass} --fix",
+    "lint:bun": "bunx biome check --write ./ || true && bunx stylelint src/styles/**/*.{css,scss,sass} --fix",
+    "stripe:login": "stripe login",
+    "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks",
+    "stripe:fixtures": "stripe fixtures fixtures/stripe-fixtures.json"
   },
   "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.7",
     "@google/generative-ai": "^0.12.0",
+    "@hono/zod-openapi": "^0.10.0",
+    "@hono/zod-validator": "^0.2.1",
+    "@livekit/components-react": "^2.3.3",
+    "@livekit/components-styles": "^1.0.12",
+    "@radix-ui/react-slot": "^1.0.2",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
+    "@tanstack/react-query": "^5.45.0",
+    "@total-typescript/tsconfig": "^1.0.4",
+    "@trpc/client": "^11.0.0-rc.403",
+    "@trpc/next": "^11.0.0-rc.403",
+    "@trpc/react-query": "^11.0.0-rc.403",
+    "@trpc/server": "^11.0.0-rc.403",
     "autoprefixer": "10.4.17",
+    "babel-plugin-react-compiler": "^0.0.0-experimental-938cd9a-20240601",
+    "bun": "^1.1.13",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
     "geist": "^1.2.1",
-    "next": "latest",
+    "googleapis": "^140.0.0",
+    "hono": "^4.2.3",
+    "livekit-server-sdk": "^2.4.0",
+    "lucide-react": "^0.394.0",
+    "next": "^15.0.0-rc.0",
+    "next-themes": "^0.3.0",
     "postcss": "8.4.33",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "react-icons": "^5.2.1",
+    "sonner": "^1.5.0",
+    "stripe": "^15.11.0",
+    "stylelint": "^16.6.0",
+    "stylelint-config-standard-scss": "^13.1.0",
+    "superjson": "^2.2.1",
+    "tailwind-merge": "^2.3.0",
     "tailwindcss": "3.4.1",
-    "typescript": "5.3.3"
+    "tailwindcss-animate": "^1.0.7",
+    "typescript": "5.3.3",
+    "usehooks-ts": "^3.1.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.8.1",
+    "@testing-library/react": "^16.0.0",
     "@types/node": "20.11.5",
     "@types/react": "18.2.48",
     "@types/react-dom": "18.2.18",
+    "@vitejs/plugin-react": "^4.3.1",
     "encoding": "^0.1.13",
-    "supabase": "^1.176.4"
+    "jsdom": "^24.1.0",
+    "supabase": "^1.176.4",
+    "vitest": "^1.6.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "browserslist": {
+    "development": ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"],
+    "production": ["defaults", "not dead", "not IE 11", "not IE_Mob 11", "maintained node versions"]
   }
 }
