@@ -12,7 +12,13 @@ export const stripe = new Stripe(
     appInfo: {
       name: 'SparkMind',
       version: '0.0.0',
+<<<<<<< HEAD
       url: 'https://google-gemini-competition.vercel.app',
     },
   },
+=======
+      url: 'https://github.com/vercel/nextjs-subscription-payments',
+    },
+  }
+>>>>>>> 54091cb (chore: linting, and slight modifications)
 );

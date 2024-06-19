@@ -45,7 +45,6 @@ const config = {
   async headers() {
     return [
       {
-        // matching all API routes
         source: '/api/v1/:path*',
         headers: [
           { key: 'Access-Control-Allow-Credentials', value: 'true' },

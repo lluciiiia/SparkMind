@@ -4,7 +4,12 @@ import { getErrorRedirect, getStatusRedirect, getURL } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+<<<<<<< HEAD
 import { getAuthTypes } from './settings';
+=======
+import { getAuthTypes } from 'utils/auth-helpers/settings';
+import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
+>>>>>>> 54091cb (chore: linting, and slight modifications)
 
 function isValidEmail(email: string) {
   var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -267,7 +272,11 @@ export async function updateEmail(formData: FormData) {
     { email: newEmail },
     {
       emailRedirectTo: callbackUrl,
+<<<<<<< HEAD
     },
+=======
+    }
+>>>>>>> 54091cb (chore: linting, and slight modifications)
   );
 
   if (error) {
