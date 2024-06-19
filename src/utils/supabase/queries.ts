@@ -1,9 +1,9 @@
-import { SupabaseClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { cache } from 'react';
 
 export const getUser = cache(async (supabase: SupabaseClient) => {
   const {
-    data: { user }
+    data: { user },
   } = await supabase.auth.getUser();
   return user;
 });
@@ -31,9 +31,6 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
 });
 
 export const getUserDetails = cache(async (supabase: SupabaseClient) => {
-  const { data: userDetails } = await supabase
-    .from('users')
-    .select('*')
-    .single();
+  const { data: userDetails } = await supabase.from('users').select('*').single();
   return userDetails;
 });

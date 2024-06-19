@@ -25,7 +25,7 @@ function SpeechToText({
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
       // Create a SpeechRecognition object
       // @ts-ignore
-      const SpeechRecognition: typeof SpeechRecognition | typeof webkitSpeechRecognition =
+      const SpeechRecognition =
         window['SpeechRecognition'] || window['webkitSpeechRecognition'];
       const recognition = new SpeechRecognition();
 

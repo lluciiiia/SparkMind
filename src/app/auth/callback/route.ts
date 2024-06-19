@@ -1,7 +1,7 @@
+import { getErrorRedirect, getStatusRedirect } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
-import { getErrorRedirect, getStatusRedirect } from '@/utils/helpers';
+import type { NextRequest } from 'next/server';
 
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url);
@@ -24,10 +24,6 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.redirect(
-    getStatusRedirect(
-      `${requestUrl.origin}/protected`,
-      'Success!',
-      'You are now signed in.'
-    )
+    getStatusRedirect(`${requestUrl.origin}/protected`, 'Success!', 'You are now signed in.')
   );
 }
