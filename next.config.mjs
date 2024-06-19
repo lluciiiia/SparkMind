@@ -1,5 +1,4 @@
 await import('./src/env.js');
-
 import pwa from '@ducanh2912/next-pwa';
 // import MillionLint from "@million/lint";
 // import million from "million/compiler";
@@ -20,7 +19,6 @@ const withPwa = pwa({
  * @type {import("next/dist/server/config").NextConfig}
  */
 const config = {
-  output: 'export',
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -30,19 +28,11 @@ const config = {
       fullUrl: true,
     },
   },
-  images: { 
+  images: {
     unoptimized: true,
-    remotePatterns: [
-      {
-        protocol: 'http',
-        domain: 'localhost',
-      }
-    ]
   },
-
   experimental: {
     optimizeCss: true,
-    reactCompiler: true,
     turbo: {
       rules: {
         '*.svg': {
@@ -55,7 +45,6 @@ const config = {
   async headers() {
     return [
       {
-        // matching all API routes
         source: '/api/v1/:path*',
         headers: [
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
@@ -72,7 +61,7 @@ const config = {
         ],
       },
     ];
-  }
+  },
 };
 
 const millionConfig = {

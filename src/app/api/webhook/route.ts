@@ -1,12 +1,12 @@
-import Stripe from 'stripe';
 import { stripe } from '@/utils/stripe/config';
 import {
-  upsertProductRecord,
-  upsertPriceRecord,
-  manageSubscriptionStatusChange,
+  deletePriceRecord,
   deleteProductRecord,
-  deletePriceRecord
+  manageSubscriptionStatusChange,
+  upsertPriceRecord,
+  upsertProductRecord,
 } from '@/utils/supabase/admin';
+import type Stripe from 'stripe';
 
 const relevantEvents = new Set([
   'product.created',
@@ -18,7 +18,7 @@ const relevantEvents = new Set([
   'checkout.session.completed',
   'customer.subscription.created',
   'customer.subscription.updated',
-  'customer.subscription.deleted'
+  'customer.subscription.deleted',
 ]);
 
 export async function POST(req: Request) {
@@ -28,8 +28,7 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    if (!sig || !webhookSecret)
-      return new Response('Webhook secret not found.', { status: 400 });
+    if (!sig || !webhookSecret) return new Response('Webhook secret not found.', { status: 400 });
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
     console.log(`🔔  Webhook received: ${event.type}`);
   } catch (err: any) {
@@ -80,16 +79,13 @@ export async function POST(req: Request) {
       }
     } catch (error) {
       console.log(error);
-      return new Response(
-        'Webhook handler failed. View your Next.js function logs.',
-        {
-          status: 400
-        }
-      );
+      return new Response('Webhook handler failed. View your Next.js function logs.', {
+        status: 400,
+      });
     }
   } else {
     return new Response(`Unsupported event type: ${event.type}`, {
-      status: 400
+      status: 400,
     });
   }
   return new Response(JSON.stringify({ received: true }));

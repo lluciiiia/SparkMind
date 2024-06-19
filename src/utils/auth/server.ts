@@ -3,8 +3,8 @@
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getURL, getErrorRedirect, getStatusRedirect } from 'utils/helpers';
 import { getAuthTypes } from 'utils/auth-helpers/settings';
+import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
 
 function isValidEmail(email: string) {
   var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -48,9 +48,9 @@ export async function signInWithEmail(formData: FormData) {
   }
 
   const supabase = createClient();
-  let options = {
+  const options = {
     emailRedirectTo: callbackURL,
-    shouldCreateUser: true
+    shouldCreateUser: true,
   };
 
   // If allowPassword is false, do not create a new user
@@ -58,7 +58,7 @@ export async function signInWithEmail(formData: FormData) {
   if (allowPassword) options.shouldCreateUser = false;
   const { data, error } = await supabase.auth.signInWithOtp({
     email,
-    options: options
+    options: options,
   });
 
   if (error) {
@@ -104,15 +104,11 @@ export async function requestPasswordUpdate(formData: FormData) {
   const supabase = createClient();
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: callbackURL
+    redirectTo: callbackURL,
   });
 
   if (error) {
-    redirectPath = getErrorRedirect(
-      '/signin/forgot_password',
-      error.message,
-      'Please try again.'
-    );
+    redirectPath = getErrorRedirect('/signin/forgot_password', error.message, 'Please try again.');
   } else if (data) {
     redirectPath = getStatusRedirect(
       '/signin/forgot_password',
@@ -140,15 +136,11 @@ export async function signInWithPassword(formData: FormData) {
   const supabase = createClient();
   const { error, data } = await supabase.auth.signInWithPassword({
     email,
-    password
+    password,
   });
 
   if (error) {
-    redirectPath = getErrorRedirect(
-      '/signin/password_signin',
-      'Sign in failed.',
-      error.message
-    );
+    redirectPath = getErrorRedirect('/signin/password_signin', 'Sign in failed.', error.message);
   } else if (data.user) {
     cookieStore.set('preferredSignInView', 'password_signin', { path: '/' });
     redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
@@ -183,23 +175,15 @@ export async function signUp(formData: FormData) {
     email,
     password,
     options: {
-      emailRedirectTo: callbackURL
-    }
+      emailRedirectTo: callbackURL,
+    },
   });
 
   if (error) {
-    redirectPath = getErrorRedirect(
-      '/signin/signup',
-      'Sign up failed.',
-      error.message
-    );
+    redirectPath = getErrorRedirect('/signin/signup', 'Sign up failed.', error.message);
   } else if (data.session) {
     redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
-  } else if (
-    data.user &&
-    data.user.identities &&
-    data.user.identities.length == 0
-  ) {
+  } else if (data.user && data.user.identities && data.user.identities.length == 0) {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Sign up failed.',
@@ -238,7 +222,7 @@ export async function updatePassword(formData: FormData) {
 
   const supabase = createClient();
   const { error, data } = await supabase.auth.updateUser({
-    password
+    password,
   });
 
   if (error) {
@@ -248,11 +232,7 @@ export async function updatePassword(formData: FormData) {
       error.message
     );
   } else if (data.user) {
-    redirectPath = getStatusRedirect(
-      '/',
-      'Success!',
-      'Your password has been updated.'
-    );
+    redirectPath = getStatusRedirect('/', 'Success!', 'Your password has been updated.');
   } else {
     redirectPath = getErrorRedirect(
       '/signin/update_password',
@@ -286,16 +266,12 @@ export async function updateEmail(formData: FormData) {
   const { error } = await supabase.auth.updateUser(
     { email: newEmail },
     {
-      emailRedirectTo: callbackUrl
+      emailRedirectTo: callbackUrl,
     }
   );
 
   if (error) {
-    return getErrorRedirect(
-      '/account',
-      'Your email could not be updated.',
-      error.message
-    );
+    return getErrorRedirect('/account', 'Your email could not be updated.', error.message);
   } else {
     return getStatusRedirect(
       '/account',
@@ -311,21 +287,13 @@ export async function updateName(formData: FormData) {
 
   const supabase = createClient();
   const { error, data } = await supabase.auth.updateUser({
-    data: { full_name: fullName }
+    data: { full_name: fullName },
   });
 
   if (error) {
-    return getErrorRedirect(
-      '/account',
-      'Your name could not be updated.',
-      error.message
-    );
+    return getErrorRedirect('/account', 'Your name could not be updated.', error.message);
   } else if (data.user) {
-    return getStatusRedirect(
-      '/account',
-      'Success!',
-      'Your name has been updated.'
-    );
+    return getStatusRedirect('/account', 'Success!', 'Your name has been updated.');
   } else {
     return getErrorRedirect(
       '/account',

@@ -9,17 +9,13 @@ export const Slugify = (text: string) => {
     .replace(/[^\w-]+/g, '');
 };
 
-
-
-export const getURL = (path: string = '') => {
+export const getURL = (path = '') => {
   // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
   let url =
-    process?.env?.NEXT_PUBLIC_SITE_URL &&
-    process.env.NEXT_PUBLIC_SITE_URL.trim() !== ''
+    process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.trim() !== ''
       ? process.env.NEXT_PUBLIC_SITE_URL
       : // If not set, check for NEXT_PUBLIC_VERCEL_URL, which is automatically set by Vercel.
-        process?.env?.NEXT_PUBLIC_VERCEL_URL &&
-          process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ''
+        process?.env?.NEXT_PUBLIC_VERCEL_URL && process.env.NEXT_PUBLIC_VERCEL_URL.trim() !== ''
         ? process.env.NEXT_PUBLIC_VERCEL_URL
         : // If neither is set, default to localhost for local development.
           'http://localhost:3000/';
@@ -37,7 +33,7 @@ export const getURL = (path: string = '') => {
 
 export const postData = async ({
   url,
-  data
+  data,
 }: {
   url: string;
   data?: { price: Price };
@@ -46,7 +42,7 @@ export const postData = async ({
     method: 'POST',
     headers: new Headers({ 'Content-Type': 'application/json' }),
     credentials: 'same-origin',
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   });
 
   return res.json();
@@ -58,37 +54,29 @@ export const toDateTime = (secs: number) => {
   return t;
 };
 
-export const calculateTrialEndUnixTimestamp = (
-  trialPeriodDays: number | null | undefined
-) => {
+export const calculateTrialEndUnixTimestamp = (trialPeriodDays: number | null | undefined) => {
   // Check if trialPeriodDays is null, undefined, or less than 2 days
-  if (
-    trialPeriodDays === null ||
-    trialPeriodDays === undefined ||
-    trialPeriodDays < 2
-  ) {
+  if (trialPeriodDays === null || trialPeriodDays === undefined || trialPeriodDays < 2) {
     return undefined;
   }
 
   const currentDate = new Date(); // Current date and time
-  const trialEnd = new Date(
-    currentDate.getTime() + (trialPeriodDays + 1) * 24 * 60 * 60 * 1000
-  ); // Add trial days
+  const trialEnd = new Date(currentDate.getTime() + (trialPeriodDays + 1) * 24 * 60 * 60 * 1000); // Add trial days
   return Math.floor(trialEnd.getTime() / 1000); // Convert to Unix timestamp in seconds
 };
 
 const toastKeyMap: { [key: string]: string[] } = {
   status: ['status', 'status_description'],
-  error: ['error', 'error_description']
+  error: ['error', 'error_description'],
 } as const;
 
 const getToastRedirect = (
   path: string,
   toastType: string,
   toastName: string,
-  toastDescription: string = '',
-  disableButton: boolean = false,
-  arbitraryParams: string = ''
+  toastDescription = '',
+  disableButton = false,
+  arbitraryParams = ''
 ): string => {
   const [nameKey, descriptionKey] = toastKeyMap[toastType] || [];
 
@@ -112,31 +100,16 @@ const getToastRedirect = (
 export const getStatusRedirect = (
   path: string,
   statusName: string,
-  statusDescription: string = '',
-  disableButton: boolean = false,
-  arbitraryParams: string = ''
+  statusDescription = '',
+  disableButton = false,
+  arbitraryParams = ''
 ) =>
-  getToastRedirect(
-    path,
-    'status',
-    statusName,
-    statusDescription,
-    disableButton,
-    arbitraryParams
-  );
+  getToastRedirect(path, 'status', statusName, statusDescription, disableButton, arbitraryParams);
 
 export const getErrorRedirect = (
   path: string,
   errorName: string,
-  errorDescription: string = '',
-  disableButton: boolean = false,
-  arbitraryParams: string = ''
-) =>
-  getToastRedirect(
-    path,
-    'error',
-    errorName,
-    errorDescription,
-    disableButton,
-    arbitraryParams
-  );
+  errorDescription = '',
+  disableButton = false,
+  arbitraryParams = ''
+) => getToastRedirect(path, 'error', errorName, errorDescription, disableButton, arbitraryParams);

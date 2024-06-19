@@ -1,12 +1,16 @@
 import { updateSession } from '@/utils/supabase/middleware';
-import type { User } from '@supabase/supabase-js';  
+import type { User } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
   const { user } = await updateSession(request);
 
-  const { res, redirect } = handleRedirect({ req: request, res: NextResponse.next({ request }), user });
+  const { res, redirect } = handleRedirect({
+    req: request,
+    res: NextResponse.next({ request }),
+    user,
+  });
 
   if (redirect) {
     return res;
@@ -38,7 +42,6 @@ export const config = {
   ],
 };
 
-
 const handleRedirect = ({
   req,
   res,
@@ -53,27 +56,14 @@ const handleRedirect = ({
 } => {
   // If current path ends with /login and user is logged in, redirect to onboarding page
   if (req.nextUrl.pathname.endsWith('/login') && user) {
-    const nextRes = NextResponse.redirect(
-      req.nextUrl.href.replace('/login', '/onboarding')
-    );
+    const nextRes = NextResponse.redirect(req.nextUrl.href.replace('/login', '/dashboard'));
 
     return { res: nextRes, redirect: true };
   }
 
   // If current path ends with /onboarding and user is not logged in, redirect to login page
-  if (req.nextUrl.pathname.endsWith('/onboarding') && !user) {
-    const nextRes = NextResponse.redirect(
-      req.nextUrl.href.replace('/onboarding', '/login')
-    );
-
-    return { res: nextRes, redirect: true };
-  }
-
-  // If current path ends with /realtime and user is not logged in, redirect to login page
-  if (req.nextUrl.pathname.endsWith('/realtime') && !user) {
-    const nextRes = NextResponse.redirect(
-      req.nextUrl.href.replace('/realtime', '/login')
-    );
+  if (req.nextUrl.pathname.endsWith('/dashboard') && !user) {
+    const nextRes = NextResponse.redirect(req.nextUrl.href.replace('/dashboard', '/login'));
 
     return { res: nextRes, redirect: true };
   }

@@ -22,13 +22,7 @@ export const getViewTypes = () => {
     viewTypes = [...viewTypes, 'email_signin'];
   }
   if (allowPassword) {
-    viewTypes = [
-      ...viewTypes,
-      'password_signin',
-      'forgot_password',
-      'update_password',
-      'signup'
-    ];
+    viewTypes = [...viewTypes, 'password_signin', 'forgot_password', 'update_password', 'signup'];
   }
 
   return viewTypes;

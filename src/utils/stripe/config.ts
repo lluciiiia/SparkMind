@@ -12,7 +12,7 @@ export const stripe = new Stripe(
     appInfo: {
       name: 'Next.js Subscription Starter',
       version: '0.0.0',
-      url: 'https://github.com/vercel/nextjs-subscription-payments'
-    }
+      url: 'https://github.com/vercel/nextjs-subscription-payments',
+    },
   }
 );
