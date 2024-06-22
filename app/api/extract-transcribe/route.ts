@@ -163,9 +163,8 @@ export async function POST(req: NextRequest) {
 
         const keywords = await extractKeyword(transcription);
 
-        console.log(keywords + 'krishna krishna testign 123141');
-
         return NextResponse.json({ keywords, transcription });
+
     } catch (error) {
         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
     }

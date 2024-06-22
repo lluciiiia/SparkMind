@@ -30,7 +30,7 @@
     "@google-cloud/storage": "^7.11.2",
     "@google/generative-ai": "^0.12.0",
     "@supabase/ssr": "^0.3.0",
-    "@supabase/supabase-js": "^2.43.4",
+    "@supabase/supabase-js": "^2.43.5",
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.2",
     "compromise": "^14.13.0",
@@ -53,7 +53,7 @@
     "@types/react-dom": "18.3.0",
     "@types/stopword": "^2.0.3",
     "encoding": "^0.1.13",
-    "supabase": "^1.176.10",
+    "supabase": "^1.178.2",
     "typescript": "5.4.5"
   }
 }
