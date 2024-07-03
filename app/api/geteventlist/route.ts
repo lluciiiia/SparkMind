@@ -8,6 +8,7 @@ import {
     HarmBlockThreshold,
 } from "@google/generative-ai";
 
+export const dynamic = 'force-dynamic';
 
 async function getEventList(transcript: string): Promise<any> {
 
@@ -105,10 +106,9 @@ async function getTranscript(uuid: string) {
 }
 
 
-export async function GET(req: any, res: NextResponse) {
+export async function GET(req: NextRequest, res: NextResponse) {
     try {
-        const url = new URL(req.url);
-        const uuid = url.searchParams.get('uuid');
+        const uuid = req.nextUrl.searchParams.get('uuid');
         console.log("user 🆔 : " + uuid);
 
         if (uuid) {
@@ -133,4 +133,5 @@ export async function GET(req: any, res: NextResponse) {
     catch (error) {
         console.log("Error in GetEventList api : " + error)
     }
+    return NextResponse.json({ status: 400, error: 'UUID is required' });
 }

@@ -29,7 +29,7 @@ function generateRandomString(length: number) {
     return result;
 }
 
-export async function createCalendarEvent(eventList: Event[], accessToken: any): Promise<string[]> {
+const createCalendarEvent = async (eventList: Event[], accessToken: any): Promise<string[]> => {
 
     const auth = new google.auth.OAuth2();
 
@@ -81,11 +81,12 @@ export async function createCalendarEvent(eventList: Event[], accessToken: any):
     return responseArray;
 }
 
-
-export async function POST(req: any, res: NextResponse) {
+export async function POST(req: NextRequest, res: NextResponse) {
     try {
+        const body = await req.json();
+        let accessToken = body.accessToken;
 
-        //only for testing purpose
+        // only for testing purpose
         const supabaseClient = createClient();
         const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
@@ -93,32 +94,29 @@ export async function POST(req: any, res: NextResponse) {
             return NextResponse.json({ status: 400, error: 'User not authenticated' });
         }
 
-        //TODO change localhost to location.origin
+        // TODO change localhost to location.origin
         const eventlistRes = await axios.get("http://localhost:3000/api/geteventlist", {
             params: { uuid }
         });
 
         let eventList = await JSON.stringify(eventlistRes.data);
-
         const secnd = await JSON.parse(eventList);
-
         const interable: Event[] = secnd.body;
 
-        let accessToken = req.accessToken;
-        req.uuid = uuid; // to set uuid and pass to the rotate Token
+        // Use type assertion to add uuid to the request object
+        (req as any).uuid = uuid;
 
-        // rotateToken is usefull for Refresh Google Accsss token
+        // rotateToken is useful for Refresh Google Access token
         await rotateToken(req, res, async () => {
-            accessToken = await req.accessToken;
+            accessToken = (req as any).accessToken;
         });
 
         if (accessToken !== undefined) {
             const calendarEvents = await createCalendarEvent(interable, accessToken);
-
             return NextResponse.json({ status: 200, calendarEvents });
         }
 
-        return NextResponse.json({ status: 400, error: 'Access tocken Might be error or undefined' });
+        return NextResponse.json({ status: 400, error: 'Access token might be error or undefined' });
 
     } catch (error) {
         console.error('Error creating event:', error);
