@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+
 
 export default function UploadComponent() {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -36,12 +37,13 @@ export default function UploadComponent() {
             console.log(data);
 
             setFetchedTranscript(data.transcription);
-            setKeywords(data.keywords);
+            setKeywords(data.keywordsArr);
 
         } catch (err: any) {
             console.error(err)
         }
     };
+
 
     return (
         <div>

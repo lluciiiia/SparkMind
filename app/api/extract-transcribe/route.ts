@@ -1,11 +1,17 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { spawn } from 'child_process';
-import { Storage } from '@google-cloud/storage';
-import { SpeechClient } from '@google-cloud/speech';
 import path from 'path';
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
+
+//supabse
+import { createClient } from '@/utils/supabase/server';
+//import { createClient } from '@supabase/supabase-js'
+
+//Google Cloude imports
+import { Storage } from '@google-cloud/storage';
+import { SpeechClient } from '@google-cloud/speech';
 
 //Gemini ai imports
 import {
@@ -15,6 +21,9 @@ import {
 } from "@google/generative-ai";
 
 
+//Initializing Local supabase only for testing purpose
+// const supabase = createClient('http://127.0.0.1:54321', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0');
+
 const apiKey = process.env.Gemini_API;
 const genAI = new GoogleGenerativeAI(apiKey!);
 
@@ -23,6 +32,7 @@ const model = genAI.getGenerativeModel({
 });
 
 const bucketName = 'geminiai-transcript'; // Replace with your bucket name
+
 
 const uploadStreamToGCS = async (destination: string) => {
     const storage = new Storage();
@@ -109,6 +119,7 @@ const generationConfig = {
     responseMimeType: "application/json",
 };
 
+// for Extrack KeyWord from Transcript
 const extractKeyword = async (transcript: string) => {
     const chatSession = model.startChat({
         generationConfig,
@@ -126,7 +137,7 @@ const extractKeyword = async (transcript: string) => {
     `;
 
     const result = await chatSession.sendMessage(inputMessage);
-    const keywords = JSON.parse(result.response.text()).keywords
+    const keywords = JSON.parse(result.response.text()).keywords;
     return keywords;
 }
 
@@ -134,6 +145,7 @@ const extractKeyword = async (transcript: string) => {
 export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Use POST method to extract and transcribe audio.' });
 }
+
 
 export async function POST(req: NextRequest) {
 
@@ -158,12 +170,29 @@ export async function POST(req: NextRequest) {
         const gcsUri = await extractAndUploadAudio(tempFilePath);
         const transcription = await transcribeAudio(gcsUri);
 
-        // Clean up the temporary file
+        //Clean up the temporary file
         await fsPromises.unlink(tempFilePath);
 
-        const keywords = await extractKeyword(transcription);
+        //extract keywords
+        const keywordsArr = await extractKeyword(transcription);
 
-        return NextResponse.json({ keywords, transcription });
+        const supabaseClient = createClient();
+
+        const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
+
+        console.log("user 🆔 : " + uuid);
+
+        //now time to insert the transcript and keyword into supabase
+
+        const { error } = await supabaseClient
+            .from('transcriptdata')
+            .insert({ uuid: uuid, transcript: transcription, keywords: keywordsArr });
+
+        if (error) {
+            console.log("Occur while trascription is perform in DB: " + error.details);
+        }
+
+        return NextResponse.json({ keywordsArr, transcription });
 
     } catch (error) {
         return NextResponse.json({ error: (error as Error).message }, { status: 500 });
