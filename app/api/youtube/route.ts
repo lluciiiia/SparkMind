@@ -1,19 +1,23 @@
 import axios from "axios";
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest) {
+
   try {
     const url = new URL(req.url);
     const query = url.searchParams.get("query");
     const pageToken = url.searchParams.get("pageToken");
     const apiKey = process.env.YOUTUBE_API_KEY;
 
-    if (!query) {
-      return NextResponse.json(
-        { error: "Error extracting text" },
-        { status: 400 }
-      );
-    }
+
+        if (!query) {
+            return NextResponse.json(
+                { error: "Error extracting text" },
+                { status: 400 }
+            );
+        }
 
     if (!apiKey) {
       return NextResponse.json(
