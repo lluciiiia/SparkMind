@@ -5,10 +5,20 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(req: NextRequest, res: NextResponse) {
     try {
         const supabaseServer = createServer();
-        const uuid = (await supabaseServer.auth.getUser()).data.user?.id;
+        const { data: user, error: userError } = (await supabaseServer.auth.getUser());
+
+        if (userError) {
+            console.error('Error fetching user: ', userError);
+            return NextResponse.json({ status: 500, message: 'Error fetching user' }, { status: 500 });
+        }
+
+        const uuid = user?.user?.id;
+
+        if (!uuid) {
+            return NextResponse.json({ status: 401, message: 'Unauthorized' }, { status: 401 });
+        }
 
         const supabase = createClient();
-
         console.log("user 🆔 : " + uuid);
 
         let { data, error } = await supabase
@@ -29,5 +39,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
     catch (err) {
         console.log('Error when feach Transcript from DB : ' + err);
+        return NextResponse.json({ status: 500, message: 'Internal Server Error' }, { status: 500 });
     }
 }
