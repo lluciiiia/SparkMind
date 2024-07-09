@@ -22,7 +22,9 @@ export default function RootLayout({
       <body className="text-white bg-background">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {/* <main className="flex flex-col items-center min-h-screen"> */}
+          <main>
             {children}
+          </main>
           {/* </main> */}
         </ThemeProvider>
       </body>

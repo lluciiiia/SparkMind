@@ -4,6 +4,7 @@ import { spawn } from 'child_process';
 import path from 'path';
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
+import { v4 as uuidv4 } from 'uuid';
 
 //supabse
 import { createClient } from '@/utils/supabase/server';
@@ -45,13 +46,13 @@ const uploadStreamToGCS = async (destination: string) => {
     return passThroughStream;
 };
 
-const extractAndUploadAudio = async (filepath: string): Promise<string> => {
+const extractAndUploadAudio = async (buffer: Buffer): Promise<string> => {
     console.log('Extracting and uploading audio ...');
     const destFileName = 'output.wav';
     const gcsUri = `gs://${bucketName}/${destFileName}`;
 
     const ffmpeg = spawn('ffmpeg', [
-        '-i', filepath,
+        '-i', 'pipe:0',
         '-ac', '1',
         '-acodec', 'pcm_s16le',
         '-ar', '16000',
@@ -62,9 +63,13 @@ const extractAndUploadAudio = async (filepath: string): Promise<string> => {
     const uploadStream = await uploadStreamToGCS(destFileName);
 
     return new Promise((resolve, reject) => {
+
+        ffmpeg.stdin.write(buffer);
+        ffmpeg.stdin.end();
+
         ffmpeg.stdout.pipe(uploadStream)
             .on('finish', () => {
-                console.log('Audio uploaded to GCS successfully.');
+                console.log('Audio uploaded to GCS successfully. ⭐✅');
                 resolve(gcsUri);
             })
             .on('error', reject); //shows processig status
@@ -163,15 +168,12 @@ export async function POST(req: NextRequest) {
         }
 
         const buffer = Buffer.from(await file.arrayBuffer());
-        const tempFilePath = path.join(process.cwd(), 'temp', 'uploaded-video.mp4');
 
-        await fsPromises.writeFile(tempFilePath, buffer);
-
-        const gcsUri = await extractAndUploadAudio(tempFilePath);
+        const gcsUri = await extractAndUploadAudio(buffer);
         const transcription = await transcribeAudio(gcsUri);
 
         //Clean up the temporary file
-        await fsPromises.unlink(tempFilePath);
+        //await fsPromises.unlink(tempFilePath);
 
         //extract keywords
         const keywordsArr = await extractKeyword(transcription);
@@ -180,16 +182,17 @@ export async function POST(req: NextRequest) {
 
         const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
+        const video_id = uuidv4();
+
         console.log("user 🆔 : " + uuid);
 
         //now time to insert the transcript and keyword into supabase
-
         const { error } = await supabaseClient
             .from('transcriptdata')
-            .insert({ uuid: uuid, transcript: transcription, keywords: keywordsArr });
+            .insert({ uuid: uuid, videoid: video_id, transcript: transcription, keywords: keywordsArr });
 
         if (error) {
-            console.log("Occur while trascription is perform in DB: " + error.details);
+            console.log("Occur while trascription is upload in DB: " + error.details);
         }
 
         return NextResponse.json({ keywordsArr, transcription });
