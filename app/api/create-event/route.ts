@@ -3,17 +3,18 @@ import rotateToken from '../middleware/rotateToken';
 import { google } from 'googleapis';
 import axios from "axios";
 import { createClient } from '@/utils/supabase/server';
+import { NextApiRequest } from 'next';
 
 //const SCOPES = 'https://www.googleapis.com/auth/calendar';
 
 interface Event {
     summary: string,
     description: string,
-    start: {
+    startDate: {
         dateTime: string,
         timeZone: string,
     },
-    end: {
+    endDate: {
         dateTime: string,
         timeZone: string,
     }
@@ -51,25 +52,15 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
                     conferenceData: {
                         createRequest: {
                             requestId: generateRandomString(10),
-                            conferenceSolutionKey: {
-                                type: "hangoutsMeet"
-                            }
                         }
                     }
                 },
-                conferenceDataVersion: 1
             })
 
             const data = response.data;
 
             if (response.status === 200 && data.htmlLink) {
-                if (data.hangoutLink) {
-                    responseArray.push(data.hangoutLink)
-                    responseArray.push(data.htmlLink);
-                }
-                else {
-                    responseArray.push(data.htmlLink);
-                }
+                responseArray.push(data.htmlLink);
             }
 
         } catch (error) {
@@ -83,10 +74,8 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
 
 export async function POST(req: NextRequest, res: NextResponse) {
     try {
-        const body = await req.json();
-        let accessToken = body.accessToken;
+        const data = await req.json();
 
-        // only for testing purpose
         const supabaseClient = createClient();
         const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
@@ -94,17 +83,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
             return NextResponse.json({ status: 400, error: 'User not authenticated' });
         }
 
-        // TODO change localhost to location.origin
-        const eventlistRes = await axios.get("http://localhost:3000/api/geteventlist", {
-            params: { uuid }
-        });
+        const selectedTask: Event[] = data.selectedTask;
 
-        let eventList = await JSON.stringify(eventlistRes.data);
-        const secnd = await JSON.parse(eventList);
-        const interable: Event[] = secnd.body;
+        console.log(selectedTask);
 
         // Use type assertion to add uuid to the request object
         (req as any).uuid = uuid;
+
+        let accessToken;
 
         // rotateToken is useful for Refresh Google Access token
         await rotateToken(req, res, async () => {
@@ -112,7 +98,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
         });
 
         if (accessToken !== undefined) {
-            const calendarEvents = await createCalendarEvent(interable, accessToken);
+            const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
             return NextResponse.json({ status: 200, calendarEvents });
         }
 

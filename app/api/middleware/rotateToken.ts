@@ -41,13 +41,13 @@ export default async function rotateToken(req: any, res: NextResponse, next: any
                 const { access_token, refresh_token, expiry_date } = newTokens.credentials;
 
                 // Update tokens in Supabase
-                await supabaseClient.from('tokens').update({
+                await supabaseClient.from('googleauthtokens').update({
                     access_token,
                     refresh_token: refresh_token, // Only update if a new refresh token is provided
                     expires_at: new Date(Date.now() + expiry_date! * 1000).toISOString()
                 }).eq('user_id', user_uuid);
 
-                console.log("this new 👶🏻 access tocken : " + req.accessToken);
+                console.log("this new 👶🏻 access tocken : " + access_token);
 
                 req.accessToken = access_token;
             }
