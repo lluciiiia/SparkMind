@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import rotateToken from '../middleware/rotateToken';
 import { google } from 'googleapis';
-import axios from "axios";
 import { createClient } from '@/utils/supabase/server';
-import { NextApiRequest } from 'next';
 
 //const SCOPES = 'https://www.googleapis.com/auth/calendar';
 
