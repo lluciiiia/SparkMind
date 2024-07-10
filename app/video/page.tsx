@@ -13,11 +13,19 @@ interface VideoItem {
 const VideoRecommendations: React.FC = () => {
   const [videos, setVideos] = useState<VideoItem[]>([]);
   const [query, setQuery] = useState<string>("");
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
 
-  const fetchVideos = async () => {
+  const fetchVideos = async (refresh = false) => {
     try {
-      const response = await axios.get("/api/youtube", { params: { query } });
-      setVideos(response.data.body);
+      const params: { query: string; pageToken?: string | null } = { query };
+      if (refresh && nextPageToken) {
+        params.pageToken = nextPageToken;
+      }
+
+      const response = await axios.get("/api/youtube", { params });
+      const newVideos = response.data.body;
+      setVideos(refresh ? newVideos : [...videos, ...newVideos]);
+      setNextPageToken(response.data.nextPageToken || null);
     } catch (error) {
       console.error("Error fetching videos:", error);
     }
@@ -36,9 +44,14 @@ const VideoRecommendations: React.FC = () => {
         className="px-4 text-center text-black"
       />
       <button
-        onClick={fetchVideos}
+        onClick={() => fetchVideos(false)}
         className="px-4 bg-white mt-8 text-gray-700 rounded border border-gray-200 hover:bg-gray-100 transition">
         Search
+      </button>
+      <button
+        onClick={() => fetchVideos(true)}
+        className="px-4 bg-white mt-8 text-gray-700 rounded border border-gray-200 hover:bg-gray-100 transition">
+        Refresh
       </button>
       <div>
         {Array.isArray(videos) && videos.length > 0 ? (
