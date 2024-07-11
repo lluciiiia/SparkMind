@@ -1,11 +1,12 @@
+"use client"
+
 import UploadComponent from "@/components/UploadComponent";
 
-const uploadscreen = () => {
+export default function UploadScreen() {
     return (
         <div>
             <UploadComponent />
         </div>
-    )
+    );
 }
 
-export default uploadscreen;
