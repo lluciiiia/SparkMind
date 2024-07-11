@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/utils/supabase/client"; 
+import { createClient } from "@/utils/supabase/client";
 
 //Gemini - ai Import
 import {
@@ -9,6 +9,8 @@ import {
 } from "@google/generative-ai";
 
 export const dynamic = 'force-dynamic';
+
+const supabase = createClient();
 
 async function getEventList(transcript: string): Promise<any> {
 
@@ -38,10 +40,14 @@ async function getEventList(transcript: string): Promise<any> {
         ],
     });
 
+    const date = new Date();
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const formattedDate = date.toISOString().split('T')[0];
+
     const prompt = `Extract tasks and deadlines from the meeting transcript provided below and structure them in JSON format suitable for scheduling with the Google Calendar API. Then, create the corresponding events in the calendar.
 
-    TimeZone: GMT+5:30
-    Date: June 23, 2024
+    TimeZone: ${timeZone}
+    Date: ${formattedDate}
 
     Transcript:
     ${transcript}
@@ -76,16 +82,15 @@ async function getEventList(transcript: string): Promise<any> {
 
 }
 
-async function getTranscript(uuid: string) {
+async function getTranscript(videoid: string) {
     try {
 
         //this is only for declaretion 
-        const supabase = createClient();
 
         let { data, error } = await supabase
             .from('transcriptdata')
             .select('transcript')
-            .eq('uuid', uuid);
+            .eq('videoid', videoid);
 
         if (error) {
             console.log('Error fetching transcript from DB: ' + error.message);
@@ -108,11 +113,12 @@ async function getTranscript(uuid: string) {
 
 export async function GET(req: NextRequest, res: NextResponse) {
     try {
-        const uuid = req.nextUrl.searchParams.get('uuid');
-        console.log("user 🆔 : " + uuid);
+        const video_id = req.nextUrl.searchParams.get('videoid');
+        console.log("video_id 🆔 : " + video_id);
 
-        if (uuid) {
-            const transcript = await getTranscript(uuid);
+        if (video_id !== null) {
+
+            const transcript = await getTranscript(video_id);
 
             if (!transcript) {
                 return NextResponse.json({ status: 404, error: 'Transcript not found' });
@@ -127,11 +133,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
             return NextResponse.json({ status: 200, body: eventList })
         }
         else {
-            return new NextResponse('UUID is required', { status: 400 });
+            return new NextResponse('video_id is required', { status: 400 });
         }
     }
     catch (error) {
         console.log("Error in GetEventList api : " + error)
     }
-    return NextResponse.json({ status: 400, error: 'UUID is required' });
+    return NextResponse.json({ status: 400, error: 'video_id is required' });
 }
