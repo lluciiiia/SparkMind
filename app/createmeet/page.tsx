@@ -41,7 +41,7 @@ export default function Home() {
         }
     };
 
-    const handleList = async (e: any) => {
+    const handleList = async () => {
         try {
             const res = await axios.get('/api/list-video');
 

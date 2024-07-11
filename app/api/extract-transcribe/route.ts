@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 //supabse
 import { createClient } from '@/utils/supabase/server';
-//import { createClient } from '@supabase/supabase-js'
 
 //Google Cloude imports
 import { Storage } from '@google-cloud/storage';
@@ -21,9 +20,6 @@ import {
     HarmBlockThreshold,
 } from "@google/generative-ai";
 
-
-//Initializing Local supabase only for testing purpose
-// const supabase = createClient('http://127.0.0.1:54321', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0');
 
 const apiKey = process.env.Gemini_API;
 const genAI = new GoogleGenerativeAI(apiKey!);

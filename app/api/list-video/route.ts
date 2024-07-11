@@ -1,27 +1,33 @@
-import { createClient } from "@/utils/supabase/client";
-import { createClient as createServer } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import { NextRequest, NextResponse } from "next/server";
+
 
 export async function GET(req: NextRequest, res: NextResponse) {
     try {
-        const supabaseServer = createServer();
-        const { data: user, error: userError } = (await supabaseServer.auth.getUser());
+
+        const supabaseClient = createClient();
+        const { data: { session } } = await supabaseClient.auth.getSession();
+
+        if (!session) {
+            console.error('Please Login and Sign up your account ');
+            return NextResponse.json({ status: 400, message: 'Please Login and Sign up your account' });
+        }
+
+        const { data: user, error: userError } = await supabaseClient.auth.getUser();
 
         if (userError) {
             console.error('Error fetching user: ', userError);
-            return NextResponse.json({ status: 500, message: 'Error fetching user' }, { status: 500 });
+            return NextResponse.json({ status: 400, message: 'Error fetching user' });
         }
 
-        const uuid = user?.user?.id;
+        const uuid = user.user.id;
 
-        if (!uuid) {
-            return NextResponse.json({ status: 401, message: 'Unauthorized' }, { status: 401 });
+        if (uuid === undefined) {
+            return NextResponse.json({ status: 401, message: 'Unauthorized' });
         }
-
-        const supabase = createClient();
         console.log("user 🆔 : " + uuid);
 
-        let { data, error } = await supabase
+        let { data, error } = await supabaseClient
             .from('transcriptdata')
             .select('videoid')
             .eq('uuid', uuid);
@@ -38,7 +44,9 @@ export async function GET(req: NextRequest, res: NextResponse) {
         return NextResponse.json({ status: 404, videolist: [] });
     }
     catch (err) {
-        console.log('Error when feach Transcript from DB : ' + err);
-        return NextResponse.json({ status: 500, message: 'Internal Server Error' }, { status: 500 });
+        console.log('Error when feach list of video id from DB : ' + err);
+        return NextResponse.json({ status: 400, message: 'Internal Server Error' });
     }
 }
+
+export const dynamic = 'force-dynamic';
