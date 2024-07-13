@@ -1,0 +1,250 @@
+.
+├── AuthButten.css
+├── Dockerfile
+├── README.md
+├── biome.json
+├── bun.lockb
+├── components.json
+├── custom.d.ts
+├── middleware.ts
+├── next-env.d.ts
+├── next.config.mjs
+├── package.json
+├── playwright.config.ts
+├── postcss.config.js
+├── public
+│   ├── assets
+│   │   ├── images
+│   │   ├── svgs
+│   │   └── videos
+│   │       └── videoplayback.mp4
+│   ├── icon
+│   │   └── search.png
+│   ├── pwa
+│   ├── service-worker.js
+│   ├── service-worker.js.map
+│   ├── swe-worker-development.js
+│   ├── workbox-7144475a.js
+│   └── workbox-7144475a.js.map
+├── renovate.json
+├── report-bundle-size.js
+├── reset.d.ts
+├── root.txt
+├── sentry.client.config.ts
+├── sentry.edge.config.ts
+├── sentry.server.config.ts
+├── src
+│   ├── app
+│   │   ├── (auth)
+│   │   │   ├── auth
+│   │   │   │   ├── callback
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── error
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── reset_password
+│   │   │   │       └── route.ts
+│   │   │   └── signin
+│   │   │       ├── [id]
+│   │   │       │   ├── page.tsx
+│   │   │       │   └── submit-button.tsx
+│   │   │       └── page.tsx
+│   │   ├── (dashboard)
+│   │   │   ├── account
+│   │   │   │   └── page.tsx
+│   │   │   ├── createmeet
+│   │   │   │   └── page.tsx
+│   │   │   ├── dashboard
+│   │   │   │   ├── dashboard.tsx
+│   │   │   │   ├── new-note.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   ├── uploadscreen
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── UploadComponent.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── page.tsx
+│   │   │   ├── users
+│   │   │   │   └── page.tsx
+│   │   │   └── video
+│   │   │       └── page.tsx
+│   │   ├── (main)
+│   │   │   └── pricing
+│   │   │       └── page.tsx
+│   │   ├── (misc)
+│   │   │   └── _middleware
+│   │   │       └── rotateToken.ts
+│   │   ├── api
+│   │   │   ├── v1
+│   │   │   │   ├── create-event
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── extract-transcribe
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── geteventlist
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── youtube
+│   │   │   │       └── route.ts
+│   │   │   └── webhook
+│   │   │       └── route.ts
+│   │   ├── error.tsx
+│   │   ├── global-error.tsx
+│   │   ├── layout.tsx
+│   │   ├── loading.tsx
+│   │   ├── manifest.ts
+│   │   ├── not-found.tsx
+│   │   ├── opengraph-image.png
+│   │   ├── page.tsx
+│   │   ├── robots.ts
+│   │   ├── sitemap.ts
+│   │   └── twitter-image.png
+│   ├── components
+│   │   ├── client
+│   │   │   ├── SpeechToText.tsx
+│   │   │   └── index.ts
+│   │   ├── custom
+│   │   │   ├── AuthButton.tsx
+│   │   │   ├── LoadingDots.tsx
+│   │   │   ├── Picture.tsx
+│   │   │   ├── Video.tsx
+│   │   │   ├── index.ts
+│   │   │   └── styles
+│   │   │       ├── auth-button.module.css
+│   │   │       └── loading-dots.module.css
+│   │   ├── dashboard
+│   │   │   ├── admin-panel-layout.tsx
+│   │   │   ├── collapse-menu-button.tsx
+│   │   │   ├── content-layout.tsx
+│   │   │   ├── index.ts
+│   │   │   ├── menu.tsx
+│   │   │   ├── navbar.tsx
+│   │   │   ├── sheet-menu.tsx
+│   │   │   ├── sidebar-toggle.tsx
+│   │   │   ├── sidebar.tsx
+│   │   │   └── user-nav.tsx
+│   │   ├── index.ts
+│   │   ├── layout
+│   │   │   ├── CenterLayout.tsx
+│   │   │   └── index.ts
+│   │   └── ui
+│   │       ├── auth
+│   │       │   ├── EmailSignIn.tsx
+│   │       │   ├── ForgotPassword.tsx
+│   │       │   ├── OauthSignIn.tsx
+│   │       │   ├── PasswordSignIn.tsx
+│   │       │   ├── Signup.tsx
+│   │       │   ├── UpdatePassword.tsx
+│   │       │   └── index.ts
+│   │       ├── avatar.tsx
+│   │       ├── breadcrumb.tsx
+│   │       ├── button.tsx
+│   │       ├── card.tsx
+│   │       ├── collapsible.tsx
+│   │       ├── context-menu.tsx
+│   │       ├── custom
+│   │       │   ├── bento-grid.tsx
+│   │       │   ├── index.ts
+│   │       │   ├── infinite-moving-cards.tsx
+│   │       │   ├── navbar-menu.tsx
+│   │       │   └── wobble-card.tsx
+│   │       ├── drawer.tsx
+│   │       ├── dropdown-menu.tsx
+│   │       ├── index.ts
+│   │       ├── scroll-area.tsx
+│   │       ├── separator.tsx
+│   │       ├── sheet.tsx
+│   │       ├── sonner.tsx
+│   │       ├── table.tsx
+│   │       ├── tabs.tsx
+│   │       ├── tooltip.tsx
+│   │       └── visual
+│   │           ├── index.ts
+│   │           └── vortex.tsx
+│   ├── constants
+│   │   ├── app.ts
+│   │   └── index.ts
+│   ├── core
+│   │   ├── index.ts
+│   │   └── store.ts
+│   ├── e2e
+│   │   └── page.spec.ts
+│   ├── fixtures
+│   │   └── stripe-fixtures.json
+│   ├── hooks
+│   │   ├── index.ts
+│   │   ├── use-sidebar-toggle.ts
+│   │   └── use-store.ts
+│   ├── instrumentation.ts
+│   ├── lib
+│   │   ├── index.ts
+│   │   ├── menu-list.ts
+│   │   └── utils.ts
+│   ├── providers
+│   │   ├── Providers.tsx
+│   │   ├── events
+│   │   │   ├── Events.tsx
+│   │   │   └── index.ts
+│   │   ├── index.ts
+│   │   └── theme
+│   │       ├── index.ts
+│   │       ├── mode-toggle.tsx
+│   │       └── theme-provider.tsx
+│   ├── schemas
+│   │   └── index.ts
+│   ├── server
+│   │   ├── api
+│   │   │   ├── index.ts
+│   │   │   ├── root.ts
+│   │   │   ├── routers
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── search-recommendation.ts
+│   │   │   │   ├── video-recommendation.ts
+│   │   │   │   └── video.ts
+│   │   │   └── trpc.ts
+│   │   ├── index.ts
+│   │   ├── schemas
+│   │   │   ├── index.ts
+│   │   │   ├── search-recommendation.schema.ts
+│   │   │   ├── video-recommendation.schema.ts
+│   │   │   └── video.schema.ts
+│   │   └── services
+│   │       ├── index.ts
+│   │       ├── search-recommendation.service.ts
+│   │       ├── video-recommendation.service.ts
+│   │       └── video.service.ts
+│   ├── styles
+│   │   ├── css
+│   │   │   └── globals.css
+│   │   └── scss
+│   │       └── cards.module.scss
+│   ├── supabase
+│   │   ├── config.toml
+│   │   └── seed.sql
+│   ├── trpc
+│   │   ├── react.tsx
+│   │   └── server.ts
+│   ├── types
+│   │   └── supabase.ts
+│   └── utils
+│       ├── auth
+│       │   ├── client.ts
+│       │   ├── server.ts
+│       │   └── settings.ts
+│       ├── helpers.ts
+│       ├── index.ts
+│       ├── meta.ts
+│       ├── stripe
+│       │   ├── client.ts
+│       │   ├── config.ts
+│       │   └── server.ts
+│       └── supabase
+│           ├── admin.ts
+│           ├── client.ts
+│           ├── middleware.ts
+│           ├── queries.ts
+│           └── server.ts
+├── tailwind.config.ts
+├── test-fixtures.ts
+├── tsconfig.json
+├── vitest.config.ts
+└── wrangler.toml
+
+70 directories, 177 files
