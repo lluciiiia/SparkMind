@@ -34,7 +34,7 @@ export function constructMetadata({
       title,
       description,
       images: [image],
-      creator: '@WaffleHacks',
+      creator: '@SparkMind',
     },
     icons: [
       {
@@ -68,8 +68,8 @@ export function constructViewport(): Viewport {
     viewportFit: 'cover',
     interactiveWidget: 'resizes-visual',
     themeColor: [
-      { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-      { media: '(prefers-color-scheme: dark)', color: '#3c2415' },
+      { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+      { media: '(prefers-color-scheme: dark)', color: '#0257AC' },
     ],
     colorScheme: 'dark light',
   };
