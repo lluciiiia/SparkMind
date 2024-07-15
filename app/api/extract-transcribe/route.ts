@@ -42,9 +42,10 @@ const uploadStreamToGCS = async (destination: string) => {
     return passThroughStream;
 };
 
-const extractAndUploadAudio = async (buffer: Buffer): Promise<string> => {
+const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
+    console.log("hello videoid : " + videoid);
     console.log('Extracting and uploading audio ...');
-    const destFileName = 'output.wav';
+    const destFileName = `output${videoid}.wav`;
     const gcsUri = `gs://${bucketName}/${destFileName}`;
 
     const ffmpeg = spawn('ffmpeg', [
@@ -109,6 +110,7 @@ const transcribeAudio = async (gcsUri: string): Promise<string> => {
 
 
     console.log('Audio trascripted sccussfully .... :)');
+    console.log(transcription);
     return transcription;
 };
 
@@ -142,6 +144,18 @@ const extractKeyword = async (transcript: string) => {
     return keywords;
 }
 
+const deleteAudioFile = (videoid: string) => {
+    const storage = new Storage();
+    const bucket = storage.bucket(bucketName);
+    const destFileName = `output${videoid}.wav`;
+    const file = bucket.file(destFileName);
+    file.delete().then((data) => {
+        console.log(`${destFileName} deleted.`);
+    }).catch(error => {
+        console.log("Error while deleting Audio File from GCloud : "+error);
+        return error;
+    });
+}
 
 export async function GET(request: NextRequest) {
     return NextResponse.json({ message: 'Use POST method to extract and transcribe audio.' });
@@ -163,24 +177,30 @@ export async function POST(req: NextRequest) {
             );
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
-
-        const gcsUri = await extractAndUploadAudio(buffer);
-        const transcription = await transcribeAudio(gcsUri);
-
-        //Clean up the temporary file
-        //await fsPromises.unlink(tempFilePath);
-
-        //extract keywords
-        const keywordsArr = await extractKeyword(transcription);
-
-        const supabaseClient = createClient();
+        var supabaseClient = createClient();
 
         const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
+        console.log("user 🆔 : " + uuid);
+
+        if (uuid === undefined) {
+            console.log("Please Login or SignUp");
+            return NextResponse.json({ error: "Please Login or SignUp" }, { status: 500 });
+        }
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+
+
         const video_id = uuidv4();
 
-        console.log("user 🆔 : " + uuid);
+        const gcsUri = await extractAndUploadAudio(buffer, video_id);
+        const transcription = await transcribeAudio(gcsUri);
+
+        //delete the Audio file form Google Clode bucket
+        deleteAudioFile(video_id);
+
+        //extract keywords
+        const keywordsArr = await extractKeyword(transcription);
 
         //now time to insert the transcript and keyword into supabase
         const { error } = await supabaseClient
