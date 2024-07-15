@@ -2,13 +2,8 @@ import { app } from '@/constants';
 import type { Metadata, Viewport } from 'next';
 
 export function constructMetadata({
-<<<<<<< HEAD
   title = `${app.name}`,
   description = `${app.description}`,
-=======
-  title = 'SparkMind',
-  description = `Hello, I am a description.`,
->>>>>>> 54091cb (chore: linting, and slight modifications)
   image = '/opengraph-image.png',
   icons = '/assets/svgs/logo.svg',
   noIndex = false,
@@ -73,13 +68,8 @@ export function constructViewport(): Viewport {
     viewportFit: 'cover',
     interactiveWidget: 'resizes-visual',
     themeColor: [
-<<<<<<< HEAD
       { media: '(prefers-color-scheme: light)', color: '#ffffff' },
       { media: '(prefers-color-scheme: dark)', color: '#0257AC' },
-=======
-      { media: '(prefers-color-scheme: light)', color: '#f5f5f5' },
-      { media: '(prefers-color-scheme: dark)', color: '#313131' },
->>>>>>> 54091cb (chore: linting, and slight modifications)
     ],
     colorScheme: 'dark light',
   };

@@ -24,14 +24,8 @@ function SpeechToText({
     // Check if the browser supports the Web Speech API
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
       // Create a SpeechRecognition object
-<<<<<<< HEAD
       const SpeechRecognition =
         (window as any)['SpeechRecognition'] || (window as any)['webkitSpeechRecognition'];
-=======
-      // @ts-ignore
-      const SpeechRecognition =
-        window['SpeechRecognition'] || window['webkitSpeechRecognition'];
->>>>>>> 54091cb (chore: linting, and slight modifications)
       const recognition = new SpeechRecognition();
 
       // Create a SpeechGrammarList object (optional)

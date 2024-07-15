@@ -9,7 +9,6 @@ export const Slugify = (text: string) => {
     .replace(/[^\w-]+/g, '');
 };
 
-<<<<<<< HEAD
 export const isValidObjectId = (val: string): boolean => /^[0-9a-fA-F]{24}$/.test(val);
 
 export const ScrollIntoCenterView = (href: string) => {
@@ -26,8 +25,6 @@ export const ScrollIntoCenterView = (href: string) => {
   }
 };
 
-=======
->>>>>>> 54091cb (chore: linting, and slight modifications)
 export const getURL = (path = '') => {
   // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
   let url =
@@ -95,11 +92,7 @@ const getToastRedirect = (
   toastName: string,
   toastDescription = '',
   disableButton = false,
-<<<<<<< HEAD
   arbitraryParams = '',
-=======
-  arbitraryParams = ''
->>>>>>> 54091cb (chore: linting, and slight modifications)
 ): string => {
   const [nameKey, descriptionKey] = toastKeyMap[toastType] || [];
 
@@ -125,11 +118,7 @@ export const getStatusRedirect = (
   statusName: string,
   statusDescription = '',
   disableButton = false,
-<<<<<<< HEAD
   arbitraryParams = '',
-=======
-  arbitraryParams = ''
->>>>>>> 54091cb (chore: linting, and slight modifications)
 ) =>
   getToastRedirect(path, 'status', statusName, statusDescription, disableButton, arbitraryParams);
 
@@ -138,9 +127,5 @@ export const getErrorRedirect = (
   errorName: string,
   errorDescription = '',
   disableButton = false,
-<<<<<<< HEAD
   arbitraryParams = '',
-=======
-  arbitraryParams = ''
->>>>>>> 54091cb (chore: linting, and slight modifications)
 ) => getToastRedirect(path, 'error', errorName, errorDescription, disableButton, arbitraryParams);

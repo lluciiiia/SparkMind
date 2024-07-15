@@ -3,10 +3,6 @@ import { toDateTime } from '@/utils/helpers';
 import { stripe } from '@/utils/stripe/config';
 import { createClient } from '@supabase/supabase-js';
 import type Stripe from 'stripe';
-<<<<<<< HEAD
-=======
-import type { Database, Tables, TablesInsert } from '@/types/supabase';
->>>>>>> 54091cb (chore: linting, and slight modifications)
 
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;

@@ -16,11 +16,7 @@ type CheckoutResponse = {
 
 export async function checkoutWithStripe(
   price: Price,
-<<<<<<< HEAD
   redirectPath = '/account',
-=======
-  redirectPath = '/account'
->>>>>>> 54091cb (chore: linting, and slight modifications)
 ): Promise<CheckoutResponse> {
   try {
     // Get the user from Supabase auth
@@ -101,11 +97,7 @@ export async function checkoutWithStripe(
         errorRedirect: getErrorRedirect(
           redirectPath,
           error.message,
-<<<<<<< HEAD
           'Please try again later or contact a system administrator.',
-=======
-          'Please try again later or contact a system administrator.'
->>>>>>> 54091cb (chore: linting, and slight modifications)
         ),
       };
     } else {
@@ -113,11 +105,7 @@ export async function checkoutWithStripe(
         errorRedirect: getErrorRedirect(
           redirectPath,
           'An unknown error occurred.',
-<<<<<<< HEAD
           'Please try again later or contact a system administrator.',
-=======
-          'Please try again later or contact a system administrator.'
->>>>>>> 54091cb (chore: linting, and slight modifications)
         ),
       };
     }
