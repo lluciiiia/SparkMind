@@ -28,9 +28,9 @@ export default function RootLayout({
     >
       <body className="bg-background">
         <Providers>
-          <main className="flex flex-col items-center min-h-screen">
+          {/* <main className="min-h-screen"> */}
           {children}
-          </main>
+          {/* </main> */}
         </Providers>
       </body>
     </html>
