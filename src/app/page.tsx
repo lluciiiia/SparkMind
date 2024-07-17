@@ -1,11 +1,10 @@
 'use client';
-// import { Button } from '@/components/custom';
 
+import { Vortex } from "@/components";
 export default function Home() {
   return (
     <>
-      This is the main page
-      {/* <Button>Click me</Button> */}
+      <Vortex />
     </>
   );
 }

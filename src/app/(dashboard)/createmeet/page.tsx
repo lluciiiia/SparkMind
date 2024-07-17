@@ -59,7 +59,7 @@ export default function Home() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/create-event', eventList);
+      const res = await axios.post('/api/v1/create-event', eventList);
       if (res.data.status === 200) {
         setMeetLink(res.data.calendarEvents);
       } else {

@@ -11,6 +11,8 @@ import { cookies } from 'next/headers';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
+import { BackgroundBeams } from '@/components';
+
 import {
   EmailSignIn,
   ForgotPassword,
@@ -57,7 +59,8 @@ export default async function SignIn({
   }
 
   return (
-    <div className="flex justify-center height-screen-helper">
+    <>
+    <div className="absolute top-0 left-0 flex justify-center h-screen w-screen z-50">
       <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
         <div className="flex justify-center pb-12 ">
           <Image src="/logo.png" alt="logo" width={64} height={64} />
@@ -72,13 +75,13 @@ export default async function SignIn({
                   ? 'Sign Up'
                   : 'Sign In'
           }
-        >
+          >
           {viewProp === 'password_signin' && (
             <PasswordSignIn allowEmail={allowEmail} redirectMethod={redirectMethod} />
           )}
           {viewProp === 'email_signin' && (
             <EmailSignIn
-              allowPassword={allowPassword}
+            allowPassword={allowPassword}
               redirectMethod={redirectMethod}
               disableButton={searchParams.disable_button}
             />
@@ -88,7 +91,7 @@ export default async function SignIn({
               allowEmail={allowEmail}
               redirectMethod={redirectMethod}
               disableButton={searchParams.disable_button}
-            />
+              />
           )}
           {viewProp === 'update_password' && <UpdatePassword redirectMethod={redirectMethod} />}
           {viewProp === 'signup' && (
@@ -103,6 +106,8 @@ export default async function SignIn({
           )}
         </Card>
       </div>
-    </div>
+      </div>
+      <BackgroundBeams />
+    </>
   );
 }
