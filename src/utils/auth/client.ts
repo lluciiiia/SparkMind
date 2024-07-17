@@ -9,7 +9,7 @@ import { redirectToPath } from './server';
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement>,
   requestFunc: (formData: FormData) => Promise<string>,
-  router: AppRouterInstance | null = null
+  router: AppRouterInstance | null = null,
 ): Promise<boolean | void> {
   // Prevent default form submission refresh
   e.preventDefault();

@@ -1,10 +1,10 @@
 'use server';
 
+import { getErrorRedirect, getStatusRedirect, getURL } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getAuthTypes } from 'utils/auth-helpers/settings';
-import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
+import { getAuthTypes } from './settings';
 
 function isValidEmail(email: string) {
   var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -25,7 +25,7 @@ export async function SignOut(formData: FormData) {
     return getErrorRedirect(
       pathName,
       'Hmm... Something went wrong.',
-      'You could not be signed out.'
+      'You could not be signed out.',
     );
   }
 
@@ -43,7 +43,7 @@ export async function signInWithEmail(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/email_signin',
       'Invalid email address.',
-      'Please try again.'
+      'Please try again.',
     );
   }
 
@@ -65,7 +65,7 @@ export async function signInWithEmail(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/email_signin',
       'You could not be signed in.',
-      error.message
+      error.message,
     );
   } else if (data) {
     cookieStore.set('preferredSignInView', 'email_signin', { path: '/' });
@@ -73,13 +73,13 @@ export async function signInWithEmail(formData: FormData) {
       '/signin/email_signin',
       'Success!',
       'Please check your email for a magic link. You may now close this tab.',
-      true
+      true,
     );
   } else {
     redirectPath = getErrorRedirect(
       '/signin/email_signin',
       'Hmm... Something went wrong.',
-      'You could not be signed in.'
+      'You could not be signed in.',
     );
   }
 
@@ -97,7 +97,7 @@ export async function requestPasswordUpdate(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/forgot_password',
       'Invalid email address.',
-      'Please try again.'
+      'Please try again.',
     );
   }
 
@@ -114,13 +114,13 @@ export async function requestPasswordUpdate(formData: FormData) {
       '/signin/forgot_password',
       'Success!',
       'Please check your email for a password reset link. You may now close this tab.',
-      true
+      true,
     );
   } else {
     redirectPath = getErrorRedirect(
       '/signin/forgot_password',
       'Hmm... Something went wrong.',
-      'Password reset email could not be sent.'
+      'Password reset email could not be sent.',
     );
   }
 
@@ -148,7 +148,7 @@ export async function signInWithPassword(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/password_signin',
       'Hmm... Something went wrong.',
-      'You could not be signed in.'
+      'You could not be signed in.',
     );
   }
 
@@ -166,7 +166,7 @@ export async function signUp(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Invalid email address.',
-      'Please try again.'
+      'Please try again.',
     );
   }
 
@@ -187,19 +187,19 @@ export async function signUp(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Sign up failed.',
-      'There is already an account associated with this email address. Try resetting your password.'
+      'There is already an account associated with this email address. Try resetting your password.',
     );
   } else if (data.user) {
     redirectPath = getStatusRedirect(
       '/',
       'Success!',
-      'Please check your email for a confirmation link. You may now close this tab.'
+      'Please check your email for a confirmation link. You may now close this tab.',
     );
   } else {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Hmm... Something went wrong.',
-      'You could not be signed up.'
+      'You could not be signed up.',
     );
   }
 
@@ -216,7 +216,7 @@ export async function updatePassword(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/update_password',
       'Your password could not be updated.',
-      'Passwords do not match.'
+      'Passwords do not match.',
     );
   }
 
@@ -229,7 +229,7 @@ export async function updatePassword(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/update_password',
       'Your password could not be updated.',
-      error.message
+      error.message,
     );
   } else if (data.user) {
     redirectPath = getStatusRedirect('/', 'Success!', 'Your password has been updated.');
@@ -237,7 +237,7 @@ export async function updatePassword(formData: FormData) {
     redirectPath = getErrorRedirect(
       '/signin/update_password',
       'Hmm... Something went wrong.',
-      'Your password could not be updated.'
+      'Your password could not be updated.',
     );
   }
 
@@ -253,21 +253,21 @@ export async function updateEmail(formData: FormData) {
     return getErrorRedirect(
       '/account',
       'Your email could not be updated.',
-      'Invalid email address.'
+      'Invalid email address.',
     );
   }
 
   const supabase = createClient();
 
   const callbackUrl = getURL(
-    getStatusRedirect('/account', 'Success!', `Your email has been updated.`)
+    getStatusRedirect('/account', 'Success!', `Your email has been updated.`),
   );
 
   const { error } = await supabase.auth.updateUser(
     { email: newEmail },
     {
       emailRedirectTo: callbackUrl,
-    }
+    },
   );
 
   if (error) {
@@ -276,7 +276,7 @@ export async function updateEmail(formData: FormData) {
     return getStatusRedirect(
       '/account',
       'Confirmation emails sent.',
-      `You will need to confirm the update by clicking the links sent to both the old and new email addresses.`
+      `You will need to confirm the update by clicking the links sent to both the old and new email addresses.`,
     );
   }
 }
@@ -298,7 +298,7 @@ export async function updateName(formData: FormData) {
     return getErrorRedirect(
       '/account',
       'Hmm... Something went wrong.',
-      'Your name could not be updated.'
+      'Your name could not be updated.',
     );
   }
 }

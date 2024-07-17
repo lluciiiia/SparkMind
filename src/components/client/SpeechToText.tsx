@@ -24,13 +24,13 @@ function SpeechToText({
     // Check if the browser supports the Web Speech API
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
       // Create a SpeechRecognition object
-      // @ts-ignore
       const SpeechRecognition =
-        window['SpeechRecognition'] || window['webkitSpeechRecognition'];
+        (window as any)['SpeechRecognition'] || (window as any)['webkitSpeechRecognition'];
       const recognition = new SpeechRecognition();
 
       // Create a SpeechGrammarList object (optional)
-      const SpeechGrammarList = window['SpeechGrammarList'] || window['webkitSpeechGrammarList'];
+      const SpeechGrammarList =
+        (window as any)['SpeechGrammarList'] || (window as any)['webkitSpeechGrammarList'];
       const speechRecognitionList = new SpeechGrammarList();
       speechRecognitionList.addFromString('command|stop', 1);
 

@@ -19,7 +19,7 @@ export const SearchRecommendationSchema = z.object({
           height: z.string(),
         })
         .optional(),
-    })
+    }),
   ),
 });
 

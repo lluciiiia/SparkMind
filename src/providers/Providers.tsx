@@ -1,5 +1,5 @@
 'use client';
-import { TRPCReactProvider } from '@/trpc/react';
+// import { TRPCReactProvider } from '@/trpc/react';
 import type { JSXElementConstructor, ReactNode } from 'react';
 import { Events, ThemeProvider } from '.';
 
@@ -12,8 +12,15 @@ export const Providers: React.FC<
     <>
       <ProviderStack
         providers={[
-          [ThemeProvider, {}],
-          [TRPCReactProvider, {}],
+          [
+            ThemeProvider,
+            {
+              attribute: 'class',
+              defaultTheme: 'light',
+              enableSystem: true,
+            },
+          ],
+          // [TRPCReactProvider, {}],
           [Events, {}],
         ]}
       >
