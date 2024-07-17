@@ -1,2 +1,2 @@
-export * from './helpers'
-export * from './meta'
+export * from './meta';
+export * from './helpers';

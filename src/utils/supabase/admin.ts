@@ -1,8 +1,8 @@
+import type { Database, Tables, TablesInsert } from '@/types/supabase';
 import { toDateTime } from '@/utils/helpers';
 import { stripe } from '@/utils/stripe/config';
 import { createClient } from '@supabase/supabase-js';
 import type Stripe from 'stripe';
-import type { Database, Tables, TablesInsert } from '@/types/supabase';
 
 type Product = Tables<'products'>;
 type Price = Tables<'prices'>;
@@ -13,8 +13,8 @@ const TRIAL_PERIOD_DAYS = 0;
 // Note: supabaseAdmin uses the SERVICE_ROLE_KEY which you must only use in a secure server-side context
 // as it has admin privileges and overwrites RLS policies!
 const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+  process.env.NEXT_PUBLIC_SUPABASE_URL as string || '',
+  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY as string || '',
 );
 
 const upsertProductRecord = async (product: Stripe.Product) => {
@@ -54,7 +54,7 @@ const upsertPriceRecord = async (price: Stripe.Price, retryCount = 0, maxRetries
       await upsertPriceRecord(price, retryCount + 1, maxRetries);
     } else {
       throw new Error(
-        `Price insert/update failed after ${maxRetries} retries: ${upsertError.message}`
+        `Price insert/update failed after ${maxRetries} retries: ${upsertError.message}`,
       );
     }
   } else if (upsertError) {
@@ -120,7 +120,7 @@ const createOrRetrieveCustomer = async ({
   let stripeCustomerId: string | undefined;
   if (existingSupabaseCustomer?.stripe_customer_id) {
     const existingStripeCustomer = await stripe.customers.retrieve(
-      existingSupabaseCustomer.stripe_customer_id
+      existingSupabaseCustomer.stripe_customer_id,
     );
     stripeCustomerId = existingStripeCustomer.id;
   } else {
@@ -183,7 +183,7 @@ const copyBillingDetailsToCustomer = async (uuid: string, payment_method: Stripe
 const manageSubscriptionStatusChange = async (
   subscriptionId: string,
   customerId: string,
-  createAction = false
+  createAction = false,
 ) => {
   // Get customer's UUID from mapping table.
   const { data: customerData, error: noCustomerError } = await supabaseAdmin
@@ -236,7 +236,7 @@ const manageSubscriptionStatusChange = async (
     //@ts-ignore
     await copyBillingDetailsToCustomer(
       uuid,
-      subscription.default_payment_method as Stripe.PaymentMethod
+      subscription.default_payment_method as Stripe.PaymentMethod,
     );
 };
 

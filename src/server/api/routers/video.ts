@@ -8,7 +8,7 @@ export const videoRouter = createTRPCRouter({
     .input(
       z.object({
         file: z.any(),
-      })
+      }),
     )
     .mutation(async ({ input }) => {
       const file = input.file;

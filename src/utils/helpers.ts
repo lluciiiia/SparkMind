@@ -9,6 +9,22 @@ export const Slugify = (text: string) => {
     .replace(/[^\w-]+/g, '');
 };
 
+export const isValidObjectId = (val: string): boolean => /^[0-9a-fA-F]{24}$/.test(val);
+
+export const ScrollIntoCenterView = (href: string) => {
+  const element = document.querySelector(href) as HTMLElement;
+  if (element) {
+    const elementRect = element.getBoundingClientRect();
+    const absoluteElementTop = elementRect.top + window.scrollY;
+    const middle: number =
+      absoluteElementTop + Math.floor(elementRect.height / 2) - Math.floor(window.innerHeight / 2);
+    window.scrollTo({
+      top: middle,
+      behavior: 'smooth',
+    });
+  }
+};
+
 export const getURL = (path = '') => {
   // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
   let url =
@@ -76,7 +92,7 @@ const getToastRedirect = (
   toastName: string,
   toastDescription = '',
   disableButton = false,
-  arbitraryParams = ''
+  arbitraryParams = '',
 ): string => {
   const [nameKey, descriptionKey] = toastKeyMap[toastType] || [];
 
@@ -102,7 +118,7 @@ export const getStatusRedirect = (
   statusName: string,
   statusDescription = '',
   disableButton = false,
-  arbitraryParams = ''
+  arbitraryParams = '',
 ) =>
   getToastRedirect(path, 'status', statusName, statusDescription, disableButton, arbitraryParams);
 
@@ -111,5 +127,5 @@ export const getErrorRedirect = (
   errorName: string,
   errorDescription = '',
   disableButton = false,
-  arbitraryParams = ''
+  arbitraryParams = '',
 ) => getToastRedirect(path, 'error', errorName, errorDescription, disableButton, arbitraryParams);

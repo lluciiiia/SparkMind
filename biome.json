@@ -36,7 +36,6 @@
   },
   "javascript": {
     "formatter": {
-      "trailingComma": "es5",
       "quoteStyle": "single",
       "semicolons": "always"
     }

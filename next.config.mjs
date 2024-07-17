@@ -1,5 +1,5 @@
-await import('./src/env.js');
 import pwa from '@ducanh2912/next-pwa';
+import { withSentryConfig } from '@sentry/nextjs';
 // import MillionLint from "@million/lint";
 // import million from "million/compiler";
 
@@ -70,4 +70,12 @@ const millionConfig = {
 
 const finalConfig = withPwa(config);
 
-export default finalConfig;
+export default withSentryConfig(finalConfig, {
+  org: 'womb0comb0',
+  project: 'spark-mind',
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+  automaticVercelMonitors: true,
+});
