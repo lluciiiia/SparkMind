@@ -16,7 +16,7 @@ export const Providers: React.FC<
             ThemeProvider,
             {
               attribute: 'class',
-              defaultTheme: 'system',
+              defaultTheme: 'light',
               enableSystem: true,
             },
           ],

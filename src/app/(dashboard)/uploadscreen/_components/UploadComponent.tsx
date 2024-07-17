@@ -25,14 +25,15 @@ export const UploadComponent = () => {
       const formData = new FormData();
       formData.append('file', selectedFile);
 
-      const res = await fetch('/api/extract-transcribe', {
+      const res = await fetch('/api/v1/extract-transcribe', {
         method: 'POST',
         body: formData,
       });
 
       if (!res.ok) throw new Error(await res.text());
 
-      const data = await res.json();
+      // @ts-ignore trust me bro
+      const data = await res.json() as any;
       console.log(data);
 
       setFetchedTranscript(data.transcription);

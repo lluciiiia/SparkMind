@@ -3,7 +3,8 @@
 import { Button } from '@/components/custom';
 import { signInWithOAuth } from '@/utils/auth/client';
 import type { Provider } from '@supabase/supabase-js';
-import { Github } from 'lucide-react';
+import { FaGoogle } from "react-icons/fa";
+
 import { useState } from 'react';
 
 type OAuthProviders = {
@@ -15,9 +16,9 @@ type OAuthProviders = {
 export const OauthSignIn = () => {
   const oAuthProviders: OAuthProviders[] = [
     {
-      name: 'github',
-      displayName: 'GitHub',
-      icon: <Github className="h-5 w-5" />,
+      name: 'google',
+      displayName: 'Google',
+      icon: <FaGoogle className="h-5 w-5" />,
     },
     /* Add desired OAuth providers here */
   ];
