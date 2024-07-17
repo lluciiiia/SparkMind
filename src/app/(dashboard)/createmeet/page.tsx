@@ -3,6 +3,18 @@
 import axios from 'axios';
 import { useState } from 'react';
 
+import Link from 'next/link';
+
+import { ContentLayout } from '@/components/dashboard/content-layout';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+
 export default function Home() {
   const [meetLink, setMeetLink] = useState([]);
 
@@ -72,8 +84,20 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <h1>Create Google Calendar Event with Google Meet Link</h1>
+    <ContentLayout title="Create Meet">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Create Meet</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <form onSubmit={handleSubmit}>
         <button className="bg-red-400 mx-10" type="submit">
           Create Event
@@ -89,6 +113,6 @@ export default function Home() {
           ))}
         </div>
       )}
-    </div>
+    </ContentLayout>
   );
 }

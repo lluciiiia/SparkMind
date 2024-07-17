@@ -1,7 +1,10 @@
-'use client';
 
 import React from 'react';
 
+export const runtime = 'edge';
+
 export const AuthPage = () => {
-  return <div></div>;
+  return (<div>
+    <h1>Error</h1>
+  </div>);
 };
