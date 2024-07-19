@@ -1,6 +1,6 @@
 'use client';
 
-import { Ellipsis, LogOut } from 'lucide-react';
+import { LogOut, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -34,7 +34,7 @@ export function Menu({ isOpen }: MenuProps) {
                   <Tooltip delayDuration={100}>
                     <TooltipTrigger className="w-full">
                       <div className="flex items-center justify-center w-full">
-                        <Ellipsis className="w-5 h-5" />
+                        <ChevronRight className="w-5 h-5" />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent side="right">

@@ -26,11 +26,9 @@ export default function RootLayout({
       data-a11y-link-underlines="false"
       data-turbo-loaded
     >
-      <body className="bg-background">
+      <body className="bg-background overflow-hidden">
         <Providers>
-          {/* <main className="min-h-screen"> */}
           {children}
-          {/* </main> */}
         </Providers>
       </body>
     </html>

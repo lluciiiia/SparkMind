@@ -1,4 +1,4 @@
-import { Bookmark, LayoutGrid, Settings, SquarePen, Tag, Users } from 'lucide-react';
+import { SquarePlus, Square, Folder, LayoutDashboard } from 'lucide-react';
 
 type Submenu = {
   href: string;
@@ -28,27 +28,48 @@ export function getMenuList(pathname: string): Group[] {
           href: '/dashboard',
           label: 'Dashboard',
           active: pathname.includes('/dashboard'),
-          icon: LayoutGrid,
+          icon: LayoutDashboard,
+          submenus: [],
+        },
+        {
+          href: '/myresources',
+          label: 'My Resources',
+          active: pathname.includes('/myresources'),
+          icon: Folder,
           submenus: [],
         },
       ],
     },
     {
-      groupLabel: 'Settings',
+      groupLabel: '',
       menus: [
         {
-          href: '/users',
-          label: 'Users',
-          active: pathname.includes('/users'),
-          icon: Users,
-          submenus: [],
-        },
-        {
-          href: '/account',
-          label: 'Account',
-          active: pathname.includes('/account'),
-          icon: Settings,
-          submenus: [],
+          href: '/upload',
+          label: 'Upload',
+          active: pathname.includes('/upload'),
+          icon: SquarePlus,
+          submenus: [
+            {
+              href: '/allresources',
+              label: 'All Resources',
+              active: pathname.includes('/allresources'),
+            },
+            {
+              href: '/video',
+              label: 'Video',
+              active: pathname.includes('/video'),
+            },
+            {
+              href: '/text',
+              label: 'Text',
+              active: pathname.includes('/text'),
+            },
+            {
+              href: '/keywords',
+              label: 'Keywords',
+              active: pathname.includes('/keywords'),
+            },
+          ],
         },
       ],
     },
