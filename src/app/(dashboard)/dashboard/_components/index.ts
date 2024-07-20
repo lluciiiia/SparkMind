@@ -1,2 +1,2 @@
-export * from './dashboard'
-export * from './new-note'
+export * from './dashboard';
+export * from './new-note';

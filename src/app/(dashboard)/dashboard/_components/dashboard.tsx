@@ -9,20 +9,20 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import Link from 'next/link';
-import { useState, useRef } from 'react';
-import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
-import { PiNoteBlankFill } from 'react-icons/pi';
-import { NewNoteSection } from './new-note';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { Textarea } from '@/components/ui/textarea';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 import { Triangle } from 'lucide-react';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import Link from 'next/link';
+import { useRef, useState } from 'react';
+import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
+import { PiNoteBlankFill } from 'react-icons/pi';
+import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { z } from 'zod';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Textarea } from '@/components/ui/textarea';
-import { useMediaQuery, useIsomorphicLayoutEffect } from 'usehooks-ts';
+import { NewNoteSection } from './new-note';
 
 const schema = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
@@ -41,16 +41,16 @@ export const Dashboard = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
   const drawerRef = useRef<HTMLDivElement>(null);
-  const [showText, setShowText] = useState(false)
+  const [showText, setShowText] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
-        setShowText(true)
-      }, 100)
-      return () => clearTimeout(timer)
+        setShowText(true);
+      }, 100);
+      return () => clearTimeout(timer);
     } else {
-      setShowText(false)
+      setShowText(false);
     }
 
     const handleClickOutside = (e: MouseEvent) => {
@@ -72,7 +72,7 @@ export const Dashboard = () => {
   const isLaptop = useMediaQuery('(min-width: 1023px)');
 
   const handleDelete = (id: string) => {
-    setNotes(notes.filter(note => note.id !== id));
+    setNotes(notes.filter((note) => note.id !== id));
   };
 
   const handleCreate = (values: z.infer<typeof schema>) => {
@@ -89,25 +89,25 @@ export const Dashboard = () => {
   return (
     <>
       <div className="flex flex-col items-center justify-items-start absolute top-[80px] right-0 rounded-l-md rounded-r-none z-[100] w-fit">
-        <motion.details 
-          open={isOpen} 
+        <motion.details
+          open={isOpen}
           onToggle={() => setIsOpen(!isOpen)}
           className="w-full"
           initial={{ width: 30 }}
           animate={{ width: isOpen ? '100%' : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}
+          transition={{ type: 'spring', stiffness: 100 }}
         >
           <summary
-            className={`left-0 relative p-2 ${isOpen ? 'rounded-l-md' : 'rounded-md'
-              } bg-blue-400 rounded-r-none w-full flex items-center justify-start ${isOpen ? 'justify-start' : 'justify-center'
-              }`}
+            className={`left-0 relative p-2 ${
+              isOpen ? 'rounded-l-md' : 'rounded-md'
+            } bg-blue-400 rounded-r-none w-full flex items-center justify-start ${
+              isOpen ? 'justify-start' : 'justify-center'
+            }`}
           >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
-            {showText && (
-              <span>New note</span>
-            )}
+            {showText && <span>New note</span>}
           </summary>
           <NewNoteSection handleCreate={handleCreate} notes={notes} />
         </motion.details>
@@ -133,12 +133,10 @@ export const Dashboard = () => {
             </div>
           )}
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {notes.map(note => (
+            {notes.map((note) => (
               <Card key={note.id} className="w-full max-w-md h-auto relative">
                 <CardHeader className="w-full flex flex-col items-center justify-start relative">
-                  <CardTitle className="text-lg font-bold left-0 mr-auto">
-                    {note.title}
-                  </CardTitle>
+                  <CardTitle className="text-lg font-bold left-0 mr-auto">{note.title}</CardTitle>
                   <Button
                     className="absolute top-2 right-2"
                     variant="ghost"
@@ -150,7 +148,10 @@ export const Dashboard = () => {
                 </CardHeader>
                 <CardContent className="h-auto overflow-y-auto">
                   <CardDescription>
-                    <Textarea placeholder="Enter your prompt" className="w-full max-h-60 overflow-y-auto resize-y mt-2">
+                    <Textarea
+                      placeholder="Enter your prompt"
+                      className="w-full max-h-60 overflow-y-auto resize-y mt-2"
+                    >
                       {note.content}
                     </Textarea>
                   </CardDescription>
@@ -159,11 +160,11 @@ export const Dashboard = () => {
             ))}
           </section>
         </section>
-        <footer className=' absolute w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center'>
+        <footer className=" absolute w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
           <motion.div
-            initial={{ y: "90%" }}
-            animate={{ y: isDrawerOpen ? 100 : "100%" }}
-            transition={{ type: "spring", stiffness: 50 }}
+            initial={{ y: '90%' }}
+            animate={{ y: isDrawerOpen ? 100 : '100%' }}
+            transition={{ type: 'spring', stiffness: 50 }}
             className={`
                 flex flex-col items-center justify-center
               `}
@@ -175,24 +176,23 @@ export const Dashboard = () => {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 100 }}
+                    transition={{ type: 'spring', stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                   >
-                    <Triangle className={`w-5 h-5 bottom-0 ${isDrawerOpen ? 'rotate-180' : ''}`} fill='black' />
+                    <Triangle
+                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? 'rotate-180' : ''}`}
+                      fill="black"
+                    />
                   </motion.div>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {isDrawerOpen ? 'Close' : 'Open'}
-                </TooltipContent>
+                <TooltipContent>{isDrawerOpen ? 'Close' : 'Open'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
             <Card
               className={` bottom-0 left-0 right-0  shadow-lg mx-auto ${!isLaptop ? 'w-[700px] h-[400px]' : 'w-[1000px] h-[600px] rounded-t-lg'}`}
-
             >
-
               <menu className="flex justify-start border-b border-gray-200 ml-4">
                 <li>
                   <button
@@ -214,13 +214,9 @@ export const Dashboard = () => {
               <div className="p-4">
                 {activeTab === 'summary' && (
                   <div className="h-[calc(100vh-56px-64px-20px-24px-56px-48px)] overflow-y-auto">
-                    <Card className="w-full h-[200px] bg-blue-400 mb-4">
+                    <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
 
-                    </Card>
-
-                    <section
-                      className={`flex flex-col items-center justify-start`}
-                    >
+                    <section className={`flex flex-col items-center justify-start`}>
                       <header
                         className={`
                             w-full mr-auto
@@ -229,17 +225,12 @@ export const Dashboard = () => {
                         <h3 className="text-lg font-bold">Generate</h3>
                       </header>
                       <div className="grid grid-cols-3 gap-4 mr-auto">
-                        {["Q&A", "Discuss with AI", "Further info"].map((item, index) => (
-                          <Card
-                            key={index}
-                            className="w-[150px] h-[150px] bg-blue-400"
-                          >
-                            <CardHeader
-                              className="w-full h-full flex items-start justify-start"
-                            >
-                              <CardTitle
-                                className={`mt-auto text-center text-sm font-semibold`}
-                              >{item}</CardTitle>
+                        {['Q&A', 'Discuss with AI', 'Further info'].map((item, index) => (
+                          <Card key={index} className="w-[150px] h-[150px] bg-blue-400">
+                            <CardHeader className="w-full h-full flex items-start justify-start">
+                              <CardTitle className={`mt-auto text-center text-sm font-semibold`}>
+                                {item}
+                              </CardTitle>
                             </CardHeader>
                           </Card>
                         ))}
@@ -249,8 +240,7 @@ export const Dashboard = () => {
                 )}
                 {activeTab === 'video' && (
                   <div className="h-[calc(100vh-56px-64px-20px-24px-56px-48px)] overflow-y-auto">
-                    <Card className="w-full h-[200px] bg-blue-400 mb-4">
-                    </Card>
+                    <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
                   </div>
                 )}
               </div>
