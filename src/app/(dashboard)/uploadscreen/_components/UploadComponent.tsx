@@ -33,7 +33,7 @@ export const UploadComponent = () => {
       if (!res.ok) throw new Error(await res.text());
 
       // @ts-ignore trust me bro
-      const data = await res.json() as any;
+      const data = (await res.json()) as any;
       console.log(data);
 
       setFetchedTranscript(data.transcription);

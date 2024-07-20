@@ -1,5 +1,4 @@
 import { ContentLayout } from '@/components';
-import Link from 'next/link';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,7 +7,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { RecentLearnings, MyLearning } from './_components';
+import Link from 'next/link';
+import { MyLearning, RecentLearnings } from './_components';
 
 const MyResourcesPage = () => {
   return (
@@ -35,7 +35,7 @@ const MyResourcesPage = () => {
       <RecentLearnings />
       <MyLearning />
     </ContentLayout>
-  )
-}
+  );
+};
 
-export default MyResourcesPage
+export default MyResourcesPage;

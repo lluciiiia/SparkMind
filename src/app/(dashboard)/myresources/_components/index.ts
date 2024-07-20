@@ -1,2 +1,2 @@
-export * from './MyLearning'
-export * from './RecentLearnings'
+export * from './MyLearning';
+export * from './RecentLearnings';

@@ -1,6 +1,4 @@
-import { UploadComponent } from './_components';
 import { ContentLayout } from '@/components';
-import Link from 'next/link';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -9,6 +7,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import Link from 'next/link';
+import { UploadComponent } from './_components';
 
 const uploadscreen = () => {
   return (

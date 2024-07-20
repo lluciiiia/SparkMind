@@ -27,9 +27,7 @@ export default function RootLayout({
       data-turbo-loaded
     >
       <body className="bg-background overflow-hidden">
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

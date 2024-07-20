@@ -3,8 +3,6 @@ import { customsearch_v1 } from 'googleapis';
 
 const API_KEY = (process.env.GOOGLE_SEARCH_API_KEY as string) || '';
 const SEARCH_ENGINE_ID = (process.env.GOOGLE_SEARCH_ENGINE_ID as string) || '';
-console.log('API_KEY:', API_KEY);
-console.log('SEARCH_ENGINE_ID:', SEARCH_ENGINE_ID);
 
 const customSearch = new customsearch_v1.Customsearch({
   key: API_KEY,

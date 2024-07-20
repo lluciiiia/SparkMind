@@ -1,7 +1,8 @@
 'use client';
 
 import cn from 'classnames';
-import React, { forwardRef, useRef, ButtonHTMLAttributes } from 'react';
+import type React from 'react';
+import { type ButtonHTMLAttributes, forwardRef, useRef } from 'react';
 import { mergeRefs } from 'react-merge-refs';
 
 import LoadingDots from '@/components/custom/LoadingDots';
@@ -34,9 +35,9 @@ const Button = forwardRef<HTMLButtonElement, Props>((props, buttonRef) => {
     {
       [styles.slim]: variant === 'slim',
       [styles.loading]: loading,
-      [styles.disabled]: disabled
+      [styles.disabled]: disabled,
     },
-    className
+    className,
   );
   return (
     <Component
@@ -47,7 +48,7 @@ const Button = forwardRef<HTMLButtonElement, Props>((props, buttonRef) => {
       disabled={disabled}
       style={{
         width,
-        ...style
+        ...style,
       }}
       {...rest}
     >

@@ -1,4 +1,4 @@
-import { SquarePlus, Square, Folder, LayoutDashboard } from 'lucide-react';
+import { Folder, LayoutDashboard, Square, SquarePlus } from 'lucide-react';
 
 type Submenu = {
   href: string;

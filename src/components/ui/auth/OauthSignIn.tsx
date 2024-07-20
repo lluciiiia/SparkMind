@@ -3,7 +3,7 @@
 import { Button } from '@/components/custom';
 import { signInWithOAuth } from '@/utils/auth/client';
 import type { Provider } from '@supabase/supabase-js';
-import { FaGoogle } from "react-icons/fa";
+import { FaGoogle } from 'react-icons/fa';
 
 import { useState } from 'react';
 
