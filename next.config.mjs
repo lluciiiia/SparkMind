@@ -70,12 +70,14 @@ const millionConfig = {
 
 const finalConfig = withPwa(config);
 
-export default withSentryConfig(finalConfig, {
-  org: 'womb0comb0',
-  project: 'spark-mind',
-  silent: !process.env.CI,
-  widenClientFileUpload: true,
-  hideSourceMaps: true,
-  disableLogger: true,
-  automaticVercelMonitors: true,
-});
+// export default withSentryConfig(finalConfig, {
+//   org: 'womb0comb0',
+//   project: 'spark-mind',
+//   silent: !process.env.CI,
+//   widenClientFileUpload: true,
+//   hideSourceMaps: true,
+//   disableLogger: true,
+//   automaticVercelMonitors: true,
+// });
+
+export default finalConfig;
