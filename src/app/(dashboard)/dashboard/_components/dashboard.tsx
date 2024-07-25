@@ -176,7 +176,7 @@ export const Dashboard = () => {
                 </Button>
               </div>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="rounded-2xl sm:rounded-2xl">
               <DialogHeader>
                 <DialogTitle>Upload files</DialogTitle>
                 <DialogDescription>
@@ -185,8 +185,9 @@ export const Dashboard = () => {
               </DialogHeader>
 
               {!fileType && (
-                <div className="grid md:grid-cols-2 gap-2">
+                <div className="grid gap-2">
                   <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => setFileType("image")}
                     disabled
@@ -195,6 +196,7 @@ export const Dashboard = () => {
                     Image
                   </Button>
                   <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => setFileType("video")}
                     disabled
@@ -203,6 +205,7 @@ export const Dashboard = () => {
                     Video
                   </Button>
                   <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => setFileType("audio")}
                     disabled
@@ -211,11 +214,12 @@ export const Dashboard = () => {
                     Audio
                   </Button>
                   <Button
+                    variant="outline"
                     className="w-full"
                     onClick={() => setFileType("text")}
                   >
                     <TextIcon className="w-4 h-4 mr-1" />
-                    Text
+                    Keywords
                   </Button>
                 </div>
               )}
@@ -237,6 +241,7 @@ export const Dashboard = () => {
               )}
             </DialogContent>
           </Dialog>
+
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {notes.map((note) => (
               <Card key={note.id} className="w-full max-w-md h-auto relative">
