@@ -16,7 +16,7 @@ const apiKey = process.env.Gemini_API;
 const genAI = new GoogleGenerativeAI(apiKey!);
 
 const model = genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash',
+  model: 'gemini-1.5-pro',
 });
 
 const bucketName = 'geminiai-transcript';
@@ -110,29 +110,45 @@ const generationConfig = {
   temperature: 0.7,
   topP: 0.85,
   topK: 50,
-  maxOutputTokens: 50,
+  maxOutputTokens: 512,
   responseMimeType: 'application/json',
 };
 
 // for Extrack KeyWord from Transcript
-const extractKeyword = async (transcript: string) => {
-  const chatSession = model.startChat({
-    generationConfig,
-    history: [],
-  });
 
-  const inputMessage = `
+interface AIresponse {
+  keywords: string[];
+  questions: string[];
+}
+
+const extractKeywordsAndQuestions = async (transcript: string) => {
+  try {
+    const chatSession = model.startChat({
+      generationConfig,
+      history: [],
+    });
+
+    const inputMessage = `
     {
-      "role": "Global Expert in giving best keywords from transcripts of online meetings. Student and employee education depend on you now.",
-      "context": "Extract the most important and relevant keywords from the following transcript. These keywords will be used to find related YouTube videos and other online resources. Please ensure the keywords are specific to the context of the transcript and highly relevant.",
-      "transcript": "${transcript}",
-      "response_format": "json"
-    }
-    `;
+      "role": "Global Expert in extracting information from transcripts",
+      "context": "Process the following transcript to extract the most important and relevant keywords and five small 3 to 5 word questions. Keywords should be used for finding related YouTube videos and other online resources. Questions should be used for discussion with AI and other online resources and in the question not use any special character like inverted comma and other. Ensure both keywords and questions are specific to the context of the transcript and highly relevant.",
+      "transcript": "${transcript.replace(/"/g, '\\"')}",
+      "response_format": "json",
+      "example": { "keywords": ["example keyword"], "questions": ["example question"] }
+    }`;
 
-  const result = await chatSession.sendMessage(inputMessage);
-  const keywords = JSON.parse(result.response.text()) as { keywords: string[] };
-  return keywords.keywords;
+    const result = await chatSession.sendMessage(inputMessage);
+    const responseText = result.response.text();
+    console.log(responseText);
+    const sanitizedResponseText = responseText.replace(/\r?\n|\r/g, '');
+    const extractedData = await JSON.parse(sanitizedResponseText) as AIresponse;
+
+    return extractedData;
+  }
+  catch (error) {
+    console.error('Error in extractKeywordsAndQuestions:', (error as Error).message);
+    throw new Error(`Error in extractKeywordsAndQuestions: ${(error as Error).message}`);
+  }
 };
 
 export async function GET(request: NextRequest) {
@@ -154,11 +170,15 @@ export async function POST(req: NextRequest) {
     const gcsUri = await extractAndUploadAudio(buffer);
     const transcription = await transcribeAudio(gcsUri);
 
-    //Clean up the temporary file
-    //await fsPromises.unlink(tempFilePath);
-
     //extract keywords
-    const keywordsArr = await extractKeyword(transcription);
+    const reliventData = await extractKeywordsAndQuestions(transcription) as AIresponse;
+
+    if (!reliventData) {
+      return NextResponse.json({ error: 'No data found' }, { status: 400 });
+    }
+
+    const keywordsArr = reliventData.keywords;
+    const questionsArr = reliventData.questions;
 
     const supabaseClient = createClient();
 
@@ -171,7 +191,10 @@ export async function POST(req: NextRequest) {
     //now time to insert the transcript and keyword into supabase
     const { error } = await supabaseClient
       .from('transcriptdata')
-      .insert({ uuid: uuid, videoid: video_id, transcript: transcription, keywords: keywordsArr });
+      .insert({
+        uuid: uuid, videoid: video_id, transcript: transcription, keywords: keywordsArr,
+        basic_questions: questionsArr
+      });
 
     if (error) {
       console.log('Occur while trascription is upload in DB: ' + error.details);
@@ -179,6 +202,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ keywordsArr, transcription });
   } catch (error) {
+    console.log('This is Error:', (error as Error).message);
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
   }
 }

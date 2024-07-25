@@ -24,6 +24,7 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { z } from 'zod';
 import { NewNoteSection } from './new-note';
 
+
 const schema = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
 });
@@ -86,6 +87,13 @@ export const Dashboard = () => {
     setIsDrawerOpen(false);
   };
 
+  const handleFeatures = (value: string) => {
+    console.log(value);
+    if (value === 'Discuss with AI') {
+      window.location.href = '/discussion';
+    }
+  }
+
   return (
     <>
       <div className="flex flex-col items-center justify-items-start absolute top-[80px] right-0 rounded-l-md rounded-r-none z-[100] w-fit">
@@ -98,11 +106,9 @@ export const Dashboard = () => {
           transition={{ type: 'spring', stiffness: 100 }}
         >
           <summary
-            className={`left-0 relative p-2 ${
-              isOpen ? 'rounded-l-md' : 'rounded-md'
-            } bg-blue-400 rounded-r-none w-full flex items-center justify-start ${
-              isOpen ? 'justify-start' : 'justify-center'
-            }`}
+            className={`left-0 relative p-2 ${isOpen ? 'rounded-l-md' : 'rounded-md'
+              } bg-blue-400 rounded-r-none w-full flex items-center justify-start ${isOpen ? 'justify-start' : 'justify-center'
+              }`}
           >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
@@ -226,7 +232,7 @@ export const Dashboard = () => {
                       </header>
                       <div className="grid grid-cols-3 gap-4 mr-auto">
                         {['Q&A', 'Discuss with AI', 'Further info'].map((item, index) => (
-                          <Card key={index} className="w-[150px] h-[150px] bg-blue-400">
+                          <Card key={index} onClick={() => handleFeatures(item)} className="w-[150px] h-[150px] bg-blue-400">
                             <CardHeader className="w-full h-full flex items-start justify-start">
                               <CardTitle className={`mt-auto text-center text-sm font-semibold`}>
                                 {item}
