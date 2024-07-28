@@ -17,16 +17,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Tooltip,
@@ -35,14 +25,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { motion } from "framer-motion";
-import {
-  AudioLinesIcon,
-  ImageIcon,
-  TextIcon,
-  Triangle,
-  UploadIcon,
-  VideoIcon,
-} from "lucide-react";
+import { Triangle } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { FaCaretLeft, FaCaretRight, FaTimes } from "react-icons/fa";
@@ -126,15 +109,13 @@ export const Dashboard = () => {
           className="w-full"
           initial={{ width: 30 }}
           animate={{ width: isOpen ? "100%" : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}
-        >
+          transition={{ type: "spring", stiffness: 100 }}>
           <summary
             className={`left-0 relative p-2 ${
               isOpen ? "rounded-l-md" : "rounded-md"
             } bg-blue-400 rounded-r-none w-full flex items-center justify-start ${
               isOpen ? "justify-start" : "justify-center"
-            }`}
-          >
+            }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -158,90 +139,6 @@ export const Dashboard = () => {
           </BreadcrumbList>
         </Breadcrumb>
         <section className="relative border-dashed border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
-          {notes.length === 0 && (
-            <div className="w-full h-[calc(100%-20px)] flex items-center justify-center top-0 left-0">
-              <span className="text-lg font-bold">No notes</span>
-            </div>
-          )}
-          <Dialog
-            onOpenChange={() => {
-              setFileType(undefined);
-            }}
-          >
-            <DialogTrigger asChild>
-              <div className="w-full flex items-center justify-center my-4">
-                <Button className="w-full max-w-sm">
-                  <UploadIcon className="w-4 h-4 mr-1" />
-                  Upload files
-                </Button>
-              </div>
-            </DialogTrigger>
-            <DialogContent className="rounded-2xl sm:rounded-2xl">
-              <DialogHeader>
-                <DialogTitle>Upload files</DialogTitle>
-                <DialogDescription>
-                  Choose which type of content you want to upload.
-                </DialogDescription>
-              </DialogHeader>
-
-              {!fileType && (
-                <div className="grid gap-2">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => setFileType("image")}
-                    disabled
-                  >
-                    <ImageIcon className="w-4 h-4 mr-1" />
-                    Image
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => setFileType("video")}
-                    disabled
-                  >
-                    <VideoIcon className="w-4 h-4 mr-1" />
-                    Video
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => setFileType("audio")}
-                    disabled
-                  >
-                    <AudioLinesIcon className="w-4 h-4 mr-1" />
-                    Audio
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => setFileType("text")}
-                  >
-                    <TextIcon className="w-4 h-4 mr-1" />
-                    Keywords
-                  </Button>
-                </div>
-              )}
-
-              {fileType === "text" && (
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Content</Label>
-                  <Textarea
-                    id="content"
-                    placeholder="Write your content here"
-                  />
-                </div>
-              )}
-
-              {fileType && (
-                <DialogFooter>
-                  <Button type="submit">Save changes</Button>
-                </DialogFooter>
-              )}
-            </DialogContent>
-          </Dialog>
-
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {notes.map((note) => (
               <Card key={note.id} className="w-full max-w-md h-auto relative">
@@ -253,8 +150,7 @@ export const Dashboard = () => {
                     className="absolute top-2 right-2"
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(note.id)}
-                  >
+                    onClick={() => handleDelete(note.id)}>
                     <FaTimes />
                   </Button>
                 </CardHeader>
@@ -262,8 +158,7 @@ export const Dashboard = () => {
                   <CardDescription>
                     <Textarea
                       placeholder="Enter your prompt"
-                      className="w-full max-h-60 overflow-y-auto resize-y mt-2"
-                    >
+                      className="w-full max-h-60 overflow-y-auto resize-y mt-2">
                       {note.content}
                     </Textarea>
                   </CardDescription>
@@ -280,8 +175,7 @@ export const Dashboard = () => {
             className={`
                 flex flex-col items-center justify-center
               `}
-            ref={drawerRef}
-          >
+            ref={drawerRef}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -290,8 +184,7 @@ export const Dashboard = () => {
                     animate={{ opacity: 1 }}
                     transition={{ type: "spring", stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                  >
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
                     <Triangle
                       className={`w-5 h-5 bottom-0 ${
                         isDrawerOpen ? "rotate-180" : ""
@@ -311,8 +204,7 @@ export const Dashboard = () => {
                 !isLaptop
                   ? "w-[700px] h-[400px]"
                   : "w-[1000px] h-[600px] rounded-t-lg"
-              }`}
-            >
+              }`}>
               <menu className="flex justify-start border-b border-gray-200 ml-4">
                 <li>
                   <button
@@ -321,8 +213,7 @@ export const Dashboard = () => {
                         ? "border-b-2 border-blue-500"
                         : ""
                     }`}
-                    onClick={() => setActiveTab("summary")}
-                  >
+                    onClick={() => setActiveTab("summary")}>
                     Summary
                   </button>
                 </li>
@@ -331,8 +222,7 @@ export const Dashboard = () => {
                     className={`px-4 py-2 ${
                       activeTab === "video" ? "border-b-2 border-blue-500" : ""
                     }`}
-                    onClick={() => setActiveTab("video")}
-                  >
+                    onClick={() => setActiveTab("video")}>
                     Video recommendation
                   </button>
                 </li>
@@ -343,13 +233,11 @@ export const Dashboard = () => {
                     <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
 
                     <section
-                      className={`flex flex-col items-center justify-start`}
-                    >
+                      className={`flex flex-col items-center justify-start`}>
                       <header
                         className={`
                             w-full mr-auto
-                          `}
-                      >
+                          `}>
                         <h3 className="text-lg font-bold">Generate</h3>
                       </header>
                       <div className="grid grid-cols-3 gap-4 mr-auto">
@@ -357,12 +245,10 @@ export const Dashboard = () => {
                           (item, index) => (
                             <Card
                               key={index}
-                              className="w-[150px] h-[150px] bg-blue-400"
-                            >
+                              className="w-[150px] h-[150px] bg-blue-400">
                               <CardHeader className="w-full h-full flex items-start justify-start">
                                 <CardTitle
-                                  className={`mt-auto text-center text-sm font-semibold`}
-                                >
+                                  className={`mt-auto text-center text-sm font-semibold`}>
                                   {item}
                                 </CardTitle>
                               </CardHeader>
