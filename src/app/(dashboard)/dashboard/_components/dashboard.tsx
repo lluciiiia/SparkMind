@@ -158,6 +158,37 @@ export const Dashboard = () => {
                 Video recommendation
               </button>
             </li>
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === "qna" ? "border-b-2 border-blue-500" : ""
+                }`}
+                onClick={() => setActiveTab("qna")}>
+                Q&A
+              </button>
+            </li>
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === "further-info"
+                    ? "border-b-2 border-blue-500"
+                    : ""
+                }`}
+                onClick={() => setActiveTab("further-info")}>
+                Further Information
+              </button>
+            </li>
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === "action-items"
+                    ? "border-b-2 border-blue-500"
+                    : ""
+                }`}
+                onClick={() => setActiveTab("action-items")}>
+                Action Items
+              </button>
+            </li>
           </menu>
           <div className="p-4">
             {activeTab === "summary" && (
@@ -168,6 +199,21 @@ export const Dashboard = () => {
             {activeTab === "video" && (
               <div className="h-200">
                 <Card className="w-full h-[200px] bg-red-400 mb-4"></Card>
+              </div>
+            )}
+            {activeTab === "qna" && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-green-400 mb-4"></Card>
+              </div>
+            )}
+            {activeTab === "further-info" && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-purple-400 mb-4"></Card>
+              </div>
+            )}
+            {activeTab === "action-items" && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-black-400 mb-4"></Card>
               </div>
             )}
           </div>
