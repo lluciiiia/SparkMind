@@ -22,24 +22,11 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-import {
-  AudioLinesIcon,
-  ImageIcon,
-  TextIcon,
-  Triangle,
-  UploadIcon,
-  VideoIcon,
-} from "lucide-react";
+import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from "lucide-react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
-import { z } from "zod";
-import { NewNoteSection } from "./new-note";
 import NewInputIcon from "../../../../../public/assets/svgs/new-input-icon";
-
-const schema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-});
 
 interface Note {
   id: string;
@@ -50,9 +37,7 @@ interface Note {
 
 export const NewDashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [notes, setNotes] = useState<Note[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState("summary");
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
 
@@ -84,21 +69,6 @@ export const NewDashboard = () => {
 
   const isLaptop = useMediaQuery("(min-width: 1023px)");
 
-  const handleDelete = (id: string) => {
-    setNotes(notes.filter((note) => note.id !== id));
-  };
-
-  const handleCreate = (values: z.infer<typeof schema>) => {
-    const newNote = {
-      id: Date.now().toString(),
-      title: values.title,
-      content: "",
-      createdAt: new Date(),
-    };
-    setNotes([...notes, newNote]);
-    setIsDrawerOpen(false);
-  };
-
   const [fileType, setFileType] = useState<
     "image" | "video" | "audio" | "text"
   >();
@@ -119,7 +89,7 @@ export const NewDashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <section className="relative border-dashed border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
+        <section className="relative flex items-center justify-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
           <div className="flex items-center justify-center w-full h-full">
             <Dialog
               onOpenChange={() => {
