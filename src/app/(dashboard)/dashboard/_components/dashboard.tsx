@@ -138,7 +138,39 @@ export const Dashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <section className="relative border-dashed border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
+        <section className="relative border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
+          <menu className="flex justify-start border-b border-gray-200 ml-4">
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === "summary" ? "border-b-2 border-blue-500" : ""
+                }`}
+                onClick={() => setActiveTab("summary")}>
+                Summary
+              </button>
+            </li>
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === "video" ? "border-b-2 border-blue-500" : ""
+                }`}
+                onClick={() => setActiveTab("video")}>
+                Video recommendation
+              </button>
+            </li>
+          </menu>
+          <div className="p-4">
+            {activeTab === "summary" && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
+              </div>
+            )}
+            {activeTab === "video" && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-red-400 mb-4"></Card>
+              </div>
+            )}
+          </div>
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {notes.map((note) => (
               <Card key={note.id} className="w-full max-w-md h-auto relative">
@@ -207,64 +239,9 @@ export const Dashboard = () => {
               }`}>
               <menu className="flex justify-start border-b border-gray-200 ml-4">
                 <li>
-                  <button
-                    className={`px-4 py-2 ${
-                      activeTab === "summary"
-                        ? "border-b-2 border-blue-500"
-                        : ""
-                    }`}
-                    onClick={() => setActiveTab("summary")}>
-                    Summary
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className={`px-4 py-2 ${
-                      activeTab === "video" ? "border-b-2 border-blue-500" : ""
-                    }`}
-                    onClick={() => setActiveTab("video")}>
-                    Video recommendation
-                  </button>
+                  <button className={"px-4 py-2"}>Discussion with AI</button>
                 </li>
               </menu>
-              <div className="p-4">
-                {activeTab === "summary" && (
-                  <div className="h-[calc(100vh-56px-64px-20px-24px-56px-48px)] overflow-y-auto">
-                    <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
-
-                    <section
-                      className={`flex flex-col items-center justify-start`}>
-                      <header
-                        className={`
-                            w-full mr-auto
-                          `}>
-                        <h3 className="text-lg font-bold">Generate</h3>
-                      </header>
-                      <div className="grid grid-cols-3 gap-4 mr-auto">
-                        {["Q&A", "Discuss with AI", "Further info"].map(
-                          (item, index) => (
-                            <Card
-                              key={index}
-                              className="w-[150px] h-[150px] bg-blue-400">
-                              <CardHeader className="w-full h-full flex items-start justify-start">
-                                <CardTitle
-                                  className={`mt-auto text-center text-sm font-semibold`}>
-                                  {item}
-                                </CardTitle>
-                              </CardHeader>
-                            </Card>
-                          )
-                        )}
-                      </div>
-                    </section>
-                  </div>
-                )}
-                {activeTab === "video" && (
-                  <div className="h-[calc(100vh-56px-64px-20px-24px-56px-48px)] overflow-y-auto">
-                    <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
-                  </div>
-                )}
-              </div>
             </Card>
           </motion.div>
         </footer>
