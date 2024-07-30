@@ -1,4 +1,4 @@
-import type { ComponentMeta } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 import * as React from 'react';
 import { Hello } from '../component';
 
@@ -7,6 +7,6 @@ import { Hello } from '../component';
 export default {
   title: 'Components/Hello',
   component: Hello,
-} as ComponentMeta<typeof Hello>;
+} as Meta<typeof Hello>;
 
 export const Render = () => <Hello />;
