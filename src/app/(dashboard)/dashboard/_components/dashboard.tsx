@@ -11,18 +11,62 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+<<<<<<< Updated upstream
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+=======
+>>>>>>> Stashed changes
 import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 import { Triangle } from 'lucide-react';
 import Link from 'next/link';
+<<<<<<< Updated upstream
+=======
+import type React from 'react';
+import { useCallback, useEffect } from 'react';
+>>>>>>> Stashed changes
 import { useRef, useState } from 'react';
 import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { z } from 'zod';
 import { NewNoteSection } from './new-note';
+<<<<<<< Updated upstream
+=======
+
+import LoadingIndicator from '@/components/ui/custom/LoadingIndicator';
+//discuss with AI Imports
+import { PlaceholdersAndVanishInput } from '@/components/ui/custom/placeholders-and-vanish-input';
+
+import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
+
+import axios from 'axios';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
+const generationConfig = {
+  temperature: 1,
+  topP: 0.95,
+  topK: 64,
+  maxOutputTokens: 8192,
+  responseMimeType: 'text/plain',
+};
+
+interface Transcript {
+  id: number;
+  text: string;
+}
+
+interface Message {
+  id: number;
+  text: string;
+  sender: 'user' | 'ai';
+}
+
+interface Props {
+  transcript: Transcript[];
+}
+>>>>>>> Stashed changes
 
 const schema = z.object({
   title: z.string().min(1, { message: 'Title is required' }),
@@ -36,6 +80,17 @@ interface Note {
 }
 
 export const Dashboard = () => {
+<<<<<<< Updated upstream
+=======
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY as string;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-1.5-pro',
+  });
+
+>>>>>>> Stashed changes
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -43,6 +98,86 @@ export const Dashboard = () => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
 
+<<<<<<< Updated upstream
+=======
+  const [input, setInput] = useState<string>('');
+  const [responses, setResponses] = useState<Message[]>([]);
+  const [chatSession, setChatSession] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [frequentQue, setfrequentQue] = useState<boolean>(false);
+
+  const [basicQuestion, setBasicQuestion] = useState<[]>([]);
+  const [transcript, setTranscript] = useState<string | undefined>();
+
+  //Todo change video id to dynamic
+  const video_id = 'cfa0784f-d23c-4430-99b6-7851508c5fdf';
+
+  useEffect(() => {
+    const fetchDiscussData = async () => {
+      const response = await axios.get(`/api/v1/getdiscuss?videoid=${video_id}`);
+      if (response.status === 500) {
+        alert('Something Goes Wrong');
+      }
+      console.log('this is response : ' + response.data);
+      setBasicQuestion(response.data.basicQue);
+      setTranscript(response.data.transcript);
+      console.log(response);
+    };
+    fetchDiscussData();
+  }, [video_id]);
+
+  useEffect(() => {
+    const Session = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: 'user',
+          parts: [{ text: transcript! }],
+        },
+      ],
+    });
+
+    setChatSession(Session);
+  }, [transcript]);
+
+  useEffect(() => {
+    if (frequentQue === true) {
+      onSubmit();
+      setfrequentQue(false);
+    }
+  }, [frequentQue]);
+
+  const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const onSubmit = useCallback(async () => {
+    try {
+      if (input.trim()) {
+        setLoading(true);
+        const newMessage: Message = { id: Date.now(), text: input, sender: 'user' };
+        setResponses((prevResponses) => [...prevResponses, newMessage]);
+
+        const question = `Given the previous transcript, Based on the transcript, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
+
+        const chatResponse = await chatSession.sendMessage(question);
+
+        const aiMessage: Message = {
+          id: Date.now(),
+          text: chatResponse.response.text(),
+          sender: 'ai',
+        };
+        setResponses((prevResponses) => [...prevResponses, aiMessage]);
+
+        setLoading(false);
+        setInput('');
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, [input, chatSession]);
+
+>>>>>>> Stashed changes
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
@@ -86,6 +221,11 @@ export const Dashboard = () => {
     setIsDrawerOpen(false);
   };
 
+<<<<<<< Updated upstream
+=======
+  const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text'>();
+
+>>>>>>> Stashed changes
   return (
     <>
       <div className="flex flex-col items-center justify-items-start absolute top-[80px] right-0 rounded-l-md rounded-r-none z-[100] w-fit">
@@ -126,12 +266,95 @@ export const Dashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+<<<<<<< Updated upstream
         <section className="relative border-dashed border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
           {notes.length === 0 && (
             <div className="w-full h-[calc(100%-20px)] flex items-center justify-center top-0 left-0">
               <span className="text-lg font-bold">No notes</span>
             </div>
           )}
+=======
+        <section className="relative border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
+          <menu className="flex justify-start border-b border-gray-200 ml-4">
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === 'summary' ? 'border-b-2 border-blue-500' : ''
+                }`}
+                onClick={() => setActiveTab('summary')}
+              >
+                Summary
+              </button>
+            </li>
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === 'video' ? 'border-b-2 border-blue-500' : ''
+                }`}
+                onClick={() => setActiveTab('video')}
+              >
+                Video recommendation
+              </button>
+            </li>
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === 'qna' ? 'border-b-2 border-blue-500' : ''
+                }`}
+                onClick={() => setActiveTab('qna')}
+              >
+                Q&A
+              </button>
+            </li>
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === 'further-info' ? 'border-b-2 border-blue-500' : ''
+                }`}
+                onClick={() => setActiveTab('further-info')}
+              >
+                Further Information
+              </button>
+            </li>
+            <li>
+              <button
+                className={`px-4 py-2 cursor-pointer ${
+                  activeTab === 'action-items' ? 'border-b-2 border-blue-500' : ''
+                }`}
+                onClick={() => setActiveTab('action-items')}
+              >
+                Action Items
+              </button>
+            </li>
+          </menu>
+          <div className="p-4">
+            {activeTab === 'summary' && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
+              </div>
+            )}
+            {activeTab === 'video' && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-red-400 mb-4"></Card>
+              </div>
+            )}
+            {activeTab === 'qna' && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-green-400 mb-4"></Card>
+              </div>
+            )}
+            {activeTab === 'further-info' && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-purple-400 mb-4"></Card>
+              </div>
+            )}
+            {activeTab === 'action-items' && (
+              <div className="h-200">
+                <Card className="w-full h-[200px] bg-black-400 mb-4"></Card>
+              </div>
+            )}
+          </div>
+>>>>>>> Stashed changes
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {notes.map((note) => (
               <Card key={note.id} className="w-full max-w-md h-auto relative">
@@ -191,6 +414,7 @@ export const Dashboard = () => {
             </TooltipProvider>
 
             <Card
+<<<<<<< Updated upstream
               className={` bottom-0 left-0 right-0  shadow-lg mx-auto ${!isLaptop ? 'w-[700px] h-[400px]' : 'w-[1000px] h-[600px] rounded-t-lg'}`}
             >
               <menu className="flex justify-start border-b border-gray-200 ml-4">
@@ -241,6 +465,69 @@ export const Dashboard = () => {
                 {activeTab === 'video' && (
                   <div className="h-[calc(100vh-56px-64px-20px-24px-56px-48px)] overflow-y-auto">
                     <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
+=======
+              className={`bottom-0 left-0 right-0  shadow-lg mx-auto ${
+                !isLaptop ? 'w-[700px] h-[400px]' : 'w-[1000px] h-[600px] rounded-t-lg'
+              }`}
+            >
+              <menu className="flex justify-start border-b border-gray-200 ml-4">
+                <li>
+                  <button className={'px-4 py-2'}>Discussion with Gemini AI</button>
+                </li>
+              </menu>
+              <div className="h-full w-full flex flex-col items-center">
+                <div className="flex flex-col mt-3 mb-4  w-full max-w-4xl px-4 h-4/5 overflow-y-scroll no-scrollbar">
+                  {responses.map((response, index) =>
+                    response.sender === 'user' ? (
+                      <div className="mb-4 flex justify-end">
+                        <div className={'p-2 rounded bg-blue-500 inline-block'}>
+                          {response.text}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mb-4 flex justify-start" key={index}>
+                        <div
+                          className={
+                            'p-2 text-black dark:text-white rounded bg-[#e6e6e6] dark:bg-gray-700 inline-block'
+                          }
+                        >
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{response.text}</ReactMarkdown>
+                        </div>
+                      </div>
+                    ),
+                  )}
+                  {loading === true ? (
+                    <div className="mb-4 flex justify-start">
+                      <div className={'p-2 rounded bg-gray-700 inline-block'}>
+                        <LoadingIndicator />
+                      </div>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+                <div className="sticky bottom-0 h-2/5 w-full max-w-4xl bg-[#e6e6e6] dark:bg-[#1e293b] p-4 flex flex-col items-center rounded-t-lg">
+                  <div className="flex flex-row overflow-x-auto no-scrollbar">
+                    {basicQuestion.map((que, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setInput(que);
+                          setfrequentQue(true);
+                        }}
+                        className="bg-gray-600 mx-4 rounded-lg p-2 flex-shrink-0"
+                      >
+                        {que}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="mt-4 w-3/5">
+                    <PlaceholdersAndVanishInput
+                      placeholders={[]}
+                      onChange={handleDiscussInputChange}
+                      onSubmit={onSubmit}
+                    />
+>>>>>>> Stashed changes
                   </div>
                 )}
               </div>
