@@ -1,4 +1,6 @@
 import type { Preview } from '@storybook/react';
+import { setProjectAnnotations } from '@storybook/react'
+import config from './main.ts'
 
 const preview: Preview = {
   parameters: {
@@ -10,5 +12,7 @@ const preview: Preview = {
     },
   },
 };
+
+setProjectAnnotations(config as any)
 
 export default preview;
