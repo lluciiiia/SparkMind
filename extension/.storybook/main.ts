@@ -19,5 +19,18 @@ const config: StorybookConfig = {
   docs: {
     autodocs: true,
   },
+  viteFinal: (config) => {
+    config.optimizeDeps = {
+      ...config.optimizeDeps,
+      exclude: ['webextension-polyfill'],
+    };
+    if (config.resolve) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'webextension-polyfill': require.resolve('../src/__mocks__/webextension-polyfill.ts'),
+      };
+    }
+    return config;
+  },
 };
 export default config;
