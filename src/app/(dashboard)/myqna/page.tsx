@@ -8,12 +8,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { MyLearning, RecentLearnings } from "./_components";
-import Wireframe from "../myqna/_components/Wireframe";
+import Wireframe from "./_components/Wireframe";
 
-const MyResourcesPage = () => {
+const MyQnAPage = () => {
   return (
-    <ContentLayout title="My Resources">
+    <ContentLayout title="Q&A">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -29,14 +28,13 @@ const MyResourcesPage = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>My Resources</BreadcrumbPage>
+            <BreadcrumbPage>My Q&A</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <RecentLearnings />
-      <MyLearning />
+      <Wireframe />
     </ContentLayout>
   );
 };
 
-export default MyResourcesPage;
+export default MyQnAPage;
