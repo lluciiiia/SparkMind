@@ -9,11 +9,13 @@ type Props = {};
 function QuizGenerator({}: Props) {
   const [query, setQuery] = useState("");
   const [quizData, setQuizData] = useState<any>([]);
+  const [quizTitle, setQuizTitle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const createQuiz = async (query: string) => {
     setIsLoading(true);
     setQuery("");
+    setQuizTitle("");
 
     buildQuiz(query)
       .then((quiz) => {
@@ -23,6 +25,7 @@ function QuizGenerator({}: Props) {
       })
       .finally(() => {
         setIsLoading(false);
+        setQuizTitle(`${query} Quiz`);
       });
   };
   const resetQuiz = () => {
@@ -37,13 +40,18 @@ function QuizGenerator({}: Props) {
   return (
     <div>
       {quizData.length > 0 && (
-        <div className="flex justify-end items-center my-4">
-          <button
-            onClick={resetQuiz}
-            className="px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:bg-red-600 transition duration-300"
-          >
-            Reset Quiz
-          </button>
+        <div className="flex justify-between items-center my-4">
+          <div className="flex-grow text-center">
+            <h1 className="text-2xl font-bold">{quizTitle}</h1>
+          </div>
+          <div className="ml-auto">
+            <button
+              onClick={resetQuiz}
+              className="px-4 py-2 bg-red-500 text-white rounded-md shadow-md hover:bg-red-600 transition duration-300"
+            >
+              Reset Quiz
+            </button>
+          </div>
         </div>
       )}
       {quizData.length == 0 && !isLoading && (
