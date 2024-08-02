@@ -81,8 +81,6 @@ async function fetchQuizData(query: string) {
   const response = result.response;
   const text = await response.text();
 
-  console.log("Fetched data:", text);
-
   // Parse the plain text into an array of objects
   const parsedData = parseQuizText(text);
 
