@@ -10,6 +10,7 @@ export default function Wireframe({ quiz }: Props) {
     <div className="items-center justify-center h-[80%] overflow-y-scroll">
       {quiz.map((item, index) => (
         <Cards
+          number={index}
           key={item.id || index}
           question={item.question}
           options={item.options}
