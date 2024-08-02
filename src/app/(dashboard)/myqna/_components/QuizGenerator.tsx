@@ -18,7 +18,6 @@ function QuizGenerator({}: Props) {
     buildQuiz(query)
       .then((quiz) => {
         if (quiz) {
-          console.log("Quiz data:", quiz);
           setQuizData(quiz);
         }
       })

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 interface Props {
   question: string;
@@ -18,10 +18,6 @@ const Cards: React.FC<Props> = ({
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [correctOptions, setCorrectOptions] = useState<Set<number>>(new Set());
-  const [incorrectOptions, setIncorrectOptions] = useState<Set<number>>(
-    new Set(),
-  );
 
   const handleOptionClick = (index: number) => {
     if (multipleAnswers) {
@@ -46,10 +42,8 @@ const Cards: React.FC<Props> = ({
 
     if (isCorrect) {
       toast.success("Correct!");
-      setCorrectOptions(new Set(selectedOptions));
     } else {
       toast.error("Incorrect, try again.");
-      setIncorrectOptions(new Set(selectedOptions));
     }
 
     setIsAnswered(true);
