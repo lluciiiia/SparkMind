@@ -1,13 +1,14 @@
 import React from "react";
 import Cards from "./Cards";
-import { data } from "./mockData.js";
 
-type Props = {};
+type Props = {
+  quiz: any[];
+};
 
-export default function Wireframe({}: Props) {
+export default function Wireframe({ quiz }: Props) {
   return (
     <div className="items-center justify-center h-[80%] overflow-y-scroll">
-      {data.map((item, index) => (
+      {quiz.map((item, index) => (
         <Cards
           key={item.id || index}
           question={item.question}
