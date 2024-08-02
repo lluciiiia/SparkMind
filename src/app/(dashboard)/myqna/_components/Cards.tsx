@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 interface Props {
   question: string;
+  number: number;
   options: string[];
   answer: string[];
   multipleAnswers: boolean;
@@ -14,6 +15,7 @@ const Cards: React.FC<Props> = ({
   options,
   answer,
   multipleAnswers,
+  number,
 }) => {
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -61,7 +63,7 @@ const Cards: React.FC<Props> = ({
         }`}
         onClick={toggleCard}
       >
-        <div>Q: </div>
+        <div>Q{number + 1}: </div>
         <div className="ml-2">{question}</div>
         <div
           className={`ml-auto transition-transform duration-300 ${
