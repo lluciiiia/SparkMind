@@ -1,8 +1,3 @@
 interface Json {
-  metadata: {
-    [key: string]: string | number | boolean | null
-  }
-  data: {
-    [key: string]: string | number | boolean | null
-  }
+  [key: string]: string | number | boolean | null | Json
 }
