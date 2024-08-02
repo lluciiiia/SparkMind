@@ -52,17 +52,21 @@ function QuizGenerator({}: Props) {
             <h1 className="text-2xl font-bold mb-4 text-center">
               Quiz Generator
             </h1>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <form onSubmit={handleSubmit} className="flex flex-col gap-1">
               <input
                 type="text"
                 value={query}
+                maxLength={25}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Enter a topic"
+                placeholder="Enter a Topic"
                 className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
+              <div className=" flex justify-end bottom-2 right-2 text-gray-600 text-xs">
+                {`${query.length}/${25} characters`}
+              </div>
               <button
                 type="submit"
-                className="bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 transition"
+                className="bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 transition mt-2"
               >
                 Generate Quiz
               </button>
