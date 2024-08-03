@@ -28,29 +28,24 @@ import { useRef, useState } from "react";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
 import NewInputIcon from "../../../../../public/assets/svgs/new-input-icon";
 
-import { appRouter } from "../../../../../src/server/api/root";
-
+import { getYoutubeResponse } from "./api-handler";
 //Circle Loading Style
 import "@/styles/css/Circle-loader.css";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export const NewDashboard = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
   const [keywords, setKeywords] = useState("");
   const [content, setContent] = useState("");
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
-  // const [keywords, setKeywords] = useState<[]>([]);
-  // const [fetchedTranscript, setFetchedTranscript] = useState('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  // const [videos, setVideos] = useState<VideoItem[]>([]);
-  const [query, setQuery] = useState<string>("");
-  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  let youtubeResponse;
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -147,20 +142,13 @@ export const NewDashboard = () => {
 
   const handleUpload = async (input: any) => {
     try {
-      const formData = new FormData();
-      formData.append("text", input);
+      // const formData = new FormData();
+      // formData.append("text", input);
 
-      const params: { query: string; pageToken?: string | null } = {
-        query: input,
-      };
-      // if (nextPageToken) {
-      //   params.pageToken = nextPageToken;
-      // }
+      youtubeResponse = await getYoutubeResponse(input);
+      console.log("youtubeResponse", youtubeResponse);
 
-      const response = await axios.get("/api/v1/youtube", { params });
-
-      // const data = await response.json();
-      console.log("API Response:", response);
+      router.push(`/dashboard`);
     } catch (err: any) {
       console.error(err);
     }
@@ -177,8 +165,9 @@ export const NewDashboard = () => {
     }
     console.log("input: ", input);
     await handleUpload(input);
-    setContent("");
-    setKeywords("");
+
+    // TODO: redirect the user to /api/v1/dashboard with youtubeResponse & summaryResponse data
+    // router.push("/api/v1/dashboard");
   };
 
   return (
