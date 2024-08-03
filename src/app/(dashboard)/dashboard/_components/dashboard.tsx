@@ -48,6 +48,7 @@ import { useSearchParams } from "next/navigation";
 //discuss with AI Imports
 import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
 import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
+import DiscussionWithAI from "./discussion-with-ai";
 
 import {
   GoogleGenerativeAI,
@@ -91,7 +92,7 @@ export const Dashboard = () => {
   const [responses, setResponses] = useState<Message[]>([]);
   const [chatSession, setChatSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [frequentQue, setfrequentQue] = useState<boolean>(false);
+  const [frequentQue, setFrequentQue] = useState<boolean>(false);
 
   const [basicQuestion, setBasicQuestion] = useState<[]>([]);
   const [transcript, setTranscript] = useState<string | undefined>();
@@ -151,7 +152,7 @@ export const Dashboard = () => {
   useEffect(() => {
     if (frequentQue === true) {
       onSubmit();
-      setfrequentQue(false);
+      setFrequentQue(false);
     }
   }, [frequentQue]);
 
@@ -404,75 +405,17 @@ export const Dashboard = () => {
             </TooltipProvider>
 
             {/* Discuss with AI */}
-            <Card
-              className={`bottom-0 left-0 right-0  shadow-lg mx-auto ${
-                !isLaptop
-                  ? "w-[700px] h-[400px]"
-                  : "w-[1000px] h-[600px] rounded-t-lg"
-              }`}>
-              <menu className="flex justify-start border-b border-gray-200 ml-4">
-                <li>
-                  <button className={"px-4 py-2"}>
-                    Discussion with Gemini AI
-                  </button>
-                </li>
-              </menu>
-              <div className="h-full w-full flex flex-col items-center">
-                <div className="flex flex-col mt-3 mb-4  w-full max-w-4xl px-4 h-4/5 overflow-y-scroll no-scrollbar">
-                  {responses.map((response, index) =>
-                    response.sender === "user" ? (
-                      <div className="mb-4 flex justify-end">
-                        <div className={"p-2 rounded bg-blue-500 inline-block"}>
-                          {response.text}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="mb-4 flex justify-start" key={index}>
-                        <div
-                          className={
-                            "p-2 text-black dark:text-white rounded bg-[#e6e6e6] dark:bg-gray-700 inline-block"
-                          }>
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {response.text}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                    )
-                  )}
-                  {loading === true ? (
-                    <div className="mb-4 flex justify-start">
-                      <div className={"p-2 rounded bg-gray-700 inline-block"}>
-                        <LoadingIndicator />
-                      </div>
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-                <div className="sticky bottom-0 h-2/5 w-full max-w-4xl bg-[#e6e6e6] dark:bg-[#1e293b] p-4 flex flex-col items-center rounded-t-lg">
-                  <div className="flex flex-row overflow-x-auto no-scrollbar">
-                    {basicQuestion.map((que, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          setInput(que);
-                          setfrequentQue(true);
-                        }}
-                        className="bg-gray-600 mx-4 rounded-lg p-2 flex-shrink-0">
-                        {que}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-4 w-3/5">
-                    <PlaceholdersAndVanishInput
-                      placeholders={[]}
-                      onChange={handleDiscussInputChange}
-                      onSubmit={onSubmit}
-                    />
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <DiscussionWithAI
+              responses={responses}
+              loading={loading}
+              basicQuestion={basicQuestion}
+              input={input}
+              setInput={setInput}
+              frequentQue={frequentQue}
+              setFrequentQue={setFrequentQue}
+              onSubmit={onSubmit}
+              handleDiscussInputChange={handleDiscussInputChange}
+            />
           </motion.div>
         </footer>
       </ContentLayout>
