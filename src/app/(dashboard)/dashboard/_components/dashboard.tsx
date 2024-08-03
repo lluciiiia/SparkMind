@@ -49,6 +49,7 @@ import { useSearchParams } from "next/navigation";
 import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
 import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
 import DiscussionWithAI from "./discussion-with-ai";
+import NoteCard from "./note";
 import VideoCard from "./cards/video-recommendation";
 
 import {
@@ -317,29 +318,7 @@ export const Dashboard = () => {
 
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {notes.map((note) => (
-              <Card key={note.id} className="w-full max-w-md h-auto relative">
-                <CardHeader className="w-full flex flex-col items-center justify-start relative">
-                  <CardTitle className="text-lg font-bold left-0 mr-auto">
-                    {note.title}
-                  </CardTitle>
-                  <Button
-                    className="absolute top-2 right-2"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(note.id)}>
-                    <FaTimes />
-                  </Button>
-                </CardHeader>
-                <CardContent className="h-auto overflow-y-auto">
-                  <CardDescription>
-                    <Textarea
-                      placeholder="Enter your prompt"
-                      className="w-full max-h-60 overflow-y-auto resize-y mt-2">
-                      {note.content}
-                    </Textarea>
-                  </CardDescription>
-                </CardContent>
-              </Card>
+              <NoteCard key={note.id} note={note} onDelete={handleDelete} />
             ))}
           </section>
         </section>
