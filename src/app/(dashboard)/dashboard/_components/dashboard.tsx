@@ -34,7 +34,16 @@ import { PiNoteBlankFill } from "react-icons/pi";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
 import { z } from "zod";
 import { NewNoteSection } from "./new-note";
-import { Transcript, Message, Props, Note } from "./interfaces";
+import {
+  Transcript,
+  Message,
+  Props,
+  Note,
+  VideoItem,
+  VideoResponse,
+} from "./interfaces";
+import { retrieveData } from "../../new/_components/hash-handler";
+import { useSearchParams } from "next/navigation";
 
 //discuss with AI Imports
 import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
@@ -89,6 +98,25 @@ export const Dashboard = () => {
 
   //Todo change video id to dynamic
   const video_id = "cfa0784f-d23c-4430-99b6-7851508c5fdf";
+
+  const searchParams = useSearchParams();
+  const [videos, setVideos] = useState<VideoItem[] | null>(null);
+  const [summaryData, setSummaryData] = useState(null);
+
+  useEffect(() => {
+    const youtubeHash = searchParams.get("youtubeHash");
+    const summaryHash = searchParams.get("summaryHash");
+
+    if (youtubeHash) {
+      const data = retrieveData(youtubeHash) as VideoResponse;
+      setVideos(data.data.body);
+    }
+
+    if (summaryHash) {
+      const data = retrieveData(summaryHash);
+      setSummaryData(data as any);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
@@ -275,7 +303,41 @@ export const Dashboard = () => {
               ({ tab, color }) =>
                 activeTab === tab && (
                   <div className="h-200" key={tab}>
-                    <Card className={`w-full h-[200px] ${color} mb-4`} />
+                    {activeTab === tab && tab === "video" ? (
+                      <Card className={`w-full h-200 ${color} mb-4`}>
+                        {/* Render video content if the tab is "video" */}
+                        <div>
+                          {Array.isArray(videos) && videos.length > 0 ? (
+                            videos.map((video) => (
+                              <div
+                                key={video.id.videoId}
+                                className="my-4 flex flex-row items-center mr-8">
+                                <div className="flex flex-col">
+                                  <h3 className="break-words max-w-lg">
+                                    Title: {video.snippet.title}
+                                  </h3>
+                                  <p className="break-words max-w-lg mt-4">
+                                    Description: {video.snippet.description}
+                                  </p>
+                                </div>
+                                <iframe
+                                  width="250"
+                                  height="160"
+                                  src={`https://www.youtube.com/embed/${video.id.videoId}`}
+                                  frameBorder="0"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="my-4"></iframe>
+                              </div>
+                            ))
+                          ) : (
+                            <p>No videos found</p>
+                          )}
+                        </div>
+                      </Card>
+                    ) : (
+                      <Card className={`w-full h-[200px] ${color} mb-4`} />
+                    )}
                   </div>
                 )
             )}
