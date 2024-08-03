@@ -33,6 +33,7 @@ import { getYoutubeResponse } from "./api-handler";
 import "@/styles/css/Circle-loader.css";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { generateHash, storeData } from "./hash-handler";
 
 export const NewDashboard = () => {
   const router = useRouter();
@@ -148,7 +149,13 @@ export const NewDashboard = () => {
       youtubeResponse = await getYoutubeResponse(input);
       console.log("youtubeResponse", youtubeResponse);
 
-      router.push(`/dashboard`);
+      const youtubeHash = generateHash(JSON.stringify(youtubeResponse));
+
+      // Store data in local storage
+      storeData(youtubeResponse);
+      // storeData(summaryResponse);
+
+      router.push(`/dashboard?youtubeHash=${youtubeHash}`);
     } catch (err: any) {
       console.error(err);
     }
@@ -165,9 +172,6 @@ export const NewDashboard = () => {
     }
     console.log("input: ", input);
     await handleUpload(input);
-
-    // TODO: redirect the user to /api/v1/dashboard with youtubeResponse & summaryResponse data
-    // router.push("/api/v1/dashboard");
   };
 
   return (

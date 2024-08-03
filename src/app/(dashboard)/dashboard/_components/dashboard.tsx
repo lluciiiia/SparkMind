@@ -35,6 +35,8 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
 import { z } from "zod";
 import { NewNoteSection } from "./new-note";
 import { Transcript, Message, Props, Note } from "./interfaces";
+import { retrieveData } from "../../new/_components/hash-handler";
+import { useSearchParams } from "next/navigation";
 
 //discuss with AI Imports
 import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
@@ -89,6 +91,26 @@ export const Dashboard = () => {
 
   //Todo change video id to dynamic
   const video_id = "cfa0784f-d23c-4430-99b6-7851508c5fdf";
+
+  const searchParams = useSearchParams();
+  const [youtubeData, setYoutubeData] = useState(null);
+  const [summaryData, setSummaryData] = useState(null);
+
+  useEffect(() => {
+    const youtubeHash = searchParams.get("youtubeHash");
+    const summaryHash = searchParams.get("summaryHash");
+
+    if (youtubeHash) {
+      const data = retrieveData(youtubeHash);
+      setYoutubeData(data as any);
+      console.log("youtubeHash", data);
+    }
+
+    if (summaryHash) {
+      const data = retrieveData(summaryHash);
+      setSummaryData(data as any);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
