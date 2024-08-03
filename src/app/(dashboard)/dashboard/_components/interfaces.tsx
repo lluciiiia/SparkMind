@@ -33,3 +33,8 @@ export interface VideoResponse {
     body: VideoItem[];
   };
 }
+
+export interface VideoCardProps {
+  videos: VideoItem[] | null;
+  color: string;
+}
