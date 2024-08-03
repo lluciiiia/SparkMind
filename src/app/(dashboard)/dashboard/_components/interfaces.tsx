@@ -19,3 +19,17 @@ export interface Note {
   content: string;
   createdAt: Date;
 }
+
+export interface VideoItem {
+  id: { videoId: string };
+  snippet: {
+    title: string;
+    description: string;
+  };
+}
+
+export interface VideoResponse {
+  data: {
+    body: VideoItem[];
+  };
+}
