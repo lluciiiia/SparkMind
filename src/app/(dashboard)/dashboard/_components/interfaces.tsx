@@ -38,3 +38,12 @@ export interface VideoCardProps {
   videos: VideoItem[] | null;
   color: string;
 }
+
+export interface NoteCardProps {
+  note: {
+    id: string;
+    title: string;
+    content: string;
+  };
+  onDelete: (id: string) => void;
+}
