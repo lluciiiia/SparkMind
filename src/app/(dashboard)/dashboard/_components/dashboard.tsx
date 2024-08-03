@@ -96,7 +96,7 @@ export const Dashboard = () => {
         `/api/v1/getdiscuss?videoid=${video_id}`
       );
       if (response.status === 500) {
-        alert("Something Goes Wrong");
+        alert("Something Went Wrong");
       }
       console.log("this is response : " + response.data);
       setBasicQuestion(response.data.basicQue);
@@ -203,10 +203,6 @@ export const Dashboard = () => {
     setNotes([...notes, newNote]);
     setIsDrawerOpen(false);
   };
-
-  const [fileType, setFileType] = useState<
-    "image" | "video" | "audio" | "text"
-  >();
 
   const tabs = [
     { name: "summary", label: "Summary" },
