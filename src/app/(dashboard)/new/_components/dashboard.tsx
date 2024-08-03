@@ -28,8 +28,11 @@ import { useRef, useState } from "react";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
 import NewInputIcon from "../../../../../public/assets/svgs/new-input-icon";
 
+import { appRouter } from "../../../../../src/server/api/root";
+
 //Circle Loading Style
 import "@/styles/css/Circle-loader.css";
+import axios from "axios";
 
 export const NewDashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,6 +47,10 @@ export const NewDashboard = () => {
   // const [keywords, setKeywords] = useState<[]>([]);
   // const [fetchedTranscript, setFetchedTranscript] = useState('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  // const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [query, setQuery] = useState<string>("");
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -143,12 +150,17 @@ export const NewDashboard = () => {
       const formData = new FormData();
       formData.append("text", input);
 
-      // const res = await fetch("/api/v1/trpc", {
-      //   method: "POST",
-      //   body: formData,
-      // });
+      const params: { query: string; pageToken?: string | null } = {
+        query: input,
+      };
+      // if (nextPageToken) {
+      //   params.pageToken = nextPageToken;
+      // }
 
-      // if (!res.ok) throw new Error(await res.text());
+      const response = await axios.get("/api/v1/youtube", { params });
+
+      // const data = await response.json();
+      console.log("API Response:", response);
     } catch (err: any) {
       console.error(err);
     }
