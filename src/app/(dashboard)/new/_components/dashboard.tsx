@@ -28,28 +28,25 @@ import { useRef, useState } from "react";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
 import NewInputIcon from "../../../../../public/assets/svgs/new-input-icon";
 
+import { getYoutubeResponse } from "./api-handler";
 //Circle Loading Style
-import '@/styles/css/Circle-loader.css';
-
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: Date;
-}
+import "@/styles/css/Circle-loader.css";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { generateHash, storeData } from "./hash-handler";
 
 export const NewDashboard = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
-
+  const [keywords, setKeywords] = useState("");
+  const [content, setContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
-  // const [keywords, setKeywords] = useState<[]>([]);
-  // const [fetchedTranscript, setFetchedTranscript] = useState('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  let youtubeResponse;
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -77,13 +74,23 @@ export const NewDashboard = () => {
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
+  const handleContentChange = (event: any) => {
+    setContent(event.target.value);
+  };
+
+  const handleKeywordsChange = (event: any) => {
+    setKeywords(event.target.value);
+  };
+
   const isLaptop = useMediaQuery("(min-width: 1023px)");
 
   const [fileType, setFileType] = useState<
-    "image" | "video" | "audio" | "text"
+    "image" | "video" | "audio" | "text" | "keywords"
   >();
 
-  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const pathURL = URL.createObjectURL(file);
@@ -100,10 +107,10 @@ export const NewDashboard = () => {
 
     try {
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append("file", selectedFile);
 
-      const res = await fetch('/api/v1/extract-transcribe', {
-        method: 'POST',
+      const res = await fetch("/api/v1/extract-transcribe", {
+        method: "POST",
         body: formData,
       });
 
@@ -126,6 +133,7 @@ export const NewDashboard = () => {
       setObjectURL(null);
       setFileType(undefined);
 
+      return data;
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -133,11 +141,38 @@ export const NewDashboard = () => {
     }
   };
 
-  const submitChanges = () => {
-    if (fileType === 'video') {
-      handleVideoUpload();
+  const handleUpload = async (input: any) => {
+    try {
+      // const formData = new FormData();
+      // formData.append("text", input);
+
+      youtubeResponse = await getYoutubeResponse(input);
+      console.log("youtubeResponse", youtubeResponse);
+
+      const youtubeHash = generateHash(JSON.stringify(youtubeResponse));
+
+      // Store data in local storage
+      storeData(youtubeResponse);
+      // storeData(summaryResponse);
+
+      router.push(`/dashboard?youtubeHash=${youtubeHash}`);
+    } catch (err: any) {
+      console.error(err);
     }
-  }
+  };
+
+  const submitChanges = async () => {
+    let input;
+    if (fileType === "video") {
+      input = await handleVideoUpload();
+    } else if (fileType == "text") {
+      input = content;
+    } else if (fileType == "keywords") {
+      input = keywords;
+    }
+    console.log("input: ", input);
+    await handleUpload(input);
+  };
 
   return (
     <>
@@ -172,7 +207,6 @@ export const NewDashboard = () => {
                 </div>
               </DialogTrigger>
               <DialogContent className="rounded-2xl sm:rounded-2xl">
-
                 {!fileType && (
                   <>
                     <DialogHeader>
@@ -182,38 +216,43 @@ export const NewDashboard = () => {
                       </DialogDescription>
                     </DialogHeader>
 
-
                     <div className="grid gap-2">
-                      <Button
+                      {/* <Button
                         variant="outline"
                         className="w-full"
                         onClick={() => setFileType("image")}
                         disabled>
                         <ImageIcon className="w-4 h-4 mr-1" />
                         Image
-                      </Button>
+                      </Button> */}
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("video")}
-                      >
+                        onClick={() => setFileType("video")}>
                         <VideoIcon className="w-4 h-4 mr-1" />
                         Video
                       </Button>
-                      <Button
+                      {/* <Button
                         variant="outline"
                         className="w-full"
                         onClick={() => setFileType("audio")}
                         disabled>
                         <AudioLinesIcon className="w-4 h-4 mr-1" />
                         Audio
+                      </Button> */}
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        onClick={() => setFileType("keywords")}>
+                        <TextIcon className="w-4 h-4 mr-1" />
+                        Keywords / Topic
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full"
                         onClick={() => setFileType("text")}>
                         <TextIcon className="w-4 h-4 mr-1" />
-                        Keywords
+                        Text
                       </Button>
                     </div>
                   </>
@@ -221,15 +260,29 @@ export const NewDashboard = () => {
 
                 {fileType === "text" && (
                   <div className="grid gap-2">
-                    <Label htmlFor="name">Content</Label>
+                    <Label htmlFor="content">Content</Label>
                     <Textarea
                       id="content"
                       placeholder="Write your content here"
+                      value={content}
+                      onChange={handleContentChange}
                     />
                   </div>
                 )}
 
-                {fileType === 'video' && (
+                {fileType === "keywords" && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="keywords">Keywords / Topic</Label>
+                    <Textarea
+                      id="keywords"
+                      placeholder="Write your keywords / topic here"
+                      value={keywords}
+                      onChange={handleKeywordsChange}
+                    />
+                  </div>
+                )}
+
+                {fileType === "video" && (
                   <>
                     <DialogTitle>Choose Video File</DialogTitle>
                     <input
@@ -242,7 +295,7 @@ export const NewDashboard = () => {
                   </>
                 )}
 
-                {fileType === 'video' && objectURL && (
+                {fileType === "video" && objectURL && (
                   <div className="grid gap-2">
                     <Label htmlFor="name">Preview</Label>
                     <div>
@@ -259,18 +312,20 @@ export const NewDashboard = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
-                        {isLoading ? 'Uploading ...' : 'Upload'}
+                      <Button
+                        type="submit"
+                        onClick={submitChanges}
+                        disabled={isLoading}>
+                        {isLoading ? "Uploading ..." : "Upload"}
                       </Button>
                     </DialogFooter>
                   </div>
                 )}
-
               </DialogContent>
             </Dialog>
           </div>
         </section>
-      </ContentLayout >
+      </ContentLayout>
     </>
   );
 };
