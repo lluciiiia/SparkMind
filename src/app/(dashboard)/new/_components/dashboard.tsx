@@ -120,7 +120,7 @@ export const NewDashboard = () => {
       const data = (await res.json()) as any;
       console.log(data);
 
-      //right now not usefull to display the transcript
+      // right now not usefull to display the transcript
       // setFetchedTranscript(data.transcription);
       // setKeywords(data.keywordsArr);
 
@@ -133,7 +133,7 @@ export const NewDashboard = () => {
       setObjectURL(null);
       setFileType(undefined);
 
-      return data;
+      return data.keywordsArr;
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -164,7 +164,8 @@ export const NewDashboard = () => {
   const submitChanges = async () => {
     let input;
     if (fileType === "video") {
-      input = await handleVideoUpload();
+      let keyWordsArray = await handleVideoUpload();
+      input = keyWordsArray.toString();
     } else if (fileType == "text") {
       input = content;
     } else if (fileType == "keywords") {
@@ -307,7 +308,7 @@ export const NewDashboard = () => {
                     </div>
                     {isLoading && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                        <div className="loader"></div>
+                        <div className="Circleloader"></div>
                       </div>
                     )}
                   </div>

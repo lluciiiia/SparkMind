@@ -2,7 +2,7 @@ import path from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GoogleAIFileManager } from '@google/generative-ai/files';
 
-const API_KEY = (process.env.Gemini_API as string) || '';
+const API_KEY = (process.env.GOOGLE_AI_API_KEY as string) || '';
 const genAI = new GoogleGenerativeAI(API_KEY);
 const fileManager = new GoogleAIFileManager(API_KEY);
 
@@ -45,7 +45,7 @@ const generationConfig: {
 } = {
   temperature: 0.1,
   topP: 0.95,
-  topK: 64,
+  topK: 1000,
   maxOutputTokens: 1048576,
   responseMimeType: 'text/plain',
 };
