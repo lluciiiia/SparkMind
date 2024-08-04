@@ -4,22 +4,19 @@ import { promises as fsPromises } from 'fs';
 import path from 'path';
 import { type NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
+import {
+  API_KEY,
+  genAI,
+  model,
+  // generationConfig,
+  safetySettings,
+} from "@/app/api/v1/gemini-settings";
 
 //supabse
 import { createClient } from '@/utils/supabase/server';
 import { SpeechClient } from '@google-cloud/speech';
 //Google Cloude imports
 import { Storage } from '@google-cloud/storage';
-
-//Gemini ai imports
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
-
-const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY;
-const genAI = new GoogleGenerativeAI(apiKey!);
-
-const model = genAI.getGenerativeModel({
-  model: 'gemini-1.5-flash',
-});
 
 const bucketName = 'geminiai-transcript'; // Replace with your bucket name
 
@@ -110,13 +107,6 @@ const transcribeAudio = async (gcsUri: string): Promise<string> => {
   return transcription;
 };
 
-const generationConfig = {
-  temperature: 0.7,
-  topP: 0.85,
-  topK: 50,
-  maxOutputTokens: 1048576,
-  responseMimeType: 'application/json',
-};
 
 interface AIresponse {
   keywords: string[];
@@ -125,10 +115,22 @@ interface AIresponse {
 
 // for Extrack KeyWord from Transcript
 const extractKeywordsAndQuestions = async (transcript: string) => {
+
   try {
-    const chatSession = model.startChat({
+
+    //configaration based on different type of output
+    const generationConfig = {
+      temperature: 0.7,
+      topP: 0.85,
+      topK: 50,
+      maxOutputTokens: 1048576,
+      responseMimeType: 'application/json',
+    };
+
+    const genModel = genAI.getGenerativeModel({
+      model,
       generationConfig,
-      history: [],
+      safetySettings,
     });
 
     const inputMessage = `
@@ -140,7 +142,8 @@ const extractKeywordsAndQuestions = async (transcript: string) => {
       "example": { "keywords": ["example keyword"], "questions": ["example question"] }
     }`;
 
-    const result = await chatSession.sendMessage(inputMessage);
+    const result = await genModel.generateContent(inputMessage);
+    //const result = await chatSession.sendMessage(inputMessage);
     const responseText = result.response.text();
     console.log(responseText);
     const sanitizedResponseText = responseText.replace(/\r?\n|\r/g, '');
@@ -176,6 +179,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
+
+    if (!API_KEY) return new Response("Missing API key", { status: 400 });
+
     const formData = await req.formData();
 
     const file = formData.get('file') as Blob | null;
