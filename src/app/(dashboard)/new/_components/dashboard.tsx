@@ -89,7 +89,7 @@ export const NewDashboard = () => {
   >();
 
   const handleVideoFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
@@ -155,7 +155,7 @@ export const NewDashboard = () => {
       storeData(youtubeResponse);
       // storeData(summaryResponse);
 
-      router.push(`/dashboard?youtubeHash=${youtubeHash}`);
+      router.push(`/dashboard?youtubeHash=${youtubeHash}&input=${input}`);
     } catch (err: any) {
       console.error(err);
     }
@@ -196,7 +196,8 @@ export const NewDashboard = () => {
             <Dialog
               onOpenChange={() => {
                 setFileType(undefined);
-              }}>
+              }}
+            >
               <DialogTrigger asChild>
                 <div className="flex flex-col items-center justify-center">
                   <div className="cursor-pointer">
@@ -229,7 +230,8 @@ export const NewDashboard = () => {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("video")}>
+                        onClick={() => setFileType("video")}
+                      >
                         <VideoIcon className="w-4 h-4 mr-1" />
                         Video
                       </Button>
@@ -244,14 +246,16 @@ export const NewDashboard = () => {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("keywords")}>
+                        onClick={() => setFileType("keywords")}
+                      >
                         <TextIcon className="w-4 h-4 mr-1" />
                         Keywords / Topic
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("text")}>
+                        onClick={() => setFileType("text")}
+                      >
                         <TextIcon className="w-4 h-4 mr-1" />
                         Text
                       </Button>
@@ -316,7 +320,8 @@ export const NewDashboard = () => {
                       <Button
                         type="submit"
                         onClick={submitChanges}
-                        disabled={isLoading}>
+                        disabled={isLoading}
+                      >
                         {isLoading ? "Uploading ..." : "Upload"}
                       </Button>
                     </DialogFooter>
