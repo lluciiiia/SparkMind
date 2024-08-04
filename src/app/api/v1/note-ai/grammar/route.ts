@@ -23,7 +23,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const geminiRes = await genModel.generateContent(prompt);
 
-    let correctedNote;
+    let correctedNote = geminiRes.response.text().trim();
     return NextResponse.json({ status: 200, correctedNote });
   } catch (error) {
     return NextResponse.json({
