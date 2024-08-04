@@ -256,13 +256,13 @@ export const Dashboard = () => {
           <summary
             className={`left-0 relative p-2 ${
               isOpen ? "rounded-l-md" : "rounded-md"
-            } bg-blue-400 rounded-r-none w-full flex items-center justify-start ${
+            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
               isOpen ? "justify-start" : "justify-center"
             }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
-            {showText && <span>New note</span>}
+            {showText && <span className="ml-4">New note</span>}
           </summary>
           <NewNoteSection handleCreate={handleCreate} notes={notes} />
         </motion.details>
