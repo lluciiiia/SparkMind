@@ -5,7 +5,7 @@ import { VideoItem, VideoCardProps } from "../interfaces";
 const VideoCard: React.FC<VideoCardProps> = ({ videos }) => {
   return (
     <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
-      <div className="flex flex-col h-full overflow-y-auto rounded-t-3xl">
+      <div className="flex flex-col h-full overflow-y-auto rounded-t-3xl justify-center items-center">
         {Array.isArray(videos) && videos.length > 0 ? (
           videos.map((video) => (
             <div
