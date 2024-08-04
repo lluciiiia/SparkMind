@@ -1,7 +1,7 @@
 export const HomeNavigation = () => {
   return (
     <>
-      <div className="flex items-center justify-end mr-12">
+      <div className="flex items-center justify-end">
         <menu>
           <li className="flex gap-8">
             <button>HOME</button>
