@@ -48,6 +48,9 @@ import { useSearchParams } from "next/navigation";
 //discuss with AI Imports
 import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
 import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
+import DiscussionWithAI from "./discussion-with-ai";
+import NoteCard from "./note";
+import VideoCard from "./cards/video-recommendation";
 
 import {
   GoogleGenerativeAI,
@@ -91,7 +94,7 @@ export const Dashboard = () => {
   const [responses, setResponses] = useState<Message[]>([]);
   const [chatSession, setChatSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [frequentQue, setfrequentQue] = useState<boolean>(false);
+  const [frequentQue, setFrequentQue] = useState<boolean>(false);
 
   const [basicQuestion, setBasicQuestion] = useState<[]>([]);
   const [transcript, setTranscript] = useState<string | undefined>();
@@ -151,7 +154,7 @@ export const Dashboard = () => {
   useEffect(() => {
     if (frequentQue === true) {
       onSubmit();
-      setfrequentQue(false);
+      setFrequentQue(false);
     }
   }, [frequentQue]);
 
@@ -253,13 +256,13 @@ export const Dashboard = () => {
           <summary
             className={`left-0 relative p-2 ${
               isOpen ? "rounded-l-md" : "rounded-md"
-            } bg-blue-400 rounded-r-none w-full flex items-center justify-start ${
+            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
               isOpen ? "justify-start" : "justify-center"
             }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
-            {showText && <span>New note</span>}
+            {showText && <span className="ml-4">New note</span>}
           </summary>
           <NewNoteSection handleCreate={handleCreate} notes={notes} />
         </motion.details>
@@ -278,13 +281,15 @@ export const Dashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <section className="relative border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
-          <menu className="flex justify-start border-b border-gray-200 ml-4">
+        <section className="relative border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] bg-gray-200 rounded-3xl mt-[56px]">
+          <menu className="flex justify-start border-b border-gray-200 min-h-40px">
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
-                  className={`px-4 py-2 cursor-pointer ${
-                    activeTab === tab.name ? "border-b-2 border-blue-500" : ""
+                  className={`px-6 py-2 cursor-pointer ${
+                    activeTab === tab.name
+                      ? "bg-navy text-white rounded-t-3xl"
+                      : "text-gray"
                   }`}
                   onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
@@ -292,84 +297,26 @@ export const Dashboard = () => {
               </li>
             ))}
           </menu>
-          <div className="p-4">
-            {[
-              { tab: "summary", color: "bg-blue-400" },
-              { tab: "video", color: "bg-red-400" },
-              { tab: "qna", color: "bg-green-400" },
-              { tab: "further-info", color: "bg-purple-400" },
-              { tab: "action-items", color: "bg-black-400" },
-            ].map(
-              ({ tab, color }) =>
-                activeTab === tab && (
-                  <div className="h-200" key={tab}>
-                    {activeTab === tab && tab === "video" ? (
-                      <Card className={`w-full h-200 ${color} mb-4`}>
-                        {/* Render video content if the tab is "video" */}
-                        <div>
-                          {Array.isArray(videos) && videos.length > 0 ? (
-                            videos.map((video) => (
-                              <div
-                                key={video.id.videoId}
-                                className="my-4 flex flex-row items-center mr-8">
-                                <div className="flex flex-col">
-                                  <h3 className="break-words max-w-lg">
-                                    Title: {video.snippet.title}
-                                  </h3>
-                                  <p className="break-words max-w-lg mt-4">
-                                    Description: {video.snippet.description}
-                                  </p>
-                                </div>
-                                <iframe
-                                  width="250"
-                                  height="160"
-                                  src={`https://www.youtube.com/embed/${video.id.videoId}`}
-                                  frameBorder="0"
-                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                  allowFullScreen
-                                  className="my-4"></iframe>
-                              </div>
-                            ))
-                          ) : (
-                            <p>No videos found</p>
-                          )}
-                        </div>
-                      </Card>
-                    ) : (
-                      <Card className={`w-full h-[200px] ${color} mb-4`} />
-                    )}
-                  </div>
-                )
-            )}
-          </div>
-
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {notes.map((note) => (
-              <Card key={note.id} className="w-full max-w-md h-auto relative">
-                <CardHeader className="w-full flex flex-col items-center justify-start relative">
-                  <CardTitle className="text-lg font-bold left-0 mr-auto">
-                    {note.title}
-                  </CardTitle>
-                  <Button
-                    className="absolute top-2 right-2"
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handleDelete(note.id)}>
-                    <FaTimes />
-                  </Button>
-                </CardHeader>
-                <CardContent className="h-auto overflow-y-auto">
-                  <CardDescription>
-                    <Textarea
-                      placeholder="Enter your prompt"
-                      className="w-full max-h-60 overflow-y-auto resize-y mt-2">
-                      {note.content}
-                    </Textarea>
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </section>
+          {[
+            { tab: "summary" },
+            { tab: "video" },
+            { tab: "qna" },
+            { tab: "further-info" },
+            { tab: "action-items" },
+          ].map(
+            ({ tab }) =>
+              activeTab === tab && (
+                <div className="rounded-t-3xl bg-white" key={tab}>
+                  {activeTab === tab && tab === "video" ? (
+                    <VideoCard videos={videos} />
+                  ) : (
+                    <Card
+                      className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-t-3xl`}
+                    />
+                  )}
+                </div>
+              )
+          )}
         </section>
         <footer className=" absolute w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
           <motion.div
@@ -404,75 +351,17 @@ export const Dashboard = () => {
             </TooltipProvider>
 
             {/* Discuss with AI */}
-            <Card
-              className={`bottom-0 left-0 right-0  shadow-lg mx-auto ${
-                !isLaptop
-                  ? "w-[700px] h-[400px]"
-                  : "w-[1000px] h-[600px] rounded-t-lg"
-              }`}>
-              <menu className="flex justify-start border-b border-gray-200 ml-4">
-                <li>
-                  <button className={"px-4 py-2"}>
-                    Discussion with Gemini AI
-                  </button>
-                </li>
-              </menu>
-              <div className="h-full w-full flex flex-col items-center">
-                <div className="flex flex-col mt-3 mb-4  w-full max-w-4xl px-4 h-4/5 overflow-y-scroll no-scrollbar">
-                  {responses.map((response, index) =>
-                    response.sender === "user" ? (
-                      <div className="mb-4 flex justify-end">
-                        <div className={"p-2 rounded bg-blue-500 inline-block"}>
-                          {response.text}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="mb-4 flex justify-start" key={index}>
-                        <div
-                          className={
-                            "p-2 text-black dark:text-white rounded bg-[#e6e6e6] dark:bg-gray-700 inline-block"
-                          }>
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {response.text}
-                          </ReactMarkdown>
-                        </div>
-                      </div>
-                    )
-                  )}
-                  {loading === true ? (
-                    <div className="mb-4 flex justify-start">
-                      <div className={"p-2 rounded bg-gray-700 inline-block"}>
-                        <LoadingIndicator />
-                      </div>
-                    </div>
-                  ) : (
-                    <></>
-                  )}
-                </div>
-                <div className="sticky bottom-0 h-2/5 w-full max-w-4xl bg-[#e6e6e6] dark:bg-[#1e293b] p-4 flex flex-col items-center rounded-t-lg">
-                  <div className="flex flex-row overflow-x-auto no-scrollbar">
-                    {basicQuestion.map((que, index) => (
-                      <button
-                        key={index}
-                        onClick={() => {
-                          setInput(que);
-                          setfrequentQue(true);
-                        }}
-                        className="bg-gray-600 mx-4 rounded-lg p-2 flex-shrink-0">
-                        {que}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-4 w-3/5">
-                    <PlaceholdersAndVanishInput
-                      placeholders={[]}
-                      onChange={handleDiscussInputChange}
-                      onSubmit={onSubmit}
-                    />
-                  </div>
-                </div>
-              </div>
-            </Card>
+            <DiscussionWithAI
+              responses={responses}
+              loading={loading}
+              basicQuestion={basicQuestion}
+              input={input}
+              setInput={setInput}
+              frequentQue={frequentQue}
+              setFrequentQue={setFrequentQue}
+              onSubmit={onSubmit}
+              handleDiscussInputChange={handleDiscussInputChange}
+            />
           </motion.div>
         </footer>
       </ContentLayout>
