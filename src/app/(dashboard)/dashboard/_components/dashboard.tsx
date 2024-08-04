@@ -317,12 +317,6 @@ export const Dashboard = () => {
                 </div>
               )
           )}
-
-          <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
-            {notes.map((note) => (
-              <NoteCard key={note.id} note={note} onDelete={handleDelete} />
-            ))}
-          </section>
         </section>
         <footer className=" absolute w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
           <motion.div
