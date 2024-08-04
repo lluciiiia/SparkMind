@@ -34,7 +34,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
   handleDiscussInputChange,
 }) => {
   return (
-    <Card className="bottom-0 left-0 right-0 shadow-lg mx-auto w-[1000px] h-[600px] rounded-t-lg">
+    <Card className="bottom-0 left-0 right-0 shadow-lg mx-auto w-[1000px] h-[600px] rounded-t-lg dark:border-1 dark:border-gray-200">
       <menu className="flex justify-start border-b border-gray-200 ml-4">
         <li>
           <button className="px-4 py-2">Discussion with Gemini AI</button>
@@ -45,13 +45,13 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
           {responses.map((response, index) =>
             response.sender === "user" ? (
               <div className="mb-4 flex justify-end" key={index}>
-                <div className="p-2 rounded bg-blue-500 inline-block">
+                <div className="p-2 rounded bg-gray-200 inline-block dark:text-black">
                   {response.text}
                 </div>
               </div>
             ) : (
               <div className="mb-4 flex justify-start" key={index}>
-                <div className="p-2 text-black dark:text-white rounded bg-[#e6e6e6] dark:bg-gray-700 inline-block">
+                <div className="p-2 text-black dark:text-white rounded bg-gray-400 inline-block">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {response.text}
                   </ReactMarkdown>
@@ -61,13 +61,13 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
           )}
           {loading && (
             <div className="mb-4 flex justify-start">
-              <div className="p-2 rounded bg-gray-700 inline-block">
+              <div className="p-4 rounded bg-navy inline-block">
                 <LoadingIndicator />
               </div>
             </div>
           )}
         </div>
-        <div className="sticky bottom-0 h-2/5 w-full max-w-4xl bg-[#e6e6e6] dark:bg-[#1e293b] p-4 flex flex-col items-center rounded-t-lg">
+        <div className="sticky bottom-0 h-2/5 w-full max-w-4xl p-4 flex flex-col items-center rounded-t-lg mb-8">
           <div className="flex flex-row overflow-x-auto no-scrollbar">
             {basicQuestion.map((que, index) => (
               <button
@@ -76,12 +76,12 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
                   setInput(que);
                   setFrequentQue(true);
                 }}
-                className="bg-gray-600 mx-4 rounded-lg p-2 flex-shrink-0">
+                className="bg-gray-200 mx-4 rounded-lg p-2 flex-shrink-0 dark:text-black">
                 {que}
               </button>
             ))}
           </div>
-          <div className="mt-4 w-3/5">
+          <div className="mt-4 w-3/5 ">
             <PlaceholdersAndVanishInput
               placeholders={[]}
               onChange={handleDiscussInputChange}
