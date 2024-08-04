@@ -1,4 +1,4 @@
-import { Folder, LayoutDashboard, Square, SquarePlus } from 'lucide-react';
+import { Folder, LayoutDashboard, Square, SquarePlus } from "lucide-react";
 
 type Submenu = {
   href: string;
@@ -22,52 +22,59 @@ type Group = {
 export function getMenuList(pathname: string): Group[] {
   return [
     {
-      groupLabel: '',
+      groupLabel: "",
       menus: [
         {
-          href: '/dashboard',
-          label: 'Dashboard',
-          active: pathname.includes('/dashboard'),
+          href: "/dashboard",
+          label: "Dashboard",
+          active: pathname.includes("/dashboard"),
           icon: LayoutDashboard,
           submenus: [],
         },
         {
-          href: '/myresources',
-          label: 'My Resources',
-          active: pathname.includes('/myresources'),
+          href: "/myresources",
+          label: "My Resources",
+          active: pathname.includes("/myresources"),
+          icon: Folder,
+          submenus: [],
+        },
+        {
+          href: "/myqna",
+          label: "My QnA",
+          active: pathname.includes("/myqna"),
           icon: Folder,
           submenus: [],
         },
       ],
     },
     {
-      groupLabel: '',
+      groupLabel: "",
       menus: [
         {
-          href: '/upload',
-          label: 'Upload',
-          active: pathname.includes('/upload'),
+          href: "/upload",
+          label: "Upload",
+          active: pathname.includes("/upload"),
           icon: SquarePlus,
           submenus: [
             {
-              href: '/allresources',
-              label: 'All Resources',
-              active: pathname.includes('/allresources'),
+              href: "/allresources",
+              label: "All Resources",
+              active: pathname.includes("/allresources"),
             },
             {
-              href: '/video',
-              label: 'Video',
-              active: pathname.includes('/video'),
+              href: "/video",
+              label: "Video",
+              active: pathname.includes("/video"),
             },
             {
-              href: '/text',
-              label: 'Text',
-              active: pathname.includes('/text'),
+              href: "/text",
+              label: "Text",
+              active: pathname.includes("/text"),
             },
             {
-              href: '/keywords',
-              label: 'Keywords',
-              active: pathname.includes('/keywords'),
+              href: "/keywords",
+              label: "Keywords",
+              active: pathname.includes("/keywords"),
             },
           ],
         },

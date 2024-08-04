@@ -8,12 +8,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { MyLearning, RecentLearnings } from "./_components";
-import Wireframe from "../myqna/_components/Wireframe";
-
-const MyResourcesPage = () => {
+import QuizGenerator from "./_components/QuizGenerator";
+import "react-toastify/dist/ReactToastify.css";
+const MyQnAPage = () => {
   return (
-    <ContentLayout title="My Resources">
+    <ContentLayout title="Q&A">
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -29,14 +28,13 @@ const MyResourcesPage = () => {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>My Resources</BreadcrumbPage>
+            <BreadcrumbPage>My Q&A</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-      <RecentLearnings />
-      <MyLearning />
+      <QuizGenerator />
     </ContentLayout>
   );
 };
 
-export default MyResourcesPage;
+export default MyQnAPage;

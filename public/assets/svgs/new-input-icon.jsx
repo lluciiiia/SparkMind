@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 const NewInputIcon = () => (
   <svg
@@ -6,8 +6,7 @@ const NewInputIcon = () => (
     height="200"
     viewBox="0 0 320 320"
     fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+    xmlns="http://www.w3.org/2000/svg">
     <g clipPath="url(#clip0_108_2)">
       <path
         d="M1.15039 10.32V1.15002H10.3204"
@@ -36,7 +35,12 @@ const NewInputIcon = () => (
         <rect width="319.74" height="319.74" fill="white" />
       </clipPath>
       <clipPath id="clip1_108_2">
-        <rect width="108.61" height="108.61" fill="white" transform="translate(106 106)" />
+        <rect
+          width="108.61"
+          height="108.61"
+          fill="white"
+          transform="translate(106 106)"
+        />
       </clipPath>
     </defs>
   </svg>
