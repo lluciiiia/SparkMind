@@ -36,7 +36,6 @@ export interface VideoResponse {
 
 export interface VideoCardProps {
   videos: VideoItem[] | null;
-  color: string;
 }
 
 export interface NoteCardProps {

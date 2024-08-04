@@ -2,31 +2,29 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { VideoItem, VideoCardProps } from "../interfaces";
 
-const VideoCard: React.FC<VideoCardProps> = ({ videos, color }) => {
+const VideoCard: React.FC<VideoCardProps> = ({ videos }) => {
   return (
-    <Card className={`w-full h-200 ${color} mb-4`}>
-      <div>
+    <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
+      <div className="flex flex-col h-full overflow-y-auto rounded-t-3xl">
         {Array.isArray(videos) && videos.length > 0 ? (
           videos.map((video) => (
             <div
               key={video.id.videoId}
-              className="my-4 flex flex-row items-center mr-8">
-              <div className="flex flex-col">
-                <h3 className="break-words max-w-lg">
-                  Title: {video.snippet.title}
-                </h3>
-                <p className="break-words max-w-lg mt-4">
+              className="flex flex-row justify-between px-8 py-4 border-b border-gray-200">
+              <div className="flex flex-col mr-8">
+                <h3 className="break-words font-bold">{video.snippet.title}</h3>
+                <p className="break-words mt-2">
                   Description: {video.snippet.description}
                 </p>
               </div>
               <iframe
-                width="250"
-                height="160"
+                className="flex-shrink-0"
+                width="120"
+                height="100"
                 src={`https://www.youtube.com/embed/${video.id.videoId}`}
                 frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="my-4"></iframe>
+                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen></iframe>
             </div>
           ))
         ) : (
