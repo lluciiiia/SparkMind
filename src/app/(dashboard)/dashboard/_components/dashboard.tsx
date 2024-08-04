@@ -281,13 +281,15 @@ export const Dashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <section className="relative border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
-          <menu className="flex justify-start border-b border-gray-200 ml-4">
+        <section className="relative border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-3xl mt-[56px]">
+          <menu className="flex justify-start border-b border-gray-200 min-h-40px">
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
-                  className={`px-4 py-2 cursor-pointer ${
-                    activeTab === tab.name ? "border-b-2 border-blue-500" : ""
+                  className={`px-6 py-2 cursor-pointer ${
+                    activeTab === tab.name
+                      ? "bg-navy text-white rounded-t-3xl"
+                      : "bg-grey text-grey"
                   }`}
                   onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
@@ -295,26 +297,26 @@ export const Dashboard = () => {
               </li>
             ))}
           </menu>
-          <div className="p-4">
-            {[
-              { tab: "summary", color: "bg-blue-400" },
-              { tab: "video", color: "bg-red-400" },
-              { tab: "qna", color: "bg-green-400" },
-              { tab: "further-info", color: "bg-purple-400" },
-              { tab: "action-items", color: "bg-black-400" },
-            ].map(
-              ({ tab, color }) =>
-                activeTab === tab && (
-                  <div className="h-200" key={tab}>
-                    {activeTab === tab && tab === "video" ? (
-                      <VideoCard videos={videos} color={color} />
-                    ) : (
-                      <Card className={`w-full h-[200px] ${color} mb-4`} />
-                    )}
-                  </div>
-                )
-            )}
-          </div>
+          {[
+            { tab: "summary" },
+            { tab: "video" },
+            { tab: "qna" },
+            { tab: "further-info" },
+            { tab: "action-items" },
+          ].map(
+            ({ tab }) =>
+              activeTab === tab && (
+                <div className="rounded-t-3xl bg-white" key={tab}>
+                  {activeTab === tab && tab === "video" ? (
+                    <VideoCard videos={videos} />
+                  ) : (
+                    <Card
+                      className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-t-3xl`}
+                    />
+                  )}
+                </div>
+              )
+          )}
 
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {notes.map((note) => (
