@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { ContentLayout } from '@/components/dashboard/content-layout';
+import React, { useEffect, useCallback } from "react";
+import { ContentLayout } from "@/components/dashboard/content-layout";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,99 +9,85 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-<<<<<<< Updated upstream
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-=======
->>>>>>> Stashed changes
-import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { motion } from 'framer-motion';
-import { Triangle } from 'lucide-react';
-import Link from 'next/link';
-<<<<<<< Updated upstream
-=======
-import type React from 'react';
-import { useCallback, useEffect } from 'react';
->>>>>>> Stashed changes
-import { useRef, useState } from 'react';
-import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
-import { PiNoteBlankFill } from 'react-icons/pi';
-import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
-import { z } from 'zod';
-import { NewNoteSection } from './new-note';
-<<<<<<< Updated upstream
-=======
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { motion } from "framer-motion";
+import { Triangle } from "lucide-react";
+import Link from "next/link";
+import { useRef, useState } from "react";
+import { FaCaretLeft, FaCaretRight, FaTimes } from "react-icons/fa";
+import { PiNoteBlankFill } from "react-icons/pi";
+import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
+import { z } from "zod";
+import { NewNoteSection } from "./new-note";
+import {
+  Transcript,
+  Message,
+  Props,
+  Note,
+  VideoItem,
+  VideoResponse,
+} from "./interfaces";
+import { retrieveData } from "../../new/_components/hash-handler";
+import { useSearchParams } from "next/navigation";
 
-import LoadingIndicator from '@/components/ui/custom/LoadingIndicator';
 //discuss with AI Imports
-import { PlaceholdersAndVanishInput } from '@/components/ui/custom/placeholders-and-vanish-input';
+import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
+import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
 
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
+import {
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold,
+} from "@google/generative-ai";
 
-import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import axios from "axios";
 
 const generationConfig = {
   temperature: 1,
   topP: 0.95,
   topK: 64,
   maxOutputTokens: 8192,
-  responseMimeType: 'text/plain',
+  responseMimeType: "text/plain",
 };
 
-interface Transcript {
-  id: number;
-  text: string;
-}
-
-interface Message {
-  id: number;
-  text: string;
-  sender: 'user' | 'ai';
-}
-
-interface Props {
-  transcript: Transcript[];
-}
->>>>>>> Stashed changes
-
 const schema = z.object({
-  title: z.string().min(1, { message: 'Title is required' }),
+  title: z.string().min(1, { message: "Title is required" }),
 });
 
-interface Note {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: Date;
-}
-
 export const Dashboard = () => {
-<<<<<<< Updated upstream
-=======
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY as string;
 
   const genAI = new GoogleGenerativeAI(apiKey);
 
   const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-pro',
+    model: "gemini-1.5-pro",
   });
 
->>>>>>> Stashed changes
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('summary');
+  const [activeTab, setActiveTab] = useState("summary");
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
 
-<<<<<<< Updated upstream
-=======
-  const [input, setInput] = useState<string>('');
+  const [input, setInput] = useState<string>("");
   const [responses, setResponses] = useState<Message[]>([]);
   const [chatSession, setChatSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -110,15 +97,36 @@ export const Dashboard = () => {
   const [transcript, setTranscript] = useState<string | undefined>();
 
   //Todo change video id to dynamic
-  const video_id = 'cfa0784f-d23c-4430-99b6-7851508c5fdf';
+  const video_id = "cfa0784f-d23c-4430-99b6-7851508c5fdf";
+
+  const searchParams = useSearchParams();
+  const [videos, setVideos] = useState<VideoItem[] | null>(null);
+  const [summaryData, setSummaryData] = useState(null);
+
+  useEffect(() => {
+    const youtubeHash = searchParams.get("youtubeHash");
+    const summaryHash = searchParams.get("summaryHash");
+
+    if (youtubeHash) {
+      const data = retrieveData(youtubeHash) as VideoResponse;
+      setVideos(data.data.body);
+    }
+
+    if (summaryHash) {
+      const data = retrieveData(summaryHash);
+      setSummaryData(data as any);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
-      const response = await axios.get(`/api/v1/getdiscuss?videoid=${video_id}`);
+      const response = await axios.get(
+        `/api/v1/getdiscuss?videoid=${video_id}`
+      );
       if (response.status === 500) {
-        alert('Something Goes Wrong');
+        alert("Something Went Wrong");
       }
-      console.log('this is response : ' + response.data);
+      console.log("this is response : " + response.data);
       setBasicQuestion(response.data.basicQue);
       setTranscript(response.data.transcript);
       console.log(response);
@@ -131,7 +139,7 @@ export const Dashboard = () => {
       generationConfig,
       history: [
         {
-          role: 'user',
+          role: "user",
           parts: [{ text: transcript! }],
         },
       ],
@@ -155,7 +163,11 @@ export const Dashboard = () => {
     try {
       if (input.trim()) {
         setLoading(true);
-        const newMessage: Message = { id: Date.now(), text: input, sender: 'user' };
+        const newMessage: Message = {
+          id: Date.now(),
+          text: input,
+          sender: "user",
+        };
         setResponses((prevResponses) => [...prevResponses, newMessage]);
 
         const question = `Given the previous transcript, Based on the transcript, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
@@ -165,19 +177,18 @@ export const Dashboard = () => {
         const aiMessage: Message = {
           id: Date.now(),
           text: chatResponse.response.text(),
-          sender: 'ai',
+          sender: "ai",
         };
         setResponses((prevResponses) => [...prevResponses, aiMessage]);
 
         setLoading(false);
-        setInput('');
+        setInput("");
       }
     } catch (error) {
       console.log(error);
     }
   }, [input, chatSession]);
 
->>>>>>> Stashed changes
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
@@ -198,13 +209,13 @@ export const Dashboard = () => {
         setIsDrawerOpen(false);
       }
     };
-    window.addEventListener('click', handleClickOutside);
+    window.addEventListener("click", handleClickOutside);
     return () => {
-      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener("click", handleClickOutside);
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
-  const isLaptop = useMediaQuery('(min-width: 1023px)');
+  const isLaptop = useMediaQuery("(min-width: 1023px)");
 
   const handleDelete = (id: string) => {
     setNotes(notes.filter((note) => note.id !== id));
@@ -214,18 +225,21 @@ export const Dashboard = () => {
     const newNote = {
       id: Date.now().toString(),
       title: values.title,
-      content: '',
+      content: "",
       createdAt: new Date(),
     };
     setNotes([...notes, newNote]);
     setIsDrawerOpen(false);
   };
 
-<<<<<<< Updated upstream
-=======
-  const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text'>();
+  const tabs = [
+    { name: "summary", label: "Summary" },
+    { name: "video", label: "Video recommendation" },
+    { name: "qna", label: "Q&A" },
+    { name: "further-info", label: "Further Information" },
+    { name: "action-items", label: "Action Items" },
+  ];
 
->>>>>>> Stashed changes
   return (
     <>
       <div className="flex flex-col items-center justify-items-start absolute top-[80px] right-0 rounded-l-md rounded-r-none z-[100] w-fit">
@@ -234,16 +248,14 @@ export const Dashboard = () => {
           onToggle={() => setIsOpen(!isOpen)}
           className="w-full"
           initial={{ width: 30 }}
-          animate={{ width: isOpen ? '100%' : 50 }}
-          transition={{ type: 'spring', stiffness: 100 }}
-        >
+          animate={{ width: isOpen ? "100%" : 50 }}
+          transition={{ type: "spring", stiffness: 100 }}>
           <summary
             className={`left-0 relative p-2 ${
-              isOpen ? 'rounded-l-md' : 'rounded-md'
+              isOpen ? "rounded-l-md" : "rounded-md"
             } bg-blue-400 rounded-r-none w-full flex items-center justify-start ${
-              isOpen ? 'justify-start' : 'justify-center'
-            }`}
-          >
+              isOpen ? "justify-start" : "justify-center"
+            }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -266,106 +278,83 @@ export const Dashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-<<<<<<< Updated upstream
-        <section className="relative border-dashed border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
-          {notes.length === 0 && (
-            <div className="w-full h-[calc(100%-20px)] flex items-center justify-center top-0 left-0">
-              <span className="text-lg font-bold">No notes</span>
-            </div>
-          )}
-=======
         <section className="relative border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
           <menu className="flex justify-start border-b border-gray-200 ml-4">
-            <li>
-              <button
-                className={`px-4 py-2 cursor-pointer ${
-                  activeTab === 'summary' ? 'border-b-2 border-blue-500' : ''
-                }`}
-                onClick={() => setActiveTab('summary')}
-              >
-                Summary
-              </button>
-            </li>
-            <li>
-              <button
-                className={`px-4 py-2 cursor-pointer ${
-                  activeTab === 'video' ? 'border-b-2 border-blue-500' : ''
-                }`}
-                onClick={() => setActiveTab('video')}
-              >
-                Video recommendation
-              </button>
-            </li>
-            <li>
-              <button
-                className={`px-4 py-2 cursor-pointer ${
-                  activeTab === 'qna' ? 'border-b-2 border-blue-500' : ''
-                }`}
-                onClick={() => setActiveTab('qna')}
-              >
-                Q&A
-              </button>
-            </li>
-            <li>
-              <button
-                className={`px-4 py-2 cursor-pointer ${
-                  activeTab === 'further-info' ? 'border-b-2 border-blue-500' : ''
-                }`}
-                onClick={() => setActiveTab('further-info')}
-              >
-                Further Information
-              </button>
-            </li>
-            <li>
-              <button
-                className={`px-4 py-2 cursor-pointer ${
-                  activeTab === 'action-items' ? 'border-b-2 border-blue-500' : ''
-                }`}
-                onClick={() => setActiveTab('action-items')}
-              >
-                Action Items
-              </button>
-            </li>
+            {tabs.map((tab) => (
+              <li key={tab.name}>
+                <button
+                  className={`px-4 py-2 cursor-pointer ${
+                    activeTab === tab.name ? "border-b-2 border-blue-500" : ""
+                  }`}
+                  onClick={() => setActiveTab(tab.name)}>
+                  {tab.label}
+                </button>
+              </li>
+            ))}
           </menu>
           <div className="p-4">
-            {activeTab === 'summary' && (
-              <div className="h-200">
-                <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
-              </div>
-            )}
-            {activeTab === 'video' && (
-              <div className="h-200">
-                <Card className="w-full h-[200px] bg-red-400 mb-4"></Card>
-              </div>
-            )}
-            {activeTab === 'qna' && (
-              <div className="h-200">
-                <Card className="w-full h-[200px] bg-green-400 mb-4"></Card>
-              </div>
-            )}
-            {activeTab === 'further-info' && (
-              <div className="h-200">
-                <Card className="w-full h-[200px] bg-purple-400 mb-4"></Card>
-              </div>
-            )}
-            {activeTab === 'action-items' && (
-              <div className="h-200">
-                <Card className="w-full h-[200px] bg-black-400 mb-4"></Card>
-              </div>
+            {[
+              { tab: "summary", color: "bg-blue-400" },
+              { tab: "video", color: "bg-red-400" },
+              { tab: "qna", color: "bg-green-400" },
+              { tab: "further-info", color: "bg-purple-400" },
+              { tab: "action-items", color: "bg-black-400" },
+            ].map(
+              ({ tab, color }) =>
+                activeTab === tab && (
+                  <div className="h-200" key={tab}>
+                    {activeTab === tab && tab === "video" ? (
+                      <Card className={`w-full h-200 ${color} mb-4`}>
+                        {/* Render video content if the tab is "video" */}
+                        <div>
+                          {Array.isArray(videos) && videos.length > 0 ? (
+                            videos.map((video) => (
+                              <div
+                                key={video.id.videoId}
+                                className="my-4 flex flex-row items-center mr-8">
+                                <div className="flex flex-col">
+                                  <h3 className="break-words max-w-lg">
+                                    Title: {video.snippet.title}
+                                  </h3>
+                                  <p className="break-words max-w-lg mt-4">
+                                    Description: {video.snippet.description}
+                                  </p>
+                                </div>
+                                <iframe
+                                  width="250"
+                                  height="160"
+                                  src={`https://www.youtube.com/embed/${video.id.videoId}`}
+                                  frameBorder="0"
+                                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                  allowFullScreen
+                                  className="my-4"></iframe>
+                              </div>
+                            ))
+                          ) : (
+                            <p>No videos found</p>
+                          )}
+                        </div>
+                      </Card>
+                    ) : (
+                      <Card className={`w-full h-[200px] ${color} mb-4`} />
+                    )}
+                  </div>
+                )
             )}
           </div>
->>>>>>> Stashed changes
+
           <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
             {notes.map((note) => (
               <Card key={note.id} className="w-full max-w-md h-auto relative">
                 <CardHeader className="w-full flex flex-col items-center justify-start relative">
-                  <CardTitle className="text-lg font-bold left-0 mr-auto">{note.title}</CardTitle>
+                  <CardTitle className="text-lg font-bold left-0 mr-auto">
+                    {note.title}
+                  </CardTitle>
                   <Button
                     className="absolute top-2 right-2"
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(note.id)}
-                  >
+                    onClick={() => handleDelete(note.id)}>
                     <FaTimes />
                   </Button>
                 </CardHeader>
@@ -373,8 +362,7 @@ export const Dashboard = () => {
                   <CardDescription>
                     <Textarea
                       placeholder="Enter your prompt"
-                      className="w-full max-h-60 overflow-y-auto resize-y mt-2"
-                    >
+                      className="w-full max-h-60 overflow-y-auto resize-y mt-2">
                       {note.content}
                     </Textarea>
                   </CardDescription>
@@ -385,102 +373,56 @@ export const Dashboard = () => {
         </section>
         <footer className=" absolute w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
           <motion.div
-            initial={{ y: '90%' }}
-            animate={{ y: isDrawerOpen ? 100 : '100%' }}
-            transition={{ type: 'spring', stiffness: 50 }}
+            initial={{ y: "90%" }}
+            animate={{ y: isDrawerOpen ? 100 : "100%" }}
+            transition={{ type: "spring", stiffness: 50 }}
             className={`
                 flex flex-col items-center justify-center
               `}
-            ref={drawerRef}
-          >
+            ref={drawerRef}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 100 }}
+                    transition={{ type: "spring", stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                  >
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? 'rotate-180' : ''}`}
+                      className={`w-5 h-5 bottom-0 ${
+                        isDrawerOpen ? "rotate-180" : ""
+                      }`}
                       fill="black"
                     />
                   </motion.div>
                 </TooltipTrigger>
-                <TooltipContent>{isDrawerOpen ? 'Close' : 'Open'}</TooltipContent>
+                <TooltipContent>
+                  {isDrawerOpen ? "Close" : "Open"}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
 
+            {/* Discuss with AI */}
             <Card
-<<<<<<< Updated upstream
-              className={` bottom-0 left-0 right-0  shadow-lg mx-auto ${!isLaptop ? 'w-[700px] h-[400px]' : 'w-[1000px] h-[600px] rounded-t-lg'}`}
-            >
-              <menu className="flex justify-start border-b border-gray-200 ml-4">
-                <li>
-                  <button
-                    className={`px-4 py-2 ${activeTab === 'summary' ? 'border-b-2 border-blue-500' : ''}`}
-                    onClick={() => setActiveTab('summary')}
-                  >
-                    Summary
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className={`px-4 py-2 ${activeTab === 'video' ? 'border-b-2 border-blue-500' : ''}`}
-                    onClick={() => setActiveTab('video')}
-                  >
-                    Video recommendation
-                  </button>
-                </li>
-              </menu>
-              <div className="p-4">
-                {activeTab === 'summary' && (
-                  <div className="h-[calc(100vh-56px-64px-20px-24px-56px-48px)] overflow-y-auto">
-                    <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
-
-                    <section className={`flex flex-col items-center justify-start`}>
-                      <header
-                        className={`
-                            w-full mr-auto
-                          `}
-                      >
-                        <h3 className="text-lg font-bold">Generate</h3>
-                      </header>
-                      <div className="grid grid-cols-3 gap-4 mr-auto">
-                        {['Q&A', 'Discuss with AI', 'Further info'].map((item, index) => (
-                          <Card key={index} className="w-[150px] h-[150px] bg-blue-400">
-                            <CardHeader className="w-full h-full flex items-start justify-start">
-                              <CardTitle className={`mt-auto text-center text-sm font-semibold`}>
-                                {item}
-                              </CardTitle>
-                            </CardHeader>
-                          </Card>
-                        ))}
-                      </div>
-                    </section>
-                  </div>
-                )}
-                {activeTab === 'video' && (
-                  <div className="h-[calc(100vh-56px-64px-20px-24px-56px-48px)] overflow-y-auto">
-                    <Card className="w-full h-[200px] bg-blue-400 mb-4"></Card>
-=======
               className={`bottom-0 left-0 right-0  shadow-lg mx-auto ${
-                !isLaptop ? 'w-[700px] h-[400px]' : 'w-[1000px] h-[600px] rounded-t-lg'
-              }`}
-            >
+                !isLaptop
+                  ? "w-[700px] h-[400px]"
+                  : "w-[1000px] h-[600px] rounded-t-lg"
+              }`}>
               <menu className="flex justify-start border-b border-gray-200 ml-4">
                 <li>
-                  <button className={'px-4 py-2'}>Discussion with Gemini AI</button>
+                  <button className={"px-4 py-2"}>
+                    Discussion with Gemini AI
+                  </button>
                 </li>
               </menu>
               <div className="h-full w-full flex flex-col items-center">
                 <div className="flex flex-col mt-3 mb-4  w-full max-w-4xl px-4 h-4/5 overflow-y-scroll no-scrollbar">
                   {responses.map((response, index) =>
-                    response.sender === 'user' ? (
+                    response.sender === "user" ? (
                       <div className="mb-4 flex justify-end">
-                        <div className={'p-2 rounded bg-blue-500 inline-block'}>
+                        <div className={"p-2 rounded bg-blue-500 inline-block"}>
                           {response.text}
                         </div>
                       </div>
@@ -488,17 +430,18 @@ export const Dashboard = () => {
                       <div className="mb-4 flex justify-start" key={index}>
                         <div
                           className={
-                            'p-2 text-black dark:text-white rounded bg-[#e6e6e6] dark:bg-gray-700 inline-block'
-                          }
-                        >
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>{response.text}</ReactMarkdown>
+                            "p-2 text-black dark:text-white rounded bg-[#e6e6e6] dark:bg-gray-700 inline-block"
+                          }>
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {response.text}
+                          </ReactMarkdown>
                         </div>
                       </div>
-                    ),
+                    )
                   )}
                   {loading === true ? (
                     <div className="mb-4 flex justify-start">
-                      <div className={'p-2 rounded bg-gray-700 inline-block'}>
+                      <div className={"p-2 rounded bg-gray-700 inline-block"}>
                         <LoadingIndicator />
                       </div>
                     </div>
@@ -515,8 +458,7 @@ export const Dashboard = () => {
                           setInput(que);
                           setfrequentQue(true);
                         }}
-                        className="bg-gray-600 mx-4 rounded-lg p-2 flex-shrink-0"
-                      >
+                        className="bg-gray-600 mx-4 rounded-lg p-2 flex-shrink-0">
                         {que}
                       </button>
                     ))}
@@ -527,9 +469,8 @@ export const Dashboard = () => {
                       onChange={handleDiscussInputChange}
                       onSubmit={onSubmit}
                     />
->>>>>>> Stashed changes
                   </div>
-                )}
+                </div>
               </div>
             </Card>
           </motion.div>
