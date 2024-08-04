@@ -3,35 +3,26 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 //Gemini - ai Import
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
+import {
+  API_KEY,
+  genAI,
+  model,
+  generationConfig,
+  safetySettings,
+} from "@/app/api/v1/gemini-settings";
 
 export const dynamic = 'force-dynamic';
 
 const supabase = createClient();
 
 async function getEventList(transcript: string): Promise<any> {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY;
 
-  if (!apiKey) {
-    throw new Error('API key not found in environment variables');
-  }
+  if (!API_KEY) return new Response("Missing API key", { status: 400 });
 
-  const genAI = new GoogleGenerativeAI(apiKey!);
-
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
-  });
-
-  const generationConfig = {
-    temperature: 0.7,
-    topP: 0.85,
-    topK: 100,
-    maxOutputTokens: 1048000,
-    responseMimeType: 'application/json',
-  };
-
-  const chatSession = model.startChat({
+  const genModel = genAI.getGenerativeModel({
+    model,
     generationConfig,
-    history: [],
+    safetySettings,
   });
 
   const date = new Date();
@@ -66,7 +57,7 @@ async function getEventList(transcript: string): Promise<any> {
     ]`;
 
   try {
-    const result = await chatSession.sendMessage(prompt.trim());
+    const result = await genModel.generateContent(prompt.trim());
     const eventList = JSON.parse(await result.response.text());
     return eventList;
   } catch (error) {
