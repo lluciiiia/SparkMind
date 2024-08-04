@@ -1,51 +1,56 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
+<a href="https://sparkmind.vercel.app/">
+<!--   <img alt="SparkMind - AI-driven learning enhancement platform" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png"> -->
+  <h1 align="center">SparkMind</h1> 
 </a>
 
 <p align="center">
- The fastest way to build apps with Next.js and Supabase
+ AI-driven learning enhancement platform providing diverse input support, personalized study aids, refined notes, and comprehensive history.
 </p>
 
 <p align="center">
+  <a href="#team"><strong>Team</strong></a> ·
   <a href="#features"><strong>Features</strong></a> ·
   <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
   <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
   <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
 </p>
 <br/>
 
+## Team
+- [Seokyung Kim - 0617lucia@gmail.com](https://github.com/lluciiiia)
+- [Krishna - @gmail.com](https://github.com/KRISHNA-DHARSANDIA)
+- [Mike - @gmail.com](https://github.com/WomB0ComB0)
+- [Lovinson - @gmail.com](https://github.com/Wisesofthemall)
+- [Hyejin Kim - haejinkim2020@gmail.com]
+
 ## Features
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+- **Diverse Learning Material Input Support**
+  - Accepts various types of input: Video, Text, Keywords, Topics, Images, and Audio.
+
+- **Generated Study Materials**
+  - **Summary**: Provides concise summaries of learning materials.
+  - **Video Recommendations**: Suggests relevant videos for further understanding.
+  - **Q&A**: Generates exercise questions to help master the concepts.
+  - **Further Information**: Offers additional resources for deeper learning.
+
+- **Note Taking**
+  - **Grammar Refinement**: Corrects grammatical errors in notes.
+  - **Concise Version**: Summarizes and simplifies lengthy or disorganized notes.
+
+- **AI-Powered Discussion**
+  - Engage in further discussions with AI about the learning materials to enhance comprehension.
+
+- **Extended Learning Materials**
+  - Allows adding extra learning materials, integrating new inputs with existing ones for comprehensive study support.
+
+- **Learning History**
+  - Tracks and maintains a history of all learning activities and materials.
 
 ## Demo
 
 You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
 
-## Deploy to Vercel
-
-Vercel deployment will guide you through creating a Supabase account and project.
-
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This%20starter%20configures%20Supabase%20Auth%20to%20use%20cookies%2C%20making%20the%20user's%20session%20available%20throughout%20the%20entire%20Next.js%20app%20-%20Client%20Components%2C%20Server%20Components%2C%20Route%20Handlers%2C%20Server%20Actions%20and%20Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6)
-
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
-
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
 
 ## Clone and run locally
 
@@ -80,14 +85,6 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
    The starter kit should now be running on [localhost:3000](http://localhost:3000/).
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
-
 ## Feedback and issues
 
 Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
-
-## More Supabase examples
-
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
