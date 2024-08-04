@@ -1,0 +1,111 @@
+:root {
+    --width: 200px;
+    --height: 30px;
+    --offset: 2px;
+    --radius: 10px;
+    --toggle-back-light: #000;
+    /* Black in light mode */
+    --toggle-back-dark: #fff;
+    /* White in dark mode */
+    --toggle-txt-light: #fff;
+    /* White text */
+    --toggle-txt-dark: #000;
+    /* Black text in dark mode */
+}
+
+.switch-toggle {
+    position: relative;
+    width: var(--width);
+    height: var(--height);
+    padding: var(--offset);
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: normal;
+    font-style: normal;
+
+    input[type="checkbox"] {
+        cursor: pointer;
+        position: absolute;
+        inset: 0;
+        appearance: none;
+        z-index: 2;
+
+        &:checked {
+            +label.switch-toggle-label {
+                &:before {
+                    translate: 100% 0;
+                }
+
+                span {
+                    &:nth-child(1) {
+                        color: gray;
+                    }
+
+                    &:nth-child(2) {
+                        color: #ffffff;
+                    }
+                }
+            }
+        }
+
+        &+label.switch-toggle-label {
+            position: absolute;
+            inset: var(--offset, 0);
+            /* padding: 10px 0; */
+            display: block;
+            user-select: none;
+            pointer-events: none;
+            display: grid;
+            gap: 2px;
+            grid-auto-flow: column;
+            grid-auto-columns: 1fr;
+            place-items: center;
+            background-color: transparent;
+
+            &:before {
+                content: "";
+                position: absolute;
+                width: 50%;
+                inset: 0;
+                background: gray;
+                border-radius: calc(var(--radius) - var(--offset));
+                box-shadow: 0px 10px 20px 0px rgba(16, 39, 68, 0.1);
+                translate: 0 0;
+                transition: translate 250ms cubic-bezier(0.93, 0.26, 0.07, 0.69);
+            }
+
+            span {
+                position: relative;
+                transition: 200ms linear;
+
+                &:nth-child(1) {
+                    color: #ffffff;
+                }
+
+                &:nth-child(2) {
+                    color: gray;
+                }
+            }
+        }
+    }
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #1b1a1a;
+    height: 10px;
+    max-height:10px;
+}
