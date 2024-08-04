@@ -70,7 +70,7 @@
     "@trpc/react-query": "^11.0.0-rc.403",
     "@trpc/server": "^11.0.0-rc.403",
     "autoprefixer": "10.4.19",
-    "axios": "^1.7.2",
+    "axios": "^1.7.3",
     "bun": "^1.1.19",
     "class-variance-authority": "^0.7.0",
     "classnames": "^2.5.1",

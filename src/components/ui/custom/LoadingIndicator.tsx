@@ -3,7 +3,7 @@ import '@/styles/css/LoadingIndicator.css';
 
 
 const LoadingIndicator: React.FC = () => (
-    <div className="loader"></div> 
+    <div className="dotloader"></div> 
 );
 
 export default LoadingIndicator;
