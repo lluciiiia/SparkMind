@@ -1,16 +1,5 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
 import { type NextRequest, NextResponse } from "next/server";
-
-dotenv.config();
-
-export const runtime = "edge";
-export const maxDuration = 60;
-export const preferredRegion = "sin1";
-
-const model = "gemini-1.5-flash";
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY || "");
+import { API_KEY, genAI } from "../../gemini-settings";
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
