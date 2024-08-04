@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_레이어_1" data-name="레이어_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 246.86 94.95">
+  <defs>
+    <style>
+      .cls-1 {
+        font-family: MillerText-Bold, 'Miller Text';
+        font-size: 23px;
+        font-weight: 700;
+      }
+
+      .cls-2 {
+        fill: #036;
+      }
+
+      .cls-3 {
+        letter-spacing: -.02em;
+      }
+    </style>
+  </defs>
+  <circle class="cls-2" cx="41.87" cy="43.26" r="28.98"/>
+  <text class="cls-1" transform="translate(90.87 50.28)"><tspan x="0" y="0">Spark</tspan><tspan class="cls-3" x="64.26" y="0">M</tspan><tspan x="86.39" y="0">ind</tspan></text>
+</svg>
