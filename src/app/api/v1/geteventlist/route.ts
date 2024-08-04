@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 const supabase = createClient();
 
 async function getEventList(transcript: string): Promise<any> {
-  const apiKey = process.env.Gemini_API;
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY;
 
   if (!apiKey) {
     throw new Error('API key not found in environment variables');
@@ -24,8 +24,8 @@ async function getEventList(transcript: string): Promise<any> {
   const generationConfig = {
     temperature: 0.7,
     topP: 0.85,
-    topK: 50,
-    maxOutputTokens: 5000,
+    topK: 100,
+    maxOutputTokens: 1048000,
     responseMimeType: 'application/json',
   };
 

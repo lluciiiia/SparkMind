@@ -14,7 +14,7 @@ import { Storage } from '@google-cloud/storage';
 //Gemini ai imports
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 
-const apiKey = process.env.Gemini_API;
+const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey!);
 
 const model = genAI.getGenerativeModel({
@@ -114,29 +114,44 @@ const generationConfig = {
   temperature: 0.7,
   topP: 0.85,
   topK: 50,
-  maxOutputTokens: 50,
+  maxOutputTokens: 1048576,
   responseMimeType: 'application/json',
 };
 
+interface AIresponse {
+  keywords: string[];
+  questions: string[];
+}
+
 // for Extrack KeyWord from Transcript
-const extractKeyword = async (transcript: string) => {
-  const chatSession = model.startChat({
-    generationConfig,
-    history: [],
-  });
+const extractKeywordsAndQuestions = async (transcript: string) => {
+  try {
+    const chatSession = model.startChat({
+      generationConfig,
+      history: [],
+    });
 
-  const inputMessage = `
+    const inputMessage = `
     {
-      "role": "Global Expert in giving best keywords from transcripts of online meetings. Student and employee education depend on you now.",
-      "context": "Extract the most important and relevant keywords from the following transcript. These keywords will be used to find related YouTube videos and other online resources. Please ensure the keywords are specific to the context of the transcript and highly relevant.",
-      "transcript": "${transcript}",
-      "response_format": "json"
-    }
-    `;
+      "role": "Global Expert in extracting information from transcripts",
+      "context": "Process the following transcript to extract the most important and relevant keywords and five small 3 to 5 word questions. Keywords should be used for finding related YouTube videos and other online resources. Questions should be used for discussion with AI and other online resources and in the question not use any special character like inverted comma and other. Ensure both keywords and questions are specific to the context of the transcript and highly relevant.",
+      "transcript": "${transcript.replace(/"/g, '\\"')}",
+      "response_format": "json",
+      "example": { "keywords": ["example keyword"], "questions": ["example question"] }
+    }`;
 
-  const result = await chatSession.sendMessage(inputMessage);
-  const keywords = (JSON.parse(result.response.text()) as any).keywords;
-  return keywords;
+    const result = await chatSession.sendMessage(inputMessage);
+    const responseText = result.response.text();
+    console.log(responseText);
+    const sanitizedResponseText = responseText.replace(/\r?\n|\r/g, '');
+    const extractedData = await JSON.parse(sanitizedResponseText) as AIresponse;
+
+    return extractedData;
+  }
+  catch (error) {
+    console.error('Error in extract Keywords And Questions:', (error as Error).message);
+    throw new Error(`Error in extract Keywords And Questions: ${(error as Error).message}`);
+  }
 };
 
 const deleteAudioFile = (videoid: string) => {
@@ -191,12 +206,22 @@ export async function POST(req: NextRequest) {
     deleteAudioFile(video_id);
 
     //extract keywords
-    const keywordsArr = await extractKeyword(transcription);
+    const reliventData = await extractKeywordsAndQuestions(transcription) as AIresponse;
+
+    if (!reliventData) {
+      return NextResponse.json({ error: 'No data found' }, { status: 400 });
+    }
+
+    const keywordsArr = reliventData.keywords;
+    const questionsArr = reliventData.questions;
 
     //now time to insert the transcript and keyword into supabase
     const { error } = await supabaseClient
       .from('transcriptdata')
-      .insert({ uuid: uuid, videoid: video_id, transcript: transcription, keywords: keywordsArr });
+      .insert({
+        uuid: uuid, videoid: video_id, transcript: transcription, keywords: keywordsArr,
+        basic_questions: questionsArr
+      });
 
     if (error) {
       console.log('Occur while trascription is upload in DB: ' + error.details);

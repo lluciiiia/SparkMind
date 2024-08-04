@@ -86,8 +86,8 @@ export async function PATCH(req: NextRequest) {
             .eq('uuid', uuid);
 
         if (error) {
-            console.error('Database Error:', error);
-            return NextResponse.json({ status: 400, body: error });
+            console.error('Database Error:', error.message);
+            return NextResponse.json({ status: 400, body: error.message  });
         }
 
         return NextResponse.json({ status: 200, body: "success" });
