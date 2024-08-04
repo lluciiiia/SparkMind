@@ -58,29 +58,28 @@ import {
   HarmBlockThreshold,
 } from "@google/generative-ai";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import axios from "axios";
+import {
+  API_KEY,
+  genAI,
+  model,
+  generationConfig,
+  safetySettings,
+} from "@/app/api/v1/gemini-settings";
 
-const generationConfig = {
-  temperature: 1,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 8192,
-  responseMimeType: "text/plain",
-};
+import axios from "axios";
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
 });
 
 export const Dashboard = () => {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY as string;
+  //const apiKey = process.env.GOOGLE_AI_API_KEY as string;
+  if (!API_KEY) { console.error("Missing API key"); }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+  const genModel = genAI.getGenerativeModel({
+    model,
+    generationConfig,
+    safetySettings,
   });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -138,8 +137,7 @@ export const Dashboard = () => {
   }, [video_id]);
 
   useEffect(() => {
-    const Session = model.startChat({
-      generationConfig,
+    const Session = genModel.startChat({
       history: [
         {
           role: "user",
@@ -254,11 +252,9 @@ export const Dashboard = () => {
           animate={{ width: isOpen ? "100%" : 50 }}
           transition={{ type: "spring", stiffness: 100 }}>
           <summary
-            className={`left-0 relative p-2 ${
-              isOpen ? "rounded-l-md" : "rounded-md"
-            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
-              isOpen ? "justify-start" : "justify-center"
-            }`}>
+            className={`left-0 relative p-2 ${isOpen ? "rounded-l-md" : "rounded-md"
+              } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${isOpen ? "justify-start" : "justify-center"
+              }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -286,11 +282,10 @@ export const Dashboard = () => {
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
-                  className={`px-6 py-2 cursor-pointer ${
-                    activeTab === tab.name
-                      ? "bg-navy text-white rounded-t-3xl"
-                      : "text-gray"
-                  }`}
+                  className={`px-6 py-2 cursor-pointer ${activeTab === tab.name
+                    ? "bg-navy text-white rounded-t-3xl"
+                    : "text-gray"
+                    }`}
                   onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
                 </button>
@@ -337,9 +332,8 @@ export const Dashboard = () => {
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${
-                        isDrawerOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? "rotate-180" : ""
+                        }`}
                       fill="black"
                     />
                   </motion.div>
