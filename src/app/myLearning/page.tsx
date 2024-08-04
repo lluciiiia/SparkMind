@@ -59,19 +59,20 @@ export const MyLearning = () => {
 
   const [colorMap, setColorMap] = useState<Map<number, string>>(new Map());
 
+  //DB Storage date
   const dateFormatter = (date: Date) => {
     const formattedDate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
     const formattedTime = ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
     const formattedDateTime = `${formattedDate} ${formattedTime}`;
-    return date;
+    return formattedDateTime;
   }
 
   useEffect(() => {
     setColorMap(assignColors(cards, colorMap));
   }, [cards]);
 
+  //Todo chnage uuid get from local storage
   const uuid = '23b5bef7-4eaa-408f-9177-e9b98a6072c7';
-
 
   useEffect(() => {
     try {
@@ -109,19 +110,13 @@ export const MyLearning = () => {
   const options = { day: 'numeric' as const, month: 'short' as const, year: 'numeric' as const };
   const DateDiplay = new Date().toLocaleDateString('en-GB', options);
 
-  //DB Storage
-  const date = new Date();
-  const formattedDate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
-  const formattedTime = ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
-  const formattedDateTime = `${formattedDate} ${formattedTime}`;
-
   const handleAddCard = async () => {
 
     //Todo change UUID to get from local Storage
     const data = {
       uuid: uuid,
       title: 'Undefined',
-      date: formattedDateTime
+      date: dateFormatter(new Date())
     };
 
     try {
@@ -196,6 +191,7 @@ export const MyLearning = () => {
 
   const handleSaveCard = async (card: Cards) => {
     try {
+
       const response = await axios.patch('/api/v1/store-learnings',
         { id: card.id, title: card.title, date: card.date, uuid: uuid });
 
@@ -203,6 +199,8 @@ export const MyLearning = () => {
       const DateDiplay = new Date(card.date).toLocaleDateString('en-GB', options);
 
       const updatedCard = { ...card, date: DateDiplay };
+
+      
 
       if (response.status === 200) {
         setCards(cards.map((c) => c.id === card.id ? updatedCard : c));
@@ -228,7 +226,7 @@ export const MyLearning = () => {
         id: id,
         index: cardToUpdate?.index,
         title: currTitle,
-        date: currDate.toString(),
+        date: dateFormatter(currDate).toString(),
       };
 
       handleSaveCard(updatedCard);
@@ -257,7 +255,7 @@ export const MyLearning = () => {
 
   return (
     <section className='bg-[#fef9f5] h-screen'>
-      <div className={`flex flex-col gap-4 px-14 py-4 `}>
+      <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4 `}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
@@ -286,9 +284,9 @@ export const MyLearning = () => {
             <div className='ml-10 w-4 h-4 rounded-full  bg-black'></div>
             <div className='w-full h-1 bg-black'></div>
           </div>
-          <div className='flex flex-row items-center'>
+          <div className='flex sm:flex-row flex-col sm:items-center'>
             <h1 className="text-4xl font-mediums text-black">Learnings</h1>
-            <div className="ml-10 flex items-center">
+            <div className="sm:ml-10 md:mt-0 mt-2 flex items-center">
               <div className="switch-toggle border dark:border-black border-black">
                 <input className="switch-toggle-checkbox" type="checkbox" id="Recent-Date" onClick={toggleSort} />
                 <label className="switch-toggle-label dark:bg-black" htmlFor="Recent-Date">
@@ -300,7 +298,7 @@ export const MyLearning = () => {
           </div>
         </div>
         <article
-          className={`h-[33rem] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 grid-flow-dense gap-y-20 mx-16 pb-8`}
+          className={`h-[33rem] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 grid-flow-dense gap-y-20 sm:mx-16 mx-4 pb-8`}
         >
           <div className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex items-center justify-center`}>
             <Button className="bg-transparent border-dashed border-2 border-blue-500 w-[150px] h-[150px] mx-auto hover:bg-transparent hover:border-blue-500 hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl"
