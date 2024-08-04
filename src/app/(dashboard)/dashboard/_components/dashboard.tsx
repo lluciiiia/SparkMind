@@ -58,32 +58,33 @@ import {
   HarmBlockThreshold,
 } from "@google/generative-ai";
 
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import {
+  API_KEY,
+  genAI,
+  model,
+  generationConfig,
+  safetySettings,
+} from "@/app/api/v1/gemini-settings";
+
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
 import { create } from "domain";
 import { buildQuiz } from "@/app/api/v1/create-quiz/route";
-
-const generationConfig = {
-  temperature: 1,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 8192,
-  responseMimeType: "text/plain",
-};
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
 });
 
 export const Dashboard = () => {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY as string;
+  //const apiKey = process.env.GOOGLE_AI_API_KEY as string;
+  if (!API_KEY) {
+    console.error("Missing API key");
+  }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-
-  const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-pro",
+  const genModel = genAI.getGenerativeModel({
+    model,
+    generationConfig,
+    safetySettings,
   });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -154,8 +155,7 @@ export const Dashboard = () => {
   }, [video_id]);
 
   useEffect(() => {
-    const Session = model.startChat({
-      generationConfig,
+    const Session = genModel.startChat({
       history: [
         {
           role: "user",

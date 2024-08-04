@@ -1,4 +1,4 @@
-.loader {
+.dotloader {
     width: 40px;
     aspect-ratio: 4;
     background: radial-gradient(circle closest-side, #ffffff 90%, #0000) 0/calc(100%/3) 100% space;
