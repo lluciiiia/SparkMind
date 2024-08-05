@@ -57,7 +57,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
                   </ReactMarkdown>
                 </div>
               </div>
-            )
+            ),
           )}
           {loading && (
             <div className="mb-4 flex justify-start">
