@@ -52,6 +52,7 @@ import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
 import DiscussionWithAI from "./discussion-with-ai";
 import NoteCard from "./note";
 import VideoCard from "./cards/video-recommendation";
+import ActionCard from "./cards/actionCard";
 
 import {
   GoogleGenerativeAI,
@@ -118,6 +119,8 @@ export const Dashboard = () => {
   const [videos, setVideos] = useState<VideoItem[] | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState(null);
+
+  const [todoList, setTodoList] = useState<any[]>([]);
   const [output, setOutput] = useState<Output | null>(null);
   const myLearningId = searchParams.get("id");
 
@@ -157,6 +160,7 @@ export const Dashboard = () => {
     if (input) {
       createSummary(input);
     }
+
     if (input) {
       console.log("THE INPUT", input);
       createQuiz(input);

@@ -69,19 +69,17 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
         </div>
         <div className="sticky bottom-0 h-2/5 w-full max-w-4xl p-4 flex flex-col items-center rounded-t-lg mb-8">
           <div className="flex flex-row overflow-x-auto no-scrollbar">
-            {basicQuestion &&
-              basicQuestion.map((que, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setInput(que);
-                    setFrequentQue(true);
-                  }}
-                  className="bg-gray-200 mx-4 rounded-lg p-2 flex-shrink-0 dark:text-black"
-                >
-                  {que}
-                </button>
-              ))}
+            {basicQuestion !== undefined && basicQuestion.map((que, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setInput(que);
+                  setFrequentQue(true);
+                }}
+                className="bg-gray-200 mx-4 rounded-lg p-2 flex-shrink-0 dark:text-black">
+                {que}
+              </button>
+            ))}
           </div>
           <div className="mt-4 w-3/5 ">
             <PlaceholdersAndVanishInput

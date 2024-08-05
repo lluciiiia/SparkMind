@@ -38,6 +38,8 @@ export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
   await supabase.auth.signInWithOAuth({
     provider: provider,
     options: {
+      queryParams: { access_type: "offline", prompt: 'consent' },
+      scopes: 'openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events',
       redirectTo: redirectURL,
     },
   });
