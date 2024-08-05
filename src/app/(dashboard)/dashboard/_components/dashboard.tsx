@@ -40,7 +40,8 @@ import {
   Props,
   Note,
   VideoItem,
-  VideoResponse,
+  Output,
+  ParsedVideoData,
 } from "./interfaces";
 import { retrieveData } from "../../new/_components/hash-handler";
 import { useSearchParams } from "next/navigation";
@@ -73,13 +74,13 @@ import { create } from "domain";
 import { buildQuiz } from "@/app/api/v1/create-quiz/route";
 import { buildSummary } from "@/app/api/v1/create-summary/route";
 import Summary from "./cards/Summary";
+import { getOutputResponse } from "./api-handler";
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
 });
 
 export const Dashboard = () => {
-  //const apiKey = process.env.GOOGLE_AI_API_KEY as string;
   if (!API_KEY) {
     console.error("Missing API key");
   }
@@ -106,7 +107,7 @@ export const Dashboard = () => {
   const [basicQuestion, setBasicQuestion] = useState<[]>([]);
   const [transcript, setTranscript] = useState<string | undefined>();
 
-  //Todo change video id to dynamic
+  // TODO: dynamic video id
   const video_id = "cfa0784f-d23c-4430-99b6-7851508c5fdf";
 
   const searchParams = useSearchParams();
@@ -115,25 +116,42 @@ export const Dashboard = () => {
   const [summaryData, setSummaryData] = useState(null);
 
   const [todoList, setTodoList] = useState<any[]>([]);
+  const [output, setOutput] = useState<Output | null>(null);
+  const myLearningId = searchParams.get("id");
 
   useEffect(() => {
-    console.log("THE SEARCH PARAMS", searchParams);
-    const youtubeHash = searchParams.get("youtubeHash");
-    const summaryHash = searchParams.get("summaryHash");
-    const input = searchParams.get("input");
-    console.log("in[itt", input);
-    console.log("THE YOUTUBE HASH", youtubeHash);
-
-    if (youtubeHash) {
-      const data = retrieveData(youtubeHash) as VideoResponse;
-
-      if (data) {
-        setVideos(data.data.body);
+    const fetchData = async (myLearningId: string) => {
+      try {
+        const response = await getOutputResponse(myLearningId);
+        console.log("response in fetchData: ", response.data.body[0]);
+        setOutput(response.data.body[0]);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
       }
+    };
+
+    if (myLearningId) {
+      fetchData(myLearningId);
     }
 
+    // Cleanup function if needed
+    return () => {
+      console.log("Output retrieved");
+    };
+  }, []);
+
+  useEffect(() => {
+    if (output?.youtube) {
+      const parsedData = JSON.parse(output.youtube) as ParsedVideoData;
+      const videoItems = parsedData.items as VideoItem[];
+      setVideos(videoItems);
+    }
+  }, [output]);
+
+  useEffect(() => {
+    const input = searchParams.get("input");
+
     if (input) {
-      // const data = retrieveData(summaryHash);
       createSummary(input);
     }
 
@@ -141,15 +159,12 @@ export const Dashboard = () => {
       console.log("THE INPUT", input);
       createQuiz(input);
     }
-
-
-
   }, [searchParams]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
       const response = await axios.get(
-        `/api/v1/getdiscuss?videoid=${video_id}`,
+        `/api/v1/getdiscuss?videoid=${video_id}`
       );
       if (response.status === 500) {
         alert("Something Went Wrong");
@@ -295,13 +310,13 @@ export const Dashboard = () => {
           className="w-full"
           initial={{ width: 30 }}
           animate={{ width: isOpen ? "100%" : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}
-        >
+          transition={{ type: "spring", stiffness: 100 }}>
           <summary
-            className={`left-0 relative p-2 ${isOpen ? "rounded-l-md" : "rounded-md"
-              } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${isOpen ? "justify-start" : "justify-center"
-              }`}
-          >
+            className={`left-0 relative p-2 ${
+              isOpen ? "rounded-l-md" : "rounded-md"
+            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
+              isOpen ? "justify-start" : "justify-center"
+            }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -329,12 +344,12 @@ export const Dashboard = () => {
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
-                  className={`px-6 py-2 cursor-pointer ${activeTab === tab.name
-                    ? "bg-navy text-white rounded-t-3xl"
-                    : "text-gray"
-                    }`}
-                  onClick={() => setActiveTab(tab.name)}
-                >
+                  className={`px-6 py-2 cursor-pointer ${
+                    activeTab === tab.name
+                      ? "bg-navy text-white rounded-t-3xl"
+                      : "text-gray"
+                  }`}
+                  onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
                 </button>
               </li>
@@ -369,7 +384,7 @@ export const Dashboard = () => {
                     />
                   )}
                 </div>
-              ),
+              )
           )}
         </section>
         <footer className=" w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
@@ -380,8 +395,7 @@ export const Dashboard = () => {
             className={`
                 absolute flex flex-col items-center justify-center bottom-6
               `}
-            ref={drawerRef}
-          >
+            ref={drawerRef}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -390,11 +404,11 @@ export const Dashboard = () => {
                     animate={{ opacity: 1 }}
                     transition={{ type: "spring", stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                  >
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? "rotate-180" : ""
-                        }`}
+                      className={`w-5 h-5 bottom-0 ${
+                        isDrawerOpen ? "rotate-180" : ""
+                      }`}
                       fill="black"
                     />
                   </motion.div>
