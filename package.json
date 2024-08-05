@@ -88,6 +88,7 @@
     "init": "^0.1.2",
     "livekit-server-sdk": "^2.5.1",
     "lucide-react": "^0.408.0",
+    "marked": "^13.0.3",
     "natural": "^7.1.0",
     "next": "^14.2.5",
     "next-themes": "^0.3.0",
