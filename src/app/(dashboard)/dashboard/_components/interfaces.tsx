@@ -28,10 +28,12 @@ export interface VideoItem {
   };
 }
 
-export interface VideoResponse {
-  data: {
-    body: VideoItem[];
-  };
+export interface ParsedVideoData {
+  items: VideoItem[];
+}
+
+export interface Output {
+  youtube: string;
 }
 
 export interface VideoCardProps {

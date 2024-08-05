@@ -28,14 +28,17 @@ import { useRef, useState } from "react";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
 import NewInputIcon from "../../../../../public/assets/svgs/new-input-icon";
 
-import { getYoutubeResponse } from "./api-handler";
+import { getYoutubeResponse, saveOutput } from "./api-handler";
 //Circle Loading Style
 import "@/styles/css/Circle-loader.css";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { generateHash, storeData } from "./hash-handler";
+import { useSearchParams } from "next/navigation";
 
 export const NewDashboard = () => {
+  const searchParams = useSearchParams();
+  const myLearningId = searchParams.get("id");
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -46,7 +49,6 @@ export const NewDashboard = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  let youtubeResponse;
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -89,7 +91,7 @@ export const NewDashboard = () => {
   >();
 
   const handleVideoFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
@@ -141,27 +143,20 @@ export const NewDashboard = () => {
     }
   };
 
-  const handleUpload = async (input: any) => {
+  const handleUpload = async (input: any, myLearningId: string) => {
     try {
-      // const formData = new FormData();
-      // formData.append("text", input);
+      const response = await saveOutput(input, myLearningId);
+      console.log("response", response);
 
-      youtubeResponse = await getYoutubeResponse(input);
-      console.log("youtubeResponse", youtubeResponse);
-
-      const youtubeHash = generateHash(JSON.stringify(youtubeResponse));
-
-      // Store data in local storage
-      storeData(youtubeResponse);
-      // storeData(summaryResponse);
-
-      router.push(`/dashboard?youtubeHash=${youtubeHash}&input=${input}`);
+      router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
       console.error(err);
     }
   };
 
   const submitChanges = async () => {
+    if (!myLearningId) return;
+
     let input;
     if (fileType === "video") {
       let keyWordsArray = await handleVideoUpload();
@@ -171,8 +166,8 @@ export const NewDashboard = () => {
     } else if (fileType == "keywords") {
       input = keywords;
     }
-    console.log("input: ", input);
-    await handleUpload(input);
+
+    await handleUpload(input, myLearningId);
   };
 
   return (
@@ -196,8 +191,7 @@ export const NewDashboard = () => {
             <Dialog
               onOpenChange={() => {
                 setFileType(undefined);
-              }}
-            >
+              }}>
               <DialogTrigger asChild>
                 <div className="flex flex-col items-center justify-center">
                   <div className="cursor-pointer">
@@ -230,8 +224,7 @@ export const NewDashboard = () => {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("video")}
-                      >
+                        onClick={() => setFileType("video")}>
                         <VideoIcon className="w-4 h-4 mr-1" />
                         Video
                       </Button>
@@ -246,16 +239,14 @@ export const NewDashboard = () => {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("keywords")}
-                      >
+                        onClick={() => setFileType("keywords")}>
                         <TextIcon className="w-4 h-4 mr-1" />
                         Keywords / Topic
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("text")}
-                      >
+                        onClick={() => setFileType("text")}>
                         <TextIcon className="w-4 h-4 mr-1" />
                         Text
                       </Button>
@@ -320,8 +311,7 @@ export const NewDashboard = () => {
                       <Button
                         type="submit"
                         onClick={submitChanges}
-                        disabled={isLoading}
-                      >
+                        disabled={isLoading}>
                         {isLoading ? "Uploading ..." : "Upload"}
                       </Button>
                     </DialogFooter>
