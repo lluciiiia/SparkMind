@@ -34,8 +34,11 @@ import "@/styles/css/Circle-loader.css";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { generateHash, storeData } from "./hash-handler";
+import { useSearchParams } from "next/navigation";
 
 export const NewDashboard = () => {
+  const searchParams = useSearchParams();
+  const myLearningId = searchParams.get("id");
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -46,7 +49,6 @@ export const NewDashboard = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  let youtubeResponse;
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -141,21 +143,20 @@ export const NewDashboard = () => {
     }
   };
 
-  const handleUpload = async (input: any) => {
+  const handleUpload = async (input: any, myLearningId: string) => {
     try {
-      // const formData = new FormData();
-      // formData.append("text", input);
-
       const response = await saveOutput(input, myLearningId);
       console.log("response", response);
 
-      router.push(`/dashboard`);
+      router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
       console.error(err);
     }
   };
 
   const submitChanges = async () => {
+    if (!myLearningId) return;
+
     let input;
     if (fileType === "video") {
       let keyWordsArray = await handleVideoUpload();
@@ -165,8 +166,8 @@ export const NewDashboard = () => {
     } else if (fileType == "keywords") {
       input = keywords;
     }
-    console.log("input: ", input);
-    await handleUpload(input);
+
+    await handleUpload(input, myLearningId);
   };
 
   return (
