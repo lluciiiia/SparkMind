@@ -7,7 +7,7 @@ declare global {
       NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
       SUPABASE_SERVICE_ROLE_KEY: string;
       GOOGLE_YOUTUBE_API_KEY: string;
-      GOOGLE_AI_API_KEY: string;
+      NEXT_PUBLIC_GOOGLE_AI_API_KEY: string;
       GOOGLE_SEARCH_API_KEY: string;
       GOOGLE_SEARCH_ENGINE_ID: string;
       GOOGLE_DRIVE_API_KEY: string;

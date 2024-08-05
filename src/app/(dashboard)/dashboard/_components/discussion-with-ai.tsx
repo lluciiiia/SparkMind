@@ -69,7 +69,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
         </div>
         <div className="sticky bottom-0 h-2/5 w-full max-w-4xl p-4 flex flex-col items-center rounded-t-lg mb-8">
           <div className="flex flex-row overflow-x-auto no-scrollbar">
-            {basicQuestion.map((que, index) => (
+            {basicQuestion !== undefined && basicQuestion.map((que, index) => (
               <button
                 key={index}
                 onClick={() => {
