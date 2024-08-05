@@ -35,6 +35,7 @@ import { assignColors } from '@/utils/assignColors';
 
 import '@/styles/css/toggle-switch.css';
 
+import { createClient } from '@/utils/supabase/client';
 import axios from 'axios';
 
 type Cards = {
@@ -71,39 +72,54 @@ export const MyLearning = () => {
     setColorMap(assignColors(cards, colorMap));
   }, [cards]);
 
-  //Todo chnage uuid get from local storage
-  const uuid = '23b5bef7-4eaa-408f-9177-e9b98a6072c7';
+
+  const fetchData = async () => {
+    try {
+
+      const supabaseClient = createClient();
+
+      const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
+
+      //setUserId(uuid);
+
+      if (!uuid) {
+        console.log('User Id is not get');
+        throw new Error('User ID not returned from superbase');
+      }
+
+      const res = await axios.get(`/api/v1/store-learnings?userId=${uuid}`);
+      if (res.status === 200) {
+        const options = { day: 'numeric' as const, month: 'short' as const, year: 'numeric' as const };
+        const fetchedCards: Cards[] = res.data.body.map((item: any, index: number) => {
+          const date = new Date(item.date);
+          return {
+            id: item.id,
+            index: index,
+            title: item.title,
+            date: date.toLocaleDateString('en-GB', options)
+          };
+        });
+
+        setCards(fetchedCards);
+      } else {
+        console.error('Error fetching data:', res.data.body);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
 
   useEffect(() => {
-    try {
-      const fetchData = async () => {
-        try {
-          const res = await axios.get(`/api/v1/store-learnings?uuid=${uuid}`);
-          if (res.status === 200) {
-            const options = { day: 'numeric' as const, month: 'short' as const, year: 'numeric' as const };
-            const fetchedCards: Cards[] = res.data.body.map((item: any, index: number) => {
-              const date = new Date(item.date);
-              return {
-                id: item.learning_id,
-                index: index,
-                title: item.title,
-                date: date.toLocaleDateString('en-GB', options)
-              };
-            });
 
-            setCards(fetchedCards);
-          } else {
-            console.error('Error fetching data:', res.data.body);
-          }
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        }
-      };
-      fetchData();
+    const init = async () => {
+      try {
+        await fetchData();
+      }
+      catch (error) {
+        console.log("this is Error is Fatch the MyLearnings : " + (error as Error).message);
+      }
     }
-    catch (error) {
-      console.log("thi sis Error is Fatch the MyLearnings : " + (error as Error).message);
-    }
+    init();
   }, []);
 
   //for Diplay in card
@@ -112,7 +128,20 @@ export const MyLearning = () => {
 
   const handleAddCard = async () => {
 
-    //Todo change UUID to get from local Storage
+    const supabaseClient = createClient();
+
+    const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
+
+    if (!uuid) {
+      console.log('User Id is not get');
+      throw new Error('User ID not returned from superbase');
+    }
+
+    if (!uuid) {
+      console.log('User Is is not get');
+      return;
+    }
+
     const data = {
       uuid: uuid,
       title: 'Undefined',
@@ -122,8 +151,8 @@ export const MyLearning = () => {
     try {
       const res = await axios.post('/api/v1/store-learnings', data);
       if (res.status === 200) {
-        console.log(res.data.body[0].learning_id);
-        const newCard = { id: res.data.body[0].learning_id, index: cards.length, title: 'Undefined', date: DateDiplay };
+        console.log("Learning id : " + res.data.body[0].id);
+        const newCard = { id: res.data.body[0].id, index: cards.length, title: 'Undefined', date: DateDiplay };
         const updatedCards = [newCard, ...cards];
         setCards(updatedCards);
         setOriginalCards(updatedCards);
@@ -138,6 +167,15 @@ export const MyLearning = () => {
   const handleDelete = async (id: string | null) => {
     try {
       if (id !== null) {
+
+        const supabaseClient = createClient();
+
+        const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
+
+        if (!uuid) {
+          console.log('User Id is not get');
+          throw new Error('User ID not returned from superbase');
+        }
 
         const response = await axios.delete('/api/v1/store-learnings', {
           data: { id, uuid }
@@ -192,15 +230,22 @@ export const MyLearning = () => {
   const handleSaveCard = async (card: Cards) => {
     try {
 
+      const supabaseClient = createClient();
+
+      const userId = (await supabaseClient.auth.getUser()).data.user?.id as string;
+
+      if (!userId) {
+        console.log('User Id is not get');
+        throw new Error('User ID not returned from superbase');
+      }
+
       const response = await axios.patch('/api/v1/store-learnings',
-        { id: card.id, title: card.title, date: card.date, uuid: uuid });
+        { id: card.id, title: card.title, date: card.date, uuid: userId });
 
       const options = { day: 'numeric' as const, month: 'short' as const, year: 'numeric' as const };
       const DateDiplay = new Date(card.date).toLocaleDateString('en-GB', options);
 
       const updatedCard = { ...card, date: DateDiplay };
-
-      
 
       if (response.status === 200) {
         setCards(cards.map((c) => c.id === card.id ? updatedCard : c));

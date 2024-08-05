@@ -9,6 +9,8 @@ export default async function rotateToken(req: any, res: NextResponse, next: any
   try {
     const user_uuid = req.uuid;
 
+    console.log("user_uuid : 🪪 " + user_uuid);
+
     if (user_uuid === undefined) {
       console.log('User not authenticated');
       return NextResponse.json({ status: 400, error: 'User not authenticated' });
@@ -42,6 +44,8 @@ export default async function rotateToken(req: any, res: NextResponse, next: any
         const newTokens = await oauth2Client.refreshAccessToken();
         const { access_token, refresh_token, expiry_date } = newTokens.credentials;
 
+        console.log(refresh_token);
+
         // Update tokens in Supabase
         await supabaseClient
           .from('tokens')
@@ -52,7 +56,7 @@ export default async function rotateToken(req: any, res: NextResponse, next: any
           })
           .eq('user_id', user_uuid);
 
-        console.log('this new 👶🏻 access tocken : ' + req.accessToken);
+        console.log('this new 👶🏻 access token : ' + req.accessToken);
 
         req.accessToken = access_token;
       } catch (err) {
