@@ -1,9 +1,7 @@
-import { Queue } from '.'
+import { Queue } from '.';
 
-export class ScraperQueue {
-  private jobs: Queue
-
+export class ScraperQueue implements Queue<ScraperJob> {
   constructor() {
-    this.jobs = new Queue()
+    this.jobs = new Queue();
   }
 }

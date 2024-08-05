@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { ContentLayout } from "@/components/dashboard/content-layout";
+import { ContentLayout } from '@/components/dashboard/content-layout';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,8 +8,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -18,31 +18,31 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
-import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from "lucide-react";
-import Link from "next/link";
-import { useRef, useState } from "react";
-import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
-import NewInputIcon from "../../../../../public/assets/svgs/new-input-icon";
+import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useRef, useState } from 'react';
+import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
+import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
-import { getYoutubeResponse } from "./api-handler";
-//Circle Loading Style
-import "@/styles/css/Circle-loader.css";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { generateHash, storeData } from "./hash-handler";
+import { getYoutubeResponse } from './api-handler';
+
+import '@/styles/css/Circle-loader.css';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { generateHash, storeData } from './hash-handler';
 
 export const NewDashboard = () => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const [showText, setShowText] = useState(false);
-  const [keywords, setKeywords] = useState("");
-  const [content, setContent] = useState("");
+  const [_showText, setShowText] = useState(false);
+  const [keywords, setKeywords] = useState('');
+  const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -68,9 +68,9 @@ export const NewDashboard = () => {
         setIsDrawerOpen(false);
       }
     };
-    window.addEventListener("click", handleClickOutside);
+    window.addEventListener('click', handleClickOutside);
     return () => {
-      window.removeEventListener("click", handleClickOutside);
+      window.removeEventListener('click', handleClickOutside);
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
@@ -82,15 +82,11 @@ export const NewDashboard = () => {
     setKeywords(event.target.value);
   };
 
-  const isLaptop = useMediaQuery("(min-width: 1023px)");
+  const isLaptop = useMediaQuery('(min-width: 1023px)');
 
-  const [fileType, setFileType] = useState<
-    "image" | "video" | "audio" | "text" | "keywords"
-  >();
+  const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text' | 'keywords'>();
 
-  const handleVideoFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const pathURL = URL.createObjectURL(file);
@@ -107,10 +103,10 @@ export const NewDashboard = () => {
 
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append('file', selectedFile);
 
-      const res = await fetch("/api/v1/extract-transcribe", {
-        method: "POST",
+      const res = await fetch('/api/v1/extract-transcribe', {
+        method: 'POST',
         body: formData,
       });
 
@@ -147,7 +143,7 @@ export const NewDashboard = () => {
       // formData.append("text", input);
 
       youtubeResponse = await getYoutubeResponse(input);
-      console.log("youtubeResponse", youtubeResponse);
+      console.log('youtubeResponse', youtubeResponse);
 
       const youtubeHash = generateHash(JSON.stringify(youtubeResponse));
 
@@ -163,14 +159,14 @@ export const NewDashboard = () => {
 
   const submitChanges = async () => {
     let input;
-    if (fileType === "video") {
+    if (fileType === 'video') {
       input = await handleVideoUpload();
-    } else if (fileType == "text") {
+    } else if (fileType == 'text') {
       input = content;
-    } else if (fileType == "keywords") {
+    } else if (fileType == 'keywords') {
       input = keywords;
     }
-    console.log("input: ", input);
+    console.log('input: ', input);
     await handleUpload(input);
   };
 
@@ -195,15 +191,14 @@ export const NewDashboard = () => {
             <Dialog
               onOpenChange={() => {
                 setFileType(undefined);
-              }}>
+              }}
+            >
               <DialogTrigger asChild>
                 <div className="flex flex-col items-center justify-center">
                   <div className="cursor-pointer">
                     <NewInputIcon></NewInputIcon>
                   </div>
-                  <span className="text-lg mt-4">
-                    Upload the files to get started
-                  </span>
+                  <span className="mt-4 text-lg">Upload the files to get started</span>
                 </div>
               </DialogTrigger>
               <DialogContent className="rounded-2xl sm:rounded-2xl">
@@ -228,7 +223,8 @@ export const NewDashboard = () => {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("video")}>
+                        onClick={() => setFileType('video')}
+                      >
                         <VideoIcon className="w-4 h-4 mr-1" />
                         Video
                       </Button>
@@ -243,14 +239,16 @@ export const NewDashboard = () => {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("keywords")}>
+                        onClick={() => setFileType('keywords')}
+                      >
                         <TextIcon className="w-4 h-4 mr-1" />
                         Keywords / Topic
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("text")}>
+                        onClick={() => setFileType('text')}
+                      >
                         <TextIcon className="w-4 h-4 mr-1" />
                         Text
                       </Button>
@@ -258,7 +256,7 @@ export const NewDashboard = () => {
                   </>
                 )}
 
-                {fileType === "text" && (
+                {fileType === 'text' && (
                   <div className="grid gap-2">
                     <Label htmlFor="content">Content</Label>
                     <Textarea
@@ -270,7 +268,7 @@ export const NewDashboard = () => {
                   </div>
                 )}
 
-                {fileType === "keywords" && (
+                {fileType === 'keywords' && (
                   <div className="grid gap-2">
                     <Label htmlFor="keywords">Keywords / Topic</Label>
                     <Textarea
@@ -282,7 +280,7 @@ export const NewDashboard = () => {
                   </div>
                 )}
 
-                {fileType === "video" && (
+                {fileType === 'video' && (
                   <>
                     <DialogTitle>Choose Video File</DialogTitle>
                     <input
@@ -295,14 +293,14 @@ export const NewDashboard = () => {
                   </>
                 )}
 
-                {fileType === "video" && objectURL && (
+                {fileType === 'video' && objectURL && (
                   <div className="grid gap-2">
                     <Label htmlFor="name">Preview</Label>
                     <div>
                       <video controls src={objectURL}></video>
                     </div>
                     {isLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-white bg-opacity-20 backdrop-blur-sm">
                         <div className="loader"></div>
                       </div>
                     )}
@@ -312,11 +310,8 @@ export const NewDashboard = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button
-                        type="submit"
-                        onClick={submitChanges}
-                        disabled={isLoading}>
-                        {isLoading ? "Uploading ..." : "Upload"}
+                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
+                        {isLoading ? 'Uploading ...' : 'Upload'}
                       </Button>
                     </DialogFooter>
                   </div>

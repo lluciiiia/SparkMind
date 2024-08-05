@@ -1,35 +1,30 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import type React from 'react';
-import { FaCaretLeft, FaCaretRight, FaPlus } from 'react-icons/fa';
+import { FaPlus } from 'react-icons/fa';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Form, FormControl, FormDescription, FormField, FormLabel } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { type NoteType } from '@/schema';
+import { createAPIClient } from '@/lib';
 
-const schema = z.object({
-  title: z.string().min(1, { message: 'Title is required' }),
-});
+const api = createAPIClient();
 
 export const NewNoteSection: React.FC<{
-  handleCreate: (values: z.infer<typeof schema>) => void;
-  notes: z.infer<typeof schema>[];
-}> = ({ handleCreate, notes }) => {
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-  });
-  const onSubmit = (values: z.infer<typeof schema>) => {
-    handleCreate(values);
+  note: NoteType;
+  notes: NoteType[];
+}> = ({ notes, note }) => {
+  const createNote = async (note: NoteType) => {
+    try {
+      await api.createNote(note);
+    } catch (error) {
+      throw new Error(`Error creating note: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  };
+
+  const onSubmit = async (note: NoteType) => {
+    createNote(note);
   };
 
   return (
@@ -47,7 +42,7 @@ export const NewNoteSection: React.FC<{
                 size={24}
                 color="#ffffff"
                 onClick={() => {
-                  handleCreate({ title: 'New note' });
+                  onSubmit({ title: note.title, uuid: note.uuid, content: note.content, created_at: note.created_at, updated_at: note.updated_at });
                 }}
               />
             </div>
