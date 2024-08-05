@@ -60,7 +60,7 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
         responseArray.push(data.htmlLink);
       }
     } catch (error) {
-      console.log('Error while creating Calendar Event:', error);
+      console.log('Error while creating Calendar Event:', (error as Error).message);
     }
   }
 
