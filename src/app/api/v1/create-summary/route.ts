@@ -57,50 +57,6 @@ export async function buildSummary(topic: string) {
 
     const response = await fetchSummaryData(prompt);
 
-    // // Extract the main title and the summary content
-    // const titleMatch = response.match(/## Title: (.+)/);
-    // const summaryMatch = response.match(/\*\*Summary:\*\*\n\n([\s\S]+)/);
-
-    // if (!titleMatch || !summaryMatch) {
-    //   throw new Error("Invalid format in AI response");
-    // }
-
-    // const mainTitle = titleMatch[1];
-    // const summaryText = summaryMatch[1].trim();
-
-    // // Split the summary text into paragraphs with titles and data
-    // const paragraphs = [];
-    // const lines = summaryText.split("\n");
-
-    // let currentParagraph = { title: "", data: "" };
-
-    // lines.forEach((line) => {
-    //   const titleMatch = line.match(/\*\*(.+?)\*\*/);
-    //   if (titleMatch) {
-    //     // If there's already a paragraph being constructed, push it to the array
-    //     if (currentParagraph.title) {
-    //       paragraphs.push({ ...currentParagraph });
-    //     }
-    //     // Start a new paragraph
-    //     currentParagraph = { title: titleMatch[1], data: "" };
-    //   } else {
-    //     // Continue the current paragraph
-    //     currentParagraph.data += (currentParagraph.data ? " " : "") + line;
-    //   }
-    // });
-
-    // // Push the last paragraph if it exists
-    // if (currentParagraph.title) {
-    //   paragraphs.push({ ...currentParagraph });
-    // }
-
-    // const parsedData = {
-    //   title: mainTitle,
-    //   summary: paragraphs,
-    // };
-
-    // const validatedData = summarySchema.parse(parsedData);
-
     return response;
   } catch (error) {
     console.error("Error fetching or generating summary data:", error);
