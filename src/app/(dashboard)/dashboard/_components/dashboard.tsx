@@ -70,6 +70,8 @@ import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
 import { create } from "domain";
 import { buildQuiz } from "@/app/api/v1/create-quiz/route";
+import { buildSummary } from "@/app/api/v1/create-summary/route";
+import Summary from "./cards/Summary";
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
@@ -127,9 +129,9 @@ export const Dashboard = () => {
       }
     }
 
-    if (summaryHash) {
-      const data = retrieveData(summaryHash);
-      setSummaryData(data as any);
+    if (input) {
+      // const data = retrieveData(summaryHash);
+      createSummary(input);
     }
     if (input) {
       console.log("THE INPUT", input);
@@ -180,6 +182,14 @@ export const Dashboard = () => {
       console.log("THE QUIZ", quiz);
       if (quiz) {
         setQuestions(quiz);
+      }
+    });
+  };
+  const createSummary = async (query: string) => {
+    buildSummary(query).then((data) => {
+      console.log("THE SUMMARY", data);
+      if (data) {
+        setSummaryData(data as any);
       }
     });
   };
@@ -339,9 +349,16 @@ export const Dashboard = () => {
                   {activeTab === tab && tab === "video" && (
                     <VideoCard videos={videos} />
                   )}
-                  {activeTab === tab && tab === "qna" && (
-                    <QuestionAndAnswer questions={questions} />
-                  )}{" "}
+                  {activeTab === tab &&
+                    tab === "qna" &&
+                    questions.length > 0 && (
+                      <QuestionAndAnswer questions={questions} />
+                    )}{" "}
+                  {activeTab === tab &&
+                    tab === "summary" &&
+                    summaryData != null && (
+                      <Summary summaryData={summaryData} />
+                    )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-t-3xl`}

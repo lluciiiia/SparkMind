@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const genAI = new GoogleGenerativeAI(
-  process.env.GOOGLE_AI_API_KEY || "",
+  process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || "",
 );
 // Define the Zod schema
 const quizSchema = z.array(
