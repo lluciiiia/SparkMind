@@ -1,0 +1,22 @@
+.markdown-content ol {
+  display: grid;
+  gap: 1.5rem;
+  padding-left: 1.5rem; /* Adjust padding if needed */
+}
+
+.markdown-content h2 {
+  font-weight: bold;
+  text-align: center;
+  margin: 2rem 0; /* Adjust margins as needed */
+}
+.markdown-content ol li {
+  position: relative;
+  padding-left: 1.5rem; /* Adjust padding if needed */
+}
+
+.markdown-content ol li::before {
+  content: counter(list-item) ".";
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+}

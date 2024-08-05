@@ -86,7 +86,9 @@ export const NewDashboard = () => {
 
   const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text' | 'keywords'>();
 
-  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const pathURL = URL.createObjectURL(file);
@@ -116,7 +118,7 @@ export const NewDashboard = () => {
       const data = (await res.json()) as any;
       console.log(data);
 
-      //right now not usefull to display the transcript
+      // right now not usefull to display the transcript
       // setFetchedTranscript(data.transcription);
       // setKeywords(data.keywordsArr);
 
@@ -129,7 +131,7 @@ export const NewDashboard = () => {
       setObjectURL(null);
       setFileType(undefined);
 
-      return data;
+      return data.keywordsArr;
     } catch (err: any) {
       console.error(err);
     } finally {
@@ -151,7 +153,7 @@ export const NewDashboard = () => {
       storeData(youtubeResponse);
       // storeData(summaryResponse);
 
-      router.push(`/dashboard?youtubeHash=${youtubeHash}`);
+      router.push(`/dashboard?youtubeHash=${youtubeHash}&input=${input}`);
     } catch (err: any) {
       console.error(err);
     }
@@ -159,9 +161,10 @@ export const NewDashboard = () => {
 
   const submitChanges = async () => {
     let input;
-    if (fileType === 'video') {
-      input = await handleVideoUpload();
-    } else if (fileType == 'text') {
+    if (fileType === "video") {
+      let keyWordsArray = await handleVideoUpload();
+      input = keyWordsArray.toString();
+    } else if (fileType == "text") {
       input = content;
     } else if (fileType == 'keywords') {
       input = keywords;
