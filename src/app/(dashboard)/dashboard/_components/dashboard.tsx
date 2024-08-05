@@ -41,6 +41,7 @@ import {
   Note,
   VideoItem,
   Output,
+  ParsedVideoData,
 } from "./interfaces";
 import { retrieveData } from "../../new/_components/hash-handler";
 import { useSearchParams } from "next/navigation";
@@ -145,10 +146,10 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (output?.youtube) {
-      const parsedVideos = JSON.parse(output.youtube) as VideoItem[];
-      console.log("Parsed videos: " + parsedVideos);
-      console.log("Parsed videos 2: ", JSON.stringify(parsedVideos, null, 2));
-      setVideos(parsedVideos);
+      const parsedData = JSON.parse(output.youtube) as ParsedVideoData;
+      const videoItems = parsedData.items as VideoItem[];
+      console.log("Video Items:", videoItems);
+      setVideos(videoItems);
     }
   }, [output]);
 
