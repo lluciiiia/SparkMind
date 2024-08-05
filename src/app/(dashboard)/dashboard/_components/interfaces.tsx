@@ -33,3 +33,16 @@ export interface VideoResponse {
     body: VideoItem[];
   };
 }
+
+export interface VideoCardProps {
+  videos: VideoItem[] | null;
+}
+
+export interface NoteCardProps {
+  note: {
+    id: string;
+    title: string;
+    content: string;
+  };
+  onDelete: (id: string) => void;
+}
