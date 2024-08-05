@@ -1,7 +1,7 @@
 export interface Message {
   id: number;
   text: string;
-  sender: "user" | "ai";
+  sender: 'user' | 'ai';
 }
 
 export interface Transcript {

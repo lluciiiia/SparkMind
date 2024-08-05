@@ -1,12 +1,10 @@
-import { z } from "zod";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+import { z } from 'zod';
 
 dotenv.config();
-const genAI = new GoogleGenerativeAI(
-  process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || "",
-);
-// Define the Zod schema
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || '');
+
 const quizSchema = z.array(
   z.object({
     id: z.number(),
@@ -20,13 +18,15 @@ const quizSchema = z.array(
 // Function to convert plain text quiz data into an array of objects
 function parseQuizText(text: string) {
   const lines = text
-    .split("\n")
+    .split('\n')
     .map((line) => line.trim())
     .filter((line) => line);
   const questions: any[] = [];
   const answers: string[] = [];
-  let currentQuestion: { question: string; options: string[] } | null =
-    null as { question: string; options: string[] } | null;
+  let currentQuestion: { question: string; options: string[] } | null = null as {
+    question: string;
+    options: string[];
+  } | null;
 
   lines.forEach((line) => {
     const questionMatch = line.match(/^\d+\. \*\*(.+?)\*\*/);
@@ -65,7 +65,7 @@ function parseQuizText(text: string) {
   }
 
   questions.forEach((question, index) => {
-    const answerIndex = "abcd".indexOf(answers[index]);
+    const answerIndex = 'abcd'.indexOf(answers[index]);
     if (answerIndex !== -1) {
       question.answer = [question.options[answerIndex]];
     }
@@ -76,7 +76,7 @@ function parseQuizText(text: string) {
 
 // Example function to simulate fetching data from the Google Gemini API
 async function fetchQuizData(query: string) {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   const result = await model.generateContent(query);
   const response = result.response;
   const text = await response.text();
@@ -141,10 +141,8 @@ Please generate 10 quiz questions about "${query}". Format the output exactly as
 
     return questions.map((question, index) => {
       if (answers[index]) {
-        const answerText = answers[index].question.split(") ")[1]; // Extract the answer text
-        const answerIndex = question.options.findIndex(
-          (option) => option === answerText,
-        );
+        const answerText = answers[index].question.split(') ')[1]; // Extract the answer text
+        const answerIndex = question.options.findIndex((option) => option === answerText);
         if (answerIndex !== -1) {
           question.answer.push(question.options[answerIndex]);
         }
@@ -152,7 +150,7 @@ Please generate 10 quiz questions about "${query}". Format the output exactly as
       return question;
     });
   } catch (error) {
-    console.error("Error fetching or validating quiz data:", error);
+    console.error('Error fetching or validating quiz data:', error);
     return null;
   }
 }

@@ -1,15 +1,15 @@
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import AutoImport from "unplugin-auto-import/vite";
-import { resolve } from "path";
+import { resolve } from 'path';
+import react from '@vitejs/plugin-react';
+import AutoImport from 'unplugin-auto-import/vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        app: resolve(__dirname, "popup.html"),
-        content: resolve(__dirname, "./src/content.js"),
-        background: resolve(__dirname, "./src/background.js"),
+        app: resolve(__dirname, 'popup.html'),
+        content: resolve(__dirname, './src/content.js'),
+        background: resolve(__dirname, './src/background.js'),
       },
       output: {
         entryFileNames: `assets/[name].js`,
@@ -18,7 +18,7 @@ export default defineConfig({
         AutoImport({
           imports: [
             {
-              "webextension-polyfill": [["*", "browser"]],
+              'webextension-polyfill': [['*', 'browser']],
             },
           ],
         }),
@@ -27,12 +27,12 @@ export default defineConfig({
   },
   plugins: [react()],
   optimizeDeps: {
-    exclude: ["webextension-polyfill"],
+    exclude: ['webextension-polyfill'],
   },
   resolve: {
     alias: {
-      "webextension-polyfill": resolve(__dirname, "./src/__mocks__/webextension-polyfill.ts"),
-      "@src": resolve(__dirname, "./src"),
+      'webextension-polyfill': resolve(__dirname, './src/__mocks__/webextension-polyfill.ts'),
+      '@src': resolve(__dirname, './src'),
     },
     extensions: ['.ts', '.tsx', '.js'],
   },
