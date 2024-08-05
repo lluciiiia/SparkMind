@@ -1,7 +1,7 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
-@import './custom-styles.css';
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+@import "./custom-styles.css";
 
 @layer base {
   :root {
@@ -58,4 +58,23 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+/* src/styles/markdown.css */
+
+.markdown-content ol {
+  display: grid;
+  gap: 1.5rem;
+  padding-left: 1.5rem; /* Adjust padding if needed */
+}
+
+.markdown-content ol li {
+  position: relative;
+  padding-left: 1.5rem; /* Adjust padding if needed */
+}
+
+.markdown-content ol li::before {
+  content: counter(list-item) ".";
+  position: absolute;
+  left: 0;
+  font-weight: bold;
 }
