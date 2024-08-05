@@ -28,6 +28,10 @@ export interface VideoItem {
   };
 }
 
+export interface ParsedVideoData {
+  items: VideoItem[];
+}
+
 export interface Output {
   youtube: string;
 }
