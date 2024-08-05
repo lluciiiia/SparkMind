@@ -4,9 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 console.log("the key", process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY);
-const genAI = new GoogleGenerativeAI(
-  process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || "",
-);
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
 
 // Define the Zod schema for the summary response
 const summarySchema = z.object({
