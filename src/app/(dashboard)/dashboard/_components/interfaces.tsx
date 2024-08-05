@@ -46,3 +46,4 @@ export interface NoteCardProps {
   };
   onDelete: (id: string) => void;
 }
+
