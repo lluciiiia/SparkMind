@@ -43,12 +43,12 @@ export async function GET(req: NextRequest, res: NextResponse) {
             return NextResponse.json({ status: 200, body: cachedData });
         }
 
-        const uuid = req.nextUrl.searchParams.get('uuid') as string;
+        const uuid = req.nextUrl.searchParams.get('userId') as string;
         const supabase = createClient();
 
         const { data, error } = await supabase
             .from('mylearnings')
-            .select('id, uuid, title, date, learning_id').eq('uuid', uuid);
+            .select('id, uuid, title, date').eq('uuid', uuid);
 
         if (error) {
             console.log("this is error : " + error.message);
@@ -82,12 +82,12 @@ export async function PATCH(req: NextRequest) {
         const { data, error } = await supabase
             .from('mylearnings')
             .update({ title: title, date: date })
-            .eq('learning_id', id)
+            .eq('id', id)
             .eq('uuid', uuid);
 
         if (error) {
             console.error('Database Error:', error.message);
-            return NextResponse.json({ status: 400, body: error.message  });
+            return NextResponse.json({ status: 400, body: error.message });
         }
 
         return NextResponse.json({ status: 200, body: "success" });
@@ -109,7 +109,7 @@ export async function DELETE(req: NextRequest) {
         const { data, error } = await supabase
             .from('mylearnings')
             .delete()
-            .eq('learning_id', id) 
+            .eq('id', id)
             .eq('uuid', uuid)
 
         if (error) {
