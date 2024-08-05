@@ -80,7 +80,6 @@ const schema = z.object({
 });
 
 export const Dashboard = () => {
-  //const apiKey = process.env.GOOGLE_AI_API_KEY as string;
   if (!API_KEY) {
     console.error("Missing API key");
   }
