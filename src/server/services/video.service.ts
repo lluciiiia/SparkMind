@@ -2,7 +2,7 @@ import path from 'path';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GoogleAIFileManager } from '@google/generative-ai/files';
 
-const API_KEY = (process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY as string) || '';
+const API_KEY = (process.env.GOOGLE_AI_API_KEY as string) || '';
 const genAI = new GoogleGenerativeAI(API_KEY);
 const fileManager = new GoogleAIFileManager(API_KEY);
 
