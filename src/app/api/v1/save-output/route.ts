@@ -5,7 +5,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { saveYoutubeOutput } from "./helpers/youtube";
 import { saveSummaryOutput } from "./helpers/summary";
 import { saveQuizOutput } from "./helpers/qna";
-import { saveActionItem } from "./helpers/actionItm";
+import { saveFurtherInfoOutput } from "./helpers/further-info";
 
 export const dynamic = "force-dynamic";
 const supabase = createClient();
@@ -85,7 +85,16 @@ export async function GET(req: NextRequest) {
     if (quizResponse.status != 200)
       return NextResponse.json({ status: quizResponse.status });
 
+    const furtherInfoResponse = await saveFurtherInfoOutput(
+      myLearning[0].input,
+      myLearningId,
+      output
+    );
 
+    if (furtherInfoResponse.status != 200)
+      return NextResponse.json({ status: furtherInfoResponse.status });
+
+    
     return NextResponse.json({ status: 200 });
   } catch (error) {
     console.error("Error saving output in DB:", error);

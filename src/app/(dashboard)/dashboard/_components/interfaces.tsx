@@ -37,6 +37,7 @@ export interface Output {
   youtube: string;
   summary: string;
   questions: string;
+  further_info: string;
 }
 
 export interface VideoCardProps {
@@ -58,4 +59,15 @@ export interface Question {
   options: string[];
   answer: string[];
   multipleAnswers: boolean;
+}
+
+export interface FurtherInfo {
+  link: string;
+  title: string;
+  snippet: string;
+  thumbnail?: {
+    src: string;
+    width: string;
+    height: string;
+  };
 }
