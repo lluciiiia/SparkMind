@@ -75,6 +75,9 @@ import { buildQuiz } from "@/app/api/v1/create-quiz/route";
 import { buildSummary } from "@/app/api/v1/create-summary/route";
 import Summary from "./cards/Summary";
 import { getOutputResponse } from "./api-handler";
+import FurtherInfo from "./cards/FurtherInfo";
+
+// import { search } from "../../../../server/services/search-recommendation.service";
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
@@ -114,6 +117,7 @@ export const Dashboard = () => {
   const [videos, setVideos] = useState<VideoItem[] | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState(null);
+  const [furtherInfoData, setFurtherInfoData] = useState(null);
 
   const [todoList, setTodoList] = useState<any[]>([]);
   const [output, setOutput] = useState<Output | null>(null);
@@ -142,6 +146,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (output?.youtube) {
+      console.log("the output", output);
       const parsedData = JSON.parse(output.youtube) as ParsedVideoData;
       const videoItems = parsedData.items as VideoItem[];
       setVideos(videoItems);
@@ -153,18 +158,15 @@ export const Dashboard = () => {
 
     if (input) {
       createSummary(input);
-    }
-
-    if (input) {
-      console.log("THE INPUT", input);
       createQuiz(input);
+      createFurtherInfo(input);
     }
   }, [searchParams]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
       const response = await axios.get(
-        `/api/v1/getdiscuss?videoid=${video_id}`
+        `/api/v1/getdiscuss?videoid=${video_id}`,
       );
       if (response.status === 500) {
         alert("Something Went Wrong");
@@ -199,9 +201,7 @@ export const Dashboard = () => {
   }, [frequentQue]);
 
   const createQuiz = async (query: string) => {
-    console.log("THE QUERY", query);
     buildQuiz(query).then((quiz) => {
-      console.log("THE QUIZ", quiz);
       if (quiz) {
         setQuestions(quiz);
       }
@@ -209,11 +209,23 @@ export const Dashboard = () => {
   };
   const createSummary = async (query: string) => {
     buildSummary(query).then((data) => {
-      console.log("THE SUMMARY", data);
       if (data) {
         setSummaryData(data as any);
       }
     });
+  };
+  const createFurtherInfo = async (query: string) => {
+    const res = await axios
+      .get(`/api/v1/furtherinfo?topic=python`, {
+        method: "GET",
+      })
+      .then((response) => {
+        if (response.status === 500) {
+          alert("Something Went Wrong");
+        } else {
+          setFurtherInfoData(response.data as any);
+        }
+      });
   };
 
   const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -310,13 +322,15 @@ export const Dashboard = () => {
           className="w-full"
           initial={{ width: 30 }}
           animate={{ width: isOpen ? "100%" : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}>
+          transition={{ type: "spring", stiffness: 100 }}
+        >
           <summary
             className={`left-0 relative p-2 ${
               isOpen ? "rounded-l-md" : "rounded-md"
             } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
               isOpen ? "justify-start" : "justify-center"
-            }`}>
+            }`}
+          >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -349,7 +363,8 @@ export const Dashboard = () => {
                       ? "bg-navy text-white rounded-t-3xl"
                       : "text-gray"
                   }`}
-                  onClick={() => setActiveTab(tab.name)}>
+                  onClick={() => setActiveTab(tab.name)}
+                >
                   {tab.label}
                 </button>
               </li>
@@ -378,13 +393,18 @@ export const Dashboard = () => {
                     summaryData != null && (
                       <Summary summaryData={summaryData} />
                     )}
+                  {activeTab === tab &&
+                    tab === "further-info" &&
+                    furtherInfoData != null && (
+                      <FurtherInfo furtherInfo={furtherInfoData} />
+                    )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-t-3xl`}
                     />
                   )}
                 </div>
-              )
+              ),
           )}
         </section>
         <footer className=" w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
@@ -395,7 +415,8 @@ export const Dashboard = () => {
             className={`
                 absolute flex flex-col items-center justify-center bottom-6
               `}
-            ref={drawerRef}>
+            ref={drawerRef}
+          >
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -404,7 +425,8 @@ export const Dashboard = () => {
                     animate={{ opacity: 1 }}
                     transition={{ type: "spring", stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                  >
                     <Triangle
                       className={`w-5 h-5 bottom-0 ${
                         isDrawerOpen ? "rotate-180" : ""
