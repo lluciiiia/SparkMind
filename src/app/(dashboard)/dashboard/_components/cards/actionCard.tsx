@@ -25,19 +25,20 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
 
     const [eventList, setEventList] = useState([]);
-    const [videolist, setvideoList] = useState([]);
     const [showList, setshowList] = useState<Event[]>([]);
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
+
+    const [isshowList, setisShowList] = useState<boolean>(true)
 
 
     const handleSubmit = async (videoid: any) => {
         try {
 
             const eventlistRes = await axios.get("/api/v1/geteventlist", {
-                params: { videoid }
+                params: { videoid: videoid }
             });
 
-            let eventList = await JSON.stringify(eventlistRes.data);
+            let eventList = JSON.stringify(eventlistRes.data);
             console.log("eventList" + eventList);
             const secnd = await JSON.parse(eventList) as any;
             const VSlList: Event[] = secnd.body;
@@ -50,44 +51,35 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
         }
     };
 
-    const handleList = async (e: any) => {
+    const handleLogSelectedRows = async () => {
         try {
-            const res = await axios.get('/api/v1/list-video');
+            const selectedTask = selectedRows.map(rowIndex => ({
+                summary: showList[rowIndex].summary,
+                description: showList[rowIndex].description,
+                start: {
+                    dateTime: showList[rowIndex].start.dateTime,
+                    timeZone: showList[rowIndex].start.timeZone,
+                },
+                end: {
+                    dateTime: showList[rowIndex].end.dateTime,
+                    timeZone: showList[rowIndex].end.timeZone,
+                }
+            }));
 
+            console.log("selectedTask : " + selectedTask);
+
+            const res = await axios.post('/api/v1/create-event', { selectedTask });
             if (res.data.status === 200) {
-                console.log("List of video input : " + res.data.videolist);
-                setvideoList(res.data.videolist);
+                setEventList(res.data.calendarEvents);
             } else {
                 alert(`Error: ${res.data.message}`);
             }
+
+            setisShowList(false);
         }
         catch (err) {
-            console.error('Error get video list:', err);
-            alert('Error get video list');
-        }
-    }
-
-    const handleLogSelectedRows = async () => {
-        const selectedTask = selectedRows.map(rowIndex => ({
-            summary: showList[rowIndex].summary,
-            description: showList[rowIndex].description,
-            start: {
-                dateTime: showList[rowIndex].start.dateTime,
-                timeZone: showList[rowIndex].start.timeZone,
-            },
-            end: {
-                dateTime: showList[rowIndex].end.dateTime,
-                timeZone: showList[rowIndex].end.timeZone,
-            }
-        }));
-
-        console.log("selectedTask : " + selectedTask);
-
-        const res = await axios.post('/api/v1/create-event', { selectedTask });
-        if (res.data.status === 200) {
-            setEventList(res.data.calendarEvents);
-        } else {
-            alert(`Error: ${res.data.message}`);
+            console.log('Error in creating Event ' + (err as Error).message);
+            return;
         }
     };
 
@@ -104,6 +96,8 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
 
     useEffect(() => {
         console.log("date : " + date);
+
+        handleSubmit('e4fab7ca-3853-444f-bde6-99b309055a22');
 
         const data = [
             {
@@ -139,53 +133,62 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
     return (
         <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
             <div className="flex flex-row h-full rounded-t-3xl w-full justify-between">
-                {/* {"1" === 1 ? ( */}
-                <div>
-                    <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        className="rounded-md border"
-                    />
-                </div>
-                <div className="w-2/5 pl-4 h-full overflow-y-auto">
-                    <h2 className="text-xl font-bold border-b pb-2 mb-4">TO-DO LIST</h2>
-                    <div className="space-y-4">
-                        {showList.map((item, index) => (
-                            <div key={index} className="border-b pb-4">
-                                <input
-                                    type="checkbox"
-                                    className="form-checkbox"
-                                    onChange={() => handleCheckboxChange(index)}
+                {1 === 1 ? (
+                    <>
+                        <div>
+                            {isshowList === false && (
+                                <Calendar
+                                    mode="single"
+                                    selected={date}
+                                    onSelect={setDate}
+                                    className="rounded-md border"
                                 />
-                                <p className="text-orange-600 font-bold">
-                                    {new Date(item.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
-                                    {new Date(item.end.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                                <p className="text-lg font-semibold">{item.summary}</p>
-                                <p className="text-sm">{item.description}</p>
-                                <p className="text-sm">
-                                    {new Date(item.start.dateTime).toLocaleDateString()} - {new Date(item.end.dateTime).toLocaleDateString()}
-                                </p>
-                                <select className="w-full border-none focus:ring-0 mt-2">
-                                    <option value="Asia/Calcutta">Asia/Calcutta</option>
-                                    <option value="PST">PST</option>
-                                    <option value="CST">CST</option>
-                                    <option value="EST">EST</option>
-                                    <option value="GMT">GMT</option>
-                                </select>
+                            )}
+                        </div>
+                        <div className="w-full pl-4 h-full overflow-y-auto">
+                            <h2 className="text-xl font-bold border-b pb-2 mb-4">TO-DO LIST</h2>
+                            <div className="space-y-4">
+                                {showList.map((item, index) => (
+                                    <div key={index} className="border-b pb-4">
+                                        <input
+                                            type="checkbox"
+                                            className="form-checkbox"
+                                            onChange={() => handleCheckboxChange(index)}
+                                        />
+                                        <p className="text-orange-600 font-bold">
+                                            {new Date(item.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
+                                            {new Date(item.end.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </p>
+                                        <p className="text-lg font-semibold">{item.summary}</p>
+                                        <p className="text-sm">{item.description}</p>
+                                        <p className="text-sm">
+                                            {item.start.dateTime.slice(0, 16)}
+                                            - {item.end.dateTime.slice(0, 16)}
+                                        </p>
+                                        <select className="w-full border-none focus:ring-0 mt-2">
+                                            <option value="Asia/Calcutta">Asia/Calcutta</option>
+                                            <option value="PST">PST</option>
+                                            <option value="CST">CST</option>
+                                            <option value="EST">EST</option>
+                                            <option value="GMT">GMT</option>
+                                        </select>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
-                    </div>
-                </div>
-                {/* ) : (
+                            <button
+                                onClick={handleLogSelectedRows}
+                                className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+                            > Create Selected Taks</button>
+                        </div>
+                    </>
+                ) : (
                     <div className="flex h-full justify-center items-center">
                         <p>No videos found</p>
                     </div>
-                )} */}
+                )}
             </div>
 
-        </Card>
+        </Card >
     );
 };
 

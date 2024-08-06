@@ -8,11 +8,11 @@ import { type NextRequest, NextResponse } from 'next/server';
 interface Event {
   summary: string;
   description: string;
-  startDate: {
+  start: {
     dateTime: string;
     timeZone: string;
   };
-  endDate: {
+  end: {
     dateTime: string;
     timeZone: string;
   };
@@ -26,6 +26,34 @@ function generateRandomString(length: number) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+const storeCalendarEvent = async (eventList: Event[]) => {
+  try {
+    console.log('this is event lsit : ' + eventList);
+    const supabaseClient = createClient();
+    const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
+
+    eventList.map(async (event) => {
+      const { error } = await supabaseClient.from('todotask').insert({
+        uuid: uuid,
+        summary: event.summary,
+        description: event.description,
+        start_dateTime: event.start.dateTime,
+        end_dateTime: event.end.dateTime,
+        timezone: event.start.timeZone,
+      })
+
+      if (error) {
+        console.log('Errror while Store TodoTask : ' + error.message)
+        return;
+      }
+    });
+  }
+  catch (err) {
+    console.error("Error Store TodoTask:", (err as Error).message);
+    return;
+  }
 }
 
 const createCalendarEvent = async (eventList: Event[], accessToken: any): Promise<string[]> => {
@@ -59,12 +87,13 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
       if (response.status === 200 && data.htmlLink) {
         responseArray.push(data.htmlLink);
       }
+
     } catch (error) {
       console.log('Error while creating Calendar Event:', (error as Error).message);
     }
   }
 
-  console.log('this is Repose Array : ' + responseArray);
+  console.log('this is Repose Array for created event : ' + responseArray);
   return responseArray;
 };
 
@@ -81,7 +110,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const selectedTask: Event[] = data.selectedTask;
 
-    console.log(selectedTask);
+    console.log("selectedTask : " + selectedTask);
 
     // Use type assertion to add uuid to the request object
     (req as any).uuid = uuid;
@@ -95,6 +124,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     if (accessToken !== undefined) {
       const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
+      await storeCalendarEvent(selectedTask);
+
       return NextResponse.json({ status: 200, calendarEvents });
     }
 
