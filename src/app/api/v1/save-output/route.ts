@@ -2,7 +2,7 @@ import axios from "axios";
 import { createClient } from "@/utils/supabase/client";
 
 import { type NextRequest, NextResponse } from "next/server";
-import { saveYoutubeOutput } from "../youtube/route";
+import { saveYoutubeOutput } from "./helpers/youtube";
 
 export const dynamic = "force-dynamic";
 
