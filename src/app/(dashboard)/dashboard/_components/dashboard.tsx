@@ -116,7 +116,6 @@ export const Dashboard = () => {
     const fetchData = async (myLearningId: string) => {
       try {
         const response = await getOutputResponse(myLearningId);
-        console.log("response in fetchData: ", response.data.body[0]);
         setOutput(response.data.body[0]);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -134,7 +133,6 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (output?.youtube) {
-      console.log("the output", output);
       const parsedData = JSON.parse(output.youtube) as ParsedVideoData;
       const videoItems = parsedData.items as VideoItem[];
       setVideos(videoItems);
@@ -153,16 +151,13 @@ export const Dashboard = () => {
   useEffect(() => {
     const fetchDiscussData = async () => {
       const response = await axios.get(
-        `/api/v1/getdiscuss?videoid=${video_id}`,
+        `/api/v1/getdiscuss?videoid=${video_id}`
       );
       if (response.status === 500) {
         alert("Something Went Wrong");
       }
-      console.log("this is response : " + response.data);
       setBasicQuestion(response.data.basicQue);
-      console.log("the BASIC QUESTIONS", response.data.basicQue);
       setTranscript(response.data.transcript);
-      console.log(response);
     };
     fetchDiscussData();
   }, [video_id]);
@@ -281,15 +276,13 @@ export const Dashboard = () => {
           className="w-full"
           initial={{ width: 30 }}
           animate={{ width: isOpen ? "100%" : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}
-        >
+          transition={{ type: "spring", stiffness: 100 }}>
           <summary
             className={`left-0 relative p-2 ${
               isOpen ? "rounded-l-md" : "rounded-md"
             } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
               isOpen ? "justify-start" : "justify-center"
-            }`}
-          >
+            }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -322,8 +315,7 @@ export const Dashboard = () => {
                       ? "bg-navy text-white rounded-t-3xl"
                       : "text-gray"
                   }`}
-                  onClick={() => setActiveTab(tab.name)}
-                >
+                  onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
                 </button>
               </li>
@@ -368,7 +360,7 @@ export const Dashboard = () => {
                     />
                   )}
                 </div>
-              ),
+              )
           )}
         </section>
         <footer className=" w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
@@ -379,8 +371,7 @@ export const Dashboard = () => {
             className={`
                 absolute flex flex-col items-center justify-center bottom-6
               `}
-            ref={drawerRef}
-          >
+            ref={drawerRef}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -389,8 +380,7 @@ export const Dashboard = () => {
                     animate={{ opacity: 1 }}
                     transition={{ type: "spring", stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                  >
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
                     <Triangle
                       className={`w-5 h-5 bottom-0 ${
                         isDrawerOpen ? "rotate-180" : ""
