@@ -4,6 +4,7 @@ import { createClient } from "@/utils/supabase/client";
 import { type NextRequest, NextResponse } from "next/server";
 import { saveYoutubeOutput } from "./helpers/youtube";
 import { saveSummaryOutput } from "./helpers/summary";
+import { saveQuizOutput } from "./helpers/qna";
 
 export const dynamic = "force-dynamic";
 const supabase = createClient();
@@ -63,6 +64,15 @@ export async function GET(req: NextRequest) {
 
     if (summaryResponse.status != 200)
       return NextResponse.json({ status: summaryResponse.status });
+
+    const quizResponse = await saveQuizOutput(
+      myLearning[0].input,
+      myLearningId,
+      output
+    );
+
+    if (quizResponse.status != 200)
+      return NextResponse.json({ status: quizResponse.status });
 
     
     return NextResponse.json({ status: 200 });
