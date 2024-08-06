@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       safetySettings,
     });
 
-    const prompt = systemInstruction + note;
+    const prompt = SYSTEM_INSTRUCTION + note;
 
     const geminiRes = await genModel.generateContent(prompt);
 
@@ -33,5 +33,5 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 }
 
-const systemInstruction = `Task: Make the given text more concise while preserving its original meaning and essential information. Ensure clarity and maintain the tone and style of the original text.
+const SYSTEM_INSTRUCTION = `Task: Make the given text more concise while preserving its original meaning and essential information. Ensure clarity and maintain the tone and style of the original text.
 Text: `;

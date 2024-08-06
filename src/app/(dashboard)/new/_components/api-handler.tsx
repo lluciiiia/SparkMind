@@ -9,3 +9,13 @@ export const getYoutubeResponse = async (input: string) => {
 
   return { data: response.data };
 };
+
+export const saveOutput = async (input: string, myLearningId: string) => {
+  const params: { id: string } = {
+    id: myLearningId,
+  };
+
+  const response = await axios.get("/api/v1/save-output", { params });
+
+  return { data: response.data };
+};
