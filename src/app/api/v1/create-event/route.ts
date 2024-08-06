@@ -28,27 +28,44 @@ function generateRandomString(length: number) {
   return result;
 }
 
-const storeCalendarEvent = async (eventList: Event[]) => {
+interface Task {
+  summary: string,
+  description: string,
+  start_dateTime: string,
+  end_dateTime: string,
+  timezone: string
+}
+
+const storeCalendarEvent = async (eventList: Event[], learning_id: string) => {
   try {
-    console.log('this is event lsit : ' + eventList);
+    console.log('this is event list : ' + eventList);
     const supabaseClient = createClient();
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
-    eventList.map(async (event) => {
-      const { error } = await supabaseClient.from('todotask').insert({
-        uuid: uuid,
+    const TodoTasksList: Task[] = [];
+
+    eventList.forEach(event => {
+      TodoTasksList.push({
         summary: event.summary,
         description: event.description,
         start_dateTime: event.start.dateTime,
         end_dateTime: event.end.dateTime,
         timezone: event.start.timeZone,
-      })
-
-      if (error) {
-        console.log('Errror while Store TodoTask : ' + error.message)
-        return;
-      }
+      });
     });
+
+
+    const { error } = await supabaseClient.from('outputs')
+      .update({
+        todo_task: TodoTasksList,
+        is_task_preview_done: true
+      }).eq('learning_id', learning_id);
+
+    if (error) {
+      console.log('Errror while Store TodoTask : ' + error.message)
+      return;
+    }
+
   }
   catch (err) {
     console.error("Error Store TodoTask:", (err as Error).message);
@@ -99,7 +116,7 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const data = (await req.json()) as { selectedTask: Event[] };
+    const data = (await req.json()) as { selectedTask: Event[], learningId: string };
 
     const supabaseClient = createClient();
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
@@ -109,6 +126,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     const selectedTask: Event[] = data.selectedTask;
+    const learningId: string = data.learningId;
 
     console.log("selectedTask : " + selectedTask);
 
@@ -124,7 +142,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     if (accessToken !== undefined) {
       const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
-      await storeCalendarEvent(selectedTask);
+      await storeCalendarEvent(selectedTask, learningId);
 
       return NextResponse.json({ status: 200, calendarEvents });
     }
