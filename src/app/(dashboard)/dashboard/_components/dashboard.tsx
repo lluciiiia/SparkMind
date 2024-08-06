@@ -123,7 +123,6 @@ export const Dashboard = () => {
       fetchData(myLearningId);
     }
 
-    // Cleanup function if needed
     return () => {
       console.log("Output retrieved");
     };
@@ -331,7 +330,12 @@ export const Dashboard = () => {
           ].map(
             ({ tab }) =>
               activeTab === tab && (
-                <div className="rounded-t-3xl bg-white h-full" key={tab}>
+                <div className="rounded-b-3xl bg-white h-full" key={tab}>
+                  {activeTab === tab &&
+                    tab === "summary" &&
+                    summaryData != null && (
+                      <Summary summaryData={summaryData} />
+                    )}
                   {activeTab === tab && tab === "video" && (
                     <VideoCard videos={videos} />
                   )}
@@ -339,15 +343,10 @@ export const Dashboard = () => {
                     tab === "qna" &&
                     questions.length > 0 && (
                       <QuestionAndAnswer questions={questions} />
-                    )}{" "}
-                  {activeTab === tab &&
-                    tab === "summary" &&
-                    summaryData != null && (
-                      <Summary summaryData={summaryData} />
                     )}
                   {activeTab != tab && (
                     <Card
-                      className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-t-3xl`}
+                      className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
                     />
                   )}
                 </div>
