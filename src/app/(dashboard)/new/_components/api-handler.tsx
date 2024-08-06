@@ -15,7 +15,7 @@ export const saveOutput = async (input: string, myLearningId: string) => {
     id: myLearningId,
   };
 
-  const response = await axios.get("/api/v1/save-output", { params });
+  const response = await axios.get('/api/v1/save-output', { params });
 
   return { data: response.data };
 };

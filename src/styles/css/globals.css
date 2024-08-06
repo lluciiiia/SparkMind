@@ -59,6 +59,7 @@
     @apply bg-background text-foreground;
   }
 }
+
 /* src/styles/markdown.css */
 
 .markdown-content ol {

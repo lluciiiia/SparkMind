@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { motion } from 'framer-motion';
 import { Triangle } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import type React from 'react';
 import { useCallback, useEffect } from 'react';
 import { useRef, useState } from 'react';
@@ -25,36 +26,35 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { z } from 'zod';
 import { retrieveData } from '../../new/_components/hash-handler';
 import {
+  type FurtherInfo,
   type Message,
   type Note,
+  type Output,
+  type ParsedVideoData,
   Props,
-  VideoItem,
-  Output,
-  ParsedVideoData,
-  Question,
-  FurtherInfo,
-} from "./interfaces";
-import { useSearchParams } from "next/navigation";
+  type Question,
+  type VideoItem,
+} from './interfaces';
 
+import SummaryCard from './cards/SummaryCard';
+import VideoCard from './cards/VideoCard';
+import ActionCard from './cards/actionCard';
 //discuss with AI Imports
-import DiscussionWithAI from "./discussion-with-ai";
-import NoteCard from "./note";
-import SummaryCard from "./cards/SummaryCard";
-import VideoCard from "./cards/VideoCard";
-import ActionCard from "./cards/actionCard";
+import DiscussionWithAI from './discussion-with-ai';
+import NoteCard from './note';
 
 import {
   API_KEY,
   genAI,
-  model,
   generationConfig,
+  model,
   safetySettings,
-} from "@/app/api/v1/gemini-settings";
+} from '@/app/api/v1/gemini-settings';
 
-import axios from "axios";
-import QuestionAndAnswer from "./cards/QuestionAndAnswer";
-import { getOutputResponse } from "./api-handler";
-import FurtherInfoCard from "./cards/FurtherInfo";
+import axios from 'axios';
+import { getOutputResponse } from './api-handler';
+import FurtherInfoCard from './cards/FurtherInfo';
+import QuestionAndAnswer from './cards/QuestionAndAnswer';
 
 // import { search } from "../../../../server/services/search-recommendation.service";
 
@@ -64,7 +64,7 @@ const schema = z.object({
 
 export const Dashboard = () => {
   if (!API_KEY) {
-    console.error("Missing API key");
+    console.error('Missing API key');
   }
 
   const genModel = genAI.getGenerativeModel({
@@ -99,7 +99,7 @@ export const Dashboard = () => {
 
   const [todoList, setTodoList] = useState<any[]>([]);
   const [output, setOutput] = useState<Output | null>(null);
-  const myLearningId = searchParams.get("id");
+  const myLearningId = searchParams.get('id');
 
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
@@ -107,7 +107,7 @@ export const Dashboard = () => {
         const response = await getOutputResponse(myLearningId);
         setOutput(response.data.body[0]);
       } catch (error) {
-        console.error("Error fetching data: ", error);
+        console.error('Error fetching data: ', error);
       }
     };
 
@@ -116,7 +116,7 @@ export const Dashboard = () => {
     }
 
     return () => {
-      console.log("Output retrieved");
+      console.log('Output retrieved');
     };
   }, []);
 
@@ -265,82 +265,71 @@ export const Dashboard = () => {
               <li key={tab.name}>
                 <button
                   className={`px-6 py-2 cursor-pointer ${
-                    activeTab === tab.name
-                      ? "bg-navy text-white rounded-t-3xl"
-                      : "text-gray"
+                    activeTab === tab.name ? 'bg-navy text-white rounded-t-3xl' : 'text-gray'
                   }`}
-                  onClick={() => setActiveTab(tab.name)}>
+                  onClick={() => setActiveTab(tab.name)}
+                >
                   {tab.label}
                 </button>
               </li>
             ))}
           </menu>
           {[
-            { tab: "summary" },
-            { tab: "video" },
-            { tab: "qna" },
-            { tab: "further-info" },
-            { tab: "action-items" },
+            { tab: 'summary' },
+            { tab: 'video' },
+            { tab: 'qna' },
+            { tab: 'further-info' },
+            { tab: 'action-items' },
           ].map(
             ({ tab }) =>
               activeTab === tab && (
                 <div className="rounded-b-3xl bg-white h-full" key={tab}>
-                  {activeTab === tab &&
-                    tab === "summary" &&
-                    summaryData != null && (
-                      <SummaryCard summaryData={summaryData} />
-                    )}
-                  {activeTab === tab && tab === "video" && (
-                    <VideoCard videos={videos} />
+                  {activeTab === tab && tab === 'summary' && summaryData != null && (
+                    <SummaryCard summaryData={summaryData} />
                   )}
-                  {activeTab === tab &&
-                    tab === "qna" &&
-                    questions.length > 0 && (
-                      <QuestionAndAnswer questions={questions} />
-                    )}
-                  {activeTab === tab &&
-                    tab === "further-info" &&
-                    furtherInfoData != null && (
-                      <FurtherInfoCard furtherInfo={furtherInfoData} />
-                    )}
+                  {activeTab === tab && tab === 'video' && <VideoCard videos={videos} />}
+                  {activeTab === tab && tab === 'qna' && questions.length > 0 && (
+                    <QuestionAndAnswer questions={questions} />
+                  )}
+                  {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
+                    <FurtherInfoCard furtherInfo={furtherInfoData} />
+                  )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
                     />
                   )}
                 </div>
-              )
+              ),
           )}
         </section>
         <footer className=" w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
           <motion.div
-            initial={{ y: "90%" }}
-            animate={{ y: isDrawerOpen ? 100 : "100%" }}
-            transition={{ type: "spring", stiffness: 50 }}
+            initial={{ y: '90%' }}
+            animate={{ y: isDrawerOpen ? 100 : '100%' }}
+            transition={{ type: 'spring', stiffness: 50 }}
             className={`
                 absolute flex flex-col items-center justify-center bottom-6
               `}
-            ref={drawerRef}>
+            ref={drawerRef}
+          >
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 100 }}
+                    transition={{ type: 'spring', stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
+                  >
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${
-                        isDrawerOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? 'rotate-180' : ''}`}
                       fill="black"
                     />
                   </motion.div>
                 </TooltipTrigger>
-                <TooltipContent>
-                  {isDrawerOpen ? "Close" : "Open"}
-                </TooltipContent>
+                <TooltipContent>{isDrawerOpen ? 'Close' : 'Open'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
 

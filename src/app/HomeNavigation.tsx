@@ -9,9 +9,7 @@ export const HomeNavigation = () => {
             <button>CONTACT</button>
           </li>
         </menu>
-        <button className="bg-navy px-12 py-3 ml-8 text-white rounded-3xl">
-          Sign-up
-        </button>
+        <button className="bg-navy px-12 py-3 ml-8 text-white rounded-3xl">Sign-up</button>
       </div>
     </>
   );

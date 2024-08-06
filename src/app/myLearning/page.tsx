@@ -1,7 +1,8 @@
-'use client'
+'use client';
 
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import type React from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 
 import {
   Dialog,
@@ -21,12 +22,12 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from '@/components/ui/dialog';
 
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { FaPlus, FaSearch } from 'react-icons/fa';
-import { PiDotsThreeOutlineVerticalThin } from "react-icons/pi";
+import { PiDotsThreeOutlineVerticalThin } from 'react-icons/pi';
 
 import { UserNav } from '@/components/dashboard/user-nav';
 import { ModeToggle } from '@/providers/theme/mode-toggle';
@@ -43,10 +44,9 @@ type Cards = {
   index: number;
   title: string;
   date: string;
-}
+};
 
 export const MyLearning = () => {
-
   const router = useRouter();
 
   const [cards, setCards] = useState<Cards[]>([]);
@@ -62,20 +62,28 @@ export const MyLearning = () => {
 
   //DB Storage date
   const dateFormatter = (date: Date) => {
-    const formattedDate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2);
-    const formattedTime = ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
+    const formattedDate =
+      date.getFullYear() +
+      '-' +
+      ('0' + (date.getMonth() + 1)).slice(-2) +
+      '-' +
+      ('0' + date.getDate()).slice(-2);
+    const formattedTime =
+      ('0' + date.getHours()).slice(-2) +
+      ':' +
+      ('0' + date.getMinutes()).slice(-2) +
+      ':' +
+      ('0' + date.getSeconds()).slice(-2);
     const formattedDateTime = `${formattedDate} ${formattedTime}`;
     return formattedDateTime;
-  }
+  };
 
   useEffect(() => {
     setColorMap(assignColors(cards, colorMap));
   }, [cards]);
 
-
   const fetchData = async () => {
     try {
-
       const supabaseClient = createClient();
 
       const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
@@ -89,14 +97,18 @@ export const MyLearning = () => {
 
       const res = await axios.get(`/api/v1/store-learnings?userId=${uuid}`);
       if (res.status === 200) {
-        const options = { day: 'numeric' as const, month: 'short' as const, year: 'numeric' as const };
+        const options = {
+          day: 'numeric' as const,
+          month: 'short' as const,
+          year: 'numeric' as const,
+        };
         const fetchedCards: Cards[] = res.data.body.map((item: any, index: number) => {
           const date = new Date(item.date);
           return {
             id: item.id,
             index: index,
             title: item.title,
-            date: date.toLocaleDateString('en-GB', options)
+            date: date.toLocaleDateString('en-GB', options),
           };
         });
 
@@ -110,15 +122,13 @@ export const MyLearning = () => {
   };
 
   useEffect(() => {
-
     const init = async () => {
       try {
         await fetchData();
+      } catch (error) {
+        console.log('this is Error is Fatch the MyLearnings : ' + (error as Error).message);
       }
-      catch (error) {
-        console.log("this is Error is Fatch the MyLearnings : " + (error as Error).message);
-      }
-    }
+    };
     init();
   }, []);
 
@@ -127,7 +137,6 @@ export const MyLearning = () => {
   const DateDiplay = new Date().toLocaleDateString('en-GB', options);
 
   const handleAddCard = async () => {
-
     const supabaseClient = createClient();
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
@@ -145,14 +154,19 @@ export const MyLearning = () => {
     const data = {
       uuid: uuid,
       title: 'Undefined',
-      date: dateFormatter(new Date())
+      date: dateFormatter(new Date()),
     };
 
     try {
       const res = await axios.post('/api/v1/store-learnings', data);
       if (res.status === 200) {
-        console.log("Learning id : " + res.data.body[0].id);
-        const newCard = { id: res.data.body[0].id, index: cards.length, title: 'Undefined', date: DateDiplay };
+        console.log('Learning id : ' + res.data.body[0].id);
+        const newCard = {
+          id: res.data.body[0].id,
+          index: cards.length,
+          title: 'Undefined',
+          date: DateDiplay,
+        };
         const updatedCards = [newCard, ...cards];
         setCards(updatedCards);
         setOriginalCards(updatedCards);
@@ -167,7 +181,6 @@ export const MyLearning = () => {
   const handleDelete = async (id: string | null) => {
     try {
       if (id !== null) {
-
         const supabaseClient = createClient();
 
         const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
@@ -178,36 +191,36 @@ export const MyLearning = () => {
         }
 
         const response = await axios.delete('/api/v1/store-learnings', {
-          data: { id, uuid }
+          data: { id, uuid },
         });
 
         if (response.status === 200) {
           setCards((cards) => cards.filter((card) => card.id !== id));
           setOriginalCards((cards) => cards.filter((card) => card.id !== id));
           setIsDialogOpen(false);
-        }
-        else {
+        } else {
           console.error('Error deleting My leaning data:', response.data.body);
         }
       }
-    }
-    catch (error) {
+    } catch (error) {
       console.error('Error when Delete my learning : ', (error as Error).message);
     }
-  }
+  };
 
   const handleSearch = (search: string) => {
     if (search.length > 0) {
-      const filteredCards = cards.filter((card) => card.title.toLowerCase().includes(search.toLowerCase()));
+      const filteredCards = cards.filter((card) =>
+        card.title.toLowerCase().includes(search.toLowerCase()),
+      );
       setCards(filteredCards);
     } else {
       setCards(originalCards);
     }
-  }
+  };
 
   function parseDateUTC(dateString: string): Date {
     const [day, month, year] = dateString.split(' ');
-    const monthIndex = new Date(Date.parse(month + " 1, 2012")).getMonth(); // Get month index
+    const monthIndex = new Date(Date.parse(month + ' 1, 2012')).getMonth(); // Get month index
     return new Date(Date.UTC(Number(year), monthIndex, Number(day)));
   }
 
@@ -229,7 +242,6 @@ export const MyLearning = () => {
 
   const handleSaveCard = async (card: Cards) => {
     try {
-
       const supabaseClient = createClient();
 
       const userId = (await supabaseClient.auth.getUser()).data.user?.id as string;
@@ -239,24 +251,31 @@ export const MyLearning = () => {
         throw new Error('User ID not returned from superbase');
       }
 
-      const response = await axios.patch('/api/v1/store-learnings',
-        { id: card.id, title: card.title, date: card.date, uuid: userId });
+      const response = await axios.patch('/api/v1/store-learnings', {
+        id: card.id,
+        title: card.title,
+        date: card.date,
+        uuid: userId,
+      });
 
-      const options = { day: 'numeric' as const, month: 'short' as const, year: 'numeric' as const };
+      const options = {
+        day: 'numeric' as const,
+        month: 'short' as const,
+        year: 'numeric' as const,
+      };
       const DateDiplay = new Date(card.date).toLocaleDateString('en-GB', options);
 
       const updatedCard = { ...card, date: DateDiplay };
 
       if (response.status === 200) {
-        setCards(cards.map((c) => c.id === card.id ? updatedCard : c));
-        setOriginalCards(cards.map((c) => c.id === card.id ? updatedCard : c));
+        setCards(cards.map((c) => (c.id === card.id ? updatedCard : c)));
+        setOriginalCards(cards.map((c) => (c.id === card.id ? updatedCard : c)));
         setIsDialogOpen(false);
       } else {
         console.error('Error updating data:', response.data.body);
       }
 
       //toggleSort(); // for sort the cards after date changes
-
     } catch (error) {
       console.error('Error Update my learning ', (error as Error).message);
     }
@@ -264,7 +283,6 @@ export const MyLearning = () => {
 
   const saveChanges = (id: string | null) => {
     if (id !== null) {
-
       const cardToUpdate = cards.find((c) => c.id === id) as Cards;
 
       const updatedCard = {
@@ -282,11 +300,13 @@ export const MyLearning = () => {
     setCurrDate(new Date());
     setCurrTitle('');
     setIsDialogOpen(false);
-  }
+  };
 
   const toggleSort = () => {
     if (isDateSorted === false) {
-      const sortedCards = [...cards].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      const sortedCards = [...cards].sort(
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+      );
       setCards(sortedCards);
     } else {
       setCards(originalCards);
@@ -296,19 +316,17 @@ export const MyLearning = () => {
 
   const redirectToDashboard = (id: string) => {
     router.push(`/new?id=${id}`);
-  }
+  };
 
   return (
-    <section className='bg-[#fef9f5] h-screen'>
+    <section className="bg-[#fef9f5] h-screen">
       <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4 `}>
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <div className="bg-black p-2 rounded-full mr-4 text-white">
-                LOGO
-              </div>
-              <div className='flex flex-row items-center ml-6'>
-                <div className='h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center'>
+              <div className="bg-black p-2 rounded-full mr-4 text-white">LOGO</div>
+              <div className="flex flex-row items-center ml-6">
+                <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
                   <FaSearch size={18} />
                 </div>
                 <input
@@ -324,16 +342,21 @@ export const MyLearning = () => {
               <UserNav />
             </div>
           </div>
-          <div className='flex flex-row items-center'>
+          <div className="flex flex-row items-center">
             <h1 className="text-4xl font-mediums text-black">My</h1>
-            <div className='ml-10 w-4 h-4 rounded-full  bg-black'></div>
-            <div className='w-full h-1 bg-black'></div>
+            <div className="ml-10 w-4 h-4 rounded-full  bg-black"></div>
+            <div className="w-full h-1 bg-black"></div>
           </div>
-          <div className='flex sm:flex-row flex-col sm:items-center'>
+          <div className="flex sm:flex-row flex-col sm:items-center">
             <h1 className="text-4xl font-mediums text-black">Learnings</h1>
             <div className="sm:ml-10 md:mt-0 mt-2 flex items-center">
               <div className="switch-toggle border dark:border-black border-black">
-                <input className="switch-toggle-checkbox" type="checkbox" id="Recent-Date" onClick={toggleSort} />
+                <input
+                  className="switch-toggle-checkbox"
+                  type="checkbox"
+                  id="Recent-Date"
+                  onClick={toggleSort}
+                />
                 <label className="switch-toggle-label dark:bg-black" htmlFor="Recent-Date">
                   <span>Recent</span>
                   <span>Date</span>
@@ -345,12 +368,16 @@ export const MyLearning = () => {
         <article
           className={`h-[33rem] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 grid-flow-dense gap-y-20 sm:mx-16 mx-4 pb-8`}
         >
-          <div className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex items-center justify-center`}>
-            <Button className="bg-transparent border-dashed border-2 border-blue-500 w-[150px] h-[150px] mx-auto hover:bg-transparent hover:border-blue-500 hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl"
+          <div
+            className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex items-center justify-center`}
+          >
+            <Button
+              className="bg-transparent border-dashed border-2 border-blue-500 w-[150px] h-[150px] mx-auto hover:bg-transparent hover:border-blue-500 hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl"
               onClick={(e) => {
                 e.preventDefault();
                 handleAddCard();
-              }}>
+              }}
+            >
               <FaPlus size={24} color="#60a5fa" />
             </Button>
           </div>
@@ -392,19 +419,30 @@ export const MyLearning = () => {
                   Date
                 </Label>
                 <Input
-                  type='date'
+                  type="date"
                   id="dateinput"
                   value={currDate.toISOString().substring(0, 10)}
                   className="col-span-3"
-                  onChange={handleDateChange} />
+                  onChange={handleDateChange}
+                />
               </div>
             </div>
             <DialogFooter>
-              <div className='w-full flex justify-between'>
-                <Button type="submit" className='bg-red-500 hover:bg-red-900 text-white' onClick={() => handleDelete(editingCardId)}>Delete</Button>
+              <div className="w-full flex justify-between">
+                <Button
+                  type="submit"
+                  className="bg-red-500 hover:bg-red-900 text-white"
+                  onClick={() => handleDelete(editingCardId)}
+                >
+                  Delete
+                </Button>
                 <div>
-                  <Button type="submit" className='mr-2' onClick={cancelChanges}>Cancel</Button>
-                  <Button type="submit" onClick={() => saveChanges(editingCardId)}>Save changes</Button>
+                  <Button type="submit" className="mr-2" onClick={cancelChanges}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" onClick={() => saveChanges(editingCardId)}>
+                    Save changes
+                  </Button>
                 </div>
               </div>
             </DialogFooter>
@@ -421,7 +459,7 @@ const LearningCard = ({
   date,
   bgColor,
   onEdit,
-  handleDashboardScreen
+  handleDashboardScreen,
 }: {
   id: string;
   title: string;
@@ -430,23 +468,27 @@ const LearningCard = ({
   bgColor: string;
   handleDashboardScreen: (id: string) => void;
 }) => {
-
   return (
-    <Card className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex flex-col justify-between
+    <Card
+      className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex flex-col justify-between
     rounded-tl-none rounded-tr-3xl rounded-b-3xl shadow-xl border-none`}
       style={{ backgroundColor: bgColor }}
-      onClick={() => handleDashboardScreen(id)}>
+      onClick={() => handleDashboardScreen(id)}
+    >
       <CardHeader className="flex items-center">
         <CardTitle className="w-full text-left text-black">{title}</CardTitle>
       </CardHeader>
       <CardFooter className="flex justify-between items-center ">
         <div className="text-left text-black">{date}</div>
-        <Button variant="outline" className='bg-gray-500 border-none shadow-xl hover:bg-gray-600'
+        <Button
+          variant="outline"
+          className="bg-gray-500 border-none shadow-xl hover:bg-gray-600"
           onClick={(e) => {
             onEdit(id);
             e.stopPropagation();
-          }}>
-          <PiDotsThreeOutlineVerticalThin size={20} className='text-white' />
+          }}
+        >
+          <PiDotsThreeOutlineVerticalThin size={20} className="text-white" />
         </Button>
       </CardFooter>
     </Card>

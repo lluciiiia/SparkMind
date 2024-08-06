@@ -1,42 +1,37 @@
-import type { ScraperScrapeResult } from '@src/types'
-import axios from 'axios'
-import { Redacted } from '.'
+import axios from 'axios';
+import { Redacted } from '.';
+import type { ScraperScrapeResultType } from '../schema';
 
+type ApiUrl = Redacted<string>;
 
 export class Api {
-  
-  private constructor(readonly baseURL: string) {}
+  private constructor(readonly baseURL: ApiUrl) {}
 
   public static make(baseURL: string) {
-    return new Api(baseURL)
+    return new Api(Redacted.make(baseURL));
   }
 
-  public async get() {
+  public async get(): Promise<Json> {
     try {
-      const scraperAPI = new Redacted().
-      const response = await axios.get()
-      if (response.status !== 200)
-        throw new Error(`HTTP error! status: ${response.status}`)
-      return response.data
+      const response = await axios.get(this.baseURL as unknown as string);
+      if (response.status !== 200) throw new Error(`HTTP error! status: ${response.status}`);
+      return response.data;
     } catch (error) {
-      console.error(error)
-      throw error
+      throw new Error(`${error instanceof Error ? error.message : 'Internal server error'}`);
     }
   }
 
-  public async post(data: Json) {
+  public async post(data: Json): Promise<Json> {
     try {
-      const response = await axios.post(this.baseURL, data)
-      if (response.status !== 200)
-        throw new Error(`HTTP error! status: ${response.status}`)
-      return response.data
+      const response = await axios.post(this.baseURL as unknown as string, data);
+      if (response.status !== 200) throw new Error(`HTTP error! status: ${response.status}`);
+      return response.data;
     } catch (error) {
-      console.error(error)
-      throw error
+      throw new Error(`${error instanceof Error ? error.message : 'Internal server error'}`);
     }
   }
 
-  public async echo(data: ScraperScrapeResult) {
-    return data
+  public async echo(data: ScraperScrapeResultType): Promise<ScraperScrapeResultType> {
+    return data;
   }
 }

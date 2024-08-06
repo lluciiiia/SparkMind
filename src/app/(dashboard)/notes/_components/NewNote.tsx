@@ -6,8 +6,8 @@ import type React from 'react';
 import { FaPlus } from 'react-icons/fa';
 
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
-import { type NoteType } from '@/schema';
 import { createAPIClient } from '@/lib';
+import type { NoteType } from '@/schema';
 
 const api = createAPIClient();
 
@@ -19,7 +19,9 @@ export const NewNoteSection: React.FC<{
     try {
       await api.createNote(note);
     } catch (error) {
-      throw new Error(`Error creating note: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Error creating note: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   };
 
@@ -42,7 +44,13 @@ export const NewNoteSection: React.FC<{
                 size={24}
                 color="#ffffff"
                 onClick={() => {
-                  onSubmit({ title: note.title, uuid: note.uuid, content: note.content, created_at: note.created_at, updated_at: note.updated_at });
+                  onSubmit({
+                    title: note.title,
+                    uuid: note.uuid,
+                    content: note.content,
+                    created_at: note.created_at,
+                    updated_at: note.updated_at,
+                  });
                 }}
               />
             </div>
@@ -54,7 +62,8 @@ export const NewNoteSection: React.FC<{
           {notes.map((_, i) => (
             <article
               key={i}
-              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl"></article>
+              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl"
+            ></article>
           ))}
         </section>
         <ScrollBar orientation="vertical" />

@@ -5,7 +5,9 @@ import css from './styles.module.css';
 
 export function Popup() {
   React.useEffect(() => {
-    Browser.runtime.sendMessage({ popupMounted: true });
+    // Browser.runtime.sendMessage({ popupMounted: true });
+    console.log('popup mounted');
+    console.log(window.location.href)
   }, []);
 
   return (

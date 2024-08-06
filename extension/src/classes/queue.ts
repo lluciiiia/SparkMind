@@ -1,8 +1,8 @@
 export class Queue<T> {
-  private constructor(
-    private items: any = {},
-    private front = 0,
-    private back = 0,
+  public constructor(
+    public items: any = {},
+    public front = 0,
+    public back = 0,
   ) {}
 
   public enqueue(item: T): string {
