@@ -42,6 +42,7 @@ import {
   VideoItem,
   Output,
   ParsedVideoData,
+  Question,
 } from "./interfaces";
 import { retrieveData } from "../../new/_components/hash-handler";
 import { useSearchParams } from "next/navigation";
@@ -149,16 +150,21 @@ export const Dashboard = () => {
     if (output?.summary) {
       setSummaryData(output.summary as any);
     }
+
+    if (output?.questions) {
+      const parsedData = JSON.parse(output.questions) as Question[];
+      setQuestions(parsedData);
+    }
   }, [output]);
 
-  useEffect(() => {
-    const input = searchParams.get("input");
+  // useEffect(() => {
+  //   const input = searchParams.get("input");
 
-    if (input) {
-      console.log("THE INPUT", input);
-      createQuiz(input);
-    }
-  }, [searchParams]);
+  //   if (input) {
+  //     console.log("THE INPUT", input);
+  //     createQuiz(input);
+  //   }
+  // }, [searchParams]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
@@ -197,15 +203,15 @@ export const Dashboard = () => {
     }
   }, [frequentQue]);
 
-  const createQuiz = async (query: string) => {
-    console.log("THE QUERY", query);
-    buildQuiz(query).then((quiz) => {
-      console.log("THE QUIZ", quiz);
-      if (quiz) {
-        setQuestions(quiz);
-      }
-    });
-  };
+  // const createQuiz = async (query: string) => {
+  //   console.log("THE QUERY", query);
+  //   buildQuiz(query).then((quiz) => {
+  //     console.log("THE QUIZ", quiz);
+  //     if (quiz) {
+  //       setQuestions(quiz);
+  //     }
+  //   });
+  // };
 
   const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
