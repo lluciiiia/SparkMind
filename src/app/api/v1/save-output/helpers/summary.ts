@@ -10,8 +10,6 @@ import {
 
 dotenv.config();
 
-
-
 async function fetchSummaryData(query: string): Promise<string> {
   const genModel = genAI.getGenerativeModel({
     model,
@@ -32,8 +30,6 @@ export async function saveSummaryOutput(myLearningId: string, topic: string, out
 
     const supabase = createClient();
 
-    
-
     if (!output) {
       const { data, error } = await supabase
         .from("outputs")
@@ -49,7 +45,7 @@ export async function saveSummaryOutput(myLearningId: string, topic: string, out
     } else {
       const { data, error } = await supabase
         .from("outputs")
-        .update([{ summary: JSON.stringify(response) }])
+        .update([{ summary: response }])
         .eq("learning_id", myLearningId);
 
       if (error) {
