@@ -42,23 +42,16 @@ import {
   VideoItem,
   Output,
   ParsedVideoData,
+  Question,
 } from "./interfaces";
-import { retrieveData } from "../../new/_components/hash-handler";
 import { useSearchParams } from "next/navigation";
 
 //discuss with AI Imports
-import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
-import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
 import DiscussionWithAI from "./discussion-with-ai";
 import NoteCard from "./note";
 import VideoCard from "./cards/video-recommendation";
 import ActionCard from "./cards/actionCard";
-
-import {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} from "@google/generative-ai";
+import Summary from "./cards/Summary";
 
 import {
   API_KEY,
@@ -70,9 +63,6 @@ import {
 
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
-import { create } from "domain";
-import { buildQuiz } from "@/app/api/v1/create-quiz/route";
-import Summary from "./cards/Summary";
 import { getOutputResponse } from "./api-handler";
 
 const schema = z.object({
@@ -149,16 +139,12 @@ export const Dashboard = () => {
     if (output?.summary) {
       setSummaryData(output.summary as any);
     }
-  }, [output]);
 
-  useEffect(() => {
-    const input = searchParams.get("input");
-
-    if (input) {
-      console.log("THE INPUT", input);
-      createQuiz(input);
+    if (output?.questions) {
+      const parsedData = JSON.parse(output.questions) as Question[];
+      setQuestions(parsedData);
     }
-  }, [searchParams]);
+  }, [output]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
@@ -196,16 +182,6 @@ export const Dashboard = () => {
       setFrequentQue(false);
     }
   }, [frequentQue]);
-
-  const createQuiz = async (query: string) => {
-    console.log("THE QUERY", query);
-    buildQuiz(query).then((quiz) => {
-      console.log("THE QUIZ", quiz);
-      if (quiz) {
-        setQuestions(quiz);
-      }
-    });
-  };
 
   const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
