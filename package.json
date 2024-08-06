@@ -90,6 +90,7 @@
     "lucide-react": "^0.408.0",
     "marked": "^13.0.3",
     "natural": "^7.1.0",
+    "net": "^1.0.2",
     "next": "^14.2.5",
     "next-themes": "^0.3.0",
     "postcss": "8.4.39",

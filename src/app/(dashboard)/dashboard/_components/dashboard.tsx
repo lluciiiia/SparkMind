@@ -43,15 +43,16 @@ import {
   Output,
   ParsedVideoData,
   Question,
+  FurtherInfo,
 } from "./interfaces";
 import { useSearchParams } from "next/navigation";
 
 //discuss with AI Imports
 import DiscussionWithAI from "./discussion-with-ai";
 import NoteCard from "./note";
-import VideoCard from "./cards/video-recommendation";
+import SummaryCard from "./cards/SummaryCard";
+import VideoCard from "./cards/VideoCard";
 import ActionCard from "./cards/actionCard";
-import Summary from "./cards/Summary";
 
 import {
   API_KEY,
@@ -64,6 +65,9 @@ import {
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
 import { getOutputResponse } from "./api-handler";
+import FurtherInfoCard from "./cards/FurtherInfo";
+
+// import { search } from "../../../../server/services/search-recommendation.service";
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
@@ -103,6 +107,7 @@ export const Dashboard = () => {
   const [videos, setVideos] = useState<VideoItem[] | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState(null);
+  const [furtherInfoData, setFurtherInfoData] = useState<any[]>([]);
 
   const [output, setOutput] = useState<Output | null>(null);
   const myLearningId = searchParams.get("id");
@@ -116,7 +121,6 @@ export const Dashboard = () => {
     const fetchData = async (myLearningId: string) => {
       try {
         const response = await getOutputResponse(myLearningId);
-        console.log("response in fetchData: ", response.data.body[0]);
         setOutput(response.data.body[0]);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -147,6 +151,11 @@ export const Dashboard = () => {
       const parsedData = JSON.parse(output.questions) as Question[];
       setQuestions(parsedData);
     }
+
+    if (output?.further_info) {
+      const parsedData = JSON.parse(output.further_info) as FurtherInfo[];
+      setFurtherInfoData(parsedData);
+    }
   }, [output]);
 
   useEffect(() => {
@@ -157,11 +166,8 @@ export const Dashboard = () => {
       if (response.status === 500) {
         alert("Something Went Wrong");
       }
-      console.log("this is response : " + response.data);
       setBasicQuestion(response.data.basicQue);
-      console.log("the BASIC QUESTIONS", response.data.basicQue);
       setTranscript(response.data.transcript);
-      console.log(response);
     };
     fetchDiscussData();
   }, [video_id]);
@@ -396,7 +402,7 @@ export const Dashboard = () => {
                   {activeTab === tab &&
                     tab === "summary" &&
                     summaryData != null && (
-                      <Summary summaryData={summaryData} />
+                      <SummaryCard summaryData={summaryData} />
                     )}
                   {activeTab === tab && tab === "video" && (
                     <VideoCard videos={videos} />
@@ -406,9 +412,14 @@ export const Dashboard = () => {
                     questions.length > 0 && (
                       <QuestionAndAnswer questions={questions} />
                     )}
-                  {activeTab === tab && tab === "action-items" && (
-                    <ActionCard videos={videos} />
-                  )}
+                  {activeTab === tab &&
+                    tab === "further-info" &&
+                    furtherInfoData != null && (
+                      <FurtherInfoCard furtherInfo={furtherInfoData} />
+                    )}
+                  {activeTab === tab && tab === "action-items"&& (
+                      <ActionCard videos={videos} />
+                    )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
