@@ -109,9 +109,13 @@ export const Dashboard = () => {
   const [summaryData, setSummaryData] = useState(null);
   const [furtherInfoData, setFurtherInfoData] = useState<any[]>([]);
 
-  const [todoList, setTodoList] = useState<any[]>([]);
   const [output, setOutput] = useState<Output | null>(null);
   const myLearningId = searchParams.get("id");
+
+  const [todoList, setTodoList] = useState<Event[]>([]);
+  const [eventList, setEventList] = useState<Event[]>([]);
+  const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
+  const [isListPreview, setListPreview] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
@@ -187,6 +191,67 @@ export const Dashboard = () => {
       setFrequentQue(false);
     }
   }, [frequentQue]);
+
+
+  // krishna start
+
+  // useEffect(() => {
+
+  //   const ActionData = async () => {
+  //     if (myLearningId) {
+  //       const check = await getIsActionPreviewDone(myLearningId);
+
+  //       if (check === false) {
+  //         getListOfEvent(myLearningId);
+  //         setListPreview(true);
+  //       } else {
+  //         getTodoTaskFormDB(myLearningId);
+  //       }
+  //     }
+  //   }
+  //   ActionData();
+
+  // }, [myLearningId]);
+
+  // const getListOfEvent = async (LearningId: any) => {
+  //   try {
+  //     const eventlistRes = await axios.get("/api/v1/geteventlist", {
+  //       params: { LearningId: LearningId }
+  //     });
+
+  //     let eventList = JSON.stringify(eventlistRes.data);
+  //     console.log("eventList" + eventList);
+
+  //     const secnd = await JSON.parse(eventList) as any;
+  //     const VSlList: Event[] = secnd.body;
+
+  //     setEventList(VSlList);
+
+  //   } catch (error) {
+  //     console.error('Error creating event :', error);
+  //     alert('Error creating event : ' + (error as Error).message);
+  //   }
+  // };
+
+  // const getIsActionPreviewDone = async (learningid: string) => {
+  //   const res = await axios.get("/api/v1/getaction-preview", {
+  //     params: { learningid: learningid }
+  //   });
+
+  //   if (res.status === 200) {
+  //     console.log(res.data.check);
+  //     return res.data.check;
+  //   }
+  //   return false;
+  // }
+
+  // const getTodoTaskFormDB = async (learning_id: string) => {
+  //   const eventlistRes = await axios.get("/api/v1/getTodolist", {
+  //     params: { learning_id: learning_id }
+  //   });
+  // }
+
+  //krishna end
 
   const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -284,11 +349,9 @@ export const Dashboard = () => {
           animate={{ width: isOpen ? "100%" : 50 }}
           transition={{ type: "spring", stiffness: 100 }}>
           <summary
-            className={`left-0 relative p-2 ${
-              isOpen ? "rounded-l-md" : "rounded-md"
-            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
-              isOpen ? "justify-start" : "justify-center"
-            }`}>
+            className={`left-0 relative p-2 ${isOpen ? "rounded-l-md" : "rounded-md"
+              } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${isOpen ? "justify-start" : "justify-center"
+              }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -316,11 +379,10 @@ export const Dashboard = () => {
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
-                  className={`px-6 py-2 cursor-pointer ${
-                    activeTab === tab.name
-                      ? "bg-navy text-white rounded-t-3xl"
-                      : "text-gray"
-                  }`}
+                  className={`px-6 py-2 cursor-pointer ${activeTab === tab.name
+                    ? "bg-navy text-white rounded-t-3xl"
+                    : "text-gray"
+                    }`}
                   onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
                 </button>
@@ -355,6 +417,9 @@ export const Dashboard = () => {
                     furtherInfoData != null && (
                       <FurtherInfoCard furtherInfo={furtherInfoData} />
                     )}
+                  {activeTab === tab && tab === "action-items"&& (
+                      <ActionCard videos={videos} />
+                    )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
@@ -383,9 +448,8 @@ export const Dashboard = () => {
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${
-                        isDrawerOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? "rotate-180" : ""
+                        }`}
                       fill="black"
                     />
                   </motion.div>
