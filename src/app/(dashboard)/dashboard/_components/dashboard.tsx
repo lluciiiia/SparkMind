@@ -43,15 +43,16 @@ import {
   Output,
   ParsedVideoData,
   Question,
+  FurtherInfo,
 } from "./interfaces";
 import { useSearchParams } from "next/navigation";
 
 //discuss with AI Imports
 import DiscussionWithAI from "./discussion-with-ai";
 import NoteCard from "./note";
-import VideoCard from "./cards/video-recommendation";
+import SummaryCard from "./cards/SummaryCard";
+import VideoCard from "./cards/VideoCard";
 import ActionCard from "./cards/actionCard";
-import Summary from "./cards/Summary";
 
 import {
   API_KEY,
@@ -64,7 +65,7 @@ import {
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
 import { getOutputResponse } from "./api-handler";
-import FurtherInfo from "./cards/FurtherInfo";
+import FurtherInfoCard from "./cards/FurtherInfo";
 
 // import { search } from "../../../../server/services/search-recommendation.service";
 
@@ -106,7 +107,7 @@ export const Dashboard = () => {
   const [videos, setVideos] = useState<VideoItem[] | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState(null);
-  const [furtherInfoData, setFurtherInfoData] = useState(null);
+  const [furtherInfoData, setFurtherInfoData] = useState<any[]>([]);
 
   const [todoList, setTodoList] = useState<any[]>([]);
   const [output, setOutput] = useState<Output | null>(null);
@@ -116,7 +117,6 @@ export const Dashboard = () => {
     const fetchData = async (myLearningId: string) => {
       try {
         const response = await getOutputResponse(myLearningId);
-        console.log("response in fetchData: ", response.data.body[0]);
         setOutput(response.data.body[0]);
       } catch (error) {
         console.error("Error fetching data: ", error);
@@ -134,7 +134,6 @@ export const Dashboard = () => {
 
   useEffect(() => {
     if (output?.youtube) {
-      console.log("the output", output);
       const parsedData = JSON.parse(output.youtube) as ParsedVideoData;
       const videoItems = parsedData.items as VideoItem[];
       setVideos(videoItems);
@@ -148,21 +147,23 @@ export const Dashboard = () => {
       const parsedData = JSON.parse(output.questions) as Question[];
       setQuestions(parsedData);
     }
+
+    if (output?.further_info) {
+      const parsedData = JSON.parse(output.further_info) as FurtherInfo[];
+      setFurtherInfoData(parsedData);
+    }
   }, [output]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
       const response = await axios.get(
-        `/api/v1/getdiscuss?videoid=${video_id}`,
+        `/api/v1/getdiscuss?videoid=${video_id}`
       );
       if (response.status === 500) {
         alert("Something Went Wrong");
       }
-      console.log("this is response : " + response.data);
       setBasicQuestion(response.data.basicQue);
-      console.log("the BASIC QUESTIONS", response.data.basicQue);
       setTranscript(response.data.transcript);
-      console.log(response);
     };
     fetchDiscussData();
   }, [video_id]);
@@ -281,15 +282,13 @@ export const Dashboard = () => {
           className="w-full"
           initial={{ width: 30 }}
           animate={{ width: isOpen ? "100%" : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}
-        >
+          transition={{ type: "spring", stiffness: 100 }}>
           <summary
             className={`left-0 relative p-2 ${
               isOpen ? "rounded-l-md" : "rounded-md"
             } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
               isOpen ? "justify-start" : "justify-center"
-            }`}
-          >
+            }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -322,8 +321,7 @@ export const Dashboard = () => {
                       ? "bg-navy text-white rounded-t-3xl"
                       : "text-gray"
                   }`}
-                  onClick={() => setActiveTab(tab.name)}
-                >
+                  onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
                 </button>
               </li>
@@ -342,7 +340,7 @@ export const Dashboard = () => {
                   {activeTab === tab &&
                     tab === "summary" &&
                     summaryData != null && (
-                      <Summary summaryData={summaryData} />
+                      <SummaryCard summaryData={summaryData} />
                     )}
                   {activeTab === tab && tab === "video" && (
                     <VideoCard videos={videos} />
@@ -351,16 +349,11 @@ export const Dashboard = () => {
                     tab === "qna" &&
                     questions.length > 0 && (
                       <QuestionAndAnswer questions={questions} />
-                    )}{" "}
-                  {activeTab === tab &&
-                    tab === "summary" &&
-                    summaryData != null && (
-                      <Summary summaryData={summaryData} />
                     )}
                   {activeTab === tab &&
                     tab === "further-info" &&
                     furtherInfoData != null && (
-                      <FurtherInfo furtherInfo={furtherInfoData} />
+                      <FurtherInfoCard furtherInfo={furtherInfoData} />
                     )}
                   {activeTab != tab && (
                     <Card
@@ -368,7 +361,7 @@ export const Dashboard = () => {
                     />
                   )}
                 </div>
-              ),
+              )
           )}
         </section>
         <footer className=" w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
@@ -379,8 +372,7 @@ export const Dashboard = () => {
             className={`
                 absolute flex flex-col items-center justify-center bottom-6
               `}
-            ref={drawerRef}
-          >
+            ref={drawerRef}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -389,8 +381,7 @@ export const Dashboard = () => {
                     animate={{ opacity: 1 }}
                     transition={{ type: "spring", stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-                  >
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
                     <Triangle
                       className={`w-5 h-5 bottom-0 ${
                         isDrawerOpen ? "rotate-180" : ""
