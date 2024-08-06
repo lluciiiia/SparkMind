@@ -5,6 +5,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { saveYoutubeOutput } from "./helpers/youtube";
 
 export const dynamic = "force-dynamic";
+const supabase = createClient();
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,17 +20,35 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const myLearning = await getMyLearningById(myLearningId);
+    const { data: myLearning, error: myLearningError } = await getMyLearningById(myLearningId);
     if (!myLearning)
       return NextResponse.json({
         status: 404,
-        error: "Error getting my learning",
+        error: "No learning found",
       });
+
+      if (myLearningError) {
+        console.log("myLearningError: ", myLearningError);
+        return NextResponse.json(
+          { error: "Error getting my learning" },
+          { status: 500 }
+        );
+      }
+
+      const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
+        if (outputError) {
+          console.log("outputError: ", outputError);
+          return NextResponse.json(
+            { error: "Error getting output" },
+            { status: 500 }
+          );
+        }
 
     const youtubeResponse = await saveYoutubeOutput(
       myLearning[0].input,
       pageToken,
-      myLearningId
+      myLearningId,
+      output
     );
 
     if (youtubeResponse.status != 200)
@@ -46,12 +65,15 @@ export async function GET(req: NextRequest) {
 }
 
 async function getMyLearningById(id: string) {
-  const supabase = createClient();
+  return await supabase
+  .from("mylearnings")
+  .select("id, input")
+  .eq("id", id);
+}
 
-  const { data, error } = await supabase
-    .from("mylearnings")
-    .select("id, input")
-    .eq("id", id);
-
-  return data;
+async function getOutputByLearningId(learningId: string) {
+  return await supabase
+  .from("outputs")
+  .select("id")
+  .eq("id", learningId);
 }
