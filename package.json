@@ -103,6 +103,7 @@
     "react-merge-refs": "^2.1.1",
     "react-toastify": "^10.0.5",
     "remark-gfm": "^4.0.0",
+    "sharp": "^0.33.4",
     "simplex-noise": "^4.0.2",
     "sonner": "^1.5.0",
     "stopword": "^3.0.1",
