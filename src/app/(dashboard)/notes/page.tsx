@@ -1,20 +1,20 @@
 'use client';
 
+import { useNotes } from '@/context';
 import { createAPIClient } from '@/lib';
 import { NoteSchema, type NoteType } from '@/schema';
+import { createClient } from '@/utils/supabase/client';
 import React, { useEffect, useState } from 'react';
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
-import type { z } from 'zod';
 import { useSessionStorage } from 'usehooks-ts';
-import { useNotes } from '@/context';
-import { createClient } from '@/utils/supabase/client';
+import type { z } from 'zod';
 
 const NotesPage = async () => {
   const supabase = createClient();
 
   const {
-    data: { user }
-  } = await supabase.auth.getUser()
+    data: { user },
+  } = await supabase.auth.getUser();
 
   console.log(user);
 
@@ -30,11 +30,7 @@ const NotesPage = async () => {
     };
     fetchNotes();
   }, []);
-  return (
-    <article id={`${user?.id}`}>
-
-    </article>
-  );
+  return <article id={`${user?.id}`}></article>;
 };
 
 export default NotesPage;

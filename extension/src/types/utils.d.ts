@@ -47,3 +47,5 @@ type DeepNullable<T extends Record<string, unknown>> = {
 };
 
 type NullableArray<T> = Array<T> | Array<NullableArray<T>>;
+
+type UUID = `${string}-${string}-${string}-${string}-${string}`;

@@ -1,9 +1,9 @@
-import React from "react";
-import "../../../../../styles/css/markdown.css";
+import React from 'react';
+import '../../../../../styles/css/markdown.css';
 type Paragraph = { title: string; data: string };
 type Props = { summaryData: any };
-import { marked } from "marked";
-import { Card } from "@/components/ui/card";
+import { Card } from '@/components/ui/card';
+import { marked } from 'marked';
 
 export default async function SummaryCard({ summaryData }: Props) {
   const htmlContent = await marked(summaryData);

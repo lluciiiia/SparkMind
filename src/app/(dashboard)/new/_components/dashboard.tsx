@@ -28,17 +28,17 @@ import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
-import { getYoutubeResponse, saveOutput } from "./api-handler";
+import { getYoutubeResponse, saveOutput } from './api-handler';
 //Circle Loading Style
-import "@/styles/css/Circle-loader.css";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { generateHash, storeData } from "./hash-handler";
-import { useSearchParams } from "next/navigation";
+import '@/styles/css/Circle-loader.css';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { generateHash, storeData } from './hash-handler';
 
 export const NewDashboard = () => {
   const searchParams = useSearchParams();
-  const myLearningId = searchParams.get("id");
+  const myLearningId = searchParams.get('id');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -88,9 +88,7 @@ export const NewDashboard = () => {
 
   const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text' | 'keywords'>();
 
-  const handleVideoFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const pathURL = URL.createObjectURL(file);
@@ -144,7 +142,7 @@ export const NewDashboard = () => {
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
       const response = await saveOutput(input, myLearningId);
-      console.log("response", response);
+      console.log('response', response);
 
       router.push(`/dashboard?id=${myLearningId}&input=${input}`);
     } catch (err: any) {
@@ -156,10 +154,10 @@ export const NewDashboard = () => {
     if (!myLearningId) return;
 
     let input;
-    if (fileType === "video") {
-      let keyWordsArray = await handleVideoUpload();
+    if (fileType === 'video') {
+      const keyWordsArray = await handleVideoUpload();
       input = keyWordsArray.toString();
-    } else if (fileType == "text") {
+    } else if (fileType == 'text') {
       input = content;
     } else if (fileType == 'keywords') {
       input = keywords;

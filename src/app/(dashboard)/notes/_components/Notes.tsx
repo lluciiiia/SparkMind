@@ -1,9 +1,9 @@
+import { createAPIClient } from '@/lib/fetch';
+import type { NoteType } from '@/schema';
 import { motion } from 'framer-motion';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { NewNoteSection } from '.';
-import { createAPIClient } from '@/lib/fetch';
-import { NoteType } from '@/schema';
 
 export const NewNoteContainer = ({
   isOpen,

@@ -40,7 +40,9 @@ export function createAPIClient() {
       return res.data;
     } catch (error) {
       console.error('Failed to fetch notes:', error);
-      throw new Error(`Error fetching notes: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Error fetching notes: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   };
 
@@ -56,7 +58,9 @@ export function createAPIClient() {
       return res.data;
     } catch (error) {
       console.error(`Failed to fetch note with id ${id}:`, error);
-      throw new Error(`Error fetching note with id ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Error fetching note with id ${id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   };
 
@@ -73,7 +77,9 @@ export function createAPIClient() {
       return res.data;
     } catch (error) {
       console.error('Failed to create note:', error);
-      throw new Error(`Error creating note: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Error creating note: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   };
 
@@ -90,7 +96,9 @@ export function createAPIClient() {
       return res.data;
     } catch (error) {
       console.error(`Failed to update note with id ${note.id}:`, error);
-      throw new Error(`Error updating note with id ${note.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Error updating note with id ${note.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   };
 
@@ -107,7 +115,9 @@ export function createAPIClient() {
       return res.data;
     } catch (error) {
       console.error(`Failed to delete note with id ${note.id}:`, error);
-      throw new Error(`Error deleting note with id ${note.id}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Error deleting note with id ${note.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
     }
   };
 

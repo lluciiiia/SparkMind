@@ -1,23 +1,16 @@
 import { createClient } from '@/utils/supabase/client';
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { API_KEY, genAI, model, safetySettings } from '@/app/api/v1/gemini-settings';
 //Gemini - ai Import
 import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
-import {
-  API_KEY,
-  genAI,
-  model,
-  safetySettings,
-} from "@/app/api/v1/gemini-settings";
 
 export const dynamic = 'force-dynamic';
 
 const supabase = createClient();
 
 async function getEventList(transcript: string): Promise<any> {
-
-  if (!API_KEY) return new Response("Missing API key", { status: 400 });
-
+  if (!API_KEY) return new Response('Missing API key', { status: 400 });
 
   const generationConfig = {
     temperature: 0.7,
@@ -67,7 +60,7 @@ async function getEventList(transcript: string): Promise<any> {
   try {
     const result = await genModel.generateContent(prompt.trim());
     const eventList = JSON.parse(await result.response.text());
-    console.log('this are event List are', eventList)
+    console.log('this are event List are', eventList);
     return eventList;
   } catch (error) {
     console.error('Error fetching event list:', error);

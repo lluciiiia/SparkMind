@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import React, { useState, useCallback } from "react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
-import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import { Message } from "./interfaces"; // Adjust the path as needed
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import LoadingIndicator from '@/components/ui/custom/LoadingIndicator';
+import { PlaceholdersAndVanishInput } from '@/components/ui/custom/placeholders-and-vanish-input';
+import { Textarea } from '@/components/ui/textarea';
+import type React from 'react';
+import { useCallback, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import type { Message } from './interfaces'; // Adjust the path as needed
 
 interface DiscussionWithAIProps {
   responses: Message[];
@@ -43,7 +44,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
       <div className="h-full w-full flex flex-col items-center">
         <div className="flex flex-col mt-3 mb-4 w-full max-w-4xl px-4 h-4/5 overflow-y-scroll no-scrollbar">
           {responses.map((response, index) =>
-            response.sender === "user" ? (
+            response.sender === 'user' ? (
               <div className="mb-4 flex justify-end" key={index}>
                 <div className="p-2 rounded bg-gray-200 inline-block dark:text-black">
                   {response.text}
@@ -52,9 +53,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
             ) : (
               <div className="mb-4 flex justify-start" key={index}>
                 <div className="p-2 text-black dark:text-white rounded bg-gray-400 inline-block">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {response.text}
-                  </ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{response.text}</ReactMarkdown>
                 </div>
               </div>
             ),
@@ -69,17 +68,19 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
         </div>
         <div className="sticky bottom-0 h-2/5 w-full max-w-4xl p-4 flex flex-col items-center rounded-t-lg mb-8">
           <div className="flex flex-row overflow-x-auto no-scrollbar">
-            {basicQuestion !== undefined && basicQuestion.map((que, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setInput(que);
-                  setFrequentQue(true);
-                }}
-                className="bg-gray-200 mx-4 rounded-lg p-2 flex-shrink-0 dark:text-black">
-                {que}
-              </button>
-            ))}
+            {basicQuestion !== undefined &&
+              basicQuestion.map((que, index) => (
+                <button
+                  key={index}
+                  onClick={() => {
+                    setInput(que);
+                    setFrequentQue(true);
+                  }}
+                  className="bg-gray-200 mx-4 rounded-lg p-2 flex-shrink-0 dark:text-black"
+                >
+                  {que}
+                </button>
+              ))}
           </div>
           <div className="mt-4 w-3/5 ">
             <PlaceholdersAndVanishInput
