@@ -19,7 +19,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       safetySettings,
     });
 
-    const prompt = systemInstruction + note;
+    const prompt = SYSTEM_INSTRUCTION + note;
 
     const geminiRes = await genModel.generateContent(prompt);
 
@@ -33,5 +33,5 @@ export async function POST(req: NextRequest, res: NextResponse) {
   }
 }
 
-const systemInstruction = `Task: Correct the grammar of the given text.
+const SYSTEM_INSTRUCTION = `Task: Correct the grammar of the given text.
 Text: `;

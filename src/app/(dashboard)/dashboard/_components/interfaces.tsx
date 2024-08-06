@@ -28,10 +28,15 @@ export interface VideoItem {
   };
 }
 
-export interface VideoResponse {
-  data: {
-    body: VideoItem[];
-  };
+export interface ParsedVideoData {
+  items: VideoItem[];
+}
+
+export interface Output {
+  youtube: string;
+  summary: string;
+  questions: string;
+  further_info: string;
 }
 
 export interface VideoCardProps {
@@ -45,4 +50,23 @@ export interface NoteCardProps {
     content: string;
   };
   onDelete: (id: string) => void;
+}
+
+export interface Question {
+  id: number;
+  question: string;
+  options: string[];
+  answer: string[];
+  multipleAnswers: boolean;
+}
+
+export interface FurtherInfo {
+  link: string;
+  title: string;
+  snippet: string;
+  thumbnail?: {
+    src: string;
+    width: string;
+    height: string;
+  };
 }

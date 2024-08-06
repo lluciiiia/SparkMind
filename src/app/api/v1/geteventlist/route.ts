@@ -7,7 +7,6 @@ import {
   API_KEY,
   genAI,
   model,
-  generationConfig,
   safetySettings,
 } from "@/app/api/v1/gemini-settings";
 
@@ -18,6 +17,15 @@ const supabase = createClient();
 async function getEventList(transcript: string): Promise<any> {
 
   if (!API_KEY) return new Response("Missing API key", { status: 400 });
+
+
+  const generationConfig = {
+    temperature: 0.7,
+    topP: 0.85,
+    topK: 50,
+    maxOutputTokens: 80000,
+    responseMimeType: 'application/json',
+  };
 
   const genModel = genAI.getGenerativeModel({
     model,
@@ -59,6 +67,7 @@ async function getEventList(transcript: string): Promise<any> {
   try {
     const result = await genModel.generateContent(prompt.trim());
     const eventList = JSON.parse(await result.response.text());
+    console.log('this are event List are', eventList)
     return eventList;
   } catch (error) {
     console.error('Error fetching event list:', error);
