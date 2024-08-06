@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 export async function saveYoutubeOutput(
   query: string,
   pageToken: string | null,
-  myLearningId: string
+  myLearningId: string,
+  output: any
 ) {
   const apiKey = process.env.GOOGLE_YOUTUBE_API_KEY;
 
@@ -43,39 +44,8 @@ export async function saveYoutubeOutput(
 
   const supabase = createClient();
 
-  const { data: learningData, error: learningError } = await supabase
-    .from("mylearnings")
-    .select("id")
-    .eq("id", myLearningId);
 
-  if (learningError) {
-    console.log("learningError: ", learningError);
-    return NextResponse.json(
-      { error: "Error getting my learning" },
-      { status: 500 }
-    );
-  }
-
-  if (!learningData) {
-    return NextResponse.json({ error: "No learning found" }, { status: 404 });
-  }
-
-  const { data: outputData, error: outputError } = await supabase
-    .from("outputs")
-    .select("id")
-    .eq("id", myLearningId);
-
-
-
-  if (outputError) {
-    console.log("outputError: ", learningError);
-    return NextResponse.json(
-      { error: "Error getting my learning" },
-      { status: 500 }
-    );
-  }
-
-  if (!outputData) {
+  if (!output) {
     const { data, error } = await supabase
       .from("outputs")
       .insert([
