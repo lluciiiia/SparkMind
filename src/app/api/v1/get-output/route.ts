@@ -52,7 +52,7 @@ async function getMyLearningById(id: string) {
 async function getOutputByLearningId(learningId: string) {  
     const { data, error } = await supabase
       .from("outputs")
-      .select("id, youtube, summary")
+      .select("id, youtube, summary, questions")
       .eq("learning_id", learningId);
   
     return data;
