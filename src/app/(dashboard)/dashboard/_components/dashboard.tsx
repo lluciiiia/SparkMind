@@ -72,7 +72,6 @@ import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
 import { create } from "domain";
 import { buildQuiz } from "@/app/api/v1/create-quiz/route";
-import { buildSummary } from "@/app/api/v1/create-summary/route";
 import Summary from "./cards/Summary";
 import { getOutputResponse } from "./api-handler";
 
@@ -146,14 +145,14 @@ export const Dashboard = () => {
       const videoItems = parsedData.items as VideoItem[];
       setVideos(videoItems);
     }
+
+    if (output?.summary) {
+      setSummaryData(output.summary as any);
+    }
   }, [output]);
 
   useEffect(() => {
     const input = searchParams.get("input");
-
-    if (input) {
-      createSummary(input);
-    }
 
     if (input) {
       console.log("THE INPUT", input);
@@ -204,14 +203,6 @@ export const Dashboard = () => {
       console.log("THE QUIZ", quiz);
       if (quiz) {
         setQuestions(quiz);
-      }
-    });
-  };
-  const createSummary = async (query: string) => {
-    buildSummary(query).then((data) => {
-      console.log("THE SUMMARY", data);
-      if (data) {
-        setSummaryData(data as any);
       }
     });
   };
