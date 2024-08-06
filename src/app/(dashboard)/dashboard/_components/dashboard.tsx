@@ -344,6 +344,9 @@ export const Dashboard = () => {
                     questions.length > 0 && (
                       <QuestionAndAnswer questions={questions} />
                     )}
+                  {activeTab === tab && tab === "action-items"&& (
+                      <ActionCard videos={videos} />
+                    )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
