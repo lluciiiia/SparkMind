@@ -10,14 +10,13 @@ type Props = {
   }[];
 };
 
-export default function FurtherInfo({ furtherInfo }: Props) {
+export default function FurtherInfoCard({ furtherInfo }: Props) {
   return (
     <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl px-4 overflow-y-scroll pb-5 gap-5 grid">
       {furtherInfo.map((info) => (
         <div
           key={info.link}
-          className="flex space-x-4 p-4 border rounded-lg shadow-sm"
-        >
+          className="flex space-x-4 p-4 border rounded-lg shadow-sm">
           {info.thumbnail && (
             <img
               src={info.thumbnail.src}
@@ -30,8 +29,7 @@ export default function FurtherInfo({ furtherInfo }: Props) {
           <div>
             <a
               href={info.link}
-              className="text-blue-600 hover:underline font-semibold text-lg"
-            >
+              className="text-blue-600 hover:underline font-semibold text-lg">
               {info.title}
             </a>
             <p className="text-gray-700 mt-2">{info.snippet}</p>
