@@ -2,9 +2,12 @@ import axios from "axios";
 import { createClient } from "@/utils/supabase/client";
 
 import { type NextRequest, NextResponse } from "next/server";
-import { saveYoutubeOutput } from "../youtube/route";
+import { saveYoutubeOutput } from "./helpers/youtube";
+import { saveSummaryOutput } from "./helpers/summary";
+import { saveQuizOutput } from "./helpers/qna";
 
 export const dynamic = "force-dynamic";
+const supabase = createClient();
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,22 +22,59 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const myLearning = await getMyLearningById(myLearningId);
+    const { data: myLearning, error: myLearningError } = await getMyLearningById(myLearningId);
     if (!myLearning)
       return NextResponse.json({
         status: 404,
-        error: "Error getting my learning",
+        error: "No learning found",
       });
+
+      if (myLearningError) {
+        console.log("myLearningError: ", myLearningError);
+        return NextResponse.json(
+          { error: "Error getting my learning" },
+          { status: 500 }
+        );
+      }
+
+      const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
+        if (outputError) {
+          console.log("outputError: ", outputError);
+          return NextResponse.json(
+            { error: "Error getting output" },
+            { status: 500 }
+          );
+        }
 
     const youtubeResponse = await saveYoutubeOutput(
       myLearning[0].input,
       pageToken,
-      myLearningId
+      myLearningId,
+      output
     );
 
     if (youtubeResponse.status != 200)
       return NextResponse.json({ status: youtubeResponse.status });
 
+    const summaryResponse = await saveSummaryOutput(
+      myLearningId,
+      myLearning[0].input,
+      output
+    );
+
+    if (summaryResponse.status != 200)
+      return NextResponse.json({ status: summaryResponse.status });
+
+    const quizResponse = await saveQuizOutput(
+      myLearning[0].input,
+      myLearningId,
+      output
+    );
+
+    if (quizResponse.status != 200)
+      return NextResponse.json({ status: quizResponse.status });
+
+    
     return NextResponse.json({ status: 200 });
   } catch (error) {
     console.error("Error saving output in DB:", error);
@@ -46,12 +86,15 @@ export async function GET(req: NextRequest) {
 }
 
 async function getMyLearningById(id: string) {
-  const supabase = createClient();
+  return await supabase
+  .from("mylearnings")
+  .select("id, input")
+  .eq("id", id);
+}
 
-  const { data, error } = await supabase
-    .from("mylearnings")
-    .select("id, input")
-    .eq("id", id);
-
-  return data;
+async function getOutputByLearningId(learningId: string) {
+  return await supabase
+  .from("outputs")
+  .select("id")
+  .eq("id", learningId);
 }

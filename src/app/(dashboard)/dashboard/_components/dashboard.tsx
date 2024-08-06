@@ -42,23 +42,16 @@ import {
   VideoItem,
   Output,
   ParsedVideoData,
+  Question,
 } from "./interfaces";
-import { retrieveData } from "../../new/_components/hash-handler";
 import { useSearchParams } from "next/navigation";
 
 //discuss with AI Imports
-import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
-import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
 import DiscussionWithAI from "./discussion-with-ai";
 import NoteCard from "./note";
 import VideoCard from "./cards/video-recommendation";
 import ActionCard from "./cards/actionCard";
-
-import {
-  GoogleGenerativeAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} from "@google/generative-ai";
+import Summary from "./cards/Summary";
 
 import {
   API_KEY,
@@ -70,10 +63,6 @@ import {
 
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
-import { create } from "domain";
-import { buildQuiz } from "@/app/api/v1/create-quiz/route";
-import { buildSummary } from "@/app/api/v1/create-summary/route";
-import Summary from "./cards/Summary";
 import { getOutputResponse } from "./api-handler";
 import FurtherInfo from "./cards/FurtherInfo";
 
@@ -138,7 +127,6 @@ export const Dashboard = () => {
       fetchData(myLearningId);
     }
 
-    // Cleanup function if needed
     return () => {
       console.log("Output retrieved");
     };
@@ -151,17 +139,16 @@ export const Dashboard = () => {
       const videoItems = parsedData.items as VideoItem[];
       setVideos(videoItems);
     }
-  }, [output]);
 
-  useEffect(() => {
-    const input = searchParams.get("input");
-
-    if (input) {
-      createSummary(input);
-      createQuiz(input);
-      createFurtherInfo(input);
+    if (output?.summary) {
+      setSummaryData(output.summary as any);
     }
-  }, [searchParams]);
+
+    if (output?.questions) {
+      const parsedData = JSON.parse(output.questions) as Question[];
+      setQuestions(parsedData);
+    }
+  }, [output]);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
@@ -199,34 +186,6 @@ export const Dashboard = () => {
       setFrequentQue(false);
     }
   }, [frequentQue]);
-
-  const createQuiz = async (query: string) => {
-    buildQuiz(query).then((quiz) => {
-      if (quiz) {
-        setQuestions(quiz);
-      }
-    });
-  };
-  const createSummary = async (query: string) => {
-    buildSummary(query).then((data) => {
-      if (data) {
-        setSummaryData(data as any);
-      }
-    });
-  };
-  const createFurtherInfo = async (query: string) => {
-    const res = await axios
-      .get(`/api/v1/furtherinfo?topic=python`, {
-        method: "GET",
-      })
-      .then((response) => {
-        if (response.status === 500) {
-          alert("Something Went Wrong");
-        } else {
-          setFurtherInfoData(response.data as any);
-        }
-      });
-  };
 
   const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -379,7 +338,12 @@ export const Dashboard = () => {
           ].map(
             ({ tab }) =>
               activeTab === tab && (
-                <div className="rounded-t-3xl bg-white h-full" key={tab}>
+                <div className="rounded-b-3xl bg-white h-full" key={tab}>
+                  {activeTab === tab &&
+                    tab === "summary" &&
+                    summaryData != null && (
+                      <Summary summaryData={summaryData} />
+                    )}
                   {activeTab === tab && tab === "video" && (
                     <VideoCard videos={videos} />
                   )}
@@ -400,7 +364,7 @@ export const Dashboard = () => {
                     )}
                   {activeTab != tab && (
                     <Card
-                      className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-t-3xl`}
+                      className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
                     />
                   )}
                 </div>

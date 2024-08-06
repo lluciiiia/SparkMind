@@ -34,6 +34,8 @@ export interface ParsedVideoData {
 
 export interface Output {
   youtube: string;
+  summary: string;
+  questions: string;
 }
 
 export interface VideoCardProps {
@@ -49,3 +51,10 @@ export interface NoteCardProps {
   onDelete: (id: string) => void;
 }
 
+export interface Question {
+  id: number;
+  question: string;
+  options: string[];
+  answer: string[];
+  multipleAnswers: boolean;
+}
