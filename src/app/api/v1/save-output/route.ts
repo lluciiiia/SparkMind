@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/client";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { saveYoutubeOutput } from "./helpers/youtube";
+import { saveSummaryOutput } from "./helpers/summary";
 
 export const dynamic = "force-dynamic";
 const supabase = createClient();
@@ -54,6 +55,16 @@ export async function GET(req: NextRequest) {
     if (youtubeResponse.status != 200)
       return NextResponse.json({ status: youtubeResponse.status });
 
+    const summaryResponse = await saveSummaryOutput(
+      myLearningId,
+      myLearning[0].input,
+      output
+    );
+
+    if (summaryResponse.status != 200)
+      return NextResponse.json({ status: summaryResponse.status });
+
+    
     return NextResponse.json({ status: 200 });
   } catch (error) {
     console.error("Error saving output in DB:", error);

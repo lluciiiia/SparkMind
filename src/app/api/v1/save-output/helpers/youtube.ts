@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 export async function saveYoutubeOutput(
   query: string,
   pageToken: string | null,
-  myLearningId: string
+  myLearningId: string,
+  output: any
 ) {
   const apiKey = process.env.GOOGLE_YOUTUBE_API_KEY;
 
