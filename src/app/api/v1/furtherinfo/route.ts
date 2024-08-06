@@ -1,4 +1,3 @@
-// /app/api/v1/furtherinfo/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { search } from "@/server/services";
 
@@ -8,10 +7,7 @@ export async function saveFurtherInfoOutput(
   query: string,
   myLearningId: string,
 ) {
-  console.log("BRO WORK");
   const response = await search(query);
-  console.log("response", response);
-  console.log(JSON.stringify(response.items));
   return response.items;
 }
 
