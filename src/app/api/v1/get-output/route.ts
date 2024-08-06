@@ -1,10 +1,8 @@
-import axios from "axios";
 import { createClient } from "@/utils/supabase/client";
-
 import { type NextRequest, NextResponse } from "next/server";
-import { saveYoutubeOutput } from "../youtube/route";
 
 export const dynamic = "force-dynamic";
+const supabase = createClient();
 
 export async function GET(req: NextRequest) {
   try {
@@ -32,8 +30,6 @@ export async function GET(req: NextRequest) {
           error: "Error getting output",
         });
 
-
-
     return NextResponse.json({ status: 200, body: output });
   } catch (error) {
     console.error("Error saving output in DB:", error);
@@ -45,8 +41,6 @@ export async function GET(req: NextRequest) {
 }
 
 async function getMyLearningById(id: string) {
-  const supabase = createClient();
-
   const { data, error } = await supabase
     .from("mylearnings")
     .select("id, input")
@@ -55,12 +49,10 @@ async function getMyLearningById(id: string) {
   return data;
 }
 
-async function getOutputByLearningId(learningId: string) {
-    const supabase = createClient();
-  
+async function getOutputByLearningId(learningId: string) {  
     const { data, error } = await supabase
       .from("outputs")
-      .select("id, youtube")
+      .select("id, youtube, summary")
       .eq("learning_id", learningId);
   
     return data;
