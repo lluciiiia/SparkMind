@@ -6,6 +6,7 @@ import { saveYoutubeOutput } from "./helpers/youtube";
 import { saveSummaryOutput } from "./helpers/summary";
 import { saveQuizOutput } from "./helpers/qna";
 import { saveFurtherInfoOutput } from "./helpers/further-info";
+import { saveActionItem } from "./helpers/actionItm";
 
 export const dynamic = "force-dynamic";
 const supabase = createClient();
@@ -57,15 +58,15 @@ export async function GET(req: NextRequest) {
     if (youtubeResponse.status != 200)
       return NextResponse.json({ status: youtubeResponse.status });
 
-    const ActionItmResponse = await saveActionItem(
+    const actionItemResponse = await saveActionItem(
       myLearning[0].input,
       pageToken,
       myLearningId,
       output
     );
 
-    if (ActionItmResponse.status != 200)
-      return NextResponse.json({ status: ActionItmResponse.status });
+    if (actionItemResponse.status != 200)
+      return NextResponse.json({ status: actionItemResponse.status });
 
     const summaryResponse = await saveSummaryOutput(
       myLearningId,

@@ -5,6 +5,7 @@ const supabase = createClient();
 
 async function getTranscript(videoid: string) {
     try {
+        // new things we are store learning_id in video id in DB 
         const { data, error } = await supabase
             .from('transcriptdata')
             .select('transcript')

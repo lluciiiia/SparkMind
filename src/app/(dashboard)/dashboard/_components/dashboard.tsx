@@ -193,8 +193,6 @@ export const Dashboard = () => {
   }, [frequentQue]);
 
 
-  // krishna start
-
   // useEffect(() => {
 
   //   const ActionData = async () => {
@@ -250,8 +248,6 @@ export const Dashboard = () => {
   //     params: { learning_id: learning_id }
   //   });
   // }
-
-  //krishna end
 
   const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -417,9 +413,9 @@ export const Dashboard = () => {
                     furtherInfoData != null && (
                       <FurtherInfoCard furtherInfo={furtherInfoData} />
                     )}
-                  {activeTab === tab && tab === "action-items"&& (
-                      <ActionCard videos={videos} />
-                    )}
+                  {activeTab === tab && tab === "action-items" && (
+                    <ActionCard videos={videos} />
+                  )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
@@ -446,7 +442,11 @@ export const Dashboard = () => {
                     animate={{ opacity: 1 }}
                     transition={{ type: "spring", stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsDrawerOpen(!isDrawerOpen)
+                    }}
+                  >
                     <Triangle
                       className={`w-5 h-5 bottom-0 ${isDrawerOpen ? "rotate-180" : ""
                         }`}
@@ -462,15 +462,7 @@ export const Dashboard = () => {
 
             {/* Discuss with AI */}
             <DiscussionWithAI
-              responses={responses}
-              loading={loading}
-              basicQuestion={basicQuestion}
-              input={input}
-              setInput={setInput}
-              frequentQue={frequentQue}
-              setFrequentQue={setFrequentQue}
-              onSubmit={onSubmit}
-              handleDiscussInputChange={handleDiscussInputChange}
+              learningid={myLearningId}
             />
           </motion.div>
         </footer>

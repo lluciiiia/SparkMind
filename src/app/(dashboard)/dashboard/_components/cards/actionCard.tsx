@@ -44,8 +44,7 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
         const ActionData = async () => {
             if (learning_id) {
                 const check = await getIsActionPreviewDone(learning_id);
-                console.log("Checkk Value 🍜🍜🍜 : " + check);
-                console.log("learning_id 🔃🔃 : " + learning_id);
+
                 if (check === false) {
                     await getListOfEvent(learning_id);
                     setListPreview(true);
