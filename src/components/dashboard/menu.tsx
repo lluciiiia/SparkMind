@@ -10,7 +10,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getMenuList } from '@/lib/menu-list';
 import { cn } from '@/lib/utils';
-
+import { createClient } from '@/utils/supabase/client';
 interface MenuProps {
   isOpen: boolean | undefined;
 }
@@ -18,6 +18,7 @@ interface MenuProps {
 export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
+  const supabase = createClient();
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -96,7 +97,7 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => {}}
+                    onClick={() => supabase.auth.signOut()}
                     variant="outline"
                     className="justify-center w-full h-10 mt-5"
                   >

@@ -179,7 +179,6 @@ export const Dashboard = () => {
     }
   }, [frequentQue]);
 
-
   // krishna start
 
   // useEffect(() => {
@@ -316,18 +315,22 @@ export const Dashboard = () => {
           onToggle={() => setIsOpen(!isOpen)}
           className="w-full"
           initial={{ width: 30 }}
-          animate={{ width: isOpen ? "100%" : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}>
+          animate={{ width: isOpen ? '100%' : 50 }}
+          transition={{ type: 'spring', stiffness: 100 }}
+        >
           <summary
-            className={`left-0 relative p-2 ${isOpen ? "rounded-l-md" : "rounded-md"
-              } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${isOpen ? "justify-start" : "justify-center"
-              }`}>
+            className={`left-0 relative p-2 ${
+              isOpen ? 'rounded-l-md' : 'rounded-md'
+            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
+              isOpen ? 'justify-start' : 'justify-center'
+            }`}
+          >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
             {showText && <span className="ml-4">New note</span>}
           </summary>
-          <NewNoteSection handleCreate={handleCreate} notes={notes} />
+          {/* <NewNoteSection handleCreate={handleCreate} notes={notes} /> */}
         </motion.details>
       </div>
       <ContentLayout title="Dashboard">
@@ -349,11 +352,11 @@ export const Dashboard = () => {
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
-                  className={`px-6 py-2 cursor-pointer ${activeTab === tab.name
-                    ? "bg-navy text-white rounded-t-3xl"
-                    : "text-gray"
-                    }`}
-                  onClick={() => setActiveTab(tab.name)}>
+                  className={`px-6 py-2 cursor-pointer ${
+                    activeTab === tab.name ? 'bg-navy text-white rounded-t-3xl' : 'text-gray'
+                  }`}
+                  onClick={() => setActiveTab(tab.name)}
+                >
                   {tab.label}
                 </button>
               </li>
@@ -379,19 +382,13 @@ export const Dashboard = () => {
                   {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
                     <FurtherInfoCard furtherInfo={furtherInfoData} />
                   )}
-                  {activeTab === tab &&
-                    tab === "qna" &&
-                    questions.length > 0 && (
-                      <QuestionAndAnswer questions={questions} />
-                    )}
-                  {activeTab === tab &&
-                    tab === "further-info" &&
-                    furtherInfoData != null && (
-                      <FurtherInfoCard furtherInfo={furtherInfoData} />
-                    )}
-                  {activeTab === tab && tab === "action-items"&& (
-                      <ActionCard videos={videos} />
-                    )}
+                  {activeTab === tab && tab === 'qna' && questions.length > 0 && (
+                    <QuestionAndAnswer questions={questions} />
+                  )}
+                  {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
+                    <FurtherInfoCard furtherInfo={furtherInfoData} />
+                  )}
+                  {activeTab === tab && tab === 'action-items' && <ActionCard videos={videos} />}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
@@ -422,8 +419,7 @@ export const Dashboard = () => {
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                   >
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? "rotate-180" : ""
-                        }`}
+                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? 'rotate-180' : ''}`}
                       fill="black"
                     />
                   </motion.div>

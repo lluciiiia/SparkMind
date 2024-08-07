@@ -1,0 +1,486 @@
+.
+├── Dockerfile
+├── README.md
+├── biome.json
+├── bun.lockb
+├── components.json
+├── custom.d.ts
+├── env.d.ts
+├── extension
+│   ├── README.md
+│   ├── auto-imports.d.ts
+│   ├── bun.lockb
+│   ├── dist
+│   │   ├── assets
+│   │   │   ├── app-BI1jT9P2.css
+│   │   │   ├── app.js
+│   │   │   ├── background.js
+│   │   │   ├── browser-DV9xUX1W.js
+│   │   │   ├── browser-polyfill-BZs9fRMg.js
+│   │   │   └── content.js
+│   │   ├── icon-128.png
+│   │   ├── icon-16.png
+│   │   ├── icon-48.png
+│   │   ├── manifest.json
+│   │   └── popup.html
+│   ├── dist.crx
+│   ├── dist.pem
+│   ├── package.json
+│   ├── popup.html
+│   ├── postcss.config.js
+│   ├── public
+│   │   ├── icon-128.png
+│   │   ├── icon-16.png
+│   │   ├── icon-48.png
+│   │   └── manifest.json
+│   ├── src
+│   │   ├── background.js
+│   │   ├── classes
+│   │   │   ├── api.ts
+│   │   │   ├── index.ts
+│   │   │   ├── queue.ts
+│   │   │   ├── redacted.ts
+│   │   │   ├── scrape.ts
+│   │   │   └── scraper-queue.ts
+│   │   ├── components
+│   │   │   ├── auth
+│   │   │   │   ├── component.tsx
+│   │   │   │   ├── index.ts
+│   │   │   │   └── stories
+│   │   │   │       └── Auth.stories.tsx
+│   │   │   └── scraper
+│   │   │       ├── component.tsx
+│   │   │       ├── index.ts
+│   │   │       ├── stories
+│   │   │       │   └── Scraper.stories.tsx
+│   │   │       └── styles.module.css
+│   │   ├── constants
+│   │   │   ├── api.ts
+│   │   │   └── index.ts
+│   │   ├── content.js
+│   │   ├── css
+│   │   │   └── app.css
+│   │   ├── libs
+│   │   │   ├── cn.ts
+│   │   │   ├── fetch.ts
+│   │   │   └── index.ts
+│   │   ├── popup
+│   │   │   ├── component.tsx
+│   │   │   ├── index.tsx
+│   │   │   ├── stories
+│   │   │   │   └── Popup.stories.tsx
+│   │   │   └── styles.module.css
+│   │   ├── schema
+│   │   │   ├── api.ts
+│   │   │   └── index.ts
+│   │   ├── styles
+│   │   │   └── css
+│   │   │       └── globals.css
+│   │   ├── supabase
+│   │   │   └── supabase.ts
+│   │   ├── types
+│   │   │   ├── json.d.ts
+│   │   │   └── utils.d.ts
+│   │   ├── utils
+│   │   │   ├── auth.ts
+│   │   │   ├── browser.ts
+│   │   │   ├── helpers.ts
+│   │   │   └── index.ts
+│   │   └── vite-env.d.ts
+│   ├── tailwind.config.ts
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   ├── typings.d.ts
+│   └── vite.config.ts
+├── middleware.ts
+├── next-env.d.ts
+├── next.config.mjs
+├── out
+│   ├── 404.html
+│   ├── _next
+│   │   ├── ZINKLSo_hKkLy9wxHemsa
+│   │   └── static
+│   │       ├── ZINKLSo_hKkLy9wxHemsa
+│   │       │   ├── _buildManifest.js
+│   │       │   └── _ssgManifest.js
+│   │       └── chunks
+│   │           ├── 169-1dba62d3a699258e.js
+│   │           ├── 169-1dba62d3a699258e.js.map
+│   │           ├── 52774a7f-1622315c493c18af.js
+│   │           ├── 52774a7f-1622315c493c18af.js.map
+│   │           ├── fd9d1056-c28197670200c985.js
+│   │           ├── fd9d1056-c28197670200c985.js.map
+│   │           ├── framework-332f134768e2321c.js
+│   │           ├── framework-332f134768e2321c.js.map
+│   │           ├── main-1876a0579e9cb0ee.js
+│   │           ├── main-1876a0579e9cb0ee.js.map
+│   │           ├── main-app-ba319dd1a35777f6.js
+│   │           ├── main-app-ba319dd1a35777f6.js.map
+│   │           ├── pages
+│   │           │   ├── _app-58a42d70527f2721.js
+│   │           │   ├── _app-58a42d70527f2721.js.map
+│   │           │   ├── _error-4e67edb43300d372.js
+│   │           │   └── _error-4e67edb43300d372.js.map
+│   │           ├── polyfills-78c92fac7aa8fdd8.js
+│   │           ├── webpack-055aca46d2f8ed72.js
+│   │           └── webpack-055aca46d2f8ed72.js.map
+│   ├── assets
+│   │   ├── images
+│   │   ├── svgs
+│   │   └── videos
+│   │       └── videoplayback.mp4
+│   ├── icon
+│   │   └── search.png
+│   ├── opengraph-image.png
+│   ├── pwa
+│   ├── service-worker.js
+│   ├── service-worker.js.map
+│   ├── swe-worker-5c72df51bb1f6ee0.js
+│   ├── swe-worker-5c72df51bb1f6ee0.js.map
+│   ├── twitter-image.png
+│   ├── workbox-f1770938.js
+│   └── workbox-f1770938.js.map
+├── package.json
+├── playwright.config.ts
+├── postcss.config.js
+├── public
+│   ├── assets
+│   │   ├── fonts
+│   │   │   └── Miller text font.css
+│   │   ├── images
+│   │   │   └── home
+│   │   │       ├── home-feat-1.png
+│   │   │       ├── home-feat-2.png
+│   │   │       ├── home-feat-3.png
+│   │   │       ├── home-logo.png
+│   │   │       └── home-title.png
+│   │   ├── svgs
+│   │   │   ├── home
+│   │   │   │   ├── arrow.svg
+│   │   │   │   └── logo.svg
+│   │   │   └── new-input-icon.jsx
+│   │   └── videos
+│   │       └── videoplayback.mp4
+│   ├── icon
+│   │   └── search.png
+│   ├── pwa
+│   ├── service-worker.js
+│   ├── service-worker.js.map
+│   ├── swe-worker-5c72df51bb1f6ee0.js
+│   ├── swe-worker-development.js
+│   ├── workbox-7144475a.js
+│   ├── workbox-7144475a.js.map
+│   └── workbox-f1770938.js
+├── renovate.json
+├── report-bundle-size.js
+├── reset.d.ts
+├── sentry.client.config.ts
+├── sentry.edge.config.ts
+├── sentry.server.config.ts
+├── src
+│   ├── app
+│   │   ├── (auth)
+│   │   │   ├── auth
+│   │   │   │   ├── callback
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── error
+│   │   │   │   │   └── page.tsx
+│   │   │   │   └── reset_password
+│   │   │   │       └── route.ts
+│   │   │   └── signin
+│   │   │       ├── [id]
+│   │   │       │   ├── Button.module.css
+│   │   │       │   ├── page.tsx
+│   │   │       │   └── submit-button.tsx
+│   │   │       └── page.tsx
+│   │   ├── (dashboard)
+│   │   │   ├── account
+│   │   │   │   └── page.tsx
+│   │   │   ├── createmeet
+│   │   │   │   └── page.tsx
+│   │   │   ├── dashboard
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── api-handler.tsx
+│   │   │   │   │   ├── cards
+│   │   │   │   │   │   ├── FurtherInfo.tsx
+│   │   │   │   │   │   ├── QnaCards.tsx
+│   │   │   │   │   │   ├── QuestionAndAnswer.tsx
+│   │   │   │   │   │   ├── SummaryCard.tsx
+│   │   │   │   │   │   ├── VideoCard.tsx
+│   │   │   │   │   │   └── actionCard.tsx
+│   │   │   │   │   ├── dashboard.tsx
+│   │   │   │   │   ├── discussion-with-ai.tsx
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   ├── interfaces.tsx
+│   │   │   │   │   └── note.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── layout.tsx
+│   │   │   ├── new
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── api-handler.tsx
+│   │   │   │   │   ├── dashboard.tsx
+│   │   │   │   │   ├── hash-handler.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── page.tsx
+│   │   │   ├── notes
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── NewNote.tsx
+│   │   │   │   │   ├── Notes.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── page.tsx
+│   │   │   ├── uploadscreen
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── UploadComponent.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── page.tsx
+│   │   │   └── users
+│   │   │       └── page.tsx
+│   │   ├── (main)
+│   │   │   └── pricing
+│   │   │       ├── _components
+│   │   │       │   ├── Pricing.tsx
+│   │   │       │   └── index.ts
+│   │   │       └── page.tsx
+│   │   ├── (misc)
+│   │   │   └── _middleware
+│   │   │       └── rotateToken.ts
+│   │   ├── HomeNavigation.tsx
+│   │   ├── api
+│   │   │   ├── v1
+│   │   │   │   ├── create-event
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── create-summary
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── extract-transcribe
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── gemini-settings.ts
+│   │   │   │   ├── get-output
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── get-todotask
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── getaction-preview
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── getdiscuss
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── geteventlist
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── input
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── list-video
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── note-ai
+│   │   │   │   │   ├── concise
+│   │   │   │   │   │   └── route.ts
+│   │   │   │   │   └── grammar
+│   │   │   │   │       └── route.ts
+│   │   │   │   ├── notes
+│   │   │   │   │   ├── [id]
+│   │   │   │   │   │   └── route.ts
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── save-output
+│   │   │   │   │   ├── helpers
+│   │   │   │   │   │   ├── actionItm.ts
+│   │   │   │   │   │   ├── further-info.ts
+│   │   │   │   │   │   ├── qna.ts
+│   │   │   │   │   │   ├── summary.ts
+│   │   │   │   │   │   └── youtube.ts
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── store-learnings
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── trpc
+│   │   │   │       └── [trpc]
+│   │   │   │           └── route.ts
+│   │   │   └── webhook
+│   │   │       └── route.ts
+│   │   ├── error.tsx
+│   │   ├── favicon.ico
+│   │   ├── global-error.tsx
+│   │   ├── layout.tsx
+│   │   ├── loading.tsx
+│   │   ├── manifest.ts
+│   │   ├── myLearning
+│   │   │   └── page.tsx
+│   │   ├── not-found.tsx
+│   │   ├── opengraph-image.png
+│   │   ├── page.tsx
+│   │   ├── robots.ts
+│   │   ├── sitemap.ts
+│   │   └── twitter-image.png
+│   ├── components
+│   │   ├── AuthButton.tsx
+│   │   ├── DeployButton.tsx
+│   │   ├── Header.tsx
+│   │   ├── NextLogo.tsx
+│   │   ├── SupabaseLogo.tsx
+│   │   ├── client
+│   │   │   ├── SpeechToText.tsx
+│   │   │   └── index.ts
+│   │   ├── custom
+│   │   │   ├── AuthButton.tsx
+│   │   │   ├── LoadingDots.tsx
+│   │   │   ├── Picture.tsx
+│   │   │   ├── Video.tsx
+│   │   │   ├── index.ts
+│   │   │   └── styles
+│   │   │       ├── auth-button.module.css
+│   │   │       └── loading-dots.module.css
+│   │   ├── dashboard
+│   │   │   ├── admin-panel-layout.tsx
+│   │   │   ├── collapse-menu-button.tsx
+│   │   │   ├── content-layout.tsx
+│   │   │   ├── index.ts
+│   │   │   ├── menu.tsx
+│   │   │   ├── navbar.tsx
+│   │   │   ├── sheet-menu.tsx
+│   │   │   ├── sidebar-toggle.tsx
+│   │   │   ├── sidebar.tsx
+│   │   │   └── user-nav.tsx
+│   │   ├── index.ts
+│   │   ├── layout
+│   │   │   ├── CenterLayout.tsx
+│   │   │   └── index.ts
+│   │   └── ui
+│   │       ├── auth
+│   │       │   ├── EmailSignIn.tsx
+│   │       │   ├── ForgotPassword.tsx
+│   │       │   ├── OauthSignIn.tsx
+│   │       │   ├── PasswordSignIn.tsx
+│   │       │   ├── Signup.tsx
+│   │       │   ├── UpdatePassword.tsx
+│   │       │   └── index.ts
+│   │       ├── avatar.tsx
+│   │       ├── breadcrumb.tsx
+│   │       ├── button.tsx
+│   │       ├── calendar.tsx
+│   │       ├── card.tsx
+│   │       ├── collapsible.tsx
+│   │       ├── context-menu.tsx
+│   │       ├── custom
+│   │       │   ├── LoadingIndicator.tsx
+│   │       │   ├── background-beams.tsx
+│   │       │   ├── bento-grid.tsx
+│   │       │   ├── index.ts
+│   │       │   ├── infinite-moving-cards.tsx
+│   │       │   ├── navbar-menu.tsx
+│   │       │   ├── placeholders-and-vanish-input.tsx
+│   │       │   ├── vortex.tsx
+│   │       │   └── wobble-card.tsx
+│   │       ├── dialog.tsx
+│   │       ├── drawer.tsx
+│   │       ├── dropdown-menu.tsx
+│   │       ├── form.tsx
+│   │       ├── index.ts
+│   │       ├── input.tsx
+│   │       ├── label.tsx
+│   │       ├── scroll-area.tsx
+│   │       ├── separator.tsx
+│   │       ├── sheet.tsx
+│   │       ├── sonner.tsx
+│   │       ├── switch.tsx
+│   │       ├── table.tsx
+│   │       ├── tabs.tsx
+│   │       ├── textarea.tsx
+│   │       └── tooltip.tsx
+│   ├── constants
+│   │   ├── app.ts
+│   │   └── index.ts
+│   ├── context
+│   │   ├── NotesContext.tsx
+│   │   └── index.ts
+│   ├── core
+│   │   ├── index.ts
+│   │   └── store.ts
+│   ├── e2e
+│   │   └── page.spec.ts
+│   ├── fixtures
+│   │   └── stripe-fixtures.json
+│   ├── hooks
+│   │   ├── index.ts
+│   │   ├── use-sidebar-toggle.ts
+│   │   └── use-store.ts
+│   ├── instrumentation.ts
+│   ├── lib
+│   │   ├── fetch.ts
+│   │   ├── index.ts
+│   │   ├── menu-list.ts
+│   │   └── utils.ts
+│   ├── providers
+│   │   ├── Providers.tsx
+│   │   ├── events
+│   │   │   ├── Events.tsx
+│   │   │   └── index.ts
+│   │   ├── index.ts
+│   │   └── theme
+│   │       ├── index.ts
+│   │       ├── mode-toggle.tsx
+│   │       └── theme-provider.tsx
+│   ├── schema
+│   │   ├── index.ts
+│   │   └── notes.ts
+│   ├── server
+│   │   ├── api
+│   │   │   ├── index.ts
+│   │   │   ├── root.ts
+│   │   │   ├── routers
+│   │   │   │   ├── index.ts
+│   │   │   │   ├── search-recommendation.ts
+│   │   │   │   ├── video-recommendation.ts
+│   │   │   │   └── video.ts
+│   │   │   └── trpc.ts
+│   │   ├── index.ts
+│   │   ├── schemas
+│   │   │   ├── index.ts
+│   │   │   ├── search-recommendation.schema.ts
+│   │   │   ├── video-recommendation.schema.ts
+│   │   │   └── video.schema.ts
+│   │   └── services
+│   │       ├── index.ts
+│   │       ├── search-recommendation.service.ts
+│   │       ├── video-recommendation.service.ts
+│   │       └── video.service.ts
+│   ├── styles
+│   │   ├── css
+│   │   │   ├── Circle-loader.css
+│   │   │   ├── LoadingIndicator.css
+│   │   │   ├── custom-styles.css
+│   │   │   ├── globals.css
+│   │   │   ├── markdown.css
+│   │   │   └── toggle-switch.css
+│   │   └── scss
+│   │       └── cards.module.scss
+│   ├── supabase
+│   │   ├── config.toml
+│   │   └── seed.sql
+│   ├── trpc
+│   │   ├── react.tsx
+│   │   └── server.ts
+│   ├── types
+│   │   └── supabase.ts
+│   └── utils
+│       ├── assignColors.ts
+│       ├── auth
+│       │   ├── client.ts
+│       │   ├── server.ts
+│       │   └── settings.ts
+│       ├── colorUtils.ts
+│       ├── helpers.ts
+│       ├── index.ts
+│       ├── meta.ts
+│       ├── stripe
+│       │   ├── client.ts
+│       │   ├── config.ts
+│       │   └── server.ts
+│       └── supabase
+│           ├── admin.ts
+│           ├── client.ts
+│           ├── middleware.ts
+│           ├── queries.ts
+│           └── server.ts
+├── tailwind.config.ts
+├── test-fixtures.ts
+├── tree.txt
+├── tsconfig.json
+├── vitest.config.ts
+└── wrangler.toml
+
+131 directories, 352 files

@@ -1,6 +1,9 @@
+import { PING } from '@src/constants';
+import { createAPIClient } from '@src/libs';
+import type { ScraperQueueItemType, ScraperScrapeResultType } from '@src/schema';
+import { scraperQueueItemSchema, scraperScrapeResultSchema } from '@src/schema';
 import axios from 'axios';
 import { Redacted } from '.';
-import type { ScraperScrapeResultType } from '../schema';
 
 type ApiUrl = Redacted<string>;
 
@@ -11,21 +14,34 @@ export class Api {
     return new Api(Redacted.make(baseURL));
   }
 
-  public async get(): Promise<Json> {
+  public async get(): Promise<ScraperScrapeResultType> {
+    const { fetch } = createAPIClient();
     try {
-      const response = await axios.get(this.baseURL as unknown as string);
-      if (response.status !== 200) throw new Error(`HTTP error! status: ${response.status}`);
-      return response.data;
+      const response = await fetch(
+        `${PING}${this.baseURL as unknown as string}`,
+        {
+          method: 'GET',
+        },
+        scraperScrapeResultSchema,
+      );
+      return response;
     } catch (error) {
       throw new Error(`${error instanceof Error ? error.message : 'Internal server error'}`);
     }
   }
 
-  public async post(data: Json): Promise<Json> {
+  public async post(data: ScraperQueueItemType): Promise<ScraperQueueItemType> {
+    const { fetch } = createAPIClient();
     try {
-      const response = await axios.post(this.baseURL as unknown as string, data);
-      if (response.status !== 200) throw new Error(`HTTP error! status: ${response.status}`);
-      return response.data;
+      const response = await fetch(
+        this.baseURL as unknown as string,
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+        },
+        scraperQueueItemSchema,
+      );
+      return response;
     } catch (error) {
       throw new Error(`${error instanceof Error ? error.message : 'Internal server error'}`);
     }

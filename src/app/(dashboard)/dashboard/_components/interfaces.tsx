@@ -28,7 +28,6 @@ export interface VideoItem {
   };
 }
 
-
 export interface ParsedVideoData {
   items: VideoItem[];
 }

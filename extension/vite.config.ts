@@ -31,7 +31,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      'webextension-polyfill': resolve(__dirname, './src/__mocks__/webextension-polyfill.ts'),
       '@src': resolve(__dirname, './src'),
     },
     extensions: ['.ts', '.tsx', '.js'],

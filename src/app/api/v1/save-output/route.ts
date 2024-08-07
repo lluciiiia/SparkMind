@@ -28,20 +28,14 @@ export async function GET(req: NextRequest) {
       });
 
     if (myLearningError) {
-      console.log("myLearningError: ", myLearningError);
-      return NextResponse.json(
-        { error: "Error getting my learning" },
-        { status: 500 }
-      );
+      console.log('myLearningError: ', myLearningError);
+      return NextResponse.json({ error: 'Error getting my learning' }, { status: 500 });
     }
 
     const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
     if (outputError) {
-      console.log("outputError: ", outputError);
-      return NextResponse.json(
-        { error: "Error getting output" },
-        { status: 500 }
-      );
+      console.log('outputError: ', outputError);
+      return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
     }
 
     const youtubeResponse = await saveYoutubeOutput(
@@ -57,17 +51,13 @@ export async function GET(req: NextRequest) {
       myLearning[0].input,
       pageToken,
       myLearningId,
-      output
+      output,
     );
 
     if (ActionItmResponse.status != 200)
       return NextResponse.json({ status: ActionItmResponse.status });
 
-    const summaryResponse = await saveSummaryOutput(
-      myLearningId,
-      myLearning[0].input,
-      output
-    );
+    const summaryResponse = await saveSummaryOutput(myLearningId, myLearning[0].input, output);
 
     if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
 
@@ -92,15 +82,9 @@ export async function GET(req: NextRequest) {
 }
 
 async function getMyLearningById(id: string) {
-  return await supabase
-    .from("mylearnings")
-    .select("id, input")
-    .eq("id", id);
+  return await supabase.from('mylearnings').select('id, input').eq('id', id);
 }
 
 async function getOutputByLearningId(learningId: string) {
-  return await supabase
-    .from("outputs")
-    .select("id")
-    .eq("id", learningId);
+  return await supabase.from('outputs').select('id').eq('id', learningId);
 }

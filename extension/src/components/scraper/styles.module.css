@@ -4,6 +4,7 @@
     @apply justify-center;
     @apply px-4;
     @apply py-2;
+    @apply rounded-lg;
     @apply border;
     @apply border-transparent;
     @apply text-sm;
@@ -18,4 +19,14 @@
     @apply focus:ring-2;
     @apply focus:ring-offset-2;
     @apply focus:ring-[#004a94];
+    @apply disabled:opacity-50;
+    @apply disabled:cursor-not-allowed;
+    @apply disabled:bg-gray-500;
+    @apply disabled:text-white;
+    @apply disabled:border-gray-500;
+    @apply disabled:shadow-none;
+    @apply disabled:ring-0;
+    @apply disabled:ring-offset-0;
+    @apply disabled:ring-offset-white;
+    @apply disabled:ring-offset-2;
 }
