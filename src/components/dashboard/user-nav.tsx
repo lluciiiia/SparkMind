@@ -51,9 +51,10 @@ export function UserNav() {
   }, []);
 
   const handleSignOut = async () => {
+    // 'user server'
     const supabase = createClient();
     await supabase.auth.signOut();
-    return redirect('/signin');
+    //return redirect('/signin');
   }
 
   return (
@@ -99,7 +100,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { handleSignOut() }}>
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { handleSignOut(); }}>
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>
