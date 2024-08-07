@@ -88,9 +88,7 @@ export const NewDashboard = () => {
 
   const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text' | 'keywords'>();
 
-  const handleVideoFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const pathURL = URL.createObjectURL(file);
@@ -107,13 +105,13 @@ export const NewDashboard = () => {
 
     try {
       const formData = new FormData();
-      formData.append("file", selectedFile);
+      formData.append('file', selectedFile);
       if (myLearningId !== null) {
-        formData.append("learningid", myLearningId);
+        formData.append('learningid', myLearningId);
       }
 
-      const res = await fetch("/api/v1/extract-transcribe", {
-        method: "POST",
+      const res = await fetch('/api/v1/extract-transcribe', {
+        method: 'POST',
         body: formData,
       });
 
@@ -191,7 +189,8 @@ export const NewDashboard = () => {
             <Dialog
               onOpenChange={() => {
                 setFileType(undefined);
-              }}>
+              }}
+            >
               <DialogTrigger asChild>
                 <div className="flex flex-col items-center justify-center">
                   <div className="cursor-pointer">
@@ -309,11 +308,8 @@ export const NewDashboard = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button
-                        type="submit"
-                        onClick={submitChanges}
-                        disabled={isLoading}>
-                        {isLoading ? "Uploading ..." : "Upload"}
+                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
+                        {isLoading ? 'Uploading ...' : 'Upload'}
                       </Button>
                     </DialogFooter>
                   </div>

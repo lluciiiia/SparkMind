@@ -76,23 +76,23 @@ export interface FurtherInfo {
 }
 
 export interface TodoType {
-  summary: string,
-  description: string,
-  start_dateTime: string,
-  end_dateTime: string,
-  timezone: string,
-  event_link: string
+  summary: string;
+  description: string;
+  start_dateTime: string;
+  end_dateTime: string;
+  timezone: string;
+  event_link: string;
 }
 
 export interface Event {
-  summary: string,
-  description: string,
+  summary: string;
+  description: string;
   start: {
-    dateTime: string,
-    timeZone: string,
-  },
+    dateTime: string;
+    timeZone: string;
+  };
   end: {
-    dateTime: string,
-    timeZone: string,
-  }
+    dateTime: string;
+    timeZone: string;
+  };
 }

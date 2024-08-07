@@ -13,15 +13,15 @@ const supabase = createClient();
 export async function POST(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const myLearningId = url.searchParams.get("id");
-    const pageToken = url.searchParams.get("pageToken");
-    const body = await req.json() as { input: string };
+    const myLearningId = url.searchParams.get('id');
+    const pageToken = url.searchParams.get('pageToken');
+    const body = (await req.json()) as { input: string };
     const input = body.input;
 
     if (!myLearningId || !input) {
       return NextResponse.json(
-        { error: "Error extracting myLearningId or input" },
-        { status: 400 }
+        { error: 'Error extracting myLearningId or input' },
+        { status: 400 },
       );
     }
 
@@ -45,36 +45,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
     }
 
-    const youtubeResponse = await saveYoutubeOutput(
-      input,
-      pageToken,
-      myLearningId,
-      output,
-    );
+    const youtubeResponse = await saveYoutubeOutput(input, pageToken, myLearningId, output);
 
     if (youtubeResponse.status != 200) return NextResponse.json({ status: youtubeResponse.status });
 
-    const summaryResponse = await saveSummaryOutput(
-      myLearningId,
-      input,
-      output
-    );
+    const summaryResponse = await saveSummaryOutput(myLearningId, input, output);
 
     if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
 
-    const quizResponse = await saveQuizOutput(
-      input,
-      myLearningId,
-      output
-    );
+    const quizResponse = await saveQuizOutput(input, myLearningId, output);
 
     if (quizResponse.status != 200) return NextResponse.json({ status: quizResponse.status });
 
-    const furtherInfoResponse = await saveFurtherInfoOutput(
-      input,
-      myLearningId,
-      output,
-    );
+    const furtherInfoResponse = await saveFurtherInfoOutput(input, myLearningId, output);
 
     if (furtherInfoResponse.status != 200)
       return NextResponse.json({ status: furtherInfoResponse.status });
@@ -91,10 +74,7 @@ async function getMyLearningById(id: string) {
 }
 
 async function saveMyLearningInput(id: string, input: string) {
-  return await supabase
-  .from('mylearnings')
-  .update({ input })
-  .eq('id', id);
+  return await supabase.from('mylearnings').update({ input }).eq('id', id);
 }
 
 async function getOutputByLearningId(learningId: string) {

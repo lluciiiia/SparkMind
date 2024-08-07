@@ -1,8 +1,5 @@
 'use client';
 
-import { LayoutGrid, LogOut, User } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -15,10 +12,13 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { LayoutGrid, LogOut, User } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { createClient } from '@/utils/supabase/client';
-import { useEffect, useState } from 'react';
 import { redirect } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export function UserNav() {
   const [userName, setUserName] = useState<string | null>(null);
@@ -56,7 +56,7 @@ export function UserNav() {
     const supabase = createClient();
     await supabase.auth.signOut();
     //return redirect('/signin');
-  }
+  };
 
   return (
     <DropdownMenu>
@@ -101,7 +101,9 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {
+        <DropdownMenuItem
+          className="hover:cursor-pointer"
+          onClick={() => {
             supabase.auth.signOut();
             router.push('/signin');
           }}

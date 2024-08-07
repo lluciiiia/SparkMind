@@ -2,7 +2,6 @@ import type { NoteType } from '@/schema';
 import { createClient } from '@/utils/supabase/server';
 import { type NextRequest, NextResponse } from 'next/server';
 
-
 export const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
   const supabase = createClient();
   const { id } = params;

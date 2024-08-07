@@ -177,10 +177,11 @@ export const Dashboard = () => {
         >
           <summary
             className={`left-0 relative p-2 ${
-              isOpen ? "rounded-l-md" : "rounded-md"
+              isOpen ? 'rounded-l-md' : 'rounded-md'
             } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
-              isOpen ? "justify-start" : "justify-center"
-            }`}>
+              isOpen ? 'justify-start' : 'justify-center'
+            }`}
+          >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -209,11 +210,10 @@ export const Dashboard = () => {
               <li key={tab.name}>
                 <button
                   className={`px-6 py-2 cursor-pointer ${
-                    activeTab === tab.name
-                      ? "bg-navy text-white rounded-t-3xl"
-                      : "text-gray"
+                    activeTab === tab.name ? 'bg-navy text-white rounded-t-3xl' : 'text-gray'
                   }`}
-                  onClick={() => setActiveTab(tab.name)}>
+                  onClick={() => setActiveTab(tab.name)}
+                >
                   {tab.label}
                 </button>
               </li>
@@ -232,19 +232,15 @@ export const Dashboard = () => {
                   {activeTab === tab && tab === 'summary' && summaryData != null && (
                     <SummaryCard summaryData={summaryData} />
                   )}
-                  {activeTab === tab &&
-                    tab === "qna" &&
-                    questions.length > 0 && (
-                      <QuestionAndAnswer questions={questions} />
-                    )}
-                  {activeTab === tab &&
-                    tab === "further-info" &&
-                    furtherInfoData != null && (
-                      <FurtherInfoCard furtherInfo={furtherInfoData} />
-                    )}
-                  {activeTab === tab && tab === "action-items"&& (
-                      <ActionCard learningId={myLearningId} />
-                    )}
+                  {activeTab === tab && tab === 'qna' && questions.length > 0 && (
+                    <QuestionAndAnswer questions={questions} />
+                  )}
+                  {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
+                    <FurtherInfoCard furtherInfo={furtherInfoData} />
+                  )}
+                  {activeTab === tab && tab === 'action-items' && (
+                    <ActionCard learningId={myLearningId} />
+                  )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
@@ -274,13 +270,11 @@ export const Dashboard = () => {
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
                     onClick={(e) => {
                       e.preventDefault();
-                      setIsDrawerOpen(!isDrawerOpen)
+                      setIsDrawerOpen(!isDrawerOpen);
                     }}
                   >
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${
-                        isDrawerOpen ? "rotate-180" : ""
-                      }`}
+                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? 'rotate-180' : ''}`}
                       fill="black"
                     />
                   </motion.div>
@@ -290,9 +284,7 @@ export const Dashboard = () => {
             </TooltipProvider>
 
             {/* Discuss with AI */}
-            <DiscussionWithAI
-              learningid={myLearningId}
-            />
+            <DiscussionWithAI learningid={myLearningId} />
           </motion.div>
         </footer>
       </ContentLayout>

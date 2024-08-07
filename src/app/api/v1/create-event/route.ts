@@ -1,8 +1,8 @@
+import type { Event, TodoType } from '@/app/(dashboard)/dashboard/_components/interfaces';
 import rotateToken from '@/app/(misc)/_middleware/rotateToken';
 import { createClient } from '@/utils/supabase/server';
 import { google } from 'googleapis';
 import { type NextRequest, NextResponse } from 'next/server';
-import { Event, TodoType } from '@/app/(dashboard)/dashboard/_components/interfaces';
 
 //const SCOPES = 'https://www.googleapis.com/auth/calendar';
 
@@ -56,7 +56,11 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
   return responseArray;
 };
 
-const storeCalendarEvent = async (eventList: Event[], learning_id: string, calendarEvents: string[]) => {
+const storeCalendarEvent = async (
+  eventList: Event[],
+  learning_id: string,
+  calendarEvents: string[],
+) => {
   try {
     console.log('this is event list : ' + eventList);
     const supabaseClient = createClient();
@@ -65,7 +69,7 @@ const storeCalendarEvent = async (eventList: Event[], learning_id: string, calen
 
     let idx = 0;
 
-    eventList.forEach(event => {
+    eventList.forEach((event) => {
       TodoTasksList.push({
         summary: event.summary,
         description: event.description,
@@ -76,25 +80,25 @@ const storeCalendarEvent = async (eventList: Event[], learning_id: string, calen
       });
     });
 
-    const { error } = await supabaseClient.from('outputs')
+    const { error } = await supabaseClient
+      .from('outputs')
       .update({
         todo_task: TodoTasksList,
-        is_task_preview_done: true
-      }).eq('learning_id', learning_id);
+        is_task_preview_done: true,
+      })
+      .eq('learning_id', learning_id);
 
     if (error) {
-      console.log('Errror while Store TodoTask : ' + error.message)
+      console.log('Errror while Store TodoTask : ' + error.message);
       return;
     }
 
     return TodoTasksList;
-
-  }
-  catch (err) {
-    console.error("Error Store TodoTask:", (err as Error).message);
+  } catch (err) {
+    console.error('Error Store TodoTask:', (err as Error).message);
     return;
   }
-}
+};
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
@@ -124,7 +128,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     if (accessToken !== undefined) {
       const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
-      const todolist = await storeCalendarEvent(selectedTask, learningId, calendarEvents) as TodoType[];
+      const todolist = (await storeCalendarEvent(
+        selectedTask,
+        learningId,
+        calendarEvents,
+      )) as TodoType[];
       return NextResponse.json({ status: 200, todolist });
     }
 
