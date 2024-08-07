@@ -102,7 +102,7 @@ async function getTranscript(videoid: string) {
 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
-    const video_id = req.nextUrl.searchParams.get('videoid');
+    const video_id = req.nextUrl.searchParams.get('LearningId');
     console.log('video_id 🆔 : ' + video_id);
 
     if (video_id !== null) {

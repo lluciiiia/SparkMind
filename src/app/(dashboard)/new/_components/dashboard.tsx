@@ -110,6 +110,9 @@ export const NewDashboard = () => {
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
+      if (myLearningId !== null) {
+        formData.append("learningid", myLearningId);
+      }
 
       const res = await fetch("/api/v1/extract-transcribe", {
         method: "POST",
