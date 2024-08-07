@@ -48,7 +48,7 @@ export default async function rotateToken(req: any, res: NextResponse, next: any
 
         // Update tokens in Supabase
         await supabaseClient
-          .from('googleauthtokens')
+          .from('tokens')
           .update({
             access_token,
             refresh_token: refresh_token, // Only update if a new refresh token is provided

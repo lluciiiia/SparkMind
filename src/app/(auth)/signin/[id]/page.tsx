@@ -67,16 +67,18 @@ export default async function SignIn({
           </div>
           <Card
             title={
-              viewProp === 'forgot_password'
-                ? 'Reset Password'
-                : viewProp === 'update_password'
-                  ? 'Update Password'
-                  : viewProp === 'signup'
-                    ? 'Sign Up'
-                    : 'Sign In'
+              // viewProp === 'forgot_password'
+              //   ? 'Reset Password'
+              //: 
+              viewProp === 'update_password'
+                ? 'Update Password'
+                :
+                viewProp === 'signup'
+                  ? 'Sign Up'
+                  : 'Sign In'
             }
           >
-            {viewProp === 'password_signin' && (
+            {/* {viewProp === 'password_signin' && (
               <PasswordSignIn allowEmail={allowEmail} redirectMethod={redirectMethod} />
             )}
             {viewProp === 'email_signin' && (
@@ -96,11 +98,11 @@ export default async function SignIn({
             {viewProp === 'update_password' && <UpdatePassword redirectMethod={redirectMethod} />}
             {viewProp === 'signup' && (
               <SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
-            )}
+            )} */}
             {viewProp !== 'update_password' && viewProp !== 'signup' && allowOauth && (
               <>
-                <span className="text-center">Third-party sign-in</span>
-                <Separator />
+                {/* <span className="text-center">Third-party sign-in</span> */}
+                {/* <Separator /> */}
                 <OauthSignIn />
               </>
             )}

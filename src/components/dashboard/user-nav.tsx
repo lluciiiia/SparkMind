@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 import { createClient } from '@/utils/supabase/client';
 import { useEffect, useState } from 'react';
+import { redirect } from 'next/navigation';
 
 export function UserNav() {
   const [userName, setUserName] = useState<string | null>(null);
@@ -49,6 +50,13 @@ export function UserNav() {
   useEffect(() => {
     getUserInfo();
   }, []);
+
+  const handleSignOut = async () => {
+    // 'user server'
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    //return redirect('/signin');
+  }
 
   return (
     <DropdownMenu>

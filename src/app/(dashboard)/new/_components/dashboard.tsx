@@ -88,7 +88,9 @@ export const NewDashboard = () => {
 
   const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text' | 'keywords'>();
 
-  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const pathURL = URL.createObjectURL(file);
@@ -103,47 +105,50 @@ export const NewDashboard = () => {
 
     setIsLoading(true);
 
-    if (myLearningId !== null) {
-      try {
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('myLearningId', myLearningId);
-
-        const res = await fetch('/api/v1/extract-transcribe', {
-          method: 'POST',
-          body: formData,
-        });
-
-        if (!res.ok) throw new Error(await res.text());
-
-        // @ts-ignore trust me bro
-        const data = (await res.json()) as any;
-        console.log(data);
-
-        // right now not usefull to display the transcript
-        // setFetchedTranscript(data.transcription);
-        // setKeywords(data.keywordsArr);
-
-        //clean up old setState
-        setSelectedFile(null);
-        setObjectURL(null);
-        setFileType(undefined);
-
-        return data.keywordsArr;
-      } catch (err: any) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      if (myLearningId !== null) {
+        formData.append("learningid", myLearningId);
       }
+
+      const res = await fetch("/api/v1/extract-transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      // @ts-ignore trust me bro
+      const data = (await res.json()) as any;
+      console.log(data);
+
+      // right now not usefull to display the transcript
+      // setFetchedTranscript(data.transcription);
+      // setKeywords(data.keywordsArr);
+
+      //const value = { 'title': 'Video File' };
+
+      // handleCreate(value);
+
+      //clean up old setState
+      setSelectedFile(null);
+      setObjectURL(null);
+      setFileType(undefined);
+
+      return data.keywordsArr;
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
       const response = await saveOutput(input, myLearningId);
-      console.log('response', response);
 
-      router.push(`/dashboard?id=${myLearningId}&input=${input}`);
+      router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
       console.error(err);
     }
@@ -186,8 +191,7 @@ export const NewDashboard = () => {
             <Dialog
               onOpenChange={() => {
                 setFileType(undefined);
-              }}
-            >
+              }}>
               <DialogTrigger asChild>
                 <div className="flex flex-col items-center justify-center">
                   <div className="cursor-pointer">
@@ -305,8 +309,11 @@ export const NewDashboard = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
-                        {isLoading ? 'Uploading ...' : 'Upload'}
+                      <Button
+                        type="submit"
+                        onClick={submitChanges}
+                        disabled={isLoading}>
+                        {isLoading ? "Uploading ..." : "Upload"}
                       </Button>
                     </DialogFooter>
                   </div>

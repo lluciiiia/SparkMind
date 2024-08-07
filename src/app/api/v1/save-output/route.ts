@@ -10,14 +10,19 @@ import { saveYoutubeOutput } from './helpers/youtube';
 export const dynamic = 'force-dynamic';
 const supabase = createClient();
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const url = new URL(req.url);
-    const myLearningId = url.searchParams.get('id');
-    const pageToken = url.searchParams.get('pageToken');
+    const myLearningId = url.searchParams.get("id");
+    const pageToken = url.searchParams.get("pageToken");
+    const body = await req.json() as { input: string };
+    const input = body.input;
 
-    if (!myLearningId) {
-      return NextResponse.json({ error: 'Error extracting myLearningId' }, { status: 400 });
+    if (!myLearningId || !input) {
+      return NextResponse.json(
+        { error: "Error extracting myLearningId or input" },
+        { status: 400 }
+      );
     }
 
     const { data: myLearning, error: myLearningError } = await getMyLearningById(myLearningId);
@@ -32,6 +37,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Error getting my learning' }, { status: 500 });
     }
 
+    await saveMyLearningInput(myLearningId, input);
+
     const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
     if (outputError) {
       console.log('outputError: ', outputError);
@@ -39,7 +46,7 @@ export async function GET(req: NextRequest) {
     }
 
     const youtubeResponse = await saveYoutubeOutput(
-      myLearning[0].input,
+      input,
       pageToken,
       myLearningId,
       output,
@@ -47,26 +54,24 @@ export async function GET(req: NextRequest) {
 
     if (youtubeResponse.status != 200) return NextResponse.json({ status: youtubeResponse.status });
 
-    const ActionItmResponse = await saveActionItem(
-      myLearning[0].input,
-      pageToken,
+    const summaryResponse = await saveSummaryOutput(
       myLearningId,
-      output,
+      input,
+      output
     );
-
-    if (ActionItmResponse.status != 200)
-      return NextResponse.json({ status: ActionItmResponse.status });
-
-    const summaryResponse = await saveSummaryOutput(myLearningId, myLearning[0].input, output);
 
     if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
 
-    const quizResponse = await saveQuizOutput(myLearning[0].input, myLearningId, output);
+    const quizResponse = await saveQuizOutput(
+      input,
+      myLearningId,
+      output
+    );
 
     if (quizResponse.status != 200) return NextResponse.json({ status: quizResponse.status });
 
     const furtherInfoResponse = await saveFurtherInfoOutput(
-      myLearning[0].input,
+      input,
       myLearningId,
       output,
     );
@@ -83,6 +88,13 @@ export async function GET(req: NextRequest) {
 
 async function getMyLearningById(id: string) {
   return await supabase.from('mylearnings').select('id, input').eq('id', id);
+}
+
+async function saveMyLearningInput(id: string, input: string) {
+  return await supabase
+  .from('mylearnings')
+  .update({ input })
+  .eq('id', id);
 }
 
 async function getOutputByLearningId(learningId: string) {
