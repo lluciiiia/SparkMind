@@ -1,10 +1,15 @@
 'use client';
 
+import { NewNoteContainer } from '@/app/(dashboard)/notes/_components';
 import { Sidebar } from '@/components/dashboard/sidebar';
 import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
 import { useStore } from '@/hooks/use-store';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from 'usehooks-ts';
+import { NotesProvider, useNotes } from '@/context';
+import { createStore } from 'zustand'
+import { useState } from 'react';
+
 export default function AdminPanelLayout({
   children,
 }: {
@@ -12,7 +17,9 @@ export default function AdminPanelLayout({
 }) {
   const isLaptop = useMediaQuery('(max-width: 1023px)');
   const sidebar = useStore(useSidebarToggle, (state) => state);
-
+  const { notes } = useNotes();
+  const [isOpen, setIsOpen] = useState(false);
+  const [showText, setShowText] = useState(false);
   if (!sidebar) return null;
   return (
     <>
@@ -31,6 +38,9 @@ export default function AdminPanelLayout({
       >
         {children}
       </main>
+      <NotesProvider>
+        <NewNoteContainer notes={notes} isOpen={isOpen} showText={showText} setIsOpen={setIsOpen} />
+      </NotesProvider>
     </>
   );
 }

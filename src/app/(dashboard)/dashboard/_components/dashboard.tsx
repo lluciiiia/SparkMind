@@ -74,7 +74,6 @@ export const Dashboard = () => {
   });
 
   const [isOpen, setIsOpen] = useState(false);
-  const [notes, setNotes] = useState<Note[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -166,30 +165,6 @@ export const Dashboard = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-items-start absolute top-[80px] right-0 rounded-l-md rounded-r-none z-[100] w-fit">
-        <motion.details
-          open={isOpen}
-          onToggle={() => setIsOpen(!isOpen)}
-          className="w-full"
-          initial={{ width: 30 }}
-          animate={{ width: isOpen ? '100%' : 50 }}
-          transition={{ type: 'spring', stiffness: 100 }}
-        >
-          <summary
-            className={`left-0 relative p-2 ${
-              isOpen ? 'rounded-l-md' : 'rounded-md'
-            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
-              isOpen ? 'justify-start' : 'justify-center'
-            }`}
-          >
-            {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
-            <PiNoteBlankFill size={24} />
-
-            {showText && <span className="ml-4">New note</span>}
-          </summary>
-          {/* <NewNoteSection handleCreate={handleCreate} notes={notes} /> */}
-        </motion.details>
-      </div>
       <ContentLayout title="Dashboard">
         <Breadcrumb>
           <BreadcrumbList>

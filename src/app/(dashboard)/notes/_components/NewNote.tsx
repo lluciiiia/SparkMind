@@ -8,13 +8,14 @@ import { FaPlus } from 'react-icons/fa';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { createAPIClient } from '@/lib';
 import type { NoteType } from '@/schema';
-
-const api = createAPIClient();
+import { useNotes } from '@/context';
+import { v4 as uuidv4 } from 'uuid';
 
 export const NewNoteSection: React.FC<{
-  note: NoteType;
   notes: NoteType[];
-}> = ({ notes, note }) => {
+}> = ({ notes }) => {
+  const { setNotes } = useNotes();
+  const api = createAPIClient();
   const createNote = async (note: NoteType) => {
     try {
       await api.createNote(note);
@@ -44,13 +45,15 @@ export const NewNoteSection: React.FC<{
                 size={24}
                 color="#ffffff"
                 onClick={() => {
-                  onSubmit({
-                    title: note.title,
-                    uuid: note.uuid,
-                    content: note.content,
-                    created_at: note.created_at,
-                    updated_at: note.updated_at,
-                  });
+                  setNotes([
+                    {
+                      title: 'New Note',
+                      uuid: uuidv4(),
+                      content: [],
+                      created_at: new Date(),
+                      updated_at: new Date(),
+                    },
+                  ]);
                 }}
               />
             </div>
@@ -63,7 +66,10 @@ export const NewNoteSection: React.FC<{
             <article
               key={i}
               className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl"
-            ></article>
+              onClick={() => {
+                setNotes(notes.filter((note) => note.uuid !== _.uuid));
+              }}
+            />
           ))}
         </section>
         <ScrollBar orientation="vertical" />
