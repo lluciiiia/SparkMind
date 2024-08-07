@@ -29,7 +29,6 @@ export function Popup() {
     } catch (error) {
       console.error('Error in popup.tsx:', error);
       throw new Error(`${error instanceof Error ? error.message : 'Unknown error'}`);
-    
     }
     // getCurrentUser().then((resp) => {
     //   if (resp) {

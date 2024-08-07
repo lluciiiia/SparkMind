@@ -1,10 +1,10 @@
+import { Api, ScraperQueue } from '@src/classes';
+import { Scraper as ScraperClass } from '@src/classes/scrape';
+import { PONG } from '@src/constants';
+import type { ScraperQueueItemType } from '@src/schema';
 import React, { useEffect } from 'react';
 import { toast } from 'sonner';
-import { Scraper as ScraperClass } from '@src/classes/scrape';
-import type { ScraperQueueItemType } from '@src/schema';
 import css from './styles.module.css';
-import { Api, ScraperQueue } from '@src/classes';
-import { PONG } from '@src/constants';
 
 export function Scraper() {
   const [scraper, setScraper] = React.useState<ScraperQueueItemType | null>(null);
@@ -41,7 +41,7 @@ export function Scraper() {
           await postInstance.post({
             input_id: nextItem.id,
             url: window.location.href,
-            text: response.filteredTexts
+            text: response.filteredTexts,
           });
         } catch (error) {
           console.error('Error during posting:', error);

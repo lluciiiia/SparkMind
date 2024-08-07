@@ -12,7 +12,6 @@ const supabase = createClient();
 async function getEventList(transcript: string): Promise<any> {
   if (!API_KEY) return new Response('Missing API key', { status: 400 });
 
-
   const generationConfig = {
     temperature: 0.7,
     topP: 0.85,
