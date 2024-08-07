@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
@@ -15,160 +15,150 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         console.error('LearningId is Missing in ActionCard');
     }
 
-    const [date, setDate] = useState<Date | undefined>(new Date());
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
-    const [todoList, setTodoList] = useState<TodoType[]>([]);
-    const [EventList, setEventList] = useState<Event[]>([]);
-    const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
-    const [isListPreview, setListPreview] = useState<boolean>(false);
-    const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
+  const [todoList, setTodoList] = useState<TodoType[]>([]);
+  const [EventList, setEventList] = useState<Event[]>([]);
+  const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
+  const [isListPreview, setListPreview] = useState<boolean>(false);
+  const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
 
-    useEffect(() => {
-        const ActionData = async () => {
-            if (learningId) {
-                const check = await getIsActionPreviewDone(learningId);
+  useEffect(() => {
+    const ActionData = async () => {
+      if (learningId) {
+        const check = await getIsActionPreviewDone(learningId);
 
-                if (check === false) {
-                    await getListOfEvent(learningId);
-                    setListPreview(true);
-                } else {
-                    await getTodoTaskFormDB(learningId);
-                }
-            }
+        if (check === false) {
+          await getListOfEvent(learningId);
+          setListPreview(true);
+        } else {
+          await getTodoTaskFormDB(learningId);
         }
-        ActionData();
-    }, []);
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+      }
     };
+    ActionData();
+  }, []);
 
-    useEffect(() => {
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
-        if (date) {
-            const filteredList = initTodoList.filter(todo => {
-                console.log("calander date : " + formatDate(todo.start_dateTime));
-                console.log("todo date : " + formatDate(date.toISOString()));
-                return formatDate(todo.start_dateTime) === formatDate(date.toISOString())
-            });
-            setTodoList(filteredList);
-        }
-    }, [date]);
+  useEffect(() => {
+    if (date) {
+      const filteredList = initTodoList.filter((todo) => {
+        console.log("calander date : " + formatDate(todo.start_dateTime));
+        console.log("todo date : " + formatDate(date.toISOString()));
+        return (
+          formatDate(todo.start_dateTime) === formatDate(date.toISOString())
+        );
+      });
+      setTodoList(filteredList);
+    }
+  }, [date]);
 
-    const getListOfEvent = async (LearningId: any) => {
-        try {
-            const eventlistRes = await axios.get("/api/v1/geteventlist", {
-                params: { LearningId: LearningId }
-            });
+  const getListOfEvent = async (LearningId: any) => {
+    try {
+      const eventlistRes = await axios.get("/api/v1/geteventlist", {
+        params: { LearningId: LearningId },
+      });
 
-            let eventList = JSON.stringify(eventlistRes.data);
-            console.log("eventList" + eventList);
+      let eventList = JSON.stringify(eventlistRes.data);
+      console.log("eventList" + eventList);
 
-            const secnd = await JSON.parse(eventList) as any;
-            const VSlList: Event[] = secnd.body;
+      const secnd = (await JSON.parse(eventList)) as any;
+      const VSlList: Event[] = secnd.body;
 
-            setEventList(VSlList);
+      setEventList(VSlList);
+    } catch (error) {
+      console.error("Error creating event :", error);
+      alert("Error creating event : " + (error as Error).message);
+    }
+  };
 
-        } catch (error) {
-            console.error('Error creating event :', error);
-            alert('Error creating event : ' + (error as Error).message);
-        }
-    };
+  const handleCreateEvent = async () => {
+    try {
+      const selectedTask = selectedRowsidx.map((rowIndex) => ({
+        summary: EventList[rowIndex].summary,
+        description: EventList[rowIndex].description,
+        start: {
+          dateTime: EventList[rowIndex].start.dateTime,
+          timeZone: EventList[rowIndex].start.timeZone,
+        },
+        end: {
+          dateTime: EventList[rowIndex].end.dateTime,
+          timeZone: EventList[rowIndex].end.timeZone,
+        },
+      }));
 
-    const handleCreateEvent = async () => {
-        try {
+      console.log("selectedTask : " + selectedTask);
 
-            const selectedTask = selectedRowsidx.map(rowIndex => ({
-                summary: EventList[rowIndex].summary,
-                description: EventList[rowIndex].description,
-                start: {
-                    dateTime: EventList[rowIndex].start.dateTime,
-                    timeZone: EventList[rowIndex].start.timeZone,
-                },
-                end: {
-                    dateTime: EventList[rowIndex].end.dateTime,
-                    timeZone: EventList[rowIndex].end.timeZone,
-                }
-            }));
-
-            console.log("selectedTask : " + selectedTask);
-
-            const res = await axios.post('/api/v1/create-event', { selectedTask: selectedTask, learningId: learningId });
+      const res = await axios.post("/api/v1/create-event", {
+        selectedTask: selectedTask,
+        learningId: learningId,
+      });
 
             if (res.data.status === 200) {
-
-                // const visulaTodo = selectedRowsidx.map(rowIndex => {
-                //     const event = EventList[rowIndex];
-                //     return {
-                //         summary: event.summary,
-                //         description: event.description,
-                //         start_dateTime: event.start.dateTime,
-                //         end_dateTime: event.end.dateTime,
-                //         timezone: event.start.timeZone
-                //     } as TodoType;
-                // });
-
                 setTodoList(res.data.todolist);
                 setinitTdoLisit(res.data.todolist);
             } else {
                 alert(`Error create-event: ${res.data.message}`);
             }
 
-            setListPreview(false);
-        }
-        catch (err) {
-            console.log('Error in creating Event ' + (err as Error).message);
-            return;
-        }
-    };
+      setListPreview(false);
+    } catch (err) {
+      console.log("Error in creating Event " + (err as Error).message);
+      return;
+    }
+  };
 
-    const handleCheckboxChange = (index: number) => {
-        setSelectedRowsidx(prevSelectedRows => {
-            if (prevSelectedRows.includes(index)) {
-                return prevSelectedRows.filter(row => row !== index);
-            } else {
-                return [...prevSelectedRows, index];
-            }
-        });
-    };
+  const handleCheckboxChange = (index: number) => {
+    setSelectedRowsidx((prevSelectedRows) => {
+      if (prevSelectedRows.includes(index)) {
+        return prevSelectedRows.filter((row) => row !== index);
+      } else {
+        return [...prevSelectedRows, index];
+      }
+    });
+  };
 
-    const getIsActionPreviewDone = async (learningid: string) => {
-        const res = await axios.get("/api/v1/getaction-preview", {
-            params: { learningid: learningid }
-        });
+  const getIsActionPreviewDone = async (learningid: string) => {
+    const res = await axios.get("/api/v1/getaction-preview", {
+      params: { learningid: learningid },
+    });
 
         console.log("check check :" + JSON.stringify(res));
 
-        if (res.status === 200) {
-            console.log("this is check :" + res.data.check);
-            return res.data.check;
-        }
-        return false;
+    if (res.status === 200) {
+      console.log("this is check :" + res.data.check);
+      return res.data.check;
     }
+    return false;
+  };
 
-    const getTodoTaskFormDB = async (learningId: string) => {
-        try {
-            const eventlistRes = await axios.get("/api/v1/get-todotask", {
-                params: { learning_id: learningId }
-            });
+  const getTodoTaskFormDB = async (learningId: string) => {
+    try {
+      const eventlistRes = await axios.get("/api/v1/get-todotask", {
+        params: { learning_id: learningId },
+      });
 
-            if (eventlistRes.status === 200) {
-                console.log("todo_task : " + JSON.stringify(eventlistRes.data.todo_task));
-                setTodoList(eventlistRes.data.todo_task);
-                setinitTdoLisit(eventlistRes.data.todo_task);
-            } else {
-                setTodoList([]);
-            }
-        }
-        catch (err) {
-            console.log("getTodoTaskFormDB gives error :" + (err as Error).message);
-            setTodoList([]);
-        }
+      if (eventlistRes.status === 200) {
+        console.log(
+          "todo_task : " + JSON.stringify(eventlistRes.data.todo_task)
+        );
+        setTodoList(eventlistRes.data.todo_task);
+        setinitTdoLisit(eventlistRes.data.todo_task);
+      } else {
+        setTodoList([]);
+      }
+    } catch (err) {
+      console.log("getTodoTaskFormDB gives error :" + (err as Error).message);
+      setTodoList([]);
     }
+  };
 
     return (
         <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
