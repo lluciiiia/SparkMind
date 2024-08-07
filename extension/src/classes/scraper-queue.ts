@@ -1,9 +1,12 @@
-import { Queue } from '.';
+import type { ScraperQueueItemType } from '@src/schema';
+import { Stringify } from '@src/utils';
 import { v4 as uuidv4 } from 'uuid';
-import { ScraperQueueItemType } from '../schema';
+import { Queue } from '.';
 
 export class ScraperQueue extends Queue<ScraperQueueItemType> {
-  constructor(items: ScraperQueueItemType[] = []) { super(items) }
+  constructor(items: ScraperQueueItemType[] = []) {
+    super(items);
+  }
 
   public insert(item: Omit<ScraperQueueItemType, 'id'>): void {
     const newItem = { ...item, id: uuidv4() };
@@ -22,6 +25,10 @@ export class ScraperQueue extends Queue<ScraperQueueItemType> {
     return this.items.find((i: ScraperQueueItemType) => i.id === id);
   }
 
+  public next(): ScraperQueueItemType | undefined {
+    return this.items.shift();
+  }
+
   public static make() {
     return new ScraperQueue();
   }
@@ -31,6 +38,6 @@ export class ScraperQueue extends Queue<ScraperQueueItemType> {
   }
 
   public log(): string {
-    return JSON.stringify(this.items, null, 2);
+    return Stringify(this.items);
   }
 }

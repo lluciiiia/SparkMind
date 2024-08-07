@@ -1,6 +1,7 @@
 import type { NoteType } from '@/schema';
+import { createClient } from '@/utils/supabase/client';
 import type React from 'react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 type NotesContextType = {
   notes: NoteType[];
@@ -14,6 +15,22 @@ const NotesContext = createContext<NotesContextType>({
 
 export const NotesProvider = ({ children }: { children: React.ReactNode }) => {
   const [notes, setNotes] = useState<NoteType[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchNotes = async () => {
+      const { data, error } = await supabase.from('notes').select('*');
+
+      if (error) {
+        console.error('Error fetching notes:', error);
+      } else {
+        setNotes(data);
+      }
+    };
+
+    fetchNotes();
+  }, [supabase]);
+
   return <NotesContext.Provider value={{ notes, setNotes }}>{children}</NotesContext.Provider>;
 };
 

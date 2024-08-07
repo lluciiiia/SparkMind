@@ -2,7 +2,15 @@
   "$schema": "https://biomejs.dev/schemas/1.6.3/schema.json",
   "organizeImports": {
     "enabled": true,
-    "ignore": ["node_modules", ".next", "dist", ".nuxt", ".wrangler", ".react-email"]
+    "ignore": [
+      "node_modules",
+      ".next",
+      "dist",
+      ".nuxt",
+      ".wrangler",
+      ".react-email",
+      "extension/dist"
+    ]
   },
   "linter": {
     "enabled": true,
@@ -15,7 +23,14 @@
         "noBannedTypes": "warn"
       }
     },
-    "ignore": ["node_modules/**/*", "dist/**/*", "build/**/*", ".next/**/*", "public/**/*.js"]
+    "ignore": [
+      "node_modules/**/*",
+      "dist/**/*",
+      "build/**/*",
+      ".next/**/*",
+      "public/**/*.js",
+      "extension/dist/**/*"
+    ]
   },
   "formatter": {
     "indentStyle": "space",
@@ -31,7 +46,8 @@
       "package.json",
       "package-lock.json",
       "yarn.lock",
-      "bun.lockb"
+      "bun.lockb",
+      "extension/dist/**/*"
     ]
   },
   "javascript": {

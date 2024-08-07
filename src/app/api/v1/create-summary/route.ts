@@ -1,10 +1,10 @@
-import { z } from "zod";
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import dotenv from "dotenv";
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+import { z } from 'zod';
 
 dotenv.config();
-console.log("the key", process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY);
-const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || "");
+console.log('the key', process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY || '');
 
 // Define the Zod schema for the summary response
 const summarySchema = z.object({
@@ -19,11 +19,11 @@ const summarySchema = z.object({
 
 // Function to fetch summary data from the Google Generative AI
 async function fetchSummaryData(query: string) {
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
   const result = await model.generateContent(query);
   const response = result.response;
   const text = await response.text();
-  console.log("the text", text);
+  console.log('the text', text);
   return text;
 }
 
@@ -57,17 +57,17 @@ export async function buildSummary(topic: string) {
 
     return response;
   } catch (error) {
-    console.error("Error fetching or generating summary data:", error);
+    console.error('Error fetching or generating summary data:', error);
     return null;
   }
 }
 // Example usage
 async function main() {
-  const summaryData = await buildSummary("engineer");
+  const summaryData = await buildSummary('engineer');
   if (summaryData) {
-    console.log("data:", summaryData);
+    console.log('data:', summaryData);
   } else {
-    console.log("Failed to generate summary.");
+    console.log('Failed to generate summary.');
   }
 }
 

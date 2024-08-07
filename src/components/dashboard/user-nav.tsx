@@ -20,14 +20,14 @@ import { createClient } from '@/utils/supabase/client';
 import { useEffect, useState } from 'react';
 
 export function UserNav() {
-
   const [userName, setUserName] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
+  const supabase = createClient();
+
   const getUserInfo = async () => {
     try {
-      const supabase = createClient();
       const { data, error } = await supabase.auth.getUser();
       if (error) {
         console.error('Error fetching user data:', error.message);
@@ -39,7 +39,7 @@ export function UserNav() {
       const email = data.user.email;
       setUserEmail(email || 'johndoe@gamil.com');
       setUserName(name || 'johndoe');
-      setAvatarUrl(avatar || null);// Fallback to 'Anonymous' if no name is found
+      setAvatarUrl(avatar || null); // Fallback to 'Anonymous' if no name is found
     } catch (err) {
       console.error('Error in getUserInfo:', (err as Error).message);
     }
@@ -92,7 +92,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { }}>
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => supabase.auth.signOut()}>
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>

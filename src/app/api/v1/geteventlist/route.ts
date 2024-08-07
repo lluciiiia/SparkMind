@@ -10,8 +10,7 @@ export const dynamic = 'force-dynamic';
 const supabase = createClient();
 
 async function getEventList(transcript: string): Promise<any> {
-
-  if (!API_KEY) return new Response("Missing API key", { status: 400 });
+  if (!API_KEY) return new Response('Missing API key', { status: 400 });
 
   const generationConfig = {
     temperature: 0.7,
@@ -116,8 +115,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     }
 
     return NextResponse.json({ status: 200, body: eventList });
-  }
-  catch (error) {
+  } catch (error) {
     console.log('Error in GetEventList api : ' + error);
   }
   return NextResponse.json({ status: 400, error: 'video_id is required' });

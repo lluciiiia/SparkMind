@@ -29,11 +29,11 @@ function generateRandomString(length: number) {
 }
 
 interface Task {
-  summary: string,
-  description: string,
-  start_dateTime: string,
-  end_dateTime: string,
-  timezone: string
+  summary: string;
+  description: string;
+  start_dateTime: string;
+  end_dateTime: string;
+  timezone: string;
 }
 
 const storeCalendarEvent = async (eventList: Event[], learning_id: string) => {
@@ -44,7 +44,7 @@ const storeCalendarEvent = async (eventList: Event[], learning_id: string) => {
 
     const TodoTasksList: Task[] = [];
 
-    eventList.forEach(event => {
+    eventList.forEach((event) => {
       TodoTasksList.push({
         summary: event.summary,
         description: event.description,
@@ -54,24 +54,23 @@ const storeCalendarEvent = async (eventList: Event[], learning_id: string) => {
       });
     });
 
-
-    const { error } = await supabaseClient.from('outputs')
+    const { error } = await supabaseClient
+      .from('outputs')
       .update({
         todo_task: TodoTasksList,
-        is_task_preview_done: true
-      }).eq('learning_id', learning_id);
+        is_task_preview_done: true,
+      })
+      .eq('learning_id', learning_id);
 
     if (error) {
-      console.log('Errror while Store TodoTask : ' + error.message)
+      console.log('Errror while Store TodoTask : ' + error.message);
       return;
     }
-
-  }
-  catch (err) {
-    console.error("Error Store TodoTask:", (err as Error).message);
+  } catch (err) {
+    console.error('Error Store TodoTask:', (err as Error).message);
     return;
   }
-}
+};
 
 const createCalendarEvent = async (eventList: Event[], accessToken: any): Promise<string[]> => {
   const auth = new google.auth.OAuth2();
@@ -104,7 +103,6 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
       if (response.status === 200 && data.htmlLink) {
         responseArray.push(data.htmlLink);
       }
-
     } catch (error) {
       console.log('Error while creating Calendar Event:', (error as Error).message);
     }
@@ -116,7 +114,7 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const data = (await req.json()) as { selectedTask: Event[], learningId: string };
+    const data = (await req.json()) as { selectedTask: Event[]; learningId: string };
 
     const supabaseClient = createClient();
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
@@ -128,7 +126,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const selectedTask: Event[] = data.selectedTask;
     const learningId: string = data.learningId;
 
-    console.log("selectedTask : " + selectedTask);
+    console.log('selectedTask : ' + selectedTask);
 
     // Use type assertion to add uuid to the request object
     (req as any).uuid = uuid;
