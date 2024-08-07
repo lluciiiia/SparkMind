@@ -91,18 +91,6 @@ export const Dashboard = () => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
 
-  const [input, setInput] = useState<string>("");
-  const [responses, setResponses] = useState<Message[]>([]);
-  const [chatSession, setChatSession] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [frequentQue, setFrequentQue] = useState<boolean>(false);
-
-  const [basicQuestion, setBasicQuestion] = useState<[]>([]);
-  const [transcript, setTranscript] = useState<string | undefined>();
-
-  // TODO: dynamic video id
-  const video_id = "cfa0784f-d23c-4430-99b6-7851508c5fdf";
-
   const searchParams = useSearchParams();
   const [videos, setVideos] = useState<VideoItem[] | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
@@ -111,11 +99,6 @@ export const Dashboard = () => {
 
   const [output, setOutput] = useState<Output | null>(null);
   const myLearningId = searchParams.get("id");
-
-  const [todoList, setTodoList] = useState<Event[]>([]);
-  const [eventList, setEventList] = useState<Event[]>([]);
-  const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
-  const [isListPreview, setListPreview] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
@@ -157,131 +140,6 @@ export const Dashboard = () => {
       setFurtherInfoData(parsedData);
     }
   }, [output]);
-
-  useEffect(() => {
-    const fetchDiscussData = async () => {
-      const response = await axios.get(
-        `/api/v1/getdiscuss?videoid=${video_id}`
-      );
-      if (response.status === 500) {
-        alert("Something Went Wrong");
-      }
-      setBasicQuestion(response.data.basicQue);
-      setTranscript(response.data.transcript);
-    };
-    fetchDiscussData();
-  }, [video_id]);
-
-  useEffect(() => {
-    const Session = genModel.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [{ text: transcript! }],
-        },
-      ],
-    });
-
-    setChatSession(Session);
-  }, [transcript]);
-
-  useEffect(() => {
-    if (frequentQue === true) {
-      onSubmit();
-      setFrequentQue(false);
-    }
-  }, [frequentQue]);
-
-
-  // useEffect(() => {
-
-  //   const ActionData = async () => {
-  //     if (myLearningId) {
-  //       const check = await getIsActionPreviewDone(myLearningId);
-
-  //       if (check === false) {
-  //         getListOfEvent(myLearningId);
-  //         setListPreview(true);
-  //       } else {
-  //         getTodoTaskFormDB(myLearningId);
-  //       }
-  //     }
-  //   }
-  //   ActionData();
-
-  // }, [myLearningId]);
-
-  // const getListOfEvent = async (LearningId: any) => {
-  //   try {
-  //     const eventlistRes = await axios.get("/api/v1/geteventlist", {
-  //       params: { LearningId: LearningId }
-  //     });
-
-  //     let eventList = JSON.stringify(eventlistRes.data);
-  //     console.log("eventList" + eventList);
-
-  //     const secnd = await JSON.parse(eventList) as any;
-  //     const VSlList: Event[] = secnd.body;
-
-  //     setEventList(VSlList);
-
-  //   } catch (error) {
-  //     console.error('Error creating event :', error);
-  //     alert('Error creating event : ' + (error as Error).message);
-  //   }
-  // };
-
-  // const getIsActionPreviewDone = async (learningid: string) => {
-  //   const res = await axios.get("/api/v1/getaction-preview", {
-  //     params: { learningid: learningid }
-  //   });
-
-  //   if (res.status === 200) {
-  //     console.log(res.data.check);
-  //     return res.data.check;
-  //   }
-  //   return false;
-  // }
-
-  // const getTodoTaskFormDB = async (learning_id: string) => {
-  //   const eventlistRes = await axios.get("/api/v1/getTodolist", {
-  //     params: { learning_id: learning_id }
-  //   });
-  // }
-
-  const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  const onSubmit = useCallback(async () => {
-    try {
-      if (input.trim()) {
-        setLoading(true);
-        const newMessage: Message = {
-          id: Date.now(),
-          text: input,
-          sender: "user",
-        };
-        setResponses((prevResponses) => [...prevResponses, newMessage]);
-
-        const question = `Given the previous transcript, Based on the transcript, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
-
-        const chatResponse = await chatSession.sendMessage(question);
-
-        const aiMessage: Message = {
-          id: Date.now(),
-          text: chatResponse.response.text(),
-          sender: "ai",
-        };
-        setResponses((prevResponses) => [...prevResponses, aiMessage]);
-
-        setLoading(false);
-        setInput("");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [input, chatSession]);
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -345,9 +203,11 @@ export const Dashboard = () => {
           animate={{ width: isOpen ? "100%" : 50 }}
           transition={{ type: "spring", stiffness: 100 }}>
           <summary
-            className={`left-0 relative p-2 ${isOpen ? "rounded-l-md" : "rounded-md"
-              } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${isOpen ? "justify-start" : "justify-center"
-              }`}>
+            className={`left-0 relative p-2 ${
+              isOpen ? "rounded-l-md" : "rounded-md"
+            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
+              isOpen ? "justify-start" : "justify-center"
+            }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
@@ -375,10 +235,11 @@ export const Dashboard = () => {
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
-                  className={`px-6 py-2 cursor-pointer ${activeTab === tab.name
-                    ? "bg-navy text-white rounded-t-3xl"
-                    : "text-gray"
-                    }`}
+                  className={`px-6 py-2 cursor-pointer ${
+                    activeTab === tab.name
+                      ? "bg-navy text-white rounded-t-3xl"
+                      : "text-gray"
+                  }`}
                   onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
                 </button>
@@ -413,9 +274,9 @@ export const Dashboard = () => {
                     furtherInfoData != null && (
                       <FurtherInfoCard furtherInfo={furtherInfoData} />
                     )}
-                  {activeTab === tab && tab === "action-items" && (
-                    <ActionCard videos={videos} />
-                  )}
+                  {activeTab === tab && tab === "action-items"&& (
+                      <ActionCard learningId={myLearningId} />
+                    )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
@@ -448,8 +309,9 @@ export const Dashboard = () => {
                     }}
                   >
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? "rotate-180" : ""
-                        }`}
+                      className={`w-5 h-5 bottom-0 ${
+                        isDrawerOpen ? "rotate-180" : ""
+                      }`}
                       fill="black"
                     />
                   </motion.div>

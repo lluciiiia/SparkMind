@@ -18,6 +18,7 @@ async function getEventList(transcript: string): Promise<any> {
 
   if (!API_KEY) return new Response("Missing API key", { status: 400 });
 
+
   const generationConfig = {
     temperature: 0.7,
     topP: 0.85,
@@ -101,28 +102,27 @@ async function getTranscript(videoid: string) {
 
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
-    const LearningId = req.nextUrl.searchParams.get('LearningId');
-    console.log('LearningId 🆔 in geteventlist : ' + LearningId);
+    const video_id = req.nextUrl.searchParams.get('LearningId');
+    console.log('video_id 🆔 : ' + video_id);
 
-    if (LearningId === null) {
-      return new NextResponse('LearningId is required', { status: 400 });
+    if (video_id !== null) {
+      const transcript = await getTranscript(video_id);
+
+      if (!transcript) {
+        return NextResponse.json({ status: 404, error: 'Transcript not found' });
+      }
+
+      const eventList = await getEventList(transcript);
+
+      if (!eventList) {
+        return NextResponse.json({ status: 400, body: 'eventList is empty' });
+      }
+
+      return NextResponse.json({ status: 200, body: eventList });
+    } else {
+      return new NextResponse('video_id is required', { status: 400 });
     }
-
-    const transcript = await getTranscript(LearningId);
-
-    if (!transcript) {
-      return NextResponse.json({ status: 404, error: 'Transcript not found' });
-    }
-
-    const eventList = await getEventList(transcript);
-
-    if (!eventList) {
-      return NextResponse.json({ status: 400, body: 'eventList is empty' });
-    }
-
-    return NextResponse.json({ status: 200, body: eventList });
-  }
-  catch (error) {
+  } catch (error) {
     console.log('Error in GetEventList api : ' + error);
   }
   return NextResponse.json({ status: 400, error: 'video_id is required' });
