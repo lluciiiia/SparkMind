@@ -4,11 +4,12 @@ import { type NextRequest, NextResponse } from 'next/server';
 const supabase = createClient();
 
 async function getTranscript(videoid: string) {
-  try {
-    const { data, error } = await supabase
-      .from('transcriptdata')
-      .select('transcript')
-      .eq('videoid', videoid);
+    try {
+        // new things we are store learning_id in video id in DB 
+        const { data, error } = await supabase
+            .from('transcriptdata')
+            .select('transcript')
+            .eq('videoid', videoid);
 
     if (error) {
       console.log('Error fetching transcript from DB: ' + error.message);

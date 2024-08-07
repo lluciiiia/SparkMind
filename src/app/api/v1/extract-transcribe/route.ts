@@ -180,7 +180,12 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     const file = formData.get('file') as Blob | null;
-    const myleanings = formData.get('myLearningId') as string;
+    const learning_id = formData.get('learningid') as string;
+
+    if (learning_id === null) {
+      console.error('leaning Id is missing');
+    }
+
     if (!file) {
       return NextResponse.json({ error: 'File blob is required.' }, { status: 400 });
     }
@@ -198,8 +203,7 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    //if can change it name of video id to learning_id
-    const video_id = myleanings;
+    const video_id = learning_id;
 
     const gcsUri = await extractAndUploadAudio(buffer, video_id);
     const transcription = await transcribeAudio(gcsUri);
