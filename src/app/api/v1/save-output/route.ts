@@ -10,15 +10,17 @@ import { saveFurtherInfoOutput } from "./helpers/further-info";
 export const dynamic = "force-dynamic";
 const supabase = createClient();
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const myLearningId = url.searchParams.get("id");
     const pageToken = url.searchParams.get("pageToken");
+    const body = await req.json() as { input: string };
+    const input = body.input;
 
-    if (!myLearningId) {
+    if (!myLearningId || !input) {
       return NextResponse.json(
-        { error: "Error extracting myLearningId" },
+        { error: "Error extracting myLearningId or input" },
         { status: 400 }
       );
     }
@@ -30,25 +32,27 @@ export async function GET(req: NextRequest) {
         error: "No learning found",
       });
 
-      if (myLearningError) {
-        console.log("myLearningError: ", myLearningError);
-        return NextResponse.json(
-          { error: "Error getting my learning" },
-          { status: 500 }
-        );
-      }
+    if (myLearningError) {
+      console.log("myLearningError: ", myLearningError);
+      return NextResponse.json(
+        { error: "Error getting my learning" },
+        { status: 500 }
+      );
+    }
 
-      const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
-        if (outputError) {
-          console.log("outputError: ", outputError);
-          return NextResponse.json(
-            { error: "Error getting output" },
-            { status: 500 }
-          );
-        }
+    await saveMyLearningInput(myLearningId, input);
+
+    const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
+    if (outputError) {
+      console.log("outputError: ", outputError);
+      return NextResponse.json(
+        { error: "Error getting output" },
+        { status: 500 }
+      );
+    }
 
     const youtubeResponse = await saveYoutubeOutput(
-      myLearning[0].input,
+      input,
       pageToken,
       myLearningId,
       output
@@ -59,7 +63,7 @@ export async function GET(req: NextRequest) {
 
     const summaryResponse = await saveSummaryOutput(
       myLearningId,
-      myLearning[0].input,
+      input,
       output
     );
 
@@ -67,7 +71,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ status: summaryResponse.status });
 
     const quizResponse = await saveQuizOutput(
-      myLearning[0].input,
+      input,
       myLearningId,
       output
     );
@@ -76,7 +80,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ status: quizResponse.status });
 
     const furtherInfoResponse = await saveFurtherInfoOutput(
-      myLearning[0].input,
+      input,
       myLearningId,
       output
     );
@@ -97,14 +101,21 @@ export async function GET(req: NextRequest) {
 
 async function getMyLearningById(id: string) {
   return await supabase
-  .from("mylearnings")
-  .select("id, input")
-  .eq("id", id);
+    .from("mylearnings")
+    .select("id, input")
+    .eq("id", id);
+}
+
+async function saveMyLearningInput(id: string, input: string) {
+  return await supabase
+  .from('mylearnings')
+  .update({ input })
+  .eq('id', id);
 }
 
 async function getOutputByLearningId(learningId: string) {
   return await supabase
-  .from("outputs")
-  .select("id")
-  .eq("id", learningId);
+    .from("outputs")
+    .select("id")
+    .eq("id", learningId);
 }
