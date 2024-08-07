@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 
 import { createClient } from '@/utils/supabase/client';
 import { useEffect, useState } from 'react';
+import { redirect } from 'next/navigation';
 
 export function UserNav() {
 
@@ -48,6 +49,12 @@ export function UserNav() {
   useEffect(() => {
     getUserInfo();
   }, []);
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    return redirect('/signin');
+  }
 
   return (
     <DropdownMenu>
@@ -92,7 +99,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { }}>
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { handleSignOut() }}>
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>
