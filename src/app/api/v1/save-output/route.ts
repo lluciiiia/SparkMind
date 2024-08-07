@@ -30,22 +30,22 @@ export async function GET(req: NextRequest) {
         error: "No learning found",
       });
 
-    if (myLearningError) {
-      console.log("myLearningError: ", myLearningError);
-      return NextResponse.json(
-        { error: "Error getting my learning" },
-        { status: 500 }
-      );
-    }
+      if (myLearningError) {
+        console.log("myLearningError: ", myLearningError);
+        return NextResponse.json(
+          { error: "Error getting my learning" },
+          { status: 500 }
+        );
+      }
 
-    const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
-    if (outputError) {
-      console.log("outputError: ", outputError);
-      return NextResponse.json(
-        { error: "Error getting output" },
-        { status: 500 }
-      );
-    }
+      const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
+        if (outputError) {
+          console.log("outputError: ", outputError);
+          return NextResponse.json(
+            { error: "Error getting output" },
+            { status: 500 }
+          );
+        }
 
     const youtubeResponse = await saveYoutubeOutput(
       myLearning[0].input,
@@ -56,16 +56,6 @@ export async function GET(req: NextRequest) {
 
     if (youtubeResponse.status != 200)
       return NextResponse.json({ status: youtubeResponse.status });
-
-    const ActionItmResponse = await saveActionItem(
-      myLearning[0].input,
-      pageToken,
-      myLearningId,
-      output
-    );
-
-    if (ActionItmResponse.status != 200)
-      return NextResponse.json({ status: ActionItmResponse.status });
 
     const summaryResponse = await saveSummaryOutput(
       myLearningId,
@@ -107,14 +97,14 @@ export async function GET(req: NextRequest) {
 
 async function getMyLearningById(id: string) {
   return await supabase
-    .from("mylearnings")
-    .select("id, input")
-    .eq("id", id);
+  .from("mylearnings")
+  .select("id, input")
+  .eq("id", id);
 }
 
 async function getOutputByLearningId(learningId: string) {
   return await supabase
-    .from("outputs")
-    .select("id")
-    .eq("id", learningId);
+  .from("outputs")
+  .select("id")
+  .eq("id", learningId);
 }
