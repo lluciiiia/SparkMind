@@ -2,7 +2,7 @@
 
 import { LayoutGrid, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
-
+import { useRouter } from 'next/navigation';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -25,6 +25,7 @@ export function UserNav() {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const supabase = createClient();
+  const router = useRouter();
 
   const getUserInfo = async () => {
     try {
@@ -92,7 +93,11 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => supabase.auth.signOut()}>
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {
+            supabase.auth.signOut();
+            router.push('/signin');
+          }}
+        >
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>

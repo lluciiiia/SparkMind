@@ -11,6 +11,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { getMenuList } from '@/lib/menu-list';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 interface MenuProps {
   isOpen: boolean | undefined;
 }
@@ -19,7 +20,7 @@ export function Menu({ isOpen }: MenuProps) {
   const pathname = usePathname();
   const menuList = getMenuList(pathname);
   const supabase = createClient();
-
+  const router = useRouter();
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
       <nav className="w-full h-full mt-8">
@@ -97,7 +98,10 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => supabase.auth.signOut()}
+                    onClick={() => {
+                      supabase.auth.signOut();
+                      router.push('/signin');
+                    }}
                     variant="outline"
                     className="justify-center w-full h-10 mt-5"
                   >
