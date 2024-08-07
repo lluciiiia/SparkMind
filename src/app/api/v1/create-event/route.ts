@@ -8,11 +8,11 @@ import { type NextRequest, NextResponse } from 'next/server';
 interface Event {
   summary: string;
   description: string;
-  start: {
+  startDate: {
     dateTime: string;
     timeZone: string;
   };
-  end: {
+  endDate: {
     dateTime: string;
     timeZone: string;
   };
@@ -26,51 +26,6 @@ function generateRandomString(length: number) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
-}
-
-interface Task {
-  summary: string,
-  description: string,
-  start_dateTime: string,
-  end_dateTime: string,
-  timezone: string
-}
-
-const storeCalendarEvent = async (eventList: Event[], learning_id: string) => {
-  try {
-    console.log('this is event list : ' + eventList);
-    const supabaseClient = createClient();
-    const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
-
-    const TodoTasksList: Task[] = [];
-
-    eventList.forEach(event => {
-      TodoTasksList.push({
-        summary: event.summary,
-        description: event.description,
-        start_dateTime: event.start.dateTime,
-        end_dateTime: event.end.dateTime,
-        timezone: event.start.timeZone,
-      });
-    });
-
-
-    const { error } = await supabaseClient.from('outputs')
-      .update({
-        todo_task: TodoTasksList,
-        is_task_preview_done: true
-      }).eq('learning_id', learning_id);
-
-    if (error) {
-      console.log('Errror while Store TodoTask : ' + error.message)
-      return;
-    }
-
-  }
-  catch (err) {
-    console.error("Error Store TodoTask:", (err as Error).message);
-    return;
-  }
 }
 
 const createCalendarEvent = async (eventList: Event[], accessToken: any): Promise<string[]> => {
@@ -104,13 +59,12 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
       if (response.status === 200 && data.htmlLink) {
         responseArray.push(data.htmlLink);
       }
-
     } catch (error) {
       console.log('Error while creating Calendar Event:', (error as Error).message);
     }
   }
 
-  console.log('this is Repose Array for created event : ' + responseArray);
+  console.log('this is Repose Array : ' + responseArray);
   return responseArray;
 };
 
@@ -126,9 +80,9 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     const selectedTask: Event[] = data.selectedTask;
-    const learningId: string = data.learningId;
+    const learningId = data.learningId;
 
-    console.log("selectedTask : " + selectedTask);
+    console.log(selectedTask);
 
     // Use type assertion to add uuid to the request object
     (req as any).uuid = uuid;
@@ -142,8 +96,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     if (accessToken !== undefined) {
       const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
-      await storeCalendarEvent(selectedTask, learningId);
-
       return NextResponse.json({ status: 200, calendarEvents });
     }
 

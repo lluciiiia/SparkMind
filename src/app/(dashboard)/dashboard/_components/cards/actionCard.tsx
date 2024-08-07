@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { VideoItem, VideoCardProps } from "../interfaces";
+import { ActionCardProps } from "../interfaces";
 import { Calendar } from "@/components/ui/calendar"
 import axios from 'axios';
 
@@ -19,7 +19,6 @@ interface Event {
     }
 }
 
-
 interface TodoType {
     summary: string,
     description: string,
@@ -28,7 +27,11 @@ interface TodoType {
     timezone: string
 }
 
-const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
+const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
+
+    if(!learningId){
+        console.error('LearningId is Missing in ActionCard');
+    }
 
     const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -38,18 +41,16 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
     const [isListPreview, setListPreview] = useState<boolean>(false);
     const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
 
-    const learning_id = '6e3a87c0-d43f-443d-834f-210c1553520f';
-
     useEffect(() => {
         const ActionData = async () => {
-            if (learning_id) {
-                const check = await getIsActionPreviewDone(learning_id);
+            if (learningId) {
+                const check = await getIsActionPreviewDone(learningId);
 
                 if (check === false) {
-                    await getListOfEvent(learning_id);
+                    await getListOfEvent(learningId);
                     setListPreview(true);
                 } else {
-                    await getTodoTaskFormDB(learning_id);
+                    await getTodoTaskFormDB(learningId);
                 }
             }
         }
@@ -114,7 +115,7 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
 
             console.log("selectedTask : " + selectedTask);
 
-            const res = await axios.post('/api/v1/create-event', { selectedTask: selectedTask, learningId: learning_id });
+            const res = await axios.post('/api/v1/create-event', { selectedTask: selectedTask, learningId: learningId });
 
             if (res.data.status === 200) {
 
@@ -167,10 +168,10 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
         return false;
     }
 
-    const getTodoTaskFormDB = async (learning_id: string) => {
+    const getTodoTaskFormDB = async (learningId: string) => {
         try {
             const eventlistRes = await axios.get("/api/v1/get-todotask", {
-                params: { learning_id: learning_id }
+                params: { learning_id: learningId }
             });
 
             if (eventlistRes.status === 200) {

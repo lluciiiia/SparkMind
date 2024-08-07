@@ -107,39 +107,42 @@ export const NewDashboard = () => {
 
     setIsLoading(true);
 
-    if (myLearningId !== null) {
-
-      try {
-        const formData = new FormData();
-        formData.append("file", selectedFile);
-        formData.append("myLearningId", myLearningId);
-
-        const res = await fetch("/api/v1/extract-transcribe", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!res.ok) throw new Error(await res.text());
-
-        // @ts-ignore trust me bro
-        const data = (await res.json()) as any;
-        console.log(data);
-
-        // right now not usefull to display the transcript
-        // setFetchedTranscript(data.transcription);
-        // setKeywords(data.keywordsArr);
-
-        //clean up old setState
-        setSelectedFile(null);
-        setObjectURL(null);
-        setFileType(undefined);
-
-        return data.keywordsArr;
-      } catch (err: any) {
-        console.error(err);
-      } finally {
-        setIsLoading(false);
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      if (myLearningId !== null) {
+        formData.append("learningid", myLearningId);
       }
+
+      const res = await fetch("/api/v1/extract-transcribe", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      // @ts-ignore trust me bro
+      const data = (await res.json()) as any;
+      console.log(data);
+
+      // right now not usefull to display the transcript
+      // setFetchedTranscript(data.transcription);
+      // setKeywords(data.keywordsArr);
+
+      //const value = { 'title': 'Video File' };
+
+      // handleCreate(value);
+
+      //clean up old setState
+      setSelectedFile(null);
+      setObjectURL(null);
+      setFileType(undefined);
+
+      return data.keywordsArr;
+    } catch (err: any) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   };
 

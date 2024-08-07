@@ -28,7 +28,6 @@ export interface VideoItem {
   };
 }
 
-
 export interface ParsedVideoData {
   items: VideoItem[];
 }
@@ -42,6 +41,10 @@ export interface Output {
 
 export interface VideoCardProps {
   videos: VideoItem[] | null;
+}
+
+export interface ActionCardProps {
+  learningId: string | null;
 }
 
 export interface NoteCardProps {
