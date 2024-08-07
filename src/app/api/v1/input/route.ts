@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 const inputSchema = z.object({
-  input_uuid: z.string().uuid(),
+  input_id: z.string().uuid(),
   url: z.string().url(),
   text: z.string(),
 });

@@ -2,6 +2,9 @@ export class Redacted<T = string> {
   private constructor(private readonly _value: T) {}
 
   public static make<T>(value: T) {
+    if (!value) {
+      throw new Error('Value is required');
+    }
     return new Redacted(value);
   }
 

@@ -7,12 +7,6 @@ var config = {
     '@storybook/addon-essentials',
     '@chromatic-com/storybook',
     '@storybook/addon-interactions',
-    {
-      name: '@storybook/addon-docs',
-      options: {
-        configureJSX: true,
-      },
-    },
   ],
   framework: {
     name: '@storybook/react-vite',
