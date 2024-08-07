@@ -53,7 +53,6 @@ export async function GET(request: Request) {
 
           // Insert new tokens
           const token = data.session;
-          console.log("this is token : " + token);
           await supabaseClient.from('googleauthtokens').insert({
             user_uuid: data.user.id,
             access_token: token.provider_token,

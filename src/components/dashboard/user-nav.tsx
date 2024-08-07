@@ -16,39 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-import { createClient } from '@/utils/supabase/client';
-import { useEffect, useState } from 'react';
-
 export function UserNav() {
-
-  const [userName, setUserName] = useState<string | null>(null);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
-  const getUserInfo = async () => {
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getUser();
-      if (error) {
-        console.error('Error fetching user data:', error.message);
-        return;
-      }
-
-      const name = data.user?.user_metadata.name;
-      const avatar = data.user?.user_metadata.avatar_url;
-      const email = data.user.email;
-      setUserEmail(email || 'johndoe@gamil.com');
-      setUserName(name || 'johndoe');
-      setAvatarUrl(avatar || null);// Fallback to 'Anonymous' if no name is found
-    } catch (err) {
-      console.error('Error in getUserInfo:', (err as Error).message);
-    }
-  };
-
-  useEffect(() => {
-    getUserInfo();
-  }, []);
-
   return (
     <DropdownMenu>
       <TooltipProvider disableHoverableContent>
@@ -58,9 +26,7 @@ export function UserNav() {
               <Button variant="outline" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="#" alt="Avatar" />
-                  <AvatarFallback className="bg-transparent">
-                    {avatarUrl && <img src={avatarUrl} alt={`${userName}'s avatar`} />}
-                  </AvatarFallback>
+                  <AvatarFallback className="bg-transparent">JD</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
@@ -72,8 +38,8 @@ export function UserNav() {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{userName}</p>
-            <p className="text-xs leading-none text-muted-foreground">{userEmail}</p>
+            <p className="text-sm font-medium leading-none">John Doe</p>
+            <p className="text-xs leading-none text-muted-foreground">johndoe@example.com</p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -92,7 +58,7 @@ export function UserNav() {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => { }}>
+        <DropdownMenuItem className="hover:cursor-pointer" onClick={() => {}}>
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
           Sign out
         </DropdownMenuItem>
