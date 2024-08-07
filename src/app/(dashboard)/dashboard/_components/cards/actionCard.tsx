@@ -2,34 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { ActionCardProps } from "../interfaces";
+import { ActionCardProps, TodoType, Event } from "../interfaces";
 import { Calendar } from "@/components/ui/calendar"
 import axios from 'axios';
-
-interface Event {
-    summary: string,
-    description: string,
-    start: {
-        dateTime: string,
-        timeZone: string,
-    },
-    end: {
-        dateTime: string,
-        timeZone: string,
-    }
-}
-
-interface TodoType {
-    summary: string,
-    description: string,
-    start_dateTime: string,
-    end_dateTime: string,
-    timezone: string
-}
+import '@/styles/css/custom-scroll.css'
+import Link from "next/link";
+import { Calendar as Calendericon } from "lucide-react";
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
 
-    if(!learningId){
+    if (!learningId) {
         console.error('LearningId is Missing in ActionCard');
     }
 
@@ -119,19 +101,19 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
 
             if (res.data.status === 200) {
 
-                const visulaTodo = selectedRowsidx.map(rowIndex => {
-                    const event = EventList[rowIndex];
-                    return {
-                        summary: event.summary,
-                        description: event.description,
-                        start_dateTime: event.start.dateTime,
-                        end_dateTime: event.end.dateTime,
-                        timezone: event.start.timeZone
-                    } as TodoType;
-                });
+                // const visulaTodo = selectedRowsidx.map(rowIndex => {
+                //     const event = EventList[rowIndex];
+                //     return {
+                //         summary: event.summary,
+                //         description: event.description,
+                //         start_dateTime: event.start.dateTime,
+                //         end_dateTime: event.end.dateTime,
+                //         timezone: event.start.timeZone
+                //     } as TodoType;
+                // });
 
-                setTodoList(visulaTodo);
-                setinitTdoLisit(visulaTodo);
+                setTodoList(res.data.todolist);
+                setinitTdoLisit(res.data.todolist);
             } else {
                 alert(`Error create-event: ${res.data.message}`);
             }
@@ -159,7 +141,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
             params: { learningid: learningid }
         });
 
-        console.log("check check :"+JSON.stringify(res));
+        console.log("check check :" + JSON.stringify(res));
 
         if (res.status === 200) {
             console.log("this is check :" + res.data.check);
@@ -196,26 +178,35 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                         <div>
                             {isListPreview === true ? (
                                 <div className="w-full pl-4 h-full overflow-y-auto">
-                                    <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
+                                    <div className="flex flex-row justify-between items-center">
+                                        <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
+                                        <button
+                                            onClick={() => handleCreateEvent()}
+                                            className="bg-blue-500 text-white py-2 px-4 rounded mr-2 mb-2"
+                                        > Create Selected Taks</button>
+                                    </div>
                                     <div className="space-y-4">
                                         {EventList.map((item, index) => (
                                             <div key={index} className="border-b pb-4">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-checkbox"
-                                                    onChange={() => handleCheckboxChange(index)}
-                                                />
-                                                <p className="text-orange-600 font-bold">
-                                                    {new Date(item.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
-                                                    {new Date(item.end.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                </p>
+                                                <div className="flex flex-row items-center">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
+                                                        onChange={() => handleCheckboxChange(index)}
+                                                    />
+                                                    <p className="text-sm mr-2 font-bold">
+                                                        {item.start.dateTime.slice(0, 16).split('T')[0]}
+                                                        {/* - {item.end.dateTime.slice(0, 16)} */}
+                                                    </p>
+                                                    <p className="text-orange-600 font-bold">
+                                                        {new Date(item.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {' '}
+                                                        {new Date(item.end.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
+                                                </div>
                                                 <p className="text-lg font-semibold">{item.summary}</p>
                                                 <p className="text-sm">{item.description}</p>
-                                                <p className="text-sm">
-                                                    {item.start.dateTime.slice(0, 16)}
-                                                    - {item.end.dateTime.slice(0, 16)}
-                                                </p>
-                                                <select className="w-full border-none focus:ring-0 mt-2">
+                                                <select className="w-32 focus:ring-0 mt-2 border
+                                                 border-[#003366] p-1 rounded-lg">
                                                     <option value="Asia/Calcutta">Asia/Calcutta</option>
                                                     <option value="PST">PST</option>
                                                     <option value="CST">CST</option>
@@ -225,10 +216,6 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                                             </div>
                                         ))}
                                     </div>
-                                    <button
-                                        onClick={() => handleCreateEvent()}
-                                        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
-                                    > Create Selected Taks</button>
                                 </div>
                             ) : (
                                 <div className="flex flex-row">
@@ -245,16 +232,22 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                                         <div className="space-y-4">
                                             {todoList.map((item, index) => (
                                                 <div key={index} className="border-b pb-4">
-                                                    <p className="text-orange-600 font-bold">
-                                                        {new Date(item.start_dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
-                                                        {new Date(item.end_dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                    </p>
-                                                    <p className="text-lg font-semibold">{item.summary}</p>
+                                                    <div className="flex flex-row items-center">
+                                                        <p className="text-sm font-bold mr-2">
+                                                            {item.start_dateTime.slice(0, 16).split('T')[0]}
+                                                        </p>
+                                                        <p className="text-orange-600 font-bold">
+                                                            {new Date(item.start_dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
+                                                            {new Date(item.end_dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                        </p>
+                                                    </div>
+                                                    <div className="flex flex-row items-center">
+                                                        <p className="text-lg font-semibold mr-2">{item.summary}</p>
+                                                        <Link href={item.event_link}>
+                                                            <Calendericon className="h-5 w-5" />
+                                                        </Link>
+                                                    </div>
                                                     <p className="text-sm">{item.description}</p>
-                                                    <p className="text-sm">
-                                                        {item.start_dateTime.slice(0, 16)}
-                                                        - {item.end_dateTime.slice(0, 16)}
-                                                    </p>
                                                 </div>
                                             ))}
                                         </div>
