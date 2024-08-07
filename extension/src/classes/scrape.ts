@@ -5,6 +5,9 @@ export class Scraper<T = string> {
   private constructor(private readonly _url: T) {}
 
   public static make<T>(url: T): Scraper<T> {
+    if (!url) {
+      throw new Error('URL is required');
+    }
     return new Scraper(url);
   }
 

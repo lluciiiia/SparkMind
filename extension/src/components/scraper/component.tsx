@@ -41,7 +41,7 @@ export function Scraper() {
           await postInstance.post({
             input_id: nextItem.id,
             url: window.location.href,
-            text: response.filteredTexts,
+            text: response.filteredTexts.join('\n'),
           });
         } catch (error) {
           console.error('Error during posting:', error);
