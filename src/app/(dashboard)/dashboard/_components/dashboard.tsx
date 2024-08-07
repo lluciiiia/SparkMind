@@ -91,25 +91,12 @@ export const Dashboard = () => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
 
-  const [input, setInput] = useState<string>("");
-  const [responses, setResponses] = useState<Message[]>([]);
-  const [chatSession, setChatSession] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [frequentQue, setFrequentQue] = useState<boolean>(false);
-
-  const [basicQuestion, setBasicQuestion] = useState<[]>([]);
-  const [transcript, setTranscript] = useState<string | undefined>();
-
-  // TODO: dynamic video id
-  const video_id = "cfa0784f-d23c-4430-99b6-7851508c5fdf";
-
   const searchParams = useSearchParams();
   const [videos, setVideos] = useState<VideoItem[] | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState(null);
   const [furtherInfoData, setFurtherInfoData] = useState<any[]>([]);
 
-  const [todoList, setTodoList] = useState<any[]>([]);
   const [output, setOutput] = useState<Output | null>(null);
   const myLearningId = searchParams.get("id");
 
@@ -153,74 +140,6 @@ export const Dashboard = () => {
       setFurtherInfoData(parsedData);
     }
   }, [output]);
-
-  useEffect(() => {
-    const fetchDiscussData = async () => {
-      const response = await axios.get(
-        `/api/v1/getdiscuss?videoid=${video_id}`
-      );
-      if (response.status === 500) {
-        alert("Something Went Wrong");
-      }
-      setBasicQuestion(response.data.basicQue);
-      setTranscript(response.data.transcript);
-    };
-    fetchDiscussData();
-  }, [video_id]);
-
-  useEffect(() => {
-    const Session = genModel.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [{ text: transcript! }],
-        },
-      ],
-    });
-
-    setChatSession(Session);
-  }, [transcript]);
-
-  useEffect(() => {
-    if (frequentQue === true) {
-      onSubmit();
-      setFrequentQue(false);
-    }
-  }, [frequentQue]);
-
-  const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  const onSubmit = useCallback(async () => {
-    try {
-      if (input.trim()) {
-        setLoading(true);
-        const newMessage: Message = {
-          id: Date.now(),
-          text: input,
-          sender: "user",
-        };
-        setResponses((prevResponses) => [...prevResponses, newMessage]);
-
-        const question = `Given the previous transcript, Based on the transcript, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
-
-        const chatResponse = await chatSession.sendMessage(question);
-
-        const aiMessage: Message = {
-          id: Date.now(),
-          text: chatResponse.response.text(),
-          sender: "ai",
-        };
-        setResponses((prevResponses) => [...prevResponses, aiMessage]);
-
-        setLoading(false);
-        setInput("");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }, [input, chatSession]);
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -355,6 +274,9 @@ export const Dashboard = () => {
                     furtherInfoData != null && (
                       <FurtherInfoCard furtherInfo={furtherInfoData} />
                     )}
+                  {activeTab === tab && tab === "action-items"&& (
+                      <ActionCard learningId={myLearningId} />
+                    )}
                   {activeTab != tab && (
                     <Card
                       className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
@@ -381,7 +303,11 @@ export const Dashboard = () => {
                     animate={{ opacity: 1 }}
                     transition={{ type: "spring", stiffness: 100 }}
                     className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}>
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setIsDrawerOpen(!isDrawerOpen)
+                    }}
+                  >
                     <Triangle
                       className={`w-5 h-5 bottom-0 ${
                         isDrawerOpen ? "rotate-180" : ""
@@ -398,15 +324,7 @@ export const Dashboard = () => {
 
             {/* Discuss with AI */}
             <DiscussionWithAI
-              responses={responses}
-              loading={loading}
-              basicQuestion={basicQuestion}
-              input={input}
-              setInput={setInput}
-              frequentQue={frequentQue}
-              setFrequentQue={setFrequentQue}
-              onSubmit={onSubmit}
-              handleDiscussInputChange={handleDiscussInputChange}
+              learningid={myLearningId}
             />
           </motion.div>
         </footer>

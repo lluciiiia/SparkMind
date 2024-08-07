@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
-import { VideoItem, VideoCardProps } from "../interfaces";
+import { ActionCardProps } from "../interfaces";
 import { Calendar } from "@/components/ui/calendar"
 import axios from 'axios';
 
@@ -19,80 +19,133 @@ interface Event {
     }
 }
 
+interface TodoType {
+    summary: string,
+    description: string,
+    start_dateTime: string,
+    end_dateTime: string,
+    timezone: string
+}
 
-const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
+const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
+
+    if(!learningId){
+        console.error('LearningId is Missing in ActionCard');
+    }
 
     const [date, setDate] = useState<Date | undefined>(new Date());
 
-    const [eventList, setEventList] = useState([]);
-    const [videolist, setvideoList] = useState([]);
-    const [showList, setshowList] = useState<Event[]>([]);
-    const [selectedRows, setSelectedRows] = useState<number[]>([]);
+    const [todoList, setTodoList] = useState<TodoType[]>([]);
+    const [EventList, setEventList] = useState<Event[]>([]);
+    const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
+    const [isListPreview, setListPreview] = useState<boolean>(false);
+    const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
 
+    useEffect(() => {
+        const ActionData = async () => {
+            if (learningId) {
+                const check = await getIsActionPreviewDone(learningId);
 
-    const handleSubmit = async (videoid: any) => {
+                if (check === false) {
+                    await getListOfEvent(learningId);
+                    setListPreview(true);
+                } else {
+                    await getTodoTaskFormDB(learningId);
+                }
+            }
+        }
+        ActionData();
+    }, []);
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
+    useEffect(() => {
+
+        if (date) {
+            const filteredList = initTodoList.filter(todo => {
+                console.log("calander date : " + formatDate(todo.start_dateTime));
+                console.log("todo date : " + formatDate(date.toISOString()));
+                return formatDate(todo.start_dateTime) === formatDate(date.toISOString())
+            });
+            setTodoList(filteredList);
+        }
+    }, [date]);
+
+    const getListOfEvent = async (LearningId: any) => {
         try {
-
             const eventlistRes = await axios.get("/api/v1/geteventlist", {
-                params: { videoid }
+                params: { LearningId: LearningId }
             });
 
-            let eventList = await JSON.stringify(eventlistRes.data);
+            let eventList = JSON.stringify(eventlistRes.data);
             console.log("eventList" + eventList);
+
             const secnd = await JSON.parse(eventList) as any;
             const VSlList: Event[] = secnd.body;
 
-            setshowList(VSlList);
+            setEventList(VSlList);
 
         } catch (error) {
-            console.error('Error creating event:', error);
-            alert('Error creating event');
+            console.error('Error creating event :', error);
+            alert('Error creating event : ' + (error as Error).message);
         }
     };
 
-    const handleList = async (e: any) => {
+    const handleCreateEvent = async () => {
         try {
-            const res = await axios.get('/api/v1/list-video');
+
+            const selectedTask = selectedRowsidx.map(rowIndex => ({
+                summary: EventList[rowIndex].summary,
+                description: EventList[rowIndex].description,
+                start: {
+                    dateTime: EventList[rowIndex].start.dateTime,
+                    timeZone: EventList[rowIndex].start.timeZone,
+                },
+                end: {
+                    dateTime: EventList[rowIndex].end.dateTime,
+                    timeZone: EventList[rowIndex].end.timeZone,
+                }
+            }));
+
+            console.log("selectedTask : " + selectedTask);
+
+            const res = await axios.post('/api/v1/create-event', { selectedTask: selectedTask, learningId: learningId });
 
             if (res.data.status === 200) {
-                console.log("List of video input : " + res.data.videolist);
-                setvideoList(res.data.videolist);
+
+                const visulaTodo = selectedRowsidx.map(rowIndex => {
+                    const event = EventList[rowIndex];
+                    return {
+                        summary: event.summary,
+                        description: event.description,
+                        start_dateTime: event.start.dateTime,
+                        end_dateTime: event.end.dateTime,
+                        timezone: event.start.timeZone
+                    } as TodoType;
+                });
+
+                setTodoList(visulaTodo);
+                setinitTdoLisit(visulaTodo);
             } else {
-                alert(`Error: ${res.data.message}`);
+                alert(`Error create-event: ${res.data.message}`);
             }
+
+            setListPreview(false);
         }
         catch (err) {
-            console.error('Error get video list:', err);
-            alert('Error get video list');
-        }
-    }
-
-    const handleLogSelectedRows = async () => {
-        const selectedTask = selectedRows.map(rowIndex => ({
-            summary: showList[rowIndex].summary,
-            description: showList[rowIndex].description,
-            start: {
-                dateTime: showList[rowIndex].start.dateTime,
-                timeZone: showList[rowIndex].start.timeZone,
-            },
-            end: {
-                dateTime: showList[rowIndex].end.dateTime,
-                timeZone: showList[rowIndex].end.timeZone,
-            }
-        }));
-
-        console.log("selectedTask : " + selectedTask);
-
-        const res = await axios.post('/api/v1/create-event', { selectedTask });
-        if (res.data.status === 200) {
-            setEventList(res.data.calendarEvents);
-        } else {
-            alert(`Error: ${res.data.message}`);
+            console.log('Error in creating Event ' + (err as Error).message);
+            return;
         }
     };
 
     const handleCheckboxChange = (index: number) => {
-        setSelectedRows(prevSelectedRows => {
+        setSelectedRowsidx(prevSelectedRows => {
             if (prevSelectedRows.includes(index)) {
                 return prevSelectedRows.filter(row => row !== index);
             } else {
@@ -101,91 +154,123 @@ const ActionCard: React.FC<VideoCardProps> = ({ videos }) => {
         });
     };
 
+    const getIsActionPreviewDone = async (learningid: string) => {
+        const res = await axios.get("/api/v1/getaction-preview", {
+            params: { learningid: learningid }
+        });
 
-    useEffect(() => {
-        console.log("date : " + date);
+        console.log("check check :"+JSON.stringify(res));
 
-        const data = [
-            {
-                summary: 'Analyze MR Rate Discrepancy',
-                description: 'Investigate why the MR rate for the insect team is higher than the company-wide average. Consider factors like team size, project workload, and potential for improvement.',
-                start: {
-                    dateTime: '2024-08-05T00:00:00+05:30',
-                    timeZone: 'Asia/Calcutta'
-                },
-                end: {
-                    dateTime: '2024-08-12T00:00:00+05:30',
-                    timeZone: 'Asia/Calcutta'
-                }
-            },
-            {
-                summary: 'Review Issue Comments',
-                description: 'Check for any comments on the issue related to MR rate analysis. Determine if the analysis was helpful and identify any areas for improvement.',
-                start: {
-                    dateTime: '2024-08-05T00:00:00+05:30',
-                    timeZone: 'Asia/Calcutta'
-                },
-                end: {
-                    dateTime: '2024-08-05T23:59:59+05:30',
-                    timeZone: 'Asia/Calcutta'
-                }
+        if (res.status === 200) {
+            console.log("this is check :" + res.data.check);
+            return res.data.check;
+        }
+        return false;
+    }
+
+    const getTodoTaskFormDB = async (learningId: string) => {
+        try {
+            const eventlistRes = await axios.get("/api/v1/get-todotask", {
+                params: { learning_id: learningId }
+            });
+
+            if (eventlistRes.status === 200) {
+                console.log("todo_task : " + JSON.stringify(eventlistRes.data.todo_task));
+                setTodoList(eventlistRes.data.todo_task);
+                setinitTdoLisit(eventlistRes.data.todo_task);
+            } else {
+                setTodoList([]);
             }
-        ];
-
-        setshowList(data)
-
-    }, [date]);
+        }
+        catch (err) {
+            console.log("getTodoTaskFormDB gives error :" + (err as Error).message);
+            setTodoList([]);
+        }
+    }
 
     return (
         <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
             <div className="flex flex-row h-full rounded-t-3xl w-full justify-between">
-                {/* {"1" === 1 ? ( */}
-                <div>
-                    <Calendar
-                        mode="single"
-                        selected={date}
-                        onSelect={setDate}
-                        className="rounded-md border"
-                    />
-                </div>
-                <div className="w-2/5 pl-4 h-full overflow-y-auto">
-                    <h2 className="text-xl font-bold border-b pb-2 mb-4">TO-DO LIST</h2>
-                    <div className="space-y-4">
-                        {showList.map((item, index) => (
-                            <div key={index} className="border-b pb-4">
-                                <input
-                                    type="checkbox"
-                                    className="form-checkbox"
-                                    onChange={() => handleCheckboxChange(index)}
-                                />
-                                <p className="text-orange-600 font-bold">
-                                    {new Date(item.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
-                                    {new Date(item.end.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                </p>
-                                <p className="text-lg font-semibold">{item.summary}</p>
-                                <p className="text-sm">{item.description}</p>
-                                <p className="text-sm">
-                                    {new Date(item.start.dateTime).toLocaleDateString()} - {new Date(item.end.dateTime).toLocaleDateString()}
-                                </p>
-                                <select className="w-full border-none focus:ring-0 mt-2">
-                                    <option value="Asia/Calcutta">Asia/Calcutta</option>
-                                    <option value="PST">PST</option>
-                                    <option value="CST">CST</option>
-                                    <option value="EST">EST</option>
-                                    <option value="GMT">GMT</option>
-                                </select>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-                {/* ) : (
+                {1 === 1 ? (
+                    <>
+                        <div>
+                            {isListPreview === true ? (
+                                <div className="w-full pl-4 h-full overflow-y-auto">
+                                    <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
+                                    <div className="space-y-4">
+                                        {EventList.map((item, index) => (
+                                            <div key={index} className="border-b pb-4">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-checkbox"
+                                                    onChange={() => handleCheckboxChange(index)}
+                                                />
+                                                <p className="text-orange-600 font-bold">
+                                                    {new Date(item.start.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
+                                                    {new Date(item.end.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                </p>
+                                                <p className="text-lg font-semibold">{item.summary}</p>
+                                                <p className="text-sm">{item.description}</p>
+                                                <p className="text-sm">
+                                                    {item.start.dateTime.slice(0, 16)}
+                                                    - {item.end.dateTime.slice(0, 16)}
+                                                </p>
+                                                <select className="w-full border-none focus:ring-0 mt-2">
+                                                    <option value="Asia/Calcutta">Asia/Calcutta</option>
+                                                    <option value="PST">PST</option>
+                                                    <option value="CST">CST</option>
+                                                    <option value="EST">EST</option>
+                                                    <option value="GMT">GMT</option>
+                                                </select>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <button
+                                        onClick={() => handleCreateEvent()}
+                                        className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+                                    > Create Selected Taks</button>
+                                </div>
+                            ) : (
+                                <div className="flex flex-row">
+                                    <div>
+                                        <Calendar
+                                            mode="single"
+                                            selected={date}
+                                            onSelect={setDate}
+                                            className="rounded-md border"
+                                        />
+                                    </div>
+                                    <div className="w-full pl-4 h-full overflow-y-auto">
+                                        <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
+                                        <div className="space-y-4">
+                                            {todoList.map((item, index) => (
+                                                <div key={index} className="border-b pb-4">
+                                                    <p className="text-orange-600 font-bold">
+                                                        {new Date(item.start_dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} -{' '}
+                                                        {new Date(item.end_dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
+                                                    <p className="text-lg font-semibold">{item.summary}</p>
+                                                    <p className="text-sm">{item.description}</p>
+                                                    <p className="text-sm">
+                                                        {item.start_dateTime.slice(0, 16)}
+                                                        - {item.end_dateTime.slice(0, 16)}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                ) : (
                     <div className="flex h-full justify-center items-center">
                         <p>No videos found</p>
                     </div>
-                )} */}
+                )}
             </div>
 
-        </Card>
+        </Card >
     );
 };
 

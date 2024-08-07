@@ -43,6 +43,10 @@ export interface VideoCardProps {
   videos: VideoItem[] | null;
 }
 
+export interface ActionCardProps {
+  learningId: string | null;
+}
+
 export interface NoteCardProps {
   note: {
     id: string;

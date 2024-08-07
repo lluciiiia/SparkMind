@@ -1,38 +1,125 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
 import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Message } from "./interfaces"; // Adjust the path as needed
+import axios from 'axios';
+
+import {
+  API_KEY,
+  genAI,
+  safetySettings,
+} from "@/app/api/v1/gemini-settings";
 
 interface DiscussionWithAIProps {
-  responses: Message[];
-  loading: boolean;
-  basicQuestion: string[];
-  input: string;
-  setInput: React.Dispatch<React.SetStateAction<string>>;
-  frequentQue: boolean;
-  setFrequentQue: React.Dispatch<React.SetStateAction<boolean>>;
-  onSubmit: () => void;
-  handleDiscussInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  learningid: string | null
 }
 
 const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
-  responses,
-  loading,
-  basicQuestion,
-  input,
-  setInput,
-  frequentQue,
-  setFrequentQue,
-  onSubmit,
-  handleDiscussInputChange,
+  learningid
 }) => {
+
+  if (!API_KEY) {
+    console.error("Missing Google API key");
+  }
+
+  if (!learningid) {
+    console.error("Missing Learning Key" + learningid);
+  }
+
+  const [input, setInput] = useState<string>('');
+  const [responses, setResponses] = useState<Message[]>([]);
+  const [chatSession, setChatSession] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [frequentQue, setFrequentQue] = useState<boolean>(false);
+
+  const [basicQuestion, setBasicQuestion] = useState<[]>([]);
+  const [transcript, setTranscript] = useState<string | undefined>();
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-pro",
+    safetySettings,
+  });
+
+  const generationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 64,
+    maxOutputTokens: 8192,
+    responseMimeType: "text/plain",
+  };
+
+  const video_id = learningid;
+
+  useEffect(() => {
+    const fetchDiscussData = async () => {
+      const response = await axios.get(`/api/v1/getdiscuss?videoid=${video_id}`);
+      if (response.status === 200) {
+        console.log("this is response : " + response.data);
+        setBasicQuestion(response.data.basicQue);
+        setTranscript(response.data.transcript);
+      }
+      console.log('Something goes Wrong in Discuss with ai feature');
+    }
+    fetchDiscussData();
+  }, [video_id]);
+
+  useEffect(() => {
+    const Session = model.startChat({
+      generationConfig,
+      history: [
+        {
+          role: "user",
+          parts: [
+            { text: transcript! }
+          ]
+        }
+      ],
+    });
+
+    setChatSession(Session);
+
+  }, [transcript]);
+
+  useEffect(() => {
+    if (frequentQue === true) {
+      onSubmit();
+      setFrequentQue(false);
+    }
+  }, [frequentQue]);
+
+  const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const onSubmit = useCallback(async () => {
+    try {
+      if (input.trim()) {
+
+        setLoading(true);
+        const newMessage: Message = { id: Date.now(), text: input, sender: 'user' };
+        setResponses(prevResponses => [...prevResponses, newMessage]);
+
+        const question = `Given the previous transcript, Based on the transcript, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
+
+        const chatResponse = await chatSession.sendMessage(question);
+
+        const aiMessage: Message = { id: Date.now(), text: chatResponse.response.text(), sender: 'ai' };
+        setResponses(prevResponses => [...prevResponses, aiMessage]);
+
+        setLoading(false);
+        setInput('');
+      }
+    }
+    catch (error) {
+      console.log(error);
+    }
+  }, [input, chatSession]);
+
   return (
     <Card className="bottom-0 left-0 right-0 shadow-lg mx-auto w-[1000px] h-[600px] rounded-t-lg dark:border-1 dark:border-gray-200">
       <menu className="flex justify-start border-b border-gray-200 ml-4">
@@ -85,7 +172,10 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({
             <PlaceholdersAndVanishInput
               placeholders={[]}
               onChange={handleDiscussInputChange}
-              onSubmit={onSubmit}
+              onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+                event.preventDefault();
+                onSubmit();
+              }}
             />
           </div>
         </div>

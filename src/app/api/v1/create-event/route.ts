@@ -70,7 +70,7 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const data = (await req.json()) as { selectedTask: Event[] };
+    const data = (await req.json()) as { selectedTask: Event[], learningId: string };
 
     const supabaseClient = createClient();
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
@@ -80,6 +80,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
     }
 
     const selectedTask: Event[] = data.selectedTask;
+    const learningId = data.learningId;
 
     console.log(selectedTask);
 
