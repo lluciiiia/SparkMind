@@ -30,7 +30,11 @@ const NotesPage = async () => {
     };
     fetchNotes();
   }, []);
-  return <article id={`${user?.id}`}></article>;
+  return (
+    <article id={`${user?.id}`}>
+      <h1>Notes</h1>
+    </article>
+  );
 };
 
 export default NotesPage;

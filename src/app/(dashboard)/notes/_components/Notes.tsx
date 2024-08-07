@@ -10,12 +10,10 @@ export const NewNoteContainer = ({
   setIsOpen,
   showText,
   notes,
-  note,
 }: {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   showText: boolean;
-  note: NoteType;
   notes: NoteType[];
 }) => {
   return (
@@ -40,7 +38,7 @@ export const NewNoteContainer = ({
 
           {showText && <span>New note</span>}
         </summary>
-        <NewNoteSection notes={notes} note={note} />
+        <NewNoteSection notes={notes} />
       </motion.details>
     </div>
   );
