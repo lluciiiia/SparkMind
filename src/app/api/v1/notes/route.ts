@@ -2,10 +2,9 @@ import type { NoteType } from '@/schema';
 import { createClient } from '@/utils/supabase/server';
 import { type NextRequest, NextResponse } from 'next/server';
 
-const supabase = createClient();
-
 export async function GET(req: NextRequest, _res: NextResponse) {
   try {
+    const supabase = createClient();
     const body = (await req.json()) as NoteType;
     const { data, error } = await supabase.from('notes').select('*').eq('uuid', body.uuid);
     if (error) {
@@ -25,6 +24,7 @@ export async function GET(req: NextRequest, _res: NextResponse) {
 
 export async function POST(req: NextRequest, _res: NextResponse) {
   try {
+    const supabase = createClient();
     const body = (await req.json()) as NoteType;
     const { data, error } = await supabase.from('notes').insert(body);
     if (error) {

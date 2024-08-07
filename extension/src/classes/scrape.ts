@@ -8,7 +8,7 @@ export class Scraper<T = string> {
     return new Scraper(url);
   }
 
-  public static async run<T>(scraper: Scraper<T>): Promise<ScraperScrapeResultType> {
+  public  async run<T>(scraper: Scraper<T>): Promise<ScraperScrapeResultType> {
     try {
       const apiInstance = Api.make(scraper._url as unknown as string);
       const ping = await apiInstance.get();

@@ -30,7 +30,7 @@ export class Api {
     }
   }
 
-  public async post(data: ScraperQueueItemType): Promise<ScraperQueueItemType> {
+  public async post(data: { input_id: string, url: string, text: string[] }) {
     const { fetch } = createAPIClient();
     try {
       const response = await fetch(

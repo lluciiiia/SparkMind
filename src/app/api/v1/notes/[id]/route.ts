@@ -2,9 +2,9 @@ import type { NoteType } from '@/schema';
 import { createClient } from '@/utils/supabase/server';
 import { type NextRequest, NextResponse } from 'next/server';
 
-const supabase = createClient();
 
 export const GET = async (req: NextRequest, { params }: { params: { id: string } }) => {
+  const supabase = createClient();
   const { id } = params;
   try {
     const { uuid } = (await req.json()) as Pick<NoteType, 'uuid'>;
@@ -27,6 +27,7 @@ export const GET = async (req: NextRequest, { params }: { params: { id: string }
 };
 
 export const PUT = async (req: NextRequest, { params }: { params: { id: string } }) => {
+  const supabase = createClient();
   const { id } = params;
   try {
     const body = (await req.json()) as NoteType;
@@ -48,6 +49,7 @@ export const PUT = async (req: NextRequest, { params }: { params: { id: string }
 };
 
 export const DELETE = async (req: NextRequest, { params }: { params: { id: string } }) => {
+  const supabase = createClient();
   const { id } = params;
   try {
     const { uuid } = (await req.json()) as Pick<NoteType, 'uuid'>;

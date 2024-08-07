@@ -29,15 +29,10 @@ const setTokens = async (tabId, changeInfo, tab) => {
 
 try {
   Browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === 'signInWithGoogle') {
-      Browser.tabs.onUpdated.removeListener(setTokens);
-      const url = request.payload.url;
-      Browser.tabs.create({ url: url, active: true }, (tab) => {
-        Browser.tabs.onUpdated.addListener(setTokens);
-        sendResponse({ message: 'signInWithGoogle executed' });
-      });
-    }
-    return true;
+    console.log('request', request);
+    console.log('sender', sender);
+    sendResponse({ error: 'Unknown action' });
+    return true; // Indicate that the response is asynchronous
   });
 } catch (error) {
   console.error('Error in background.js:', error);
