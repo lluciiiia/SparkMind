@@ -9,7 +9,7 @@ export default async function rotateToken(req: any, res: NextResponse, next: any
   try {
     const user_uuid = req.uuid;
 
-    console.log("user_uuid : 🪪 " + user_uuid);
+    console.log('user_uuid : 🪪 ' + user_uuid);
 
     if (user_uuid === undefined) {
       console.log('User not authenticated');

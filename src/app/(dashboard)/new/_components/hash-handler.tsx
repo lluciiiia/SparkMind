@@ -1,4 +1,4 @@
-import { SHA256 } from "crypto-js";
+import { SHA256 } from 'crypto-js';
 
 export const generateHash = (data: string) => SHA256(data).toString();
 

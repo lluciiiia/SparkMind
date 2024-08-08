@@ -2,15 +2,15 @@ import { spawn } from 'child_process';
 import fs from 'fs';
 import { promises as fsPromises } from 'fs';
 import path from 'path';
-import { type NextRequest, NextResponse } from 'next/server';
-import { v4 as uuidv4 } from 'uuid';
 import {
   API_KEY,
   genAI,
   model,
   // generationConfig,
   safetySettings,
-} from "@/app/api/v1/gemini-settings";
+} from '@/app/api/v1/gemini-settings';
+import { type NextRequest, NextResponse } from 'next/server';
+import { v4 as uuidv4 } from 'uuid';
 
 //supabse
 import { createClient } from '@/utils/supabase/server';
@@ -107,7 +107,6 @@ const transcribeAudio = async (gcsUri: string): Promise<string> => {
   return transcription;
 };
 
-
 interface AIresponse {
   keywords: string[];
   questions: string[];
@@ -115,9 +114,7 @@ interface AIresponse {
 
 // for Extrack KeyWord from Transcript
 const extractKeywordsAndQuestions = async (transcript: string) => {
-
   try {
-
     //configaration based on different type of output
     const generationConfig = {
       temperature: 0.7,
@@ -147,11 +144,10 @@ const extractKeywordsAndQuestions = async (transcript: string) => {
     const responseText = result.response.text();
     console.log(responseText);
     const sanitizedResponseText = responseText.replace(/\r?\n|\r/g, '');
-    const extractedData = await JSON.parse(sanitizedResponseText) as AIresponse;
+    const extractedData = (await JSON.parse(sanitizedResponseText)) as AIresponse;
 
     return extractedData;
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Error in extract Keywords And Questions:', (error as Error).message);
     throw new Error(`Error in extract Keywords And Questions: ${(error as Error).message}`);
   }
@@ -179,12 +175,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-
-    if (!API_KEY) return new Response("Missing API key", { status: 400 });
+    if (!API_KEY) return new Response('Missing API key', { status: 400 });
 
     const formData = await req.formData();
 
     const file = formData.get('file') as Blob | null;
+    const learning_id = formData.get('learningid') as string;
+
+    if (learning_id === null) {
+      console.error('leaning Id is missing');
+    }
 
     if (!file) {
       return NextResponse.json({ error: 'File blob is required.' }, { status: 400 });
@@ -203,7 +203,7 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    const video_id = uuidv4();
+    const video_id = learning_id;
 
     const gcsUri = await extractAndUploadAudio(buffer, video_id);
     const transcription = await transcribeAudio(gcsUri);
@@ -212,7 +212,7 @@ export async function POST(req: NextRequest) {
     deleteAudioFile(video_id);
 
     //extract keywords
-    const reliventData = await extractKeywordsAndQuestions(transcription) as AIresponse;
+    const reliventData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
 
     if (!reliventData) {
       return NextResponse.json({ error: 'No data found' }, { status: 400 });
@@ -222,12 +222,13 @@ export async function POST(req: NextRequest) {
     const questionsArr = reliventData.questions;
 
     //now time to insert the transcript and keyword into supabase
-    const { error } = await supabaseClient
-      .from('transcriptdata')
-      .insert({
-        uuid: uuid, videoid: video_id, transcript: transcription, keywords: keywordsArr,
-        basic_questions: questionsArr
-      });
+    const { error } = await supabaseClient.from('transcriptdata').insert({
+      uuid: uuid,
+      videoid: video_id,
+      transcript: transcription,
+      keywords: keywordsArr,
+      basic_questions: questionsArr,
+    });
 
     if (error) {
       console.log('Occur while trascription is upload in DB: ' + error.details);
