@@ -14,48 +14,48 @@ import threeDots from "../../public/assets/images/home/feature-03.png";
 export default function Home() {
   return (
     <>
-      <div className="bg-white flex flex-col ">
+      <div className="bg-white flex flex-col h-screen overflow-y-auto">
         <div className="flex w-full justify-between px-4 md:px-16 lg:px-32 fixed top-0 left-0 right-0 bg-white z-10 shadow-md">
           <Image width={150} src={homeLogoSvg} alt="Home Logo" />
           <HomeNavigation />
         </div>
 
-        {/* Fixed Navbar */}
-
         {/* Content below the navbar */}
-        <div className="pt-56 md:pt-24 lg:pt-32 gap-10 flex flex-col">
-          {" "}
-          {/* Adjust padding as necessary */}
+        <div className="flex-1 pt-56 md:pt-24 lg:pt-32 flex flex-col space-y-10">
           <div className="flex justify-center items-center w-full">
             <span className="font-extrabold text-center">
               AI-Driven learning enhancement platform
             </span>
           </div>
           <div className="flex gap-4 w-full items-center justify-center ml-[-6%]">
-            <Image className="w-[10%]" src={arrowCloud} alt="Arrow " />
-            <Image className="w-[50%]" src={homeLogo1} alt="Home Logo" />
+            <Image className="w-[10%] h-auto" src={arrowCloud} alt="Arrow " />
+            <Image className="w-[50%] h-auto" src={homeLogo1} alt="Home Logo" />
           </div>
-          <div className="flex justify-center w-full ">
+          <div className="flex justify-center w-full">
             <button className="bg-navy rounded-3xl text-white py-3 px-8">
               Get Started
             </button>
           </div>
           <div className="flex justify-center">
-            <Image className="w-[80%]" src={threeDots} alt="Three Dots " />
-          </div>
-          <div className="flex justify-center w-full mb-4 gap-24">
             <Image
-              className="w-[24%] h-[24%]"
+              className="w-[80%] h-auto"
+              src={threeDots}
+              alt="Three Dots "
+            />
+          </div>
+          <div className="flex flex-wrap justify-center w-full mb-4 gap-4 md:gap-8 lg:gap-24">
+            <Image
+              className="w-[24%] h-auto"
               src={homeFeature1Image}
               alt="Home Feature 1"
             />
             <Image
-              className="w-[24%] h-[24%]"
+              className="w-[24%] h-auto"
               src={homeFeature2Image}
               alt="Home Feature 2"
             />
             <Image
-              className="w-[24%] h-[24%]"
+              className="w-[24%] h-auto"
               src={homeFeature3Image}
               alt="Home Feature 3"
             />
