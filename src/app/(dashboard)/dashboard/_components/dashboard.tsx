@@ -38,7 +38,7 @@ import {
 
 import SummaryCard from './cards/SummaryCard';
 import VideoCard from './cards/VideoCard';
-import ActionCard from './cards/actionCard';
+// import ActionCard from './cards/actionCard';
 //discuss with AI Imports
 import DiscussionWithAI from './discussion-with-ai';
 import NoteCard from './note';
@@ -239,6 +239,19 @@ export const Dashboard = () => {
                     <FurtherInfoCard furtherInfo={furtherInfoData} />
                   )}
                   {activeTab === tab && tab === 'action-items' && (
+                    <ActionCard learningId={myLearningId} />
+                  )}
+                  {activeTab === tab &&
+                    tab === "qna" &&
+                    questions.length > 0 && (
+                      <QuestionAndAnswer questions={questions} />
+                    )}
+                  {activeTab === tab &&
+                    tab === "further-info" &&
+                    furtherInfoData != null && (
+                      <FurtherInfoCard furtherInfo={furtherInfoData} />
+                    )}
+                  {activeTab === tab && tab === "action-items" && (
                     <ActionCard learningId={myLearningId} />
                   )}
                   {activeTab != tab && (
