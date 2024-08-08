@@ -196,7 +196,7 @@ export const NewDashboard = () => {
                   <div className="cursor-pointer">
                     <NewInputIcon></NewInputIcon>
                   </div>
-                  <span className="mt-4 text-lg">Upload the files to get started</span>
+                  <span className="text-lg mt-4">Upload the files to get started</span>
                 </div>
               </DialogTrigger>
               <DialogContent className="rounded-2xl sm:rounded-2xl">

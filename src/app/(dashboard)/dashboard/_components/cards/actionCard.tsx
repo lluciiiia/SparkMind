@@ -170,7 +170,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                       className="bg-blue-500 text-white py-2 px-4 rounded mr-2 mb-2"
                     >
                       {' '}
-                      Create Selected Tasks
+                      Create Selected Taks
                     </button>
                   </div>
                   <div className="space-y-4">
@@ -184,6 +184,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                           />
                           <p className="text-sm mr-2 font-bold">
                             {item.start.dateTime.slice(0, 16).split('T')[0]}
+                            {/* - {item.end.dateTime.slice(0, 16)} */}
                           </p>
                           <p className="text-orange-600 font-bold">
                             {new Date(item.start.dateTime).toLocaleTimeString([], {
@@ -199,7 +200,10 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                         </div>
                         <p className="text-lg font-semibold">{item.summary}</p>
                         <p className="text-sm">{item.description}</p>
-                        <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
+                        <select
+                          className="w-32 focus:ring-0 mt-2 border
+                                                 border-[#003366] p-1 rounded-lg"
+                        >
                           <option value="Asia/Calcutta">Asia/Calcutta</option>
                           <option value="PST">PST</option>
                           <option value="CST">CST</option>

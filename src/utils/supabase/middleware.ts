@@ -1,7 +1,6 @@
 import type { Database } from '@/types/supabase';
 import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { type NextRequest, NextResponse } from 'next/server';
-
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -54,10 +53,8 @@ export async function updateSession(request: NextRequest) {
       },
     },
   );
-
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
   return { res: response, user };
 }

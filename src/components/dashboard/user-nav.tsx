@@ -104,8 +104,8 @@ export function UserNav() {
         <DropdownMenuItem
           className="hover:cursor-pointer"
           onClick={() => {
-            supabase.auth.signOut();
             router.push('/signin');
+            handleSignOut();
           }}
         >
           <LogOut className="w-4 h-4 mr-3 text-muted-foreground" />
