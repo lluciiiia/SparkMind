@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useEffect, useState } from "react";
 
-import { Button } from '@/components/ui/button';
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -12,7 +12,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 
 import {
   Dialog,
@@ -22,22 +22,22 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from "@/components/ui/dialog";
 
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { FaPlus, FaSearch } from 'react-icons/fa';
-import { PiDotsThreeOutlineVerticalThin } from 'react-icons/pi';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { FaPlus, FaSearch } from "react-icons/fa";
+import { PiDotsThreeOutlineVerticalThin } from "react-icons/pi";
 
-import { UserNav } from '@/components/dashboard/user-nav';
-import { ModeToggle } from '@/providers/theme/mode-toggle';
+import { UserNav } from "@/components/dashboard/user-nav";
+import { ModeToggle } from "@/providers/theme/mode-toggle";
 
-import { assignColors } from '@/utils/assignColors';
+import { assignColors } from "@/utils/assignColors";
 
-import '@/styles/css/toggle-switch.css';
+import "@/styles/css/toggle-switch.css";
 
-import { createClient } from '@/utils/supabase/client';
-import axios from 'axios';
+import { createClient } from "@/utils/supabase/client";
+import axios from "axios";
 
 type Cards = {
   id: string;
@@ -51,7 +51,7 @@ export const MyLearning = () => {
 
   const [cards, setCards] = useState<Cards[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-  const [currTitle, setCurrTitle] = useState<string>('');
+  const [currTitle, setCurrTitle] = useState<string>("");
   const [currDate, setCurrDate] = useState<Date>(new Date());
   const [editingCardId, setEditingCardId] = useState<string | null>(null);
 
@@ -64,16 +64,16 @@ export const MyLearning = () => {
   const dateFormatter = (date: Date) => {
     const formattedDate =
       date.getFullYear() +
-      '-' +
-      ('0' + (date.getMonth() + 1)).slice(-2) +
-      '-' +
-      ('0' + date.getDate()).slice(-2);
+      "-" +
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2);
     const formattedTime =
-      ('0' + date.getHours()).slice(-2) +
-      ':' +
-      ('0' + date.getMinutes()).slice(-2) +
-      ':' +
-      ('0' + date.getSeconds()).slice(-2);
+      ("0" + date.getHours()).slice(-2) +
+      ":" +
+      ("0" + date.getMinutes()).slice(-2) +
+      ":" +
+      ("0" + date.getSeconds()).slice(-2);
     const formattedDateTime = `${formattedDate} ${formattedTime}`;
     return formattedDateTime;
   };
@@ -86,38 +86,41 @@ export const MyLearning = () => {
     try {
       const supabaseClient = createClient();
 
-      const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
+      const uuid = (await supabaseClient.auth.getUser()).data.user
+        ?.id as string;
 
       //setUserId(uuid);
 
       if (!uuid) {
-        console.log('User Id is not get');
-        throw new Error('User ID not returned from superbase');
+        console.log("User Id is not get");
+        throw new Error("User ID not returned from superbase");
       }
 
       const res = await axios.get(`/api/v1/store-learnings?userId=${uuid}`);
       if (res.status === 200) {
         const options = {
-          day: 'numeric' as const,
-          month: 'short' as const,
-          year: 'numeric' as const,
+          day: "numeric" as const,
+          month: "short" as const,
+          year: "numeric" as const,
         };
-        const fetchedCards: Cards[] = res.data.body.map((item: any, index: number) => {
-          const date = new Date(item.date);
-          return {
-            id: item.id,
-            index: index,
-            title: item.title,
-            date: date.toLocaleDateString('en-GB', options),
-          };
-        });
+        const fetchedCards: Cards[] = res.data.body.map(
+          (item: any, index: number) => {
+            const date = new Date(item.date);
+            return {
+              id: item.id,
+              index: index,
+              title: item.title,
+              date: date.toLocaleDateString("en-GB", options),
+            };
+          }
+        );
 
         setCards(fetchedCards);
       } else {
-        console.error('Error fetching data:', res.data.body);
+        console.error("Error fetching data:", res.data.body);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -126,7 +129,9 @@ export const MyLearning = () => {
       try {
         await fetchData();
       } catch (error) {
-        console.log('this is Error is Fatch the MyLearnings : ' + (error as Error).message);
+        console.log(
+          "this is Error is Fatch the MyLearnings : " + (error as Error).message
+        );
       }
     };
     init();
@@ -134,11 +139,11 @@ export const MyLearning = () => {
 
   //for Diplay in card
   const options = {
-    day: 'numeric' as const,
-    month: 'short' as const,
-    year: 'numeric' as const,
+    day: "numeric" as const,
+    month: "short" as const,
+    year: "numeric" as const,
   };
-  const DateDiplay = new Date().toLocaleDateString('en-GB', options);
+  const DateDiplay = new Date().toLocaleDateString("en-GB", options);
 
   const handleAddCard = async () => {
     const supabaseClient = createClient();
@@ -146,26 +151,26 @@ export const MyLearning = () => {
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
     if (!uuid) {
-      console.log('User Id is not get');
-      throw new Error('User ID not returned from superbase');
+      console.log("User Id is not get");
+      throw new Error("User ID not returned from superbase");
     }
 
     if (!uuid) {
-      console.log('User Is is not get');
+      console.log("User Is is not get");
       return;
     }
 
     const data = {
       uuid: uuid,
-      title: 'Undefined',
+      title: "Undefined",
       date: dateFormatter(new Date()),
     };
 
     try {
-      const res = await axios.post('/api/v1/store-learnings', data);
+      const res = await axios.post("/api/v1/store-learnings", data);
       if (res.status === 200) {
         const newLearningId = res.data.body[0].id;
-        console.log('Learning id : ' + res.data.body[0].id);
+        console.log("Learning id : " + res.data.body[0].id);
         redirectToDashboard(newLearningId);
         // const newCard = {
         //   id: res.data.body[0].id,
@@ -177,10 +182,10 @@ export const MyLearning = () => {
         // setCards(updatedCards);
         // setOriginalCards(updatedCards);
       } else {
-        console.error('Error storing data:', res.data.error);
+        console.error("Error storing data:", res.data.error);
       }
     } catch (error) {
-      console.error('Error storing data:', error);
+      console.error("Error storing data:", error);
     }
   };
 
@@ -189,14 +194,15 @@ export const MyLearning = () => {
       if (id !== null) {
         const supabaseClient = createClient();
 
-        const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
+        const uuid = (await supabaseClient.auth.getUser()).data.user
+          ?.id as string;
 
         if (!uuid) {
-          console.log('User Id is not get');
-          throw new Error('User ID not returned from superbase');
+          console.log("User Id is not get");
+          throw new Error("User ID not returned from superbase");
         }
 
-        const response = await axios.delete('/api/v1/store-learnings', {
+        const response = await axios.delete("/api/v1/store-learnings", {
           data: { id, uuid },
         });
 
@@ -205,18 +211,21 @@ export const MyLearning = () => {
           setOriginalCards((cards) => cards.filter((card) => card.id !== id));
           setIsDialogOpen(false);
         } else {
-          console.error('Error deleting My leaning data:', response.data.body);
+          console.error("Error deleting My leaning data:", response.data.body);
         }
       }
     } catch (error) {
-      console.error('Error when Delete my learning : ', (error as Error).message);
+      console.error(
+        "Error when Delete my learning : ",
+        (error as Error).message
+      );
     }
   };
 
   const handleSearch = (search: string) => {
     if (search.length > 0) {
       const filteredCards = cards.filter((card) =>
-        card.title.toLowerCase().includes(search.toLowerCase()),
+        card.title.toLowerCase().includes(search.toLowerCase())
       );
       setCards(filteredCards);
     } else {
@@ -225,8 +234,8 @@ export const MyLearning = () => {
   };
 
   function parseDateUTC(dateString: string): Date {
-    const [day, month, year] = dateString.split(' ');
-    const monthIndex = new Date(Date.parse(month + ' 1, 2012')).getMonth(); // Get month index
+    const [day, month, year] = dateString.split(" ");
+    const monthIndex = new Date(Date.parse(month + " 1, 2012")).getMonth(); // Get month index
     return new Date(Date.UTC(Number(year), monthIndex, Number(day)));
   }
 
@@ -250,14 +259,15 @@ export const MyLearning = () => {
     try {
       const supabaseClient = createClient();
 
-      const userId = (await supabaseClient.auth.getUser()).data.user?.id as string;
+      const userId = (await supabaseClient.auth.getUser()).data.user
+        ?.id as string;
 
       if (!userId) {
-        console.log('User Id is not get');
-        throw new Error('User ID not returned from superbase');
+        console.log("User Id is not get");
+        throw new Error("User ID not returned from superbase");
       }
 
-      const response = await axios.patch('/api/v1/store-learnings', {
+      const response = await axios.patch("/api/v1/store-learnings", {
         id: card.id,
         title: card.title,
         date: card.date,
@@ -265,25 +275,30 @@ export const MyLearning = () => {
       });
 
       const options = {
-        day: 'numeric' as const,
-        month: 'short' as const,
-        year: 'numeric' as const,
+        day: "numeric" as const,
+        month: "short" as const,
+        year: "numeric" as const,
       };
-      const DateDiplay = new Date(card.date).toLocaleDateString('en-GB', options);
+      const DateDiplay = new Date(card.date).toLocaleDateString(
+        "en-GB",
+        options
+      );
 
       const updatedCard = { ...card, date: DateDiplay };
 
       if (response.status === 200) {
         setCards(cards.map((c) => (c.id === card.id ? updatedCard : c)));
-        setOriginalCards(cards.map((c) => (c.id === card.id ? updatedCard : c)));
+        setOriginalCards(
+          cards.map((c) => (c.id === card.id ? updatedCard : c))
+        );
         setIsDialogOpen(false);
       } else {
-        console.error('Error updating data:', response.data.body);
+        console.error("Error updating data:", response.data.body);
       }
 
       //toggleSort(); // for sort the cards after date changes
     } catch (error) {
-      console.error('Error Update my learning ', (error as Error).message);
+      console.error("Error Update my learning ", (error as Error).message);
     }
   };
 
@@ -304,14 +319,14 @@ export const MyLearning = () => {
 
   const cancelChanges = () => {
     setCurrDate(new Date());
-    setCurrTitle('');
+    setCurrTitle("");
     setIsDialogOpen(false);
   };
 
   const toggleSort = () => {
     if (isDateSorted === false) {
       const sortedCards = [...cards].sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
       );
       setCards(sortedCards);
     } else {
@@ -334,7 +349,9 @@ export const MyLearning = () => {
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <div className="bg-black p-2 rounded-full mr-4 text-white">LOGO</div>
+              <div className="bg-black p-2 rounded-full mr-4 text-white">
+                LOGO
+              </div>
               <div className="flex flex-row items-center ml-6">
                 <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
                   <FaSearch size={18} />
@@ -367,7 +384,9 @@ export const MyLearning = () => {
                   id="Recent-Date"
                   onClick={toggleSort}
                 />
-                <label className="switch-toggle-label dark:bg-black" htmlFor="Recent-Date">
+                <label
+                  className="switch-toggle-label dark:bg-black"
+                  htmlFor="Recent-Date">
                   <span>Recent</span>
                   <span>Date</span>
                 </label>
@@ -376,18 +395,15 @@ export const MyLearning = () => {
           </div>
         </div>
         <article
-          className={`h-[33rem] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 grid-flow-dense gap-y-20 sm:mx-16 mx-4 pb-8`}
-        >
+          className={`h-[33rem] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 grid-flow-dense gap-y-20 sm:mx-16 mx-4 pb-8`}>
           <div
-            className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex items-center justify-center`}
-          >
+            className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex items-center justify-center`}>
             <Button
               className="bg-transparent border-dashed border-2 border-blue-500 w-[150px] h-[150px] mx-auto hover:bg-transparent hover:border-blue-500 hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl"
               onClick={(e) => {
                 e.preventDefault();
                 handleAddCard();
-              }}
-            >
+              }}>
               <FaPlus size={24} color="#60a5fa" />
             </Button>
           </div>
@@ -398,7 +414,7 @@ export const MyLearning = () => {
               title={card.title}
               date={card.date}
               onEdit={handleEdit}
-              bgColor={colorMap.get(card.index) || '#ffffff'}
+              bgColor={colorMap.get(card.index) || "#ffffff"}
               handleDashboardScreen={redirectToMyLearningPage}
             />
           ))}
@@ -442,15 +458,19 @@ export const MyLearning = () => {
                 <Button
                   type="submit"
                   className="bg-red-500 hover:bg-red-900 text-white"
-                  onClick={() => handleDelete(editingCardId)}
-                >
+                  onClick={() => handleDelete(editingCardId)}>
                   Delete
                 </Button>
                 <div>
-                  <Button type="submit" className="mr-2" onClick={cancelChanges}>
+                  <Button
+                    type="submit"
+                    className="mr-2"
+                    onClick={cancelChanges}>
                     Cancel
                   </Button>
-                  <Button type="submit" onClick={() => saveChanges(editingCardId)}>
+                  <Button
+                    type="submit"
+                    onClick={() => saveChanges(editingCardId)}>
                     Save changes
                   </Button>
                 </div>
@@ -483,8 +503,7 @@ const LearningCard = ({
       className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex flex-col justify-between
     rounded-tl-none rounded-tr-3xl rounded-b-3xl shadow-xl border-none`}
       style={{ backgroundColor: bgColor }}
-      onClick={() => handleDashboardScreen(id)}
-    >
+      onClick={() => handleDashboardScreen(id)}>
       <CardHeader className="flex items-center">
         <CardTitle className="w-full text-left text-black">{title}</CardTitle>
       </CardHeader>
@@ -496,8 +515,7 @@ const LearningCard = ({
           onClick={(e) => {
             onEdit(id);
             e.stopPropagation();
-          }}
-        >
+          }}>
           <PiDotsThreeOutlineVerticalThin size={20} className="text-white" />
         </Button>
       </CardFooter>

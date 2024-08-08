@@ -1,4 +1,3 @@
-// pages/api/mylearning.js
 import { createClient } from '@/utils/supabase/client';
 import { type NextRequest, NextResponse } from 'next/server';
 
