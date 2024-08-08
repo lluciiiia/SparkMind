@@ -164,16 +164,18 @@ export const MyLearning = () => {
     try {
       const res = await axios.post('/api/v1/store-learnings', data);
       if (res.status === 200) {
+        const newLearningId = res.data.body[0].id;
         console.log('Learning id : ' + res.data.body[0].id);
-        const newCard = {
-          id: res.data.body[0].id,
-          index: cards.length,
-          title: 'Undefined',
-          date: DateDiplay,
-        };
-        const updatedCards = [newCard, ...cards];
-        setCards(updatedCards);
-        setOriginalCards(updatedCards);
+        redirectToDashboard(newLearningId);
+        // const newCard = {
+        //   id: res.data.body[0].id,
+        //   index: cards.length,
+        //   title: "Undefined",
+        //   date: DateDiplay,
+        // };
+        // const updatedCards = [newCard, ...cards];
+        // setCards(updatedCards);
+        // setOriginalCards(updatedCards);
       } else {
         console.error('Error storing data:', res.data.error);
       }

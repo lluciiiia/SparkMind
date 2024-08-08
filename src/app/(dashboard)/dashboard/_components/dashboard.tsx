@@ -17,24 +17,24 @@ import { motion } from 'framer-motion';
 import { Triangle } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import type React from 'react';
-import { useCallback, useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useRef, useState } from 'react';
 import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { z } from 'zod';
-import { retrieveData } from '../../new/_components/hash-handler';
 import {
   type FurtherInfo,
-  type Message,
+  Message,
   type Note,
   type Output,
   type ParsedVideoData,
   Props,
   type Question,
+  Transcript,
   type VideoItem,
 } from './interfaces';
+import { NewNoteSection } from './new-note';
 
 import SummaryCard from './cards/SummaryCard';
 import VideoCard from './cards/VideoCard';
@@ -155,6 +155,23 @@ export const Dashboard = () => {
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
+  const isLaptop = useMediaQuery('(min-width: 1023px)');
+
+  const handleDelete = (id: string) => {
+    setNotes(notes.filter((note) => note.id !== id));
+  };
+
+  const handleCreate = (values: z.infer<typeof schema>) => {
+    const newNote = {
+      id: Date.now().toString(),
+      title: values.title,
+      content: '',
+      createdAt: new Date(),
+    };
+    setNotes([...notes, newNote]);
+    setIsDrawerOpen(false);
+  };
+
   const tabs = [
     { name: 'summary', label: 'Summary' },
     { name: 'video', label: 'Video recommendation' },
@@ -165,6 +182,30 @@ export const Dashboard = () => {
 
   return (
     <>
+      <div className="flex flex-col items-center justify-items-start absolute top-[80px] right-0 rounded-l-md rounded-r-none z-[100] w-fit">
+        <motion.details
+          open={isOpen}
+          onToggle={() => setIsOpen(!isOpen)}
+          className="w-full"
+          initial={{ width: 30 }}
+          animate={{ width: isOpen ? '100%' : 50 }}
+          transition={{ type: 'spring', stiffness: 100 }}
+        >
+          <summary
+            className={`left-0 relative p-2 ${
+              isOpen ? 'rounded-l-md' : 'rounded-md'
+            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
+              isOpen ? 'justify-start' : 'justify-center'
+            }`}
+          >
+            {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
+            <PiNoteBlankFill size={24} />
+
+            {showText && <span className="ml-4">New note</span>}
+          </summary>
+          <NewNoteSection handleCreate={handleCreate} notes={notes} />
+        </motion.details>
+      </div>
       <ContentLayout title="Dashboard">
         <Breadcrumb>
           <BreadcrumbList>
@@ -207,6 +248,7 @@ export const Dashboard = () => {
                   {activeTab === tab && tab === 'summary' && summaryData != null && (
                     <SummaryCard summaryData={summaryData} />
                   )}
+                  {activeTab === tab && tab === 'video' && <VideoCard videos={videos} />}
                   {activeTab === tab && tab === 'qna' && questions.length > 0 && (
                     <QuestionAndAnswer questions={questions} />
                   )}
