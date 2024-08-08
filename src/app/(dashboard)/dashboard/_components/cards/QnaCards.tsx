@@ -1,6 +1,7 @@
-"use client";
-import React, { useState } from "react";
-import { toast } from "sonner";
+'use client';
+import type React from 'react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Props {
   question: string;
@@ -10,13 +11,7 @@ interface Props {
   multipleAnswers: boolean;
 }
 
-const QnaCards: React.FC<Props> = ({
-  question,
-  options,
-  answer,
-  multipleAnswers,
-  number,
-}) => {
+const QnaCards: React.FC<Props> = ({ question, options, answer, multipleAnswers, number }) => {
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
   const [isOpen, setIsOpen] = useState(true);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -38,14 +33,12 @@ const QnaCards: React.FC<Props> = ({
   };
 
   const handleSubmit = () => {
-    const isCorrect = selectedOptions.every((index) =>
-      answer.includes(options[index]),
-    );
+    const isCorrect = selectedOptions.every((index) => answer.includes(options[index]));
 
     if (isCorrect) {
-      toast.success("Correct!");
+      toast.success('Correct!');
     } else {
-      toast.error("Incorrect, try again.");
+      toast.error('Incorrect, try again.');
     }
 
     setIsAnswered(true);
@@ -55,7 +48,7 @@ const QnaCards: React.FC<Props> = ({
     <div className="my-7 transition-all duration-300 ease-in-out w-full ">
       <div
         className={`flex items-center font-semibold bg-white w-full rounded-t-xl p-2 border border-black border-b-0 ${
-          isOpen ? "rounded-b-none" : "rounded-b-md"
+          isOpen ? 'rounded-b-none' : 'rounded-b-md'
         }`}
       >
         <div>Q{number + 1}: </div>
@@ -64,7 +57,7 @@ const QnaCards: React.FC<Props> = ({
 
       <div
         className={`bg-white w-full rounded-b-xl overflow-hidden transition-max-height duration-500 border border-black rounded-bl-none ${
-          isOpen ? "max-h-screen" : "max-h-0"
+          isOpen ? 'max-h-screen' : 'max-h-0'
         }`}
       >
         <div className="p-2">
@@ -72,8 +65,7 @@ const QnaCards: React.FC<Props> = ({
             const isCorrectOption = answer.includes(item);
             const isSelected = selectedOptions.includes(index);
             const isOptionCorrect = isAnswered && isCorrectOption && isSelected;
-            const isOptionIncorrect =
-              isAnswered && !isCorrectOption && isSelected;
+            const isOptionIncorrect = isAnswered && !isCorrectOption && isSelected;
 
             return (
               <div
@@ -81,12 +73,12 @@ const QnaCards: React.FC<Props> = ({
                 onClick={() => handleOptionClick(index)}
                 className={`flex font-medium cursor-pointer p-2 rounded-md transition-colors duration-300 ${
                   isOptionCorrect
-                    ? "bg-green-500 text-white"
+                    ? 'bg-green-500 text-white'
                     : isOptionIncorrect
-                    ? "bg-red-500 text-white"
-                    : isSelected
-                    ? "bg-navy text-white"
-                    : "hover:bg-gray-300"
+                      ? 'bg-red-500 text-white'
+                      : isSelected
+                        ? 'bg-navy text-white'
+                        : 'hover:bg-gray-300'
                 }`}
               >
                 <div>{String.fromCharCode(index + 65)}: </div>
