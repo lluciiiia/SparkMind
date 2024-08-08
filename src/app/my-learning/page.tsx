@@ -501,7 +501,7 @@ const LearningCard = ({
   return (
     <Card
       className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex flex-col justify-between
-    rounded-tl-none rounded-tr-3xl rounded-b-3xl shadow-xl border-none`}
+    rounded-tl-none rounded-tr-3xl rounded-b-3xl shadow-xl border-none cursor-pointer`}
       style={{ backgroundColor: bgColor }}
       onClick={() => handleDashboardScreen(id)}>
       <CardHeader className="flex items-center">
