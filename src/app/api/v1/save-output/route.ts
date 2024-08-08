@@ -59,8 +59,7 @@ export async function POST(req: NextRequest) {
 
     const furtherInfoResponse = await saveFurtherInfoOutput(input, myLearningId, output);
 
-    if (furtherInfoResponse.status != 200)
-      return NextResponse.json({ status: furtherInfoResponse.status });
+    if (furtherInfoResponse.status != 200) return NextResponse.json({ status: furtherInfoResponse.status });
 
     return NextResponse.json({ status: 200 });
   } catch (error) {
@@ -78,5 +77,31 @@ async function saveMyLearningInput(id: string, input: string) {
 }
 
 async function getOutputByLearningId(learningId: string) {
-  return await supabase.from('outputs').select('id').eq('id', learningId);
+  const { data, error } = await supabase
+    .from('outputs')
+    .select('*')
+    .eq('learning_id', learningId)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching output:', error);
+    throw new Error('Error fetching output');
+  }
+
+  // If output exists, return it
+  if (data) return { data, error };
+  
+  // If output does not exist, create a new one
+  const { data: newOutput, error: insertError } = await supabase
+    .from('outputs')
+    .insert([{ learning_id: learningId }])
+    .select()
+    .single(); // Insert and return the new record
+
+  if (insertError) {
+    console.error('Error creating output:', insertError);
+    throw new Error('Error creating output');
+  }
+
+  return { data: newOutput, error: insertError };
 }
