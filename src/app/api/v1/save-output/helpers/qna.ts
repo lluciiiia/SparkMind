@@ -1,13 +1,10 @@
 import { createClient } from '@/utils/supabase/client';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import dotenv from 'dotenv';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
-import { generationConfig, model, safetySettings } from '../../gemini-settings';
+import { genAI, generationConfig, model, safetySettings } from '../../gemini-settings';
 
 dotenv.config();
-
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '');
 
 // Define the Zod schema
 const quizSchema = z.array(

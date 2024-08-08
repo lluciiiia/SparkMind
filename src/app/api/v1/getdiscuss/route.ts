@@ -73,7 +73,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
       return new NextResponse('video_id is required', { status: 400 });
     }
   } catch (error) {
-    console.log('Error in GetEventList api : ' + error);
+    console.log('Error in GetDiscuss api : ' + error);
   }
   return NextResponse.json({ status: 400, error: 'video_id is required' });
 }
