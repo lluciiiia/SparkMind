@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import axios from "axios";
-import { useState } from "react";
+import axios from 'axios';
+import { useState } from 'react';
 
-import Link from "next/link";
+import Link from 'next/link';
 
-import { ContentLayout } from "@/components/dashboard/content-layout";
+import { ContentLayout } from '@/components/dashboard/content-layout';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -13,7 +13,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+} from '@/components/ui/breadcrumb';
 
 interface Event {
   summary: string;
@@ -104,37 +104,37 @@ export default function Home() {
 
   const handleSubmit = async (videoid: any) => {
     try {
-      const eventlistRes = await axios.get("/api/v1/geteventlist", {
+      const eventlistRes = await axios.get('/api/v1/geteventlist', {
         params: { videoid },
       });
 
-      let eventList = await JSON.stringify(eventlistRes.data);
-      console.log("eventList" + eventList);
+      const eventList = await JSON.stringify(eventlistRes.data);
+      console.log('eventList' + eventList);
       const secnd = (await JSON.parse(eventList)) as any;
       const VSlList: Event[] = secnd.body;
 
-      console.log("this is list of working : " + VSlList);
+      console.log('this is list of working : ' + VSlList);
 
       setshowList(VSlList);
     } catch (error) {
-      console.error("Error creating event:", error);
-      alert("Error creating event");
+      console.error('Error creating event:', error);
+      alert('Error creating event');
     }
   };
 
   const handleList = async (e: any) => {
     try {
-      const res = await axios.get("/api/v1/list-video");
+      const res = await axios.get('/api/v1/list-video');
 
       if (res.data.status === 200) {
-        console.log("List of video input : " + res.data.videolist);
+        console.log('List of video input : ' + res.data.videolist);
         setvideoList(res.data.videolist);
       } else {
         alert(`Error: ${res.data.message}`);
       }
     } catch (err) {
-      console.error("Error get video list:", err);
-      alert("Error get video list");
+      console.error('Error get video list:', err);
+      alert('Error get video list');
     }
   };
 
@@ -152,9 +152,9 @@ export default function Home() {
       },
     }));
 
-    console.log("selectedTask : " + selectedTask);
+    console.log('selectedTask : ' + selectedTask);
 
-    const res = await axios.post("/api/v1/create-event", { selectedTask });
+    const res = await axios.post('/api/v1/create-event', { selectedTask });
     if (res.data.status === 200) {
       setEventList(res.data.calendarEvents);
     } else {
@@ -190,10 +190,7 @@ export default function Home() {
       <div>
         <h1>Create Google Calendar Event with Google Meet Link</h1>
 
-        <button
-          onClick={handleList}
-          className="bg-purple-400 mx-10 my-3"
-          type="button">
+        <button onClick={handleList} className="bg-purple-400 mx-10 my-3" type="button">
           Get List of Video
         </button>
 
@@ -205,7 +202,8 @@ export default function Home() {
                 <button
                   onClick={() => handleSubmit(video.videoid)}
                   className="bg-red-400 mx-10"
-                  type="button">
+                  type="button"
+                >
                   Create Event - {video.videoid}
                 </button>
               </div>
@@ -266,7 +264,8 @@ export default function Home() {
                   <td className="border px-3 py-2">
                     <select
                       className="w-full border-none focus:ring-0"
-                      defaultValue={item.start.timeZone}>
+                      defaultValue={item.start.timeZone}
+                    >
                       <option value="Asia/Calcutta">Asia/Calcutta</option>
                       <option value="PST">PST</option>
                       <option value="CST">CST</option>
@@ -280,7 +279,8 @@ export default function Home() {
           </table>
           <button
             onClick={handleLogSelectedRows}
-            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded">
+            className="mt-4 bg-blue-500 text-white py-2 px-4 rounded"
+          >
             Create Selected Tasks
           </button>
         </div>

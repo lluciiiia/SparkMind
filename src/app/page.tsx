@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { HomeNavigation } from "./HomeNavigation";
-import Image from "next/image";
-import homeLogoSvg from "../../public/assets/svgs/home/logo.svg";
-import arrowSvg from "../../public/assets/svgs/home/arrow.svg";
-import homeTitleImage from "../../public/assets/images/home/home-title.png";
-import homeFeature1Image from "../../public/assets/images/home/home-feat-1.png";
-import homeFeature2Image from "../../public/assets/images/home/home-feat-2.png";
-import homeFeature3Image from "../../public/assets/images/home/home-feat-3.png";
+import Image from 'next/image';
+import homeFeature1Image from '../../public/assets/images/home/home-feat-1.png';
+import homeFeature2Image from '../../public/assets/images/home/home-feat-2.png';
+import homeFeature3Image from '../../public/assets/images/home/home-feat-3.png';
+import homeTitleImage from '../../public/assets/images/home/home-title.png';
+import arrowSvg from '../../public/assets/svgs/home/arrow.svg';
+import homeLogoSvg from '../../public/assets/svgs/home/logo.svg';
+import { HomeNavigation } from './HomeNavigation';
 
 export default function Home() {
   return (
