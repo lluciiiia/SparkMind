@@ -42,6 +42,12 @@ export const editNote = async (id: string, title: string, content: string) => {
   return { data: response.data };
 };
 
+export const deleteNote = async (id: string) => {
+  const response = await axios.delete(`/api/v1/notes?id=${id}`);
+
+  return { data: response.data };
+};
+
 export const getNotes = async (myLearningId: string) => {
   const response = await axios.get(`/api/v1/notes?id=${myLearningId}`);
   return { data: response.data };
