@@ -110,17 +110,22 @@ export const NewNoteSection: React.FC<{
           {notes.map((note, i) => (
             <div
               key={i}
-              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl cursor-pointer"
+              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl cursor-pointer overflow-hidden"
               onClick={() => {
                 setSelectedNote(note);
                 setIsModalOpen(true);
               }}>
               {/* Content of the note */}
-              <p className="p-4">{note.title}</p>
-              {/* <p className="p-4">{note.content}</p> */}
+              <div className="p-4 overflow-hidden">
+                <p className="text-lg overflow-hidden break-words">
+                  {note.title}
+                </p>
+                {/* <p className="text-gray-700 truncate">{note.content}</p> */}
+              </div>
             </div>
           ))}
         </section>
+
         <ScrollBar orientation="vertical" />
       </ScrollArea>
     </div>
