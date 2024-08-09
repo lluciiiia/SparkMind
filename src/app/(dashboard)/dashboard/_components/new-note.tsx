@@ -19,6 +19,8 @@ export const NewNoteSection: React.FC<{
   const form = useForm<Note>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note>();
+  const [originalContent, setOriginalContent] = useState<string | null>(null);
+  const [isRevertEnabled, setIsRevertEnabled] = useState(false);
 
   useEffect(() => {
     if (selectedNote) {
@@ -26,6 +28,8 @@ export const NewNoteSection: React.FC<{
         title: selectedNote.title,
         content: selectedNote.content,
       });
+      setOriginalContent(selectedNote.content);
+      setIsRevertEnabled(false);
     }
   }, [selectedNote, form]);
 
@@ -39,12 +43,23 @@ export const NewNoteSection: React.FC<{
 
   const handleGrammar = async (content: string) => {
     const response = await getGrammarNote(content);
+    setOriginalContent(form.getValues("content"));
     form.setValue("content", response.data.correctedNote);
+    setIsRevertEnabled(true); // Enable revert after grammar change
   };
 
   const handleConcise = async (content: string) => {
     const response = await getConciseNote(content);
+    setOriginalContent(form.getValues("content"));
     form.setValue("content", response.data.concisedNote);
+    setIsRevertEnabled(true); // Enable revert after concise change
+  };
+
+  const handleRevert = () => {
+    if (originalContent !== null) {
+      form.setValue("content", originalContent);
+      setIsRevertEnabled(false); // Disable revert after reverting
+    }
   };
 
   return (
@@ -124,6 +139,17 @@ export const NewNoteSection: React.FC<{
                         handleConcise(content);
                       }}>
                       Concise
+                    </button>
+                    <button
+                      type="button"
+                      className={`bg-white text-navy text-sm py-1 px-2 rounded ${
+                        !isRevertEnabled ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                      onClick={() => {
+                        handleRevert();
+                      }}
+                      disabled={!isRevertEnabled}>
+                      Revert
                     </button>
                     <button
                       type="submit"
