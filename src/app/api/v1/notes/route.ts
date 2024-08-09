@@ -61,20 +61,20 @@ export async function PUT(req: NextRequest) {
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
     
-    if (!id) {
+    if (!id) 
       return NextResponse.json({ error: 'Missing note ID' }, { status: 400 });
-    }
 
     const body = (await req.json()) as { title: string; content: string };
+
+    console.log(id, body.title, body.content);
 
     const { data, error } = await supabase
       .from('notes')
       .update({ title: body.title, content: body.content, updated_at: new Date().toISOString() })
       .eq('id', id);
 
-    if (error) {
+    if (error) 
       return NextResponse.json({ error: error.message }, { status: 500 });
-    }
     
     return NextResponse.json({ status: 200, body: data });
   } catch (error) {

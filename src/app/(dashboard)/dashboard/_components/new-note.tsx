@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FaPlus } from "react-icons/fa";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, FormControl, FormField } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Note } from "./interfaces";
@@ -17,10 +17,20 @@ export const NewNoteSection: React.FC<{
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note>();
 
+  useEffect(() => {
+    if (selectedNote) {
+      form.reset({
+        title: selectedNote.title,
+        content: selectedNote.content,
+      });
+    }
+  }, [selectedNote, form]);
+
   const onSubmit = (values: Note) => {
     if (!selectedNote) return;
 
-    handleEdit(selectedNote);
+    const updatedNote = { ...selectedNote, ...values };
+    handleEdit(updatedNote);
     setIsModalOpen(false);
   };
 
@@ -30,7 +40,6 @@ export const NewNoteSection: React.FC<{
       <Button
         className="bg-transparent border-dashed border-2 rounded-r-2xl rounded-bl-2xl border-navy w-[75px] h-[75px]"
         onClick={() => {
-          // setIsModalOpen(true);
           handleCreate();
         }}>
         <FaPlus size={24} color="#003366" />
