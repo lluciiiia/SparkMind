@@ -39,6 +39,9 @@ import "@/styles/css/toggle-switch.css";
 import { createClient } from "@/utils/supabase/client";
 import axios from "axios";
 
+//Circle Loading Style
+import '@/styles/css/Circle-loader.css';
+
 type Cards = {
   id: string;
   index: number;
@@ -57,7 +60,7 @@ export const MyLearning = () => {
 
   const [originalCards, setOriginalCards] = useState<Cards[]>([]);
   const [isDateSorted, setIsDateSorted] = useState<boolean>(false);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [colorMap, setColorMap] = useState<Map<number, string>>(new Map());
 
   //DB Storage date
@@ -127,11 +130,15 @@ export const MyLearning = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        setIsLoading(true);
         await fetchData();
       } catch (error) {
         console.log(
           "this is Error is Fatch the MyLearnings : " + (error as Error).message
         );
+      }
+      finally {
+        setIsLoading(false);
       }
     };
     init();
@@ -479,6 +486,11 @@ export const MyLearning = () => {
           </DialogContent>
         </Dialog>
       </div>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+          <div className="Circleloader"></div>
+        </div>
+      )}
     </section>
   );
 };
