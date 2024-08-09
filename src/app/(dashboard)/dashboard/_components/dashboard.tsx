@@ -201,18 +201,20 @@ export const Dashboard = () => {
           className="w-full"
           initial={{ width: 30 }}
           animate={{ width: isOpen ? "100%" : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}>
-          <summary
+          transition={{ type: "spring", stiffness: 100 }}
+        >
+          <div
             className={`left-0 relative p-2 ${
               isOpen ? "rounded-l-md" : "rounded-md"
             } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
               isOpen ? "justify-start" : "justify-center"
-            }`}>
+            }`}
+          >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
             {showText && <span className="ml-4">New note</span>}
-          </summary>
+          </div>
           <NewNoteSection handleCreate={handleCreate} notes={notes} />
         </motion.details>
       </div>
@@ -235,12 +237,14 @@ export const Dashboard = () => {
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
+                  type="button"
                   className={`px-6 py-2 cursor-pointer ${
                     activeTab === tab.name
                       ? "bg-navy text-white rounded-t-3xl"
                       : "text-gray"
                   }`}
-                  onClick={() => setActiveTab(tab.name)}>
+                  onClick={() => setActiveTab(tab.name)}
+                >
                   {tab.label}
                 </button>
               </li>
@@ -283,7 +287,7 @@ export const Dashboard = () => {
                     />
                   )}
                 </div>
-              )
+              ),
           )}
         </section>
         <footer className=" w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
@@ -294,7 +298,8 @@ export const Dashboard = () => {
             className={`
                 absolute flex flex-col items-center justify-center bottom-6
               `}
-            ref={drawerRef}>
+            ref={drawerRef}
+          >
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -306,7 +311,8 @@ export const Dashboard = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setIsDrawerOpen(!isDrawerOpen);
-                    }}>
+                    }}
+                  >
                     <Triangle
                       className={`w-5 h-5 bottom-0 ${
                         isDrawerOpen ? "rotate-180" : ""
