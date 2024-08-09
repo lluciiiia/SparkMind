@@ -17,24 +17,24 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Content } from "@radix-ui/react-collapsible";
 
-const schema = z.object({
+export const noteSchema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
-  // content: z.string().min(1, { message: "Content is required" }),
+  content: z.string().min(1, { message: "Content is required" }),
 });
 
 export const NewNoteSection: React.FC<{
-  handleCreate: (values: z.infer<typeof schema>) => void;
-  notes: z.infer<typeof schema>[];
+  handleCreate: (values: z.infer<typeof noteSchema>) => void;
+  notes: z.infer<typeof noteSchema>[];
 }> = ({ handleCreate, notes }) => {
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
+  const form = useForm<z.infer<typeof noteSchema>>({
+    resolver: zodResolver(noteSchema),
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<z.infer<
-    typeof schema
+    typeof noteSchema
   > | null>(null);
 
-  const onSubmit = (values: z.infer<typeof schema>) => {
+  const onSubmit = (values: z.infer<typeof noteSchema>) => {
     handleCreate(values);
     setIsModalOpen(false);
   };
@@ -75,7 +75,21 @@ export const NewNoteSection: React.FC<{
                         <textarea
                           {...field}
                           placeholder="Title"
-                          rows={8}
+                          rows={1}
+                          className="w-full p-2 bg-transparent text-white rounded"
+                        />
+                      </FormControl>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormControl>
+                        <textarea
+                          {...field}
+                          placeholder="Content"
+                          rows={7}
                           className="w-full p-2 bg-transparent text-white rounded overflow-y-auto resize-none"
                         />
                       </FormControl>
@@ -117,10 +131,10 @@ export const NewNoteSection: React.FC<{
               }}>
               {/* Content of the note */}
               <div className="p-4 overflow-hidden">
-                <p className="text-lg overflow-hidden break-words">
-                  {note.title}
+                <p className="text-lg font-bold truncate">{note.title}</p>
+                <p className="text-lg text-gray-700 overflow-hidden break-words">
+                  {note.content}
                 </p>
-                {/* <p className="text-gray-700 truncate">{note.content}</p> */}
               </div>
             </div>
           ))}

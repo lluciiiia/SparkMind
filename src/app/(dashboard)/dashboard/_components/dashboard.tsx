@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import { ContentLayout } from "@/components/dashboard/content-layout";
 import {
   Breadcrumb,
@@ -10,15 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
@@ -66,23 +58,12 @@ import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
 import { getOutputResponse } from "./api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
-
-// import { search } from "../../../../server/services/search-recommendation.service";
-
-const schema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-});
+import { noteSchema } from "./new-note";
 
 export const Dashboard = () => {
   if (!API_KEY) {
     console.error("Missing API key");
   }
-
-  const genModel = genAI.getGenerativeModel({
-    model,
-    generationConfig,
-    safetySettings,
-  });
 
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -173,11 +154,11 @@ export const Dashboard = () => {
     setNotes(notes.filter((note) => note.id !== id));
   };
 
-  const handleCreate = (values: z.infer<typeof schema>) => {
+  const handleCreate = (values: z.infer<typeof noteSchema>) => {
     const newNote = {
       id: Date.now().toString(),
       title: values.title,
-      content: "",
+      content: values.content,
       createdAt: new Date(),
     };
     setNotes([...notes, newNote]);
