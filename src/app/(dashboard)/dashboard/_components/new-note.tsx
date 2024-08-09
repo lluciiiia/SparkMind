@@ -122,11 +122,7 @@ export const NewNoteSection: React.FC<{
           {notes.map((note, i) => (
             <div
               key={i}
-              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl cursor-pointer overflow-hidden"
-              onClick={() => {
-                setSelectedNote(note);
-                setIsModalOpen(true);
-              }}>
+              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl overflow-hidden">
               {/* Content of the note */}
               <div className="p-4 overflow-hidden">
                 <div className="flex">
@@ -146,9 +142,16 @@ export const NewNoteSection: React.FC<{
                     />
                   </div>
                 </div>
-                <p className="text-lg text-gray-700 overflow-hidden break-words">
-                  {note.content}
-                </p>
+                <div className="h-[230px] cursor-pointer">
+                  <p
+                    className="text-lg text-gray-700 overflow-hidden break-words "
+                    onClick={() => {
+                      setSelectedNote(note);
+                      setIsModalOpen(true);
+                    }}>
+                    {note.content}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
