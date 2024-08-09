@@ -180,7 +180,7 @@ export const Dashboard = () => {
 
     const updatedNote = {
       ...selectedNote,
-      title: selectedNote.title,
+      title: selectedNote.title ? selectedNote.title : "Undefined",
       content: selectedNote.content,
     };
 
