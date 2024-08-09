@@ -1,5 +1,4 @@
 "use client";
-import { HomeNavigation } from "./HomeNavigation";
 import Image from "next/image";
 import homeLogoSvg from "../../public/assets/svgs/home/logo.svg";
 import arrowSvg from "../../public/assets/svgs/home/arrow.svg";
@@ -19,6 +18,7 @@ import step05 from "../../public/assets/images/feature/card05.png";
 import step06 from "../../public/assets/images/feature/card06.png";
 import arrowDown from "../../public/assets/images/feature/feature02.png";
 import { useRouter } from "next/navigation";
+import { HomeNavigation } from "./HomeNavigation";
 
 export default function Home() {
   const router = useRouter();
@@ -103,7 +103,7 @@ export default function Home() {
             <Image
               src={arrowDown}
               alt="Arrow Down"
-              className="w-[15%] h-[80%]"
+              className="w-[8%] h-[60%]"
             />
           </div>
         </div>
