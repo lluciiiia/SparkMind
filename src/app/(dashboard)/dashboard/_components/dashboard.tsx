@@ -54,6 +54,7 @@ import {
   getOutputResponse,
   createNote,
   editNote,
+  deleteNote,
   getNotes,
 } from "../../../api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
@@ -153,7 +154,9 @@ export const Dashboard = () => {
 
   const isLaptop = useMediaQuery("(min-width: 1023px)");
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    const response = await deleteNote(id);
+
     setNotes(notes.filter((note) => note.id !== id));
   };
 
@@ -226,6 +229,7 @@ export const Dashboard = () => {
           <NewNoteSection
             handleCreate={handleCreate}
             handleEdit={handleEdit}
+            handleDelete={handleDelete}
             notes={notes}
           />
         </motion.details>

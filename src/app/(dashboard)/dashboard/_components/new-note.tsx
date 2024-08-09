@@ -12,8 +12,9 @@ import { Note } from "./interfaces";
 export const NewNoteSection: React.FC<{
   handleCreate: () => void;
   handleEdit: (values: Note) => void;
+  handleDelete: (id: string) => void;
   notes: Note[];
-}> = ({ handleCreate, handleEdit, notes }) => {
+}> = ({ handleCreate, handleEdit, handleDelete, notes }) => {
   const form = useForm<Note>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note>();
@@ -133,6 +134,9 @@ export const NewNoteSection: React.FC<{
                       position: "relative",
                       width: "30px",
                       height: "30px",
+                    }}
+                    onClick={() => {
+                      handleDelete(note.id);
                     }}>
                     <Image
                       src={`/assets/svgs/x_icon.svg`}
