@@ -177,19 +177,20 @@ export const Dashboard = () => {
 
   const handleEdit = async (selectedNote: Note) => {
     const id = selectedNote.id;
-    console.log("selected note: " + id);
 
-    const note = {
-      id: id,
+    const updatedNote = {
+      ...selectedNote,
       title: selectedNote.title,
       content: selectedNote.content,
-      createdAt: new Date(),
     };
 
-    const response = await editNote(note.id, note.title, note.content);
+    const response = await editNote(
+      updatedNote.id,
+      updatedNote.title,
+      updatedNote.content
+    );
 
-    setNotes(notes.filter((note) => note.id !== id));
-    setNotes([...notes, note]);
+    setNotes(notes.map((note) => (note.id === id ? updatedNote : note)));
     setIsDrawerOpen(false);
   };
 
