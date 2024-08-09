@@ -1,31 +1,23 @@
 .Circleloader {
-    border: 10px solid #f3f3f3;
+    --d: 22px;
+    width: 4px;
+    height: 4px;
     border-radius: 50%;
-    border-top: 10px solid #3498db;
-    width: 120px;
-    height: 120px;
+    color: #4e5a61;
+    box-shadow:
+        calc(1*var(--d)) calc(0*var(--d)) 0 4px,
+        calc(0.707*var(--d)) calc(0.707*var(--d)) 0 4px,
+        calc(0*var(--d)) calc(1*var(--d)) 0 4px,
+        calc(-0.707*var(--d)) calc(0.707*var(--d)) 0 4px,
+        calc(-1*var(--d)) calc(0*var(--d)) 0 4px,
+        calc(-0.707*var(--d)) calc(-0.707*var(--d))0 4px,
+        calc(0*var(--d)) calc(-1*var(--d)) 0 4px;
 
-    /* Safari */
-    animation: spin 2s linear infinite;
+    animation: l27 1s infinite steps(8);
 }
 
-/* Safari */
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
+@keyframes l27 {
     100% {
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
+        transform: rotate(1turn)
     }
 }

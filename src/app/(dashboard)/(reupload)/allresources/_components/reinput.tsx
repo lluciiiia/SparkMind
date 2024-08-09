@@ -175,7 +175,7 @@ export const ReUploadResource = () => {
 
   return (
     <>
-      <ContentLayout title="Dashboard">
+      <ContentLayout title="Upload">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
