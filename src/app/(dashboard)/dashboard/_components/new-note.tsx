@@ -142,13 +142,13 @@ export const NewNoteSection: React.FC<{
                     />
                   </div>
                 </div>
-                <div className="h-[230px] cursor-pointer">
-                  <p
-                    className="text-lg text-gray-700 overflow-hidden break-words "
-                    onClick={() => {
-                      setSelectedNote(note);
-                      setIsModalOpen(true);
-                    }}>
+                <div
+                  className="h-[230px] cursor-pointer"
+                  onClick={() => {
+                    setSelectedNote(note);
+                    setIsModalOpen(true);
+                  }}>
+                  <p className="text-lg text-gray-700 overflow-hidden break-words ">
                     {note.content}
                   </p>
                 </div>
