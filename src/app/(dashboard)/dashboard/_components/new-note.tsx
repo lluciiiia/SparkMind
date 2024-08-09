@@ -76,7 +76,7 @@ export const NewNoteSection: React.FC<{
                           {...field}
                           placeholder="Title"
                           rows={8}
-                          className="w-full p-2 bg-transparent text-white rounded"
+                          className="w-full p-2 bg-transparent text-white rounded overflow-y-auto resize-none"
                         />
                       </FormControl>
                     )}
