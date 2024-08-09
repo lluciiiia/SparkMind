@@ -15,9 +15,11 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { Content } from "@radix-ui/react-collapsible";
 
 const schema = z.object({
   title: z.string().min(1, { message: "Title is required" }),
+  // content: z.string().min(1, { message: "Content is required" }),
 });
 
 export const NewNoteSection: React.FC<{
@@ -50,29 +52,43 @@ export const NewNoteSection: React.FC<{
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="flex flex-col items-center justify-center bg-navy rounded-lg p-8 w-[700px] h-[400px]">
-            <button
-              className="self-end mb-4 text-white"
-              onClick={() => setIsModalOpen(false)}>
-              Close
-            </button>
+            <div className="flex justify-between items-center w-full mb-4">
+              <span className="text-white text-xl text-bold">Note</span>
+              <button
+                className="self-end text-white"
+                onClick={() => setIsModalOpen(false)}>
+                Close
+              </button>
+            </div>
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-4 w-full h-full">
+                className="flex flex-col gap-4 w-full h-full text-white">
                 <FormField
                   control={form.control}
                   name="title"
                   render={({ field }) => (
                     <FormControl>
-                      <Input {...field} placeholder="Title" />
+                      <Input {...field} placeholder="title" />
                     </FormControl>
                   )}
                 />
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white py-2 px-4 rounded">
-                  Save
-                </button>
+                <div className="flex gap-1">
+                  <button className="bg-white text-navy text-sm py-1 px-2 rounded">
+                    Grammar
+                  </button>
+                  <button className="bg-white text-navy text-sm py-1 px-2 rounded">
+                    Concise
+                  </button>
+                  <button className="bg-white text-navy text-sm py-1 px-2 rounded">
+                    Revert
+                  </button>
+                  <button
+                    type="submit"
+                    className="bg-white text-navy text-sm py-1 px-2 rounded">
+                    Save
+                  </button>
+                </div>
               </form>
             </Form>
           </div>
@@ -91,6 +107,7 @@ export const NewNoteSection: React.FC<{
               }}>
               {/* Content of the note */}
               <p className="p-4">{note.title}</p>
+              {/* <p className="p-4">{note.content}</p> */}
             </div>
           ))}
         </section>
