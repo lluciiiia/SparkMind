@@ -2,40 +2,35 @@
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { FaCaretLeft, FaCaretRight, FaPlus } from "react-icons/fa";
-import React, { useState } from "react";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { FaPlus } from "react-icons/fa";
+import React, { useEffect, useState } from "react";
+import { Form, FormControl, FormField } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Content } from "@radix-ui/react-collapsible";
-
-const schema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-  // content: z.string().min(1, { message: "Content is required" }),
-});
+import { Note } from "./interfaces";
 
 export const NewNoteSection: React.FC<{
-  handleCreate: (values: z.infer<typeof schema>) => void;
-  notes: z.infer<typeof schema>[];
-}> = ({ handleCreate, notes }) => {
-  const form = useForm<z.infer<typeof schema>>({
-    resolver: zodResolver(schema),
-  });
+  handleCreate: () => void;
+  handleEdit: (values: Note) => void;
+  notes: Note[];
+}> = ({ handleCreate, handleEdit, notes }) => {
+  const form = useForm<Note>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<z.infer<
-    typeof schema
-  > | null>(null);
+  const [selectedNote, setSelectedNote] = useState<Note>();
 
-  const onSubmit = (values: z.infer<typeof schema>) => {
-    handleCreate(values);
+  useEffect(() => {
+    if (selectedNote) {
+      form.reset({
+        title: selectedNote.title,
+        content: selectedNote.content,
+      });
+    }
+  }, [selectedNote, form]);
+
+  const onSubmit = (values: Note) => {
+    if (!selectedNote) return;
+
+    const updatedNote = { ...selectedNote, ...values };
+    handleEdit(updatedNote);
     setIsModalOpen(false);
   };
 
@@ -44,7 +39,9 @@ export const NewNoteSection: React.FC<{
       {/* Button to trigger the modal */}
       <Button
         className="bg-transparent border-dashed border-2 rounded-r-2xl rounded-bl-2xl border-navy w-[75px] h-[75px]"
-        onClick={() => setIsModalOpen(true)}>
+        onClick={() => {
+          handleCreate();
+        }}>
         <FaPlus size={24} color="#003366" />
       </Button>
 
@@ -75,8 +72,22 @@ export const NewNoteSection: React.FC<{
                         <textarea
                           {...field}
                           placeholder="Title"
-                          rows={8}
+                          rows={1}
                           className="w-full p-2 bg-transparent text-white rounded"
+                        />
+                      </FormControl>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormControl>
+                        <textarea
+                          {...field}
+                          placeholder="Content"
+                          rows={7}
+                          className="w-full p-2 bg-transparent text-white rounded overflow-y-auto resize-none"
                         />
                       </FormControl>
                     )}
@@ -110,17 +121,22 @@ export const NewNoteSection: React.FC<{
           {notes.map((note, i) => (
             <div
               key={i}
-              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl cursor-pointer"
+              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl cursor-pointer overflow-hidden"
               onClick={() => {
                 setSelectedNote(note);
                 setIsModalOpen(true);
               }}>
               {/* Content of the note */}
-              <p className="p-4">{note.title}</p>
-              {/* <p className="p-4">{note.content}</p> */}
+              <div className="p-4 overflow-hidden">
+                <p className="text-lg font-bold truncate">{note.title}</p>
+                <p className="text-lg text-gray-700 overflow-hidden break-words">
+                  {note.content}
+                </p>
+              </div>
             </div>
           ))}
         </section>
+
         <ScrollBar orientation="vertical" />
       </ScrollArea>
     </div>
