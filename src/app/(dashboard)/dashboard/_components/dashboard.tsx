@@ -177,6 +177,7 @@ export const Dashboard = () => {
 
   const handleEdit = async (selectedNote: Note) => {
     const id = selectedNote.id;
+    console.log("selected note: " + id);
 
     const note = {
       id: id,
