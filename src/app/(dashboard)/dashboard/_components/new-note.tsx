@@ -8,6 +8,7 @@ import { Form, FormControl, FormField } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
 import { Note } from "./interfaces";
+import { getGrammarNote, getConciseNote } from "@/app/api-handler";
 
 export const NewNoteSection: React.FC<{
   handleCreate: () => void;
@@ -34,6 +35,16 @@ export const NewNoteSection: React.FC<{
     const updatedNote = { ...selectedNote, ...values };
     handleEdit(updatedNote);
     setIsModalOpen(false);
+  };
+
+  const handleGrammar = async (content: string) => {
+    const response = await getGrammarNote(content);
+    form.setValue("content", response.data.correctedNote);
+  };
+
+  const handleConcise = async (content: string) => {
+    const response = await getConciseNote(content);
+    form.setValue("content", response.data.concisedNote);
   };
 
   return (
@@ -96,14 +107,23 @@ export const NewNoteSection: React.FC<{
                   />
                   {/* Action buttons at the bottom */}
                   <div className="flex gap-2 mt-auto">
-                    <button className="bg-white text-navy text-sm py-1 px-2 rounded">
+                    <button
+                      type="button"
+                      className="bg-white text-navy text-sm py-1 px-2 rounded"
+                      onClick={() => {
+                        const content = form.watch("content");
+                        handleGrammar(content);
+                      }}>
                       Grammar
                     </button>
-                    <button className="bg-white text-navy text-sm py-1 px-2 rounded">
+                    <button
+                      type="button"
+                      className="bg-white text-navy text-sm py-1 px-2 rounded"
+                      onClick={() => {
+                        const content = form.watch("content");
+                        handleConcise(content);
+                      }}>
                       Concise
-                    </button>
-                    <button className="bg-white text-navy text-sm py-1 px-2 rounded">
-                      Revert
                     </button>
                     <button
                       type="submit"
