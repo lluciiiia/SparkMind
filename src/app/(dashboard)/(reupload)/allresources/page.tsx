@@ -6,7 +6,7 @@ interface Props {
   id: number | string | undefined;
 }
 
-export default async function DashboardPage() {
+export default async function ReuplaodResources() {
   const supabase = createClient();
 
   console.log('id is here');
