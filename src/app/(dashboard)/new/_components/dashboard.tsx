@@ -34,7 +34,6 @@ import '@/styles/css/Circle-loader.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { generateHash, storeData } from './hash-handler';
 
 export const NewDashboard = () => {
   const searchParams = useSearchParams();

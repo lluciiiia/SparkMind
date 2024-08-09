@@ -28,13 +28,13 @@ import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
 
-import { getYoutubeResponse, saveOutput } from './api-handler';
+import { getYoutubeResponse, saveOutput } from '@/app/(dashboard)/new/_components/api-handler';
 //Circle Loading Style
 import '@/styles/css/Circle-loader.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { generateHash, storeData } from './hash-handler';
+
 
 export const ReUploadText = () => {
   const searchParams = useSearchParams();
