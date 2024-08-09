@@ -107,12 +107,12 @@ export const ReUploadText = () => {
 
   return (
     <>
-      <ContentLayout title="Dashboard">
+      <ContentLayout title="Upload">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/">Upload</Link>
+                <Link href="">Upload</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
