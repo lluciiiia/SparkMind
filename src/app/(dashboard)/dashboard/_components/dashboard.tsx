@@ -54,6 +54,7 @@ import {
   getOutputResponse,
   createNote,
   editNote,
+  deleteNote,
   getNotes,
 } from "../../../api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
@@ -153,7 +154,9 @@ export const Dashboard = () => {
 
   const isLaptop = useMediaQuery("(min-width: 1023px)");
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    const response = await deleteNote(id);
+
     setNotes(notes.filter((note) => note.id !== id));
   };
 
@@ -177,19 +180,20 @@ export const Dashboard = () => {
 
   const handleEdit = async (selectedNote: Note) => {
     const id = selectedNote.id;
-    console.log("selected note: " + id);
 
-    const note = {
-      id: id,
-      title: selectedNote.title,
+    const updatedNote = {
+      ...selectedNote,
+      title: selectedNote.title ? selectedNote.title : "Undefined",
       content: selectedNote.content,
-      createdAt: new Date(),
     };
 
-    const response = await editNote(note.id, note.title, note.content);
+    const response = await editNote(
+      updatedNote.id,
+      updatedNote.title,
+      updatedNote.content
+    );
 
-    setNotes(notes.filter((note) => note.id !== id));
-    setNotes([...notes, note]);
+    setNotes(notes.map((note) => (note.id === id ? updatedNote : note)));
     setIsDrawerOpen(false);
   };
 
@@ -225,6 +229,7 @@ export const Dashboard = () => {
           <NewNoteSection
             handleCreate={handleCreate}
             handleEdit={handleEdit}
+            handleDelete={handleDelete}
             notes={notes}
           />
         </motion.details>

@@ -89,16 +89,12 @@ export async function DELETE(req: NextRequest) {
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
     
-    if (!id) {
+    if (!id) 
       return NextResponse.json({ error: 'Missing note ID' }, { status: 400 });
-    }
-
-    const { uuid } = (await req.json()) as Pick<NoteType, 'uuid'>;
 
     const { data, error } = await supabase
       .from('notes')
       .delete()
-      .eq('uuid', uuid)
       .eq('id', id)
       .single();
 

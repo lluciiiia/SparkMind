@@ -6,13 +6,15 @@ import { FaPlus } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import { Form, FormControl, FormField } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
 import { Note } from "./interfaces";
 
 export const NewNoteSection: React.FC<{
   handleCreate: () => void;
   handleEdit: (values: Note) => void;
+  handleDelete: (id: string) => void;
   notes: Note[];
-}> = ({ handleCreate, handleEdit, notes }) => {
+}> = ({ handleCreate, handleEdit, handleDelete, notes }) => {
   const form = useForm<Note>();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNote, setSelectedNote] = useState<Note>();
@@ -121,17 +123,39 @@ export const NewNoteSection: React.FC<{
           {notes.map((note, i) => (
             <div
               key={i}
-              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl cursor-pointer overflow-hidden"
-              onClick={() => {
-                setSelectedNote(note);
-                setIsModalOpen(true);
-              }}>
+              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl overflow-hidden">
               {/* Content of the note */}
               <div className="p-4 overflow-hidden">
-                <p className="text-lg font-bold truncate">{note.title}</p>
-                <p className="text-lg text-gray-700 overflow-hidden break-words">
-                  {note.content}
-                </p>
+                <div className="flex">
+                  <p className="text-xl font-bold truncate">{note.title}</p>
+                  <div
+                    className="ml-auto cursor-pointer"
+                    style={{
+                      position: "relative",
+                      width: "30px",
+                      height: "30px",
+                    }}
+                    onClick={() => {
+                      handleDelete(note.id);
+                    }}>
+                    <Image
+                      src={`/assets/svgs/x_icon.svg`}
+                      alt={`Cancel Icon`}
+                      fill
+                      objectFit={`contain`}
+                    />
+                  </div>
+                </div>
+                <div
+                  className="h-[230px] cursor-pointer"
+                  onClick={() => {
+                    setSelectedNote(note);
+                    setIsModalOpen(true);
+                  }}>
+                  <p className="text-lg text-gray-700 overflow-hidden break-words ">
+                    {note.content}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
