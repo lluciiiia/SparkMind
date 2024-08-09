@@ -124,12 +124,12 @@ export const ReUploadKeyword = () => {
 
   return (
     <>
-      <ContentLayout title="Dashboard">
+      <ContentLayout title="Upload">
         <Breadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
+                <Link href="">Upload</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

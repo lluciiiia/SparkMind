@@ -34,6 +34,8 @@ import { ModeToggle } from "@/providers/theme/mode-toggle";
 
 import { assignColors } from "@/utils/assignColors";
 
+import Image from "next/image";
+
 import "@/styles/css/toggle-switch.css";
 
 import { createClient } from "@/utils/supabase/client";
@@ -119,6 +121,7 @@ export const MyLearning = () => {
         );
 
         setCards(fetchedCards);
+        setOriginalCards(fetchedCards);
       } else {
         console.error("Error fetching data:", res.data.body);
       }
@@ -356,8 +359,8 @@ export const MyLearning = () => {
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <div className="bg-black p-2 rounded-full mr-4 text-white">
-                LOGO
+              <div className="mr-4">
+                <Image src={'/assets/images/logo.png'} alt='logo' width={10} height={10} className="w-12 h-12" />
               </div>
               <div className="flex flex-row items-center ml-6">
                 <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
