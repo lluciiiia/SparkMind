@@ -51,46 +51,56 @@ export const NewNoteSection: React.FC<{
       {/* Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="flex flex-col items-center justify-center bg-navy rounded-lg p-8 w-[700px] h-[400px]">
-            <div className="flex justify-between items-center w-full mb-4">
-              <span className="text-white text-xl text-bold">Note</span>
+          <div className="flex flex-col bg-navy rounded-lg p-8 w-[700px] h-[400px]">
+            {/* Header with title and close button */}
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-white text-xl font-bold">Note</span>
               <button
-                className="self-end text-white"
+                className="text-white"
                 onClick={() => setIsModalOpen(false)}>
                 Close
               </button>
             </div>
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-4 w-full h-full text-white">
-                <FormField
-                  control={form.control}
-                  name="title"
-                  render={({ field }) => (
-                    <FormControl>
-                      <Input {...field} placeholder="title" />
-                    </FormControl>
-                  )}
-                />
-                <div className="flex gap-1">
-                  <button className="bg-white text-navy text-sm py-1 px-2 rounded">
-                    Grammar
-                  </button>
-                  <button className="bg-white text-navy text-sm py-1 px-2 rounded">
-                    Concise
-                  </button>
-                  <button className="bg-white text-navy text-sm py-1 px-2 rounded">
-                    Revert
-                  </button>
-                  <button
-                    type="submit"
-                    className="bg-white text-navy text-sm py-1 px-2 rounded">
-                    Save
-                  </button>
-                </div>
-              </form>
-            </Form>
+            {/* Form content */}
+            <div className="flex flex-col flex-grow">
+              <Form {...form}>
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="flex flex-col gap-4 h-full text-white">
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormControl>
+                        <textarea
+                          {...field}
+                          placeholder="Title"
+                          rows={8}
+                          className="w-full p-2 bg-transparent text-white rounded"
+                        />
+                      </FormControl>
+                    )}
+                  />
+                  {/* Action buttons at the bottom */}
+                  <div className="flex gap-2 mt-auto">
+                    <button className="bg-white text-navy text-sm py-1 px-2 rounded">
+                      Grammar
+                    </button>
+                    <button className="bg-white text-navy text-sm py-1 px-2 rounded">
+                      Concise
+                    </button>
+                    <button className="bg-white text-navy text-sm py-1 px-2 rounded">
+                      Revert
+                    </button>
+                    <button
+                      type="submit"
+                      className="bg-white text-navy text-sm py-1 px-2 rounded ml-auto">
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </Form>
+            </div>
           </div>
         </div>
       )}
