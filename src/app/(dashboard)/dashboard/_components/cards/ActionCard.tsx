@@ -10,7 +10,10 @@ import "@/styles/css/custom-scroll.css";
 import { Calendar as Calendericon } from "lucide-react";
 import Link from "next/link";
 
+import '@/styles/css/Circle-loader.css';
+
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
+
   if (!learningId) {
     console.error("LearningId is Missing in ActionCard");
   }
@@ -22,22 +25,55 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
   const [isListPreview, setListPreview] = useState<boolean>(false);
   const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const [videoNotAvailable, setVideoNotAvailable] = useState<boolean>(false);
 
   useEffect(() => {
     const ActionData = async () => {
-      if (learningId) {
-        const check = await getIsActionPreviewDone(learningId);
 
-        if (check === false) {
-          await getListOfEvent(learningId);
-          setListPreview(true);
-        } else {
-          await getTodoTaskFormDB(learningId);
+      try {
+        setIsLoading(true);
+        if (learningId) {
+          //fist check is video is uploaded on not
+          const checkid = await isVideoUploaded(learningId);
+
+          if (checkid === true) {
+            const check = await getIsActionPreviewDone(learningId);
+            if (check === false) {
+              await getListOfEvent(learningId);
+              setListPreview(true);
+            } else {
+              await getTodoTaskFormDB(learningId);
+            }
+          }
+          else {
+            setVideoNotAvailable(true);
+          }
         }
       }
+      catch (error) {
+        console.error('not enough permissions to access calander : ' + (error as Error).message)
+      }
+      finally {
+        setIsLoading(false);
+      }
+
     };
     ActionData();
   }, []);
+
+  const isVideoUploaded = async (learningid: string) => {
+    const res = await axios.get("/api/v1/check-video", {
+      params: { learningid: learningid },
+    });
+
+    if (res.status === 200) {
+      console.log("this is check :" + res.data.exists);
+      return res.data.exists;
+    }
+    return false;
+  }
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -58,7 +94,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
       });
       setTodoList(filteredList);
     }
-  }, [date]);
+  }, [date, initTodoList]);
 
   const getListOfEvent = async (LearningId: any) => {
     try {
@@ -163,7 +199,11 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   return (
     <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
       <div className="flex flex-row h-full rounded-t-3xl w-full justify-between">
-        {1 === 1 ? (
+        {videoNotAvailable === true ? (
+          <div className="flex h-full w-full justify-center items-center">
+            <p>No videos were found. Please give Calendar access in the Sign-in and upload the video.</p>
+          </div>
+        ) : (
           <>
             <div>
               {isListPreview === true ? (
@@ -172,6 +212,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                     <h2 className="text-xl font-bold border-b pb-2 mb-4">
                       List of Event
                     </h2>
+                    <p>(based on video input)</p>
                     <button
                       onClick={() => handleCreateEvent()}
                       className="bg-blue-500 text-white py-2 px-4 rounded mr-2 mb-2">
@@ -214,7 +255,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                         <p className="text-sm">{item.description}</p>
                         <select
                           className="w-32 focus:ring-0 mt-2 border
-                                                 border-[#003366] p-1 rounded-lg">
+                                               border-[#003366] p-1 rounded-lg">
                           <option value="Asia/Calcutta">Asia/Calcutta</option>
                           <option value="PST">PST</option>
                           <option value="CST">CST</option>
@@ -236,9 +277,12 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                     />
                   </div>
                   <div className="w-full pl-4 h-full overflow-y-auto">
-                    <h2 className="text-xl font-bold border-b pb-2 mb-4">
-                      List of Event
-                    </h2>
+                    <div className="flex flex-row border-b mb-4 pb-2 items-center">
+                      <h2 className="text-xl font-bold mr-2">
+                        List of Event
+                      </h2>
+                      <p>(based on video input)</p>
+                    </div>
                     <div className="space-y-4">
                       {todoList.map((item, index) => (
                         <div key={index} className="border-b pb-4">
@@ -280,11 +324,12 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                 </div>
               )}
             </div>
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+                <div className="Circleloader"></div>
+              </div>
+            )}
           </>
-        ) : (
-          <div className="flex h-full justify-center items-center">
-            <p>No videos found</p>
-          </div>
         )}
       </div>
     </Card>

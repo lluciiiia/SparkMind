@@ -26,16 +26,16 @@ import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
-import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
+import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
 
-import { getYoutubeResponse, saveOutput } from './api-handler';
+import { getYoutubeResponse, saveOutput } from '@/app/(dashboard)/new/_components/api-handler';
 //Circle Loading Style
 import '@/styles/css/Circle-loader.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
-export const NewDashboard = () => {
+export const ReUploadKeyword = () => {
   const searchParams = useSearchParams();
   const myLearningId = searchParams.get('id');
   const router = useRouter();
@@ -85,7 +85,7 @@ export const NewDashboard = () => {
 
   const isLaptop = useMediaQuery('(min-width: 1023px)');
 
-  const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text' | 'keywords'>();
+  const [fileType, setFileType] = useState<'keywords'>();
 
   const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -97,57 +97,17 @@ export const NewDashboard = () => {
     }
   };
 
-  const handleVideoUpload = async () => {
-    if (!selectedFile) return;
-
-    setIsLoading(true);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      if (myLearningId !== null) {
-        formData.append('learningid', myLearningId);
-      }
-
-      const res = await fetch('/api/v1/extract-transcribe', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error(await res.text());
-
-      // @ts-ignore trust me bro
-      const data = (await res.json()) as any;
-      console.log(data);
-
-      // right now not usefull to display the transcript
-      // setFetchedTranscript(data.transcription);
-      // setKeywords(data.keywordsArr);
-
-      //const value = { 'title': 'Video File' };
-
-      // handleCreate(value);
-
-      //clean up old setState
-      setSelectedFile(null);
-      setObjectURL(null);
-      setFileType(undefined);
-
-      return data.keywordsArr;
-    } catch (err: any) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
+      setIsLoading(true);
       const response = await saveOutput(input, myLearningId);
 
       router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
       console.error(err);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -155,12 +115,7 @@ export const NewDashboard = () => {
     if (!myLearningId) return;
 
     let input;
-    if (fileType === 'video') {
-      const keyWordsArray = await handleVideoUpload();
-      input = keyWordsArray.toString();
-    } else if (fileType == 'text') {
-      input = content;
-    } else if (fileType == 'keywords') {
+    if (fileType == 'keywords') {
       input = keywords;
     }
 
@@ -209,30 +164,6 @@ export const NewDashboard = () => {
                     </DialogHeader>
 
                     <div className="grid gap-2">
-                      {/* <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType("image")}
-                        disabled>
-                        <ImageIcon className="w-4 h-4 mr-1" />
-                        Image
-                      </Button> */}
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType('video')}
-                      >
-                        <VideoIcon className="w-4 h-4 mr-1" />
-                        Video
-                      </Button>
-                      {/* <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType("audio")}
-                        disabled>
-                        <AudioLinesIcon className="w-4 h-4 mr-1" />
-                        Audio
-                      </Button> */}
                       <Button
                         variant="outline"
                         className="w-full"
@@ -241,28 +172,8 @@ export const NewDashboard = () => {
                         <TextIcon className="w-4 h-4 mr-1" />
                         Keywords / Topic
                       </Button>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType('text')}
-                      >
-                        <TextIcon className="w-4 h-4 mr-1" />
-                        Text
-                      </Button>
                     </div>
                   </>
-                )}
-
-                {fileType === 'text' && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="content">Content</Label>
-                    <Textarea
-                      id="content"
-                      placeholder="Write your content here"
-                      value={content}
-                      onChange={handleContentChange}
-                    />
-                  </div>
                 )}
 
                 {fileType === 'keywords' && (
@@ -277,33 +188,6 @@ export const NewDashboard = () => {
                   </div>
                 )}
 
-                {fileType === 'video' && (
-                  <>
-                    <DialogTitle>Choose Video File</DialogTitle>
-                    <input
-                      type="file"
-                      name="file"
-                      accept=".mp4"
-                      onChange={handleVideoFileChange}
-                      className="rounded-md"
-                    />
-                  </>
-                )}
-
-                {fileType === 'video' && objectURL && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Preview</Label>
-                    <div>
-                      <video controls src={objectURL}></video>
-                    </div>
-                    {isLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                        <div className="Circleloader"></div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
@@ -313,6 +197,13 @@ export const NewDashboard = () => {
                     </DialogFooter>
                   </div>
                 )}
+
+                {isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+                    <div className="Circleloader"></div>
+                  </div>
+                )}
+
               </DialogContent>
             </Dialog>
           </div>
