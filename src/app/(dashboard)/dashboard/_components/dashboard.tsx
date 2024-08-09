@@ -56,7 +56,7 @@ import {
 
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
-import { getOutputResponse } from "./api-handler";
+import { getOutputResponse } from "../../../api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
 import { noteSchema } from "./new-note";
 

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { ContentLayout } from '@/components/dashboard/content-layout';
+import { ContentLayout } from "@/components/dashboard/content-layout";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,8 +8,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/breadcrumb";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -18,32 +18,32 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
-import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
-import Link from 'next/link';
-import { useRef, useState } from 'react';
-import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
-import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
+import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from "lucide-react";
+import Link from "next/link";
+import { useRef, useState } from "react";
+import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
+import NewInputIcon from "@/../public/assets/svgs/new-input-icon";
 
-import { getYoutubeResponse, saveOutput } from '@/app/(dashboard)/new/_components/api-handler';
+import { getYoutubeResponse, saveOutput } from "@/app/api-handler";
 //Circle Loading Style
-import '@/styles/css/Circle-loader.css';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
+import "@/styles/css/Circle-loader.css";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 export const ReUploadVideo = () => {
   const searchParams = useSearchParams();
-  const myLearningId = searchParams.get('id');
+  const myLearningId = searchParams.get("id");
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
-  const [keywords, setKeywords] = useState('');
-  const [content, setContent] = useState('');
+  const [keywords, setKeywords] = useState("");
+  const [content, setContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -68,17 +68,19 @@ export const ReUploadVideo = () => {
         setIsDrawerOpen(false);
       }
     };
-    window.addEventListener('click', handleClickOutside);
+    window.addEventListener("click", handleClickOutside);
     return () => {
-      window.removeEventListener('click', handleClickOutside);
+      window.removeEventListener("click", handleClickOutside);
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
-  const isLaptop = useMediaQuery('(min-width: 1023px)');
+  const isLaptop = useMediaQuery("(min-width: 1023px)");
 
-  const [fileType, setFileType] = useState<'video'>();
+  const [fileType, setFileType] = useState<"video">();
 
-  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const pathURL = URL.createObjectURL(file);
@@ -93,13 +95,13 @@ export const ReUploadVideo = () => {
 
     try {
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append("file", selectedFile);
       if (myLearningId !== null) {
-        formData.append('learningid', myLearningId);
+        formData.append("learningid", myLearningId);
       }
 
-      const res = await fetch('/api/v1/extract-transcribe', {
-        method: 'PATCH',
+      const res = await fetch("/api/v1/extract-transcribe", {
+        method: "PATCH",
         body: formData,
       });
 
@@ -136,16 +138,14 @@ export const ReUploadVideo = () => {
       setIsLoading(true);
 
       let input;
-      if (fileType === 'video') {
+      if (fileType === "video") {
         const keyWordsArray = await handleVideoUpload();
         input = keyWordsArray.toString();
       }
       await handleUpload(input, myLearningId);
-    }
-    catch (error) {
-      console.log('error in submitChanges' + (error as Error).message);
-    }
-    finally {
+    } catch (error) {
+      console.log("error in submitChanges" + (error as Error).message);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -171,14 +171,15 @@ export const ReUploadVideo = () => {
             <Dialog
               onOpenChange={() => {
                 setFileType(undefined);
-              }}
-            >
+              }}>
               <DialogTrigger asChild>
                 <div className="flex flex-col items-center justify-center">
                   <div className="cursor-pointer">
                     <NewInputIcon></NewInputIcon>
                   </div>
-                  <span className="text-lg mt-4">Upload the files to get started</span>
+                  <span className="text-lg mt-4">
+                    Upload the files to get started
+                  </span>
                 </div>
               </DialogTrigger>
               <DialogContent className="rounded-2xl sm:rounded-2xl">
@@ -203,8 +204,7 @@ export const ReUploadVideo = () => {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType('video')}
-                      >
+                        onClick={() => setFileType("video")}>
                         <VideoIcon className="w-4 h-4 mr-1" />
                         Video
                       </Button>
@@ -220,7 +220,7 @@ export const ReUploadVideo = () => {
                   </>
                 )}
 
-                {fileType === 'video' && (
+                {fileType === "video" && (
                   <>
                     <DialogTitle>Choose Video File</DialogTitle>
                     <input
@@ -233,7 +233,7 @@ export const ReUploadVideo = () => {
                   </>
                 )}
 
-                {fileType === 'video' && objectURL && (
+                {fileType === "video" && objectURL && (
                   <div className="grid gap-2">
                     <Label htmlFor="name">Preview</Label>
                     <div>
@@ -245,8 +245,11 @@ export const ReUploadVideo = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
-                        {isLoading ? 'Uploading ...' : 'Upload'}
+                      <Button
+                        type="submit"
+                        onClick={submitChanges}
+                        disabled={isLoading}>
+                        {isLoading ? "Uploading ..." : "Upload"}
                       </Button>
                     </DialogFooter>
                   </div>
@@ -257,7 +260,6 @@ export const ReUploadVideo = () => {
                     <div className="Circleloader"></div>
                   </div>
                 )}
-
               </DialogContent>
             </Dialog>
           </div>
