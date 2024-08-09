@@ -46,19 +46,12 @@ import SummaryCard from "./cards/SummaryCard";
 import VideoCard from "./cards/VideoCard";
 import ActionCard from "./cards/ActionCard";
 
-import {
-  API_KEY,
-  genAI,
-  model,
-  generationConfig,
-  safetySettings,
-} from "@/app/api/v1/gemini-settings";
+import { API_KEY } from "@/app/api/v1/gemini-settings";
 
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
-import { getOutputResponse } from "../../../api-handler";
+import { getOutputResponse, createNote, editNote } from "../../../api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
-import { noteSchema } from "./new-note";
 
 export const Dashboard = () => {
   if (!API_KEY) {
@@ -154,14 +147,33 @@ export const Dashboard = () => {
     setNotes(notes.filter((note) => note.id !== id));
   };
 
-  const handleCreate = (values: z.infer<typeof noteSchema>) => {
+  const handleCreate = async (values: Note) => {
+    if (!myLearningId) return;
+
+    const response = await createNote(myLearningId);
+
     const newNote = {
-      id: Date.now().toString(),
+      id: response.data.body[0].id,
       title: values.title,
       content: values.content,
       createdAt: new Date(),
     };
+
     setNotes([...notes, newNote]);
+    setIsDrawerOpen(false);
+  };
+
+  const handleEdit = async (values: Note) => {
+    const note = {
+      id: values.id,
+      title: values.title,
+      content: values.content,
+      createdAt: new Date(),
+    };
+
+    const response = await editNote(note.id, note.title, note.content);
+
+    setNotes([...notes, note]);
     setIsDrawerOpen(false);
   };
 
