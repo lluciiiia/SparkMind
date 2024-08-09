@@ -1,96 +1,100 @@
-import { Api, ScraperQueue } from '@src/classes';
-import { Scraper as ScraperClass } from '@src/classes/scrape';
-import { PONG } from '@src/constants';
-import type { ScraperQueueItemType } from '@src/schema';
-import React, { useEffect } from 'react';
-import { toast } from 'sonner';
-import css from './styles.module.css';
+import { PING, PONG } from '../../constants';
+import type { ScraperQueueItemType } from '../../schema';
+import React from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 export function Scraper() {
   const [scraper, setScraper] = React.useState<ScraperQueueItemType | null>(null);
-
-  const processQueue = async () => {
-    const scraperQueue = ScraperQueue.make();
-
-    while (true) {
-      const nextItem = scraperQueue.next();
-      if (!nextItem) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        continue;
-      }
-
-      setScraper(nextItem);
-
-      try {
-        const apiInstance = ScraperClass.make(window.location.href);
-        const response = await apiInstance.run(apiInstance);
-
-        console.log('response', response);
-
-        const updatedScraperItem: ScraperQueueItemType = {
-          ...nextItem,
-          url: window.location.href,
-          status: 'done',
-          finishedAt: new Date(),
-        };
-
-        scraperQueue.update(updatedScraperItem);
-        setScraper(updatedScraperItem);
-        try {
-          const postInstance = Api.make(PONG);
-          await postInstance.post({
-            input_id: nextItem.id,
-            url: window.location.href,
-            text: response.filteredTexts.join('\n'),
+  let censored: boolean = false;
+  const processItem = async (item: ScraperQueueItemType): Promise<void> => {
+    const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+    const url = tab.url;
+    if (!url) {
+      throw new Error('No tab URL found');
+    }
+    setScraper(item);
+    fetch(`${PING}${url}`, {
+      method: 'GET',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          if (data.containsCensored) {
+            censored = true;
+          }
+          const updatedScraperItem: ScraperQueueItemType = {
+            ...item,
+            url,
+            status: 'done',
+            finishedAt: new Date(),
+          };
+          setScraper(updatedScraperItem);
+          return fetch(PONG, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              input_id: item.id,
+              url,
+              text: data.filteredTexts ? data.filteredTexts.join('\n') : '',
+            }),
           });
-        } catch (error) {
-          console.error('Error during posting:', error);
+        } else {
+          throw new Error('Scraping was not successful or response is invalid');
         }
-      } catch (error) {
-        console.error('Error during scraping:', error);
-        const errorScraperItem: ScraperQueueItemType = {
-          ...nextItem,
-          status: 'error',
-          finishedAt: new Date(),
-        };
-        scraperQueue.update(errorScraperItem);
-        setScraper(errorScraperItem);
-      }
-    }
+      })
+      .then((postResponse) => postResponse.json())
+      .catch((error) => {
+        throw new Error(`${error instanceof Error ? error.message : 'Internal server error'}`);
+      })
   };
-
-  useEffect(() => {
-    if (scraper) {
-      switch (scraper.status) {
-        case 'pending':
-          toast('Scraping is pending...');
-          break;
-        case 'done':
-          toast.success('Scraping completed successfully!');
-          break;
-        case 'error':
-          toast.error('An error occurred during scraping.');
-          break;
-      }
-    }
-  }, [scraper]);
-
   return (
-    <div className="flex h-full w-full mt-3 items-center justify-center mx-auto my-auto">
+    <div className="flex h-full w-full mt-3 items-center justify-center mx-auto my-auto flex-col">
       <button
-        className={css.btn}
+        style={{
+          backgroundColor: scraper?.status === 'pending' ? 'gray' : 'blue',
+          cursor: scraper?.status === 'pending' ? 'not-allowed' : 'pointer',
+          color: scraper?.status === 'pending' ? 'white' : 'white',
+          padding: '10px 20px',
+          borderRadius: '5px',
+          fontSize: '16px',
+          fontWeight: 'bold',
+          border: 'none',
+          outline: 'none',
+          boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
+          transition: 'background-color 0.3s ease',
+          opacity: scraper?.status === 'pending' ? 0.5 : 1,
+          pointerEvents: scraper?.status === 'pending' ? 'none' : 'auto',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+        }}
         data-testid="scrape-all"
         onClick={() => {
-          processQueue();
+          const item: ScraperQueueItemType = {
+            id: uuidv4(),
+            url: window.location.href,
+            startedAt: new Date(),
+            finishedAt: new Date(),
+            status: 'pending',
+          };
+          processItem(item);
         }}
         disabled={scraper?.status === 'pending'}
       >
-        Scrape Website
-        {scraper?.status === 'pending' && <span className="ml-2">Pending...</span>}
-        {scraper?.status === 'done' && <span className="ml-2">Done</span>}
-        {scraper?.status === 'error' && <span className="ml-2">Error</span>}
-        {!scraper && <span className="ml-2">Scraper is not running</span>}
+
+        {<span className="ml-2">Scrape this website</span>}
       </button>
+      {scraper?.status === 'pending' && <span className="ml-2">Pending...</span>}
+      {scraper?.status === 'done' &&
+        <span className="ml-2">
+          Done
+        </span>
+      }
+      {scraper?.status === 'error' && <span className="ml-2">Error</span>}
+      {censored && <span className="ml-2">This site contains censored content</span>}
     </div>
   );
 }
