@@ -7,34 +7,32 @@ import React, { useState } from "react";
 import {
   Form,
   FormControl,
-  FormDescription,
+  // FormDescription,
   FormField,
-  FormLabel,
+  // FormLabel,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
+// import { Input } from "@/components/ui/input";
+// import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Content } from "@radix-ui/react-collapsible";
+// import { z } from "zod";
+// import { Content } from "@radix-ui/react-collapsible";
+import { Note } from "./interfaces";
 
-export const noteSchema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-  content: z.string().min(1, { message: "Content is required" }),
-});
+// export const noteSchema = z.object({
+//   id: z.string(),
+//   title: z.string().min(1, { message: "Title is required" }),
+//   content: z.string().min(1, { message: "Content is required" }),
+// });
 
 export const NewNoteSection: React.FC<{
-  handleCreate: (values: z.infer<typeof noteSchema>) => void;
-  notes: z.infer<typeof noteSchema>[];
+  handleCreate: (values: Note) => void;
+  notes: Note[];
 }> = ({ handleCreate, notes }) => {
-  const form = useForm<z.infer<typeof noteSchema>>({
-    resolver: zodResolver(noteSchema),
-  });
+  const form = useForm<Note>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<z.infer<
-    typeof noteSchema
-  > | null>(null);
+  const [selectedNote, setSelectedNote] = useState<Note>();
 
-  const onSubmit = (values: z.infer<typeof noteSchema>) => {
+  const onSubmit = (values: Note) => {
     handleCreate(values);
     setIsModalOpen(false);
   };

@@ -26,3 +26,18 @@ export const getOutputResponse = async (myLearningId: string) => {
   const response = await axios.get("/api/v1/get-output", { params });
   return { data: response.data };
 };
+
+export const createNote = async (myLearningId: string) => {
+  const response = await axios.post(`/api/v1/notes?id=${myLearningId}`);
+  console.log("response: " + response.data);
+  return { data: response.data };
+};
+
+export const editNote = async (id: string, title: string, content: string) => {
+  const response = await axios.put(`/api/v1/notes?id=${id}`, {
+    title: title,
+    content: content,
+  });
+
+  return { data: response.data };
+};
