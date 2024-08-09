@@ -20,22 +20,21 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
 import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
-import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
+import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
 
-import { getYoutubeResponse, saveOutput } from './api-handler';
+import { getYoutubeResponse, saveOutput } from '@/app/(dashboard)/new/_components/api-handler';
 //Circle Loading Style
 import '@/styles/css/Circle-loader.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
-export const NewDashboard = () => {
+export const ReUploadVideo = () => {
   const searchParams = useSearchParams();
   const myLearningId = searchParams.get('id');
   const router = useRouter();
@@ -75,17 +74,9 @@ export const NewDashboard = () => {
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
-  const handleContentChange = (event: any) => {
-    setContent(event.target.value);
-  };
-
-  const handleKeywordsChange = (event: any) => {
-    setKeywords(event.target.value);
-  };
-
   const isLaptop = useMediaQuery('(min-width: 1023px)');
 
-  const [fileType, setFileType] = useState<'image' | 'video' | 'audio' | 'text' | 'keywords'>();
+  const [fileType, setFileType] = useState<'video'>();
 
   const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -100,8 +91,6 @@ export const NewDashboard = () => {
   const handleVideoUpload = async () => {
     if (!selectedFile) return;
 
-    setIsLoading(true);
-
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -110,7 +99,7 @@ export const NewDashboard = () => {
       }
 
       const res = await fetch('/api/v1/extract-transcribe', {
-        method: 'POST',
+        method: 'PATCH',
         body: formData,
       });
 
@@ -120,14 +109,6 @@ export const NewDashboard = () => {
       const data = (await res.json()) as any;
       console.log(data);
 
-      // right now not usefull to display the transcript
-      // setFetchedTranscript(data.transcription);
-      // setKeywords(data.keywordsArr);
-
-      //const value = { 'title': 'Video File' };
-
-      // handleCreate(value);
-
       //clean up old setState
       setSelectedFile(null);
       setObjectURL(null);
@@ -136,15 +117,12 @@ export const NewDashboard = () => {
       return data.keywordsArr;
     } catch (err: any) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
       const response = await saveOutput(input, myLearningId);
-
       router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
       console.error(err);
@@ -154,17 +132,22 @@ export const NewDashboard = () => {
   const submitChanges = async () => {
     if (!myLearningId) return;
 
-    let input;
-    if (fileType === 'video') {
-      const keyWordsArray = await handleVideoUpload();
-      input = keyWordsArray.toString();
-    } else if (fileType == 'text') {
-      input = content;
-    } else if (fileType == 'keywords') {
-      input = keywords;
-    }
+    try {
+      setIsLoading(true);
 
-    await handleUpload(input, myLearningId);
+      let input;
+      if (fileType === 'video') {
+        const keyWordsArray = await handleVideoUpload();
+        input = keyWordsArray.toString();
+      }
+      await handleUpload(input, myLearningId);
+    }
+    catch (error) {
+      console.log('error in submitChanges' + (error as Error).message);
+    }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -174,12 +157,12 @@ export const NewDashboard = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
+                <Link href="/">Upload</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
             <BreadcrumbItem>
-              <BreadcrumbPage>New</BreadcrumbPage>
+              <BreadcrumbPage>Video</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
@@ -233,48 +216,8 @@ export const NewDashboard = () => {
                         <AudioLinesIcon className="w-4 h-4 mr-1" />
                         Audio
                       </Button> */}
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType('keywords')}
-                      >
-                        <TextIcon className="w-4 h-4 mr-1" />
-                        Keywords / Topic
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType('text')}
-                      >
-                        <TextIcon className="w-4 h-4 mr-1" />
-                        Text
-                      </Button>
                     </div>
                   </>
-                )}
-
-                {fileType === 'text' && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="content">Content</Label>
-                    <Textarea
-                      id="content"
-                      placeholder="Write your content here"
-                      value={content}
-                      onChange={handleContentChange}
-                    />
-                  </div>
-                )}
-
-                {fileType === 'keywords' && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="keywords">Keywords / Topic</Label>
-                    <Textarea
-                      id="keywords"
-                      placeholder="Write your keywords / topic here"
-                      value={keywords}
-                      onChange={handleKeywordsChange}
-                    />
-                  </div>
                 )}
 
                 {fileType === 'video' && (
@@ -296,11 +239,6 @@ export const NewDashboard = () => {
                     <div>
                       <video controls src={objectURL}></video>
                     </div>
-                    {isLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                        <div className="Circleloader"></div>
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -313,6 +251,13 @@ export const NewDashboard = () => {
                     </DialogFooter>
                   </div>
                 )}
+
+                {isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+                    <div className="Circleloader"></div>
+                  </div>
+                )}
+
               </DialogContent>
             </Dialog>
           </div>
