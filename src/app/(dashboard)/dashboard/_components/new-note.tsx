@@ -6,6 +6,7 @@ import { FaPlus } from "react-icons/fa";
 import React, { useEffect, useState } from "react";
 import { Form, FormControl, FormField } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
 import { Note } from "./interfaces";
 
 export const NewNoteSection: React.FC<{
@@ -128,7 +129,23 @@ export const NewNoteSection: React.FC<{
               }}>
               {/* Content of the note */}
               <div className="p-4 overflow-hidden">
-                <p className="text-lg font-bold truncate">{note.title}</p>
+                <div className="flex">
+                  <p className="text-xl font-bold truncate">{note.title}</p>
+                  <div
+                    className="ml-auto cursor-pointer"
+                    style={{
+                      position: "relative",
+                      width: "30px",
+                      height: "30px",
+                    }}>
+                    <Image
+                      src={`/assets/svgs/x_icon.svg`}
+                      alt={`Cancel Icon`}
+                      fill
+                      objectFit={`contain`}
+                    />
+                  </div>
+                </div>
                 <p className="text-lg text-gray-700 overflow-hidden break-words">
                   {note.content}
                 </p>
