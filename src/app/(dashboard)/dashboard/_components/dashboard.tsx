@@ -50,7 +50,12 @@ import { API_KEY } from "@/app/api/v1/gemini-settings";
 
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
-import { getOutputResponse, createNote, editNote } from "../../../api-handler";
+import {
+  getOutputResponse,
+  createNote,
+  editNote,
+  getNotes,
+} from "../../../api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
 
 export const Dashboard = () => {
@@ -77,8 +82,13 @@ export const Dashboard = () => {
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
       try {
-        const response = await getOutputResponse(myLearningId);
-        setOutput(response.data.body[0]);
+        const outputResponse = await getOutputResponse(myLearningId);
+        setOutput(outputResponse.data.body[0]);
+
+        const noteResponse = await getNotes(myLearningId);
+        console.log("notes: ", noteResponse.data.body);
+
+        setNotes(noteResponse.data.body);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -147,32 +157,37 @@ export const Dashboard = () => {
     setNotes(notes.filter((note) => note.id !== id));
   };
 
-  const handleCreate = async (values: Note) => {
+  const handleCreate = async () => {
     if (!myLearningId) return;
 
     const response = await createNote(myLearningId);
 
+    console.log("note id: " + response.data.body[0].id);
+
     const newNote = {
       id: response.data.body[0].id,
-      title: values.title,
-      content: values.content,
-      createdAt: new Date(),
+      title: response.data.body[0].title,
+      content: response.data.body[0].content,
+      createdAt: response.data.body[0].created_at,
     };
 
     setNotes([...notes, newNote]);
     setIsDrawerOpen(false);
   };
 
-  const handleEdit = async (values: Note) => {
+  const handleEdit = async (selectedNote: Note) => {
+    const id = selectedNote.id;
+
     const note = {
-      id: values.id,
-      title: values.title,
-      content: values.content,
+      id: id,
+      title: selectedNote.title,
+      content: selectedNote.content,
       createdAt: new Date(),
     };
 
     const response = await editNote(note.id, note.title, note.content);
 
+    setNotes(notes.filter((note) => note.id !== id));
     setNotes([...notes, note]);
     setIsDrawerOpen(false);
   };
@@ -206,7 +221,11 @@ export const Dashboard = () => {
 
             {showText && <span className="ml-4">New note</span>}
           </summary>
-          <NewNoteSection handleCreate={handleCreate} notes={notes} />
+          <NewNoteSection
+            handleCreate={handleCreate}
+            handleEdit={handleEdit}
+            notes={notes}
+          />
         </motion.details>
       </div>
       <ContentLayout title="Dashboard">

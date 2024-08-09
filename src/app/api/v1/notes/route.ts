@@ -9,24 +9,24 @@ export async function GET(req: NextRequest) {
   const supabase = createClient();
   try {
     const url = new URL(req.url);
-    const { uuid } = (await req.json()) as Pick<NoteType, 'uuid'>;
+    const myLearningId = url.searchParams.get('id');
     
-    const { data, error } = await supabase.from('notes').select('*').eq('uuid', uuid);
+    if (!myLearningId) 
+      return NextResponse.json({ error: 'Missing learning ID' }, { status: 400 });
+    
+    const { data, error } = await supabase.from('notes').select('*').eq('learning_id', myLearningId);
     
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     
-    if (data && data.length > 0) {
-      return NextResponse.json(data);
-    }
-    
-    return NextResponse.json({ error: 'Note not found' }, { status: 404 });
+    return NextResponse.json({ status: 200, body: data });
   } catch (error) {
-    console.error('Error retrieving note from DB:', error);
-    return NextResponse.json({ error: 'Failed to retrieve note from DB' }, { status: 500 });
+    console.error('Error getting notes in DB:', error);
+    return NextResponse.json({ error: 'Failed to save notes in DB' }, { status: 500 });
   }
 }
+
 
 export async function POST(req: NextRequest) {
   const supabase = createClient();
