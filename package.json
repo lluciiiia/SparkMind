@@ -44,6 +44,7 @@
     "@hookform/resolvers": "^3.9.0",
     "@livekit/components-react": "^2.3.6",
     "@livekit/components-styles": "^1.0.12",
+    "@next/font": "^14.2.5",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-collapsible": "^1.1.0",
     "@radix-ui/react-context-menu": "^2.2.1",
