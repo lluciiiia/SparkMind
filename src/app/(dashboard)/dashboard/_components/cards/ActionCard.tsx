@@ -211,10 +211,9 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                     <h2 className="text-xl font-bold border-b pb-2 mb-4">
                       List of Event
                     </h2>
-                    <p>(based on video input)</p>
                     <button
                       onClick={() => handleCreateEvent()}
-                      className="bg-blue-500 text-white py-2 px-4 rounded mr-2 mb-2">
+                      className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2">
                       {" "}
                       Create Selected Task
                     </button>
@@ -228,11 +227,11 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                             className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
                             onChange={() => handleCheckboxChange(index)}
                           />
-                          <p className="text-sm mr-2 font-bold">
+                          <p className="text-sm mr-2">
                             {item.start.dateTime.slice(0, 16).split("T")[0]}
                             {/* - {item.end.dateTime.slice(0, 16)} */}
                           </p>
-                          <p className="text-orange-600 font-bold">
+                          <p className="text-orange-600">
                             {new Date(item.start.dateTime).toLocaleTimeString(
                               [],
                               {
