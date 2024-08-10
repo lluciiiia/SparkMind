@@ -6,21 +6,36 @@ const supabase = createClient();
 async function getTranscript(videoid: string) {
   try {
     // new things we are store learning_id in video id in DB
-    const { data, error } = await supabase
+    const { data: transcriptData, error: transcriptError } = await supabase
       .from('transcriptdata')
       .select('transcript')
       .eq('videoid', videoid);
 
-    if (error) {
-      console.log('Error fetching transcript from DB: ' + error.message);
+    if (transcriptError) {
+      console.log('Error fetching transcript from DB: ' + transcriptError.message);
       return null;
     }
 
-    if (data && data.length > 0) {
-      return data[0].transcript;
+    if (transcriptData && transcriptData.length > 0) {
+      return transcriptData[0].transcript;
     } else {
-      console.log('No transcript found for the provided UUID');
-      return null;
+      // Fetch summary using learning_id if transcript is not found
+      const { data: summaryData, error: summaryError } = await supabase
+        .from('outputs')
+        .select('summary')
+        .eq('learning_id', videoid);  // learning id and video id is same of no woory about that 
+
+      if (summaryError) {
+        console.log('Error fetching summary from DB: ' + summaryError.message);
+        return null;
+      }
+
+      if (summaryData && summaryData.length > 0) {
+        return summaryData[0].summary;
+      } else {
+        console.log('No transcript or summary found for the provided videoid');
+        return null;
+      }
     }
   } catch (err) {
     console.log('Error when feach Transcript from DB : ' + err);
@@ -62,10 +77,12 @@ export async function GET(req: NextRequest, res: NextResponse) {
         return NextResponse.json({ status: 404, error: 'Transcript not found' });
       }
 
-      const basicQue = await getBasicQuestion(video_id);
+      let basicQue = await getBasicQuestion(video_id);
 
       if (!basicQue) {
-        return NextResponse.json({ status: 400, body: 'eventList is empty' });
+        //if user give other input like text and keyword then basic question are not we can seee
+        // return NextResponse.json({ status: 200, body: [] });
+        basicQue = [];
       }
 
       return NextResponse.json({ status: 200, basicQue: basicQue, transcript: transcript });

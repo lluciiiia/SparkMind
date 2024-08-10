@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import homeLogoSvg from "../../public/assets/svgs/home/logo.svg";
+import homeLogoSvg from "../../public/assets/svgs/home/main-logo.svg";
 import arrowSvg from "../../public/assets/svgs/home/arrow.svg";
 import homeTitleImage from "../../public/assets/images/home/home-title.png";
 import homeFeature1Image from "../../public/assets/images/home/home-feat-1.png";

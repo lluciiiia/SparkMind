@@ -55,11 +55,14 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
         `/api/v1/getdiscuss?videoid=${video_id}`,
       );
       if (response.status === 200) {
-        console.log("this is response : " + response.data);
+        console.log("this is response : " + JSON.stringify(response.data));
         setBasicQuestion(response.data.basicQue);
         setTranscript(response.data.transcript);
       }
-      console.log("Something goes Wrong in Discuss with ai feature");
+      else {
+        console.log("Something goes Wrong in Discuss with ai feature");
+      }
+
     };
     fetchDiscussData();
   }, [video_id]);
@@ -74,7 +77,6 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
         },
       ],
     });
-
     setChatSession(Session);
   }, [transcript]);
 
@@ -100,15 +102,19 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
       try {
         event?.preventDefault();
         if (input.trim()) {
+
           setLoading(true);
+          console.log("transcript" + transcript);
+
           const newMessage: Message = {
             id: Date.now(),
             text: input,
             sender: "user",
           };
+
           setResponses((prevResponses) => [...prevResponses, newMessage]);
 
-          const question = `Given the previous transcript, Based on the transcript, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
+          const question = `Given the previous transcript or summary, Based on the transcript or summary, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
 
           const chatResponse = await chatSession.sendMessage(question);
 
@@ -183,7 +189,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
             <PlaceholdersAndVanishInput
               placeholders={[]}
               onChange={handleDiscussInputChange}
-              onKeyDown={handleKeyDown}
+              //onKeyDown={handleKeyDown}
               onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
                 event.preventDefault();
                 onSubmit();

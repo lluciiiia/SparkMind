@@ -21,12 +21,11 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   const [date, setDate] = useState<Date | undefined>(new Date());
 
   const [todoList, setTodoList] = useState<TodoType[]>([]);
-  const [EventList, setEventList] = useState<Event[]>([]);
+  const [eventList, setEventList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
   const [isListPreview, setListPreview] = useState<boolean>(false);
   const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
   const [videoNotAvailable, setVideoNotAvailable] = useState<boolean>(false);
 
   useEffect(() => {
@@ -118,15 +117,15 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   const handleCreateEvent = async () => {
     try {
       const selectedTask = selectedRowsidx.map((rowIndex) => ({
-        summary: EventList[rowIndex].summary,
-        description: EventList[rowIndex].description,
+        summary: eventList[rowIndex].summary,
+        description: eventList[rowIndex].description,
         start: {
-          dateTime: EventList[rowIndex].start.dateTime,
-          timeZone: EventList[rowIndex].start.timeZone,
+          dateTime: eventList[rowIndex].start.dateTime,
+          timeZone: eventList[rowIndex].start.timeZone,
         },
         end: {
-          dateTime: EventList[rowIndex].end.dateTime,
-          timeZone: EventList[rowIndex].end.timeZone,
+          dateTime: eventList[rowIndex].end.dateTime,
+          timeZone: eventList[rowIndex].end.timeZone,
         },
       }));
 
@@ -205,7 +204,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
           </div>
         ) : (
           <>
-            <div>
+            <div className="w-full">
               {isListPreview === true ? (
                 <div className="w-full pl-4 h-full overflow-y-auto">
                   <div className="flex flex-row justify-between items-center">
@@ -217,11 +216,11 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                       onClick={() => handleCreateEvent()}
                       className="bg-blue-500 text-white py-2 px-4 rounded mr-2 mb-2">
                       {" "}
-                      Create Selected Taks
+                      Create Selected Task
                     </button>
                   </div>
                   <div className="space-y-4">
-                    {EventList.map((item, index) => (
+                    {eventList.map((item, index) => (
                       <div key={index} className="border-b pb-4">
                         <div className="flex flex-row items-center">
                           <input
@@ -251,8 +250,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                             )}
                           </p>
                         </div>
-                        <p className="text-lg font-semibold">{item.summary}</p>
-                        <p className="text-sm">{item.description}</p>
+                        <input defaultValue={item.summary} className="text-lg font-semibold w-96 block" />
+                        <textarea defaultValue={item.description} className="text-sm block w-full" />
                         <select
                           className="w-32 focus:ring-0 mt-2 border
                                                border-[#003366] p-1 rounded-lg">
