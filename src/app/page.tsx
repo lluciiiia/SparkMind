@@ -46,8 +46,7 @@ export default function Home() {
               onClick={() => {
                 router.push("/my-learning");
               }}
-              className="bg-navy rounded-3xl text-white py-3 px-8"
-            >
+              className="bg-navy rounded-3xl text-white py-3 px-8">
               Get Started
             </button>
           </div>
@@ -77,7 +76,7 @@ export default function Home() {
           </div>
         </div>
         <hr className="h-10 bg-black my-4" />
-        <div className="px-4 flex flex-col gap-8 h-screen mb-[-20%]">
+        {/* <div className="px-4 flex flex-col gap-8 h-screen mb-[-20%]">
           <div className=" w-full ">
             <Image
               alt="Our Feature"
@@ -106,7 +105,7 @@ export default function Home() {
               className="w-[8%] h-[60%]"
             />
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   );
