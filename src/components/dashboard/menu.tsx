@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { ChevronRight, LogOut, } from 'lucide-react';
+import { ChevronRight, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useQueryState } from 'nuqs'
+import { useQueryState } from 'nuqs';
+import React, { useEffect, useState } from 'react';
 
 import { CollapseMenuButton } from '@/components/dashboard/collapse-menu-button';
 import { Button } from '@/components/ui/button';
@@ -31,10 +31,10 @@ export function Menu({ isOpen }: MenuProps) {
   }, [searchParams, setId]);
 
   const pathname = usePathname();
-  const menuList = getMenuList(pathname,id);
+  const menuList = getMenuList(pathname, id);
 
   if (loading) {
-    return <p>Loading...</p>; 
+    return <p>Loading...</p>;
   }
 
   return (
@@ -114,7 +114,7 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => { }}
+                    onClick={() => {}}
                     variant="outline"
                     className="justify-center w-full h-10 mt-5"
                   >

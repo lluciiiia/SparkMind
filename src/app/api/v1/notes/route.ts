@@ -4,22 +4,23 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
-
 export async function GET(req: NextRequest) {
   const supabase = createClient();
   try {
     const url = new URL(req.url);
     const myLearningId = url.searchParams.get('id');
-    
-    if (!myLearningId) 
-      return NextResponse.json({ error: 'Missing learning ID' }, { status: 400 });
-    
-    const { data, error } = await supabase.from('notes').select('*').eq('learning_id', myLearningId);
-    
+
+    if (!myLearningId) return NextResponse.json({ error: 'Missing learning ID' }, { status: 400 });
+
+    const { data, error } = await supabase
+      .from('notes')
+      .select('*')
+      .eq('learning_id', myLearningId);
+
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    
+
     return NextResponse.json({ status: 200, body: data });
   } catch (error) {
     console.error('Error getting notes in DB:', error);
@@ -27,16 +28,13 @@ export async function GET(req: NextRequest) {
   }
 }
 
-
 export async function POST(req: NextRequest) {
   const supabase = createClient();
   try {
     const url = new URL(req.url);
     const myLearningId = url.searchParams.get('id');
-    
-    if (!myLearningId) 
-      return NextResponse.json({ error: 'Missing learning ID' }, { status: 400 });
-    
+
+    if (!myLearningId) return NextResponse.json({ error: 'Missing learning ID' }, { status: 400 });
 
     const { data, error } = await supabase
       .from('notes')
@@ -47,7 +45,7 @@ export async function POST(req: NextRequest) {
       console.error('Supabase error:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    
+
     return NextResponse.json({ status: 200, body: data });
   } catch (error) {
     console.error('Error inserting note into DB:', error);
@@ -60,9 +58,8 @@ export async function PUT(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
-    
-    if (!id) 
-      return NextResponse.json({ error: 'Missing note ID' }, { status: 400 });
+
+    if (!id) return NextResponse.json({ error: 'Missing note ID' }, { status: 400 });
 
     const body = (await req.json()) as { title: string; content: string };
 
@@ -73,9 +70,8 @@ export async function PUT(req: NextRequest) {
       .update({ title: body.title, content: body.content, updated_at: new Date().toISOString() })
       .eq('id', id);
 
-    if (error) 
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
     return NextResponse.json({ status: 200, body: data });
   } catch (error) {
     console.error('Error updating note in DB:', error);
@@ -88,20 +84,15 @@ export async function DELETE(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const id = url.searchParams.get('id');
-    
-    if (!id) 
-      return NextResponse.json({ error: 'Missing note ID' }, { status: 400 });
 
-    const { data, error } = await supabase
-      .from('notes')
-      .delete()
-      .eq('id', id)
-      .single();
+    if (!id) return NextResponse.json({ error: 'Missing note ID' }, { status: 400 });
+
+    const { data, error } = await supabase.from('notes').delete().eq('id', id).single();
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
-    
+
     return NextResponse.json({ status: 200, body: data });
   } catch (error) {
     console.error('Error deleting note from DB:', error);

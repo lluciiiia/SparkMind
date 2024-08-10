@@ -1,4 +1,4 @@
-import { Folder, House, Book, Square, SquarePlus } from 'lucide-react';
+import { Book, Folder, House, Square, SquarePlus } from 'lucide-react';
 
 type Submenu = {
   href: string;

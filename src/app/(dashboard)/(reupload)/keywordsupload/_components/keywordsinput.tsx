@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { ContentLayout } from "@/components/dashboard/content-layout";
+import { ContentLayout } from '@/components/dashboard/content-layout';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,8 +8,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -18,33 +18,33 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+} from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 
-import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from "lucide-react";
-import Link from "next/link";
-import { useRef, useState } from "react";
-import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
-import NewInputIcon from "@/../public/assets/svgs/new-input-icon";
+import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
+import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useRef, useState } from 'react';
+import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
-import { getYoutubeResponse, saveOutput } from "@/app/api-handler";
+import { getYoutubeResponse, saveOutput } from '@/app/api-handler';
 //Circle Loading Style
-import "@/styles/css/Circle-loader.css";
-import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
+import '@/styles/css/Circle-loader.css';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 export const ReUploadKeyword = () => {
   const searchParams = useSearchParams();
-  const myLearningId = searchParams.get("id");
+  const myLearningId = searchParams.get('id');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
-  const [keywords, setKeywords] = useState("");
-  const [content, setContent] = useState("");
+  const [keywords, setKeywords] = useState('');
+  const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -69,9 +69,9 @@ export const ReUploadKeyword = () => {
         setIsDrawerOpen(false);
       }
     };
-    window.addEventListener("click", handleClickOutside);
+    window.addEventListener('click', handleClickOutside);
     return () => {
-      window.removeEventListener("click", handleClickOutside);
+      window.removeEventListener('click', handleClickOutside);
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
@@ -83,13 +83,11 @@ export const ReUploadKeyword = () => {
     setKeywords(event.target.value);
   };
 
-  const isLaptop = useMediaQuery("(min-width: 1023px)");
+  const isLaptop = useMediaQuery('(min-width: 1023px)');
 
-  const [fileType, setFileType] = useState<"keywords">();
+  const [fileType, setFileType] = useState<'keywords'>();
 
-  const handleVideoFileChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
       const pathURL = URL.createObjectURL(file);
@@ -116,7 +114,7 @@ export const ReUploadKeyword = () => {
     if (!myLearningId) return;
 
     let input;
-    if (fileType == "keywords") {
+    if (fileType == 'keywords') {
       input = keywords;
     }
 
@@ -144,15 +142,14 @@ export const ReUploadKeyword = () => {
             <Dialog
               onOpenChange={() => {
                 setFileType(undefined);
-              }}>
+              }}
+            >
               <DialogTrigger asChild>
                 <div className="flex flex-col items-center justify-center">
                   <div className="cursor-pointer">
                     <NewInputIcon></NewInputIcon>
                   </div>
-                  <span className="text-lg mt-4">
-                    Upload the files to get started
-                  </span>
+                  <span className="text-lg mt-4">Upload the files to get started</span>
                 </div>
               </DialogTrigger>
               <DialogContent className="rounded-2xl sm:rounded-2xl">
@@ -169,7 +166,8 @@ export const ReUploadKeyword = () => {
                       <Button
                         variant="outline"
                         className="w-full"
-                        onClick={() => setFileType("keywords")}>
+                        onClick={() => setFileType('keywords')}
+                      >
                         <TextIcon className="w-4 h-4 mr-1" />
                         Keywords / Topic
                       </Button>
@@ -177,7 +175,7 @@ export const ReUploadKeyword = () => {
                   </>
                 )}
 
-                {fileType === "keywords" && (
+                {fileType === 'keywords' && (
                   <div className="grid gap-2">
                     <Label htmlFor="keywords">Keywords / Topic</Label>
                     <Textarea
@@ -192,11 +190,8 @@ export const ReUploadKeyword = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button
-                        type="submit"
-                        onClick={submitChanges}
-                        disabled={isLoading}>
-                        {isLoading ? "Uploading ..." : "Upload"}
+                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
+                        {isLoading ? 'Uploading ...' : 'Upload'}
                       </Button>
                     </DialogFooter>
                   </div>

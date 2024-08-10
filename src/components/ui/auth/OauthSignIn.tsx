@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { signInWithOAuth } from "@/utils/auth/client";
-import type { Provider } from "@supabase/supabase-js";
-import { FaGoogle } from "react-icons/fa";
+import { signInWithOAuth } from '@/utils/auth/client';
+import type { Provider } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
+import { FaGoogle } from 'react-icons/fa';
 
 type OAuthProviders = {
   name: Provider;
@@ -14,8 +14,8 @@ type OAuthProviders = {
 export const OauthSignIn = () => {
   const oAuthProviders: OAuthProviders[] = [
     {
-      name: "google",
-      displayName: "Google",
+      name: 'google',
+      displayName: 'Google',
       icon: <FaGoogle className="h-5 w-5" />,
     },
     /* Add desired OAuth providers here */

@@ -23,7 +23,7 @@ async function getTranscript(videoid: string) {
       const { data: summaryData, error: summaryError } = await supabase
         .from('outputs')
         .select('summary')
-        .eq('learning_id', videoid);  // learning id and video id is same of no woory about that 
+        .eq('learning_id', videoid); // learning id and video id is same of no woory about that
 
       if (summaryError) {
         console.log('Error fetching summary from DB: ' + summaryError.message);
