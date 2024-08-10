@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { getURL } from '@/utils/helpers';
-import { createClient } from '@/utils/supabase/client';
-import type { Provider } from '@supabase/supabase-js';
-import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { redirectToPath } from './server';
+import { getURL } from "@/utils/helpers";
+import { createClient } from "@/utils/supabase/client";
+import type { Provider } from "@supabase/supabase-js";
+import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { redirectToPath } from "./server";
 
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement>,
@@ -26,21 +26,19 @@ export async function handleRequest(
   }
 }
 
-export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
+export async function signInWithOAuth() {
   // Prevent default form submission refresh
-  e.preventDefault();
-  const formData = new FormData(e.currentTarget);
-  const provider = String(formData.get('provider')).trim() as Provider;
+  const provider = "google";
 
   // Create client-side supabase client and call signInWithOAuth
   const supabase = createClient();
-  const redirectURL = getURL('/auth/callback');
+  const redirectURL = getURL("/auth/callback");
   await supabase.auth.signInWithOAuth({
     provider: provider,
     options: {
-      queryParams: { access_type: 'offline', prompt: 'consent' },
+      queryParams: { access_type: "offline", prompt: "consent" },
       scopes:
-        'openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events',
+        "openid https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events",
       redirectTo: redirectURL,
     },
   });

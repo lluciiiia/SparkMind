@@ -88,9 +88,15 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
   const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // Prevent default form submission on "Enter" key press
+    }
+  };
 
   const onSubmit = useCallback(
     async (event?: React.FormEvent<HTMLFormElement>) => {
+      console.log("onSubmit", event);
       try {
         event?.preventDefault();
         if (input.trim()) {
@@ -177,6 +183,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
             <PlaceholdersAndVanishInput
               placeholders={[]}
               onChange={handleDiscussInputChange}
+              onKeyDown={handleKeyDown}
               onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
                 event.preventDefault();
                 onSubmit();
