@@ -34,8 +34,8 @@ export const OauthSignIn = () => {
   }, []); // Empty dependency array ensures this runs only once on mount
 
   return (
-    <div className="mt-8">
-      <div className="text-xl font-bold">Connecting with Google ...</div>
+    <div className="w-full flex justify-center items-center">
+      <div className="text-lg font-bold">Connecting with Google ...</div>
     </div>
   );
 };
