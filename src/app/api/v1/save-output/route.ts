@@ -59,7 +59,8 @@ export async function POST(req: NextRequest) {
 
     const furtherInfoResponse = await saveFurtherInfoOutput(input, myLearningId, output);
 
-    if (furtherInfoResponse.status != 200) return NextResponse.json({ status: furtherInfoResponse.status });
+    if (furtherInfoResponse.status != 200)
+      return NextResponse.json({ status: furtherInfoResponse.status });
 
     return NextResponse.json({ status: 200 });
   } catch (error) {
@@ -90,7 +91,7 @@ async function getOutputByLearningId(learningId: string) {
 
   // If output exists, return it
   if (data) return { data, error };
-  
+
   // If output does not exist, create a new one
   const { data: newOutput, error: insertError } = await supabase
     .from('outputs')

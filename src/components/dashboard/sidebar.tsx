@@ -1,11 +1,11 @@
-import Link from 'next/link';
-import Image from 'next/image';
 import { Menu } from '@/components/dashboard/menu';
 import { SidebarToggle } from '@/components/dashboard/sidebar-toggle';
 import { Button } from '@/components/ui/button';
 import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
 import { useStore } from '@/hooks/use-store';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export function Sidebar() {
   const sidebar = useStore(useSidebarToggle, (state) => state);
@@ -30,7 +30,13 @@ export function Sidebar() {
           asChild
         >
           <Link href="." className="flex items-center gap-2">
-            <Image src={'/assets/images/logo.png'} alt='logo' width={10} height={10} className="w-8 h-8 mr-1" />
+            <Image
+              src={'/assets/images/logo.png'}
+              alt="logo"
+              width={10}
+              height={10}
+              className="w-8 h-8 mr-1"
+            />
             <h1
               className={cn(
                 'font-bold text-lg whitespace-nowrap transition-[transform,opacity,display] ease-in-out duration-300',

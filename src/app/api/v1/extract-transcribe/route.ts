@@ -222,11 +222,15 @@ export async function PATCH(req: NextRequest) {
     const questionsArr = reliventData.questions;
 
     //now time to insert the transcript and keyword into supabase
-    const { error } = await supabaseClient.from('transcriptdata').update({
-      transcript: transcription,
-      keywords: keywordsArr,
-      basic_questions: questionsArr,
-    }).eq('uuid', uuid).eq('videoid', video_id);
+    const { error } = await supabaseClient
+      .from('transcriptdata')
+      .update({
+        transcript: transcription,
+        keywords: keywordsArr,
+        basic_questions: questionsArr,
+      })
+      .eq('uuid', uuid)
+      .eq('videoid', video_id);
 
     if (error) {
       console.log('Occur while trascription is upload in DB: ' + error.details);
