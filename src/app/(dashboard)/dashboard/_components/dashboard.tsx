@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import { ContentLayout } from "@/components/dashboard/content-layout";
 import {
   Breadcrumb,
@@ -10,15 +10,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
@@ -54,35 +46,23 @@ import SummaryCard from "./cards/SummaryCard";
 import VideoCard from "./cards/VideoCard";
 import ActionCard from "./cards/ActionCard";
 
-import {
-  API_KEY,
-  genAI,
-  model,
-  generationConfig,
-  safetySettings,
-} from "@/app/api/v1/gemini-settings";
+import { API_KEY } from "@/app/api/v1/gemini-settings";
 
 import axios from "axios";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
-import { getOutputResponse } from "./api-handler";
+import {
+  getOutputResponse,
+  createNote,
+  editNote,
+  deleteNote,
+  getNotes,
+} from "../../../api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
-
-// import { search } from "../../../../server/services/search-recommendation.service";
-
-const schema = z.object({
-  title: z.string().min(1, { message: "Title is required" }),
-});
 
 export const Dashboard = () => {
   if (!API_KEY) {
     console.error("Missing API key");
   }
-
-  const genModel = genAI.getGenerativeModel({
-    model,
-    generationConfig,
-    safetySettings,
-  });
 
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -103,8 +83,13 @@ export const Dashboard = () => {
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
       try {
-        const response = await getOutputResponse(myLearningId);
-        setOutput(response.data.body[0]);
+        const outputResponse = await getOutputResponse(myLearningId);
+        setOutput(outputResponse.data.body[0]);
+
+        const noteResponse = await getNotes(myLearningId);
+        console.log("notes: ", noteResponse.data.body);
+
+        setNotes(noteResponse.data.body);
       } catch (error) {
         console.error("Error fetching data: ", error);
       }
@@ -169,18 +154,46 @@ export const Dashboard = () => {
 
   const isLaptop = useMediaQuery("(min-width: 1023px)");
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    const response = await deleteNote(id);
+
     setNotes(notes.filter((note) => note.id !== id));
   };
 
-  const handleCreate = (values: z.infer<typeof schema>) => {
+  const handleCreate = async () => {
+    if (!myLearningId) return;
+
+    const response = await createNote(myLearningId);
+
+    console.log("note id: " + response.data.body[0].id);
+
     const newNote = {
-      id: Date.now().toString(),
-      title: values.title,
-      content: "",
-      createdAt: new Date(),
+      id: response.data.body[0].id,
+      title: response.data.body[0].title,
+      content: response.data.body[0].content,
+      createdAt: response.data.body[0].created_at,
     };
+
     setNotes([...notes, newNote]);
+    setIsDrawerOpen(false);
+  };
+
+  const handleEdit = async (selectedNote: Note) => {
+    const id = selectedNote.id;
+
+    const updatedNote = {
+      ...selectedNote,
+      title: selectedNote.title ? selectedNote.title : "Undefined",
+      content: selectedNote.content,
+    };
+
+    const response = await editNote(
+      updatedNote.id,
+      updatedNote.title,
+      updatedNote.content
+    );
+
+    setNotes(notes.map((note) => (note.id === id ? updatedNote : note)));
     setIsDrawerOpen(false);
   };
 
@@ -201,21 +214,24 @@ export const Dashboard = () => {
           className="w-full"
           initial={{ width: 30 }}
           animate={{ width: isOpen ? "100%" : 50 }}
-          transition={{ type: "spring", stiffness: 100 }}
-        >
-          <div
+          transition={{ type: "spring", stiffness: 100 }}>
+          <summary
             className={`left-0 relative p-2 ${
               isOpen ? "rounded-l-md" : "rounded-md"
             } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
               isOpen ? "justify-start" : "justify-center"
-            }`}
-          >
+            }`}>
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
 
             {showText && <span className="ml-4">New note</span>}
-          </div>
-          <NewNoteSection handleCreate={handleCreate} notes={notes} />
+          </summary>
+          <NewNoteSection
+            handleCreate={handleCreate}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            notes={notes}
+          />
         </motion.details>
       </div>
       <ContentLayout title="Dashboard">
@@ -243,8 +259,7 @@ export const Dashboard = () => {
                       ? "bg-navy text-white rounded-t-3xl"
                       : "text-gray"
                   }`}
-                  onClick={() => setActiveTab(tab.name)}
-                >
+                  onClick={() => setActiveTab(tab.name)}>
                   {tab.label}
                 </button>
               </li>
@@ -287,7 +302,7 @@ export const Dashboard = () => {
                     />
                   )}
                 </div>
-              ),
+              )
           )}
         </section>
         <footer className=" w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
@@ -298,8 +313,7 @@ export const Dashboard = () => {
             className={`
                 absolute flex flex-col items-center justify-center bottom-6
               `}
-            ref={drawerRef}
-          >
+            ref={drawerRef}>
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
@@ -311,8 +325,7 @@ export const Dashboard = () => {
                     onClick={(e) => {
                       e.preventDefault();
                       setIsDrawerOpen(!isDrawerOpen);
-                    }}
-                  >
+                    }}>
                     <Triangle
                       className={`w-5 h-5 bottom-0 ${
                         isDrawerOpen ? "rotate-180" : ""
