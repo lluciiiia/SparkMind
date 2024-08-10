@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
-import "../../../../../styles/css/markdown.css";
+import React, { useEffect, useState } from 'react';
+import '../../../../../styles/css/markdown.css';
 type Paragraph = { title: string; data: string };
 
-import { Card } from "@/components/ui/card";
-import { marked } from "marked";
+import { Card } from '@/components/ui/card';
+import { marked } from 'marked';
 
 type Props = { summaryData: string };
 export default function SummaryCard({ summaryData }: Props) {
-  const [htmlContent, setHtmlContent] = useState("");
+  const [htmlContent, setHtmlContent] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {

@@ -1,11 +1,11 @@
-import axios from "axios";
+import axios from 'axios';
 
 export const getYoutubeResponse = async (input: string) => {
   const params: { query: string; pageToken?: string | null } = {
     query: input,
   };
 
-  const response = await axios.get("/api/v1/youtube", { params });
+  const response = await axios.get('/api/v1/youtube', { params });
 
   return { data: response.data };
 };
@@ -23,13 +23,13 @@ export const getOutputResponse = async (myLearningId: string) => {
     id: myLearningId,
   };
 
-  const response = await axios.get("/api/v1/get-output", { params });
+  const response = await axios.get('/api/v1/get-output', { params });
   return { data: response.data };
 };
 
 export const createNote = async (myLearningId: string) => {
   const response = await axios.post(`/api/v1/notes?id=${myLearningId}`);
-  console.log("response: " + response.data);
+  console.log('response: ' + response.data);
   return { data: response.data };
 };
 
