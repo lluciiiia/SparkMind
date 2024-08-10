@@ -44,7 +44,7 @@ export default function Home() {
           <div className="flex justify-center w-full">
             <button
               onClick={() => {
-                router.push("/new");
+                router.push("/my-learning");
               }}
               className="bg-navy rounded-3xl text-white py-3 px-8"
             >
