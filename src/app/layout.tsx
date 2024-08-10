@@ -2,14 +2,14 @@ import { GeistSans } from 'geist/font/sans';
 import '@/styles/css/globals.css';
 import { Providers } from '@/providers';
 import { constructMetadata, constructViewport } from '@/utils';
+import { Poppins } from '@next/font/google';
 import type { NextWebVitalsMetric } from 'next/app';
-import { Poppins } from '@next/font/google'
 
 const poppins = Poppins({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-poppins',
-})
+});
 
 export const metadata = constructMetadata();
 export const viewport = constructViewport();

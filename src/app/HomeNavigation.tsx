@@ -1,4 +1,4 @@
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
 export const HomeNavigation = () => {
   const router = useRouter();
@@ -12,7 +12,7 @@ export const HomeNavigation = () => {
         </menu>
         <button
           onClick={() => {
-            router.push("/my-learning");
+            router.push('/my-learning');
           }}
           className="bg-navy px-8 py-2 mt-4 md:mt-0 md:px-12 md:py-3 ml-0 md:ml-8 text-white rounded-3xl w-full md:w-auto"
         >
