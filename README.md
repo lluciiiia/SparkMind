@@ -1,10 +1,10 @@
 <a href="https://sparkmind.vercel.app/">
-<!--   <img alt="SparkMind - AI-driven learning enhancement platform" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png"> -->
+  <img alt="SparkMind - AI-driven learning hub platform." src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
   <h1 align="center">SparkMind</h1> 
 </a>
 
 <p align="center">
- AI-driven learning enhancement platform providing diverse input support, personalized study aids, refined notes, and comprehensive history.
+ AI-driven learning hub platform.
 </p>
 
 <p align="center">
@@ -17,29 +17,30 @@
 <br/>
 
 ## Team
-- [Seokyung Kim - 0617lucia@gmail.com](https://github.com/lluciiiia)
-- [Krishna - @gmail.com](https://github.com/KRISHNA-DHARSANDIA)
-- [Mike - @gmail.com](https://github.com/WomB0ComB0)
-- [Lovinson - @gmail.com](https://github.com/Wisesofthemall)
-- [Hyejin Kim - haejinkim2020@gmail.com]
+- [Seokyung Kim](https://github.com/lluciiiia)
+- [Krishna Dharsandia](https://github.com/KRISHNA-DHARSANDIA)
+- [Mike Odnis](https://github.com/WomB0ComB0)
+- [Lovinson Dieujuste](https://github.com/Wisesofthemall)
+- [Hyejin Kim](https://linkedin.com/in/hyejin-kim-57177b321/)
 
 ## Features
 
 - **Diverse Learning Material Input Support**
-  - Accepts various types of input: Video, Text, Keywords, Topics, Images, and Audio.
+  - Accepts various types of input: Video, Text, Keywords and Topics.
 
 - **Generated Study Materials**
   - **Summary**: Provides concise summaries of learning materials.
   - **Video Recommendations**: Suggests relevant videos for further understanding.
   - **Q&A**: Generates exercise questions to help master the concepts.
   - **Further Information**: Offers additional resources for deeper learning.
+  - **Action Items**: Identifies tasks from videos, adds them to Google Calendar, and sends reminder emails through Gmail.
 
 - **Note Taking**
   - **Grammar Refinement**: Corrects grammatical errors in notes.
   - **Concise Version**: Summarizes and simplifies lengthy or disorganized notes.
 
 - **AI-Powered Discussion**
-  - Engage in further discussions with AI about the learning materials to enhance comprehension.
+  - Engage in further discussions with AI about the learning materials to enhance comprehension with AI-generated recommended questions based on user input.
 
 - **Extended Learning Materials**
   - Allows adding extra learning materials, integrating new inputs with existing ones for comprehensive study support.
