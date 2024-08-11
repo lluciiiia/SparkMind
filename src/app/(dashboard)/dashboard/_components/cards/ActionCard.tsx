@@ -146,7 +146,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   };
 
   const getIsActionPreviewDone = async (learningid: string) => {
-    const res = await axios.get('/api/v1/getaction-preview', {
+    const res = await axios.get('/api/v1/action-previews', {
       params: { learningid: learningid },
     });
 
