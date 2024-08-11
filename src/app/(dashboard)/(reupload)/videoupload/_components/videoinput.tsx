@@ -52,7 +52,7 @@ export const ReUploadVideo = () => {
 
   useEffect(() => {
     setLearningId(myLearningId);
-  }, [learningid])
+  }, [learningid]);
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -92,8 +92,7 @@ export const ReUploadVideo = () => {
         setSelectedFile(file);
         setObjectURL(pathURL);
         console.log(objectURL);
-      }
-      else {
+      } else {
         toast.error('File size must be less than 5MB because we are in the testing phase.');
       }
     }

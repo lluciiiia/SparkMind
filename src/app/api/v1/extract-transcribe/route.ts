@@ -9,7 +9,7 @@ import {
   // generationConfig,
   safetySettings,
 } from '@/app/api/v1/gemini-settings';
-import { NextRequest, NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
 //supabse
@@ -266,7 +266,6 @@ export async function POST(req: NextRequest) {
     var supabaseClient = createClient();
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
-
 
     if (uuid === undefined) {
       console.log('Please Login or SignUp');
