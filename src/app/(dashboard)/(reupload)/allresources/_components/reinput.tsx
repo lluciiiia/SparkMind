@@ -157,8 +157,7 @@ export const ReUploadResource = () => {
         const keyWordsArray = await handleVideoUpload();
         if (keyWordsArray.toString() !== undefined && keyWordsArray !== null) {
           input = keyWordsArray.toString();
-        }
-        else {
+        } else {
           input = '';
         }
       } else if (fileType == 'text') {

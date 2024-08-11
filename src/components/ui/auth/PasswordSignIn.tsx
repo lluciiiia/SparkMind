@@ -24,8 +24,7 @@ export const PasswordSignIn = ({ allowEmail, redirectMethod }: PasswordSignInPro
 
     try {
       await handleRequest(e, signInWithPassword, router);
-    }
-    catch (err) {
+    } catch (err) {
       toast.error("Sign in with your Google account, or if you don't have one, try again later.");
     }
 
@@ -58,7 +57,12 @@ export const PasswordSignIn = ({ allowEmail, redirectMethod }: PasswordSignInPro
               className="w-full p-3 rounded-md"
             />
           </div>
-          <Button variant="slim" type="submit" className="mt-1 hover:bg-[#003366] hover:text-white" loading={isSubmitting}>
+          <Button
+            variant="slim"
+            type="submit"
+            className="mt-1 hover:bg-[#003366] hover:text-white"
+            loading={isSubmitting}
+          >
             Sign in
           </Button>
         </div>

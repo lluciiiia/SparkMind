@@ -23,12 +23,10 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
     try {
       setIsSubmitting(true); // Disable the button while the request is being handled
       await handleRequest(e, signUp, router);
-      toast.success('Please verify your email account after you log in')
-    }
-    catch {
+      toast.success('Please verify your email account after you log in');
+    } catch {
       toast.error("Sign in with your Google account, or if you don't have one, try again later.");
-    }
-    finally{
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -59,7 +57,12 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
               className="w-full p-3 rounded-md"
             />
           </div>
-          <Button variant="slim" type="submit" className="mt-1 hover:bg-[#003366]" loading={isSubmitting}>
+          <Button
+            variant="slim"
+            type="submit"
+            className="mt-1 hover:bg-[#003366]"
+            loading={isSubmitting}
+          >
             Sign up
           </Button>
         </div>
