@@ -5,7 +5,7 @@
 </a>
 
 <p align="center">
- AI-driven learning hub platform.
+ AI-driven learning hub platform
 </p>
 
 <p align="center">
