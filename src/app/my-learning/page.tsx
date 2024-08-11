@@ -34,10 +34,11 @@ import { ModeToggle } from '@/providers/theme/mode-toggle';
 
 import { assignColors } from '@/utils/assignColors';
 
-import '@/styles/css/toggle-switch.css';
+import Image from 'next/image';
 
 import { createClient } from '@/utils/supabase/client';
 import axios from 'axios';
+
 
 type Cards = {
   id: string;
@@ -57,7 +58,7 @@ export const MyLearning = () => {
 
   const [originalCards, setOriginalCards] = useState<Cards[]>([]);
   const [isDateSorted, setIsDateSorted] = useState<boolean>(false);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [colorMap, setColorMap] = useState<Map<number, string>>(new Map());
 
   //DB Storage date
@@ -88,12 +89,7 @@ export const MyLearning = () => {
 
       const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-      //setUserId(uuid);
-
-      if (!uuid) {
-        console.log('User Id is not get');
-        throw new Error('User ID not returned from superbase');
-      }
+      if (!uuid) throw new Error('User ID not returned from superbase');
 
       const res = await axios.get(`/api/v1/store-learnings?userId=${uuid}`);
       if (res.status === 200) {
@@ -113,6 +109,7 @@ export const MyLearning = () => {
         });
 
         setCards(fetchedCards);
+        setOriginalCards(fetchedCards);
       } else {
         console.error('Error fetching data:', res.data.body);
       }
@@ -124,9 +121,12 @@ export const MyLearning = () => {
   useEffect(() => {
     const init = async () => {
       try {
+        setIsLoading(true);
         await fetchData();
       } catch (error) {
         console.log('this is Error is Fatch the MyLearnings : ' + (error as Error).message);
+      } finally {
+        setIsLoading(false);
       }
     };
     init();
@@ -138,22 +138,13 @@ export const MyLearning = () => {
     month: 'short' as const,
     year: 'numeric' as const,
   };
-  const DateDiplay = new Date().toLocaleDateString('en-GB', options);
 
   const handleAddCard = async () => {
     const supabaseClient = createClient();
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-    if (!uuid) {
-      console.log('User Id is not get');
-      throw new Error('User ID not returned from superbase');
-    }
-
-    if (!uuid) {
-      console.log('User Is is not get');
-      return;
-    }
+    if (!uuid) throw new Error('User ID not returned from superbase');
 
     const data = {
       uuid: uuid,
@@ -164,16 +155,8 @@ export const MyLearning = () => {
     try {
       const res = await axios.post('/api/v1/store-learnings', data);
       if (res.status === 200) {
-        console.log('Learning id : ' + res.data.body[0].id);
-        const newCard = {
-          id: res.data.body[0].id,
-          index: cards.length,
-          title: 'Undefined',
-          date: DateDiplay,
-        };
-        const updatedCards = [newCard, ...cards];
-        setCards(updatedCards);
-        setOriginalCards(updatedCards);
+        const newLearningId = res.data.body[0].id;
+        redirectToDashboard(newLearningId);
       } else {
         console.error('Error storing data:', res.data.error);
       }
@@ -189,10 +172,7 @@ export const MyLearning = () => {
 
         const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-        if (!uuid) {
-          console.log('User Id is not get');
-          throw new Error('User ID not returned from superbase');
-        }
+        if (!uuid) throw new Error('User ID not returned from superbase');
 
         const response = await axios.delete('/api/v1/store-learnings', {
           data: { id, uuid },
@@ -230,7 +210,6 @@ export const MyLearning = () => {
 
   function handleEdit(id: string): void {
     const filteredCard = cards.find((card) => card.id === id);
-    console.log(filteredCard);
     if (filteredCard) {
       const parsedDate = parseDateUTC(filteredCard.date);
       setCurrTitle(filteredCard.title);
@@ -250,10 +229,7 @@ export const MyLearning = () => {
 
       const userId = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-      if (!userId) {
-        console.log('User Id is not get');
-        throw new Error('User ID not returned from superbase');
-      }
+      if (!userId) throw new Error('User ID not returned from superbase');
 
       const response = await axios.patch('/api/v1/store-learnings', {
         id: card.id,
@@ -278,8 +254,6 @@ export const MyLearning = () => {
       } else {
         console.error('Error updating data:', response.data.body);
       }
-
-      //toggleSort(); // for sort the cards after date changes
     } catch (error) {
       console.error('Error Update my learning ', (error as Error).message);
     }
@@ -332,7 +306,15 @@ export const MyLearning = () => {
         <div className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center">
-              <div className="bg-black p-2 rounded-full mr-4 text-white">LOGO</div>
+              <div className="mr-4">
+                <Image
+                  src={'/assets/images/logo.png'}
+                  alt="logo"
+                  width={10}
+                  height={10}
+                  className="w-12 h-12"
+                />
+              </div>
               <div className="flex flex-row items-center ml-6">
                 <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
                   <FaSearch size={18} />
@@ -457,6 +439,11 @@ export const MyLearning = () => {
           </DialogContent>
         </Dialog>
       </div>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+          <div className="Circleloader"></div>
+        </div>
+      )}
     </section>
   );
 };

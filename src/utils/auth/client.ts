@@ -26,11 +26,9 @@ export async function handleRequest(
   }
 }
 
-export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
+export async function signInWithOAuth() {
   // Prevent default form submission refresh
-  e.preventDefault();
-  const formData = new FormData(e.currentTarget);
-  const provider = String(formData.get('provider')).trim() as Provider;
+  const provider = 'google';
 
   // Create client-side supabase client and call signInWithOAuth
   const supabase = createClient();

@@ -17,18 +17,11 @@ const Loading = React.memo(() => {
       >
         <Picture
           className={`
-              relative w-[200px] h-[200px]
+              relative w-[100px] h-[100px]
               animate-spin
             `}
         >
-          <Image
-            src={`/assets/svgs/dom/loading.svg`}
-            alt={`Loading`}
-            className={`
-              object-contain
-            `}
-            fill
-          />
+          <Image src={`/assets/svgs/loading.svg`} alt={`Loading`} fill objectFit={`contain`} />
         </Picture>
       </CenterLayout>
     </>

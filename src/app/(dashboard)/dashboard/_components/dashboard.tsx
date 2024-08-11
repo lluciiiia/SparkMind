@@ -9,70 +9,55 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 import { Triangle } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import type React from 'react';
-import { useCallback, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useRef, useState } from 'react';
 import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { z } from 'zod';
-import { retrieveData } from '../../new/_components/hash-handler';
 import {
   type FurtherInfo,
-  type Message,
+  Message,
   type Note,
   type Output,
   type ParsedVideoData,
   Props,
   type Question,
+  Transcript,
   type VideoItem,
 } from './interfaces';
+import { NewNoteSection } from './new-note';
 
+import ActionCard from './cards/ActionCard';
 import SummaryCard from './cards/SummaryCard';
 import VideoCard from './cards/VideoCard';
-// import ActionCard from './cards/actionCard';
 //discuss with AI Imports
 import DiscussionWithAI from './discussion-with-ai';
 import NoteCard from './note';
 
-import {
-  API_KEY,
-  genAI,
-  generationConfig,
-  model,
-  safetySettings,
-} from '@/app/api/v1/gemini-settings';
+import { API_KEY } from '@/app/api/v1/gemini-settings';
 
 import axios from 'axios';
-import { getOutputResponse } from './api-handler';
-import ActionCard from './cards/ActionCard';
+import {
+  createNote,
+  deleteNote,
+  editNote,
+  getNotes,
+  getOutputResponse,
+} from '../../../api-handler';
 import FurtherInfoCard from './cards/FurtherInfo';
 import QuestionAndAnswer from './cards/QuestionAndAnswer';
-
-// import { search } from "../../../../server/services/search-recommendation.service";
-
-const schema = z.object({
-  title: z.string().min(1, { message: 'Title is required' }),
-});
 
 export const Dashboard = () => {
   if (!API_KEY) {
     console.error('Missing API key');
   }
-
-  const genModel = genAI.getGenerativeModel({
-    model,
-    generationConfig,
-    safetySettings,
-  });
 
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
@@ -93,16 +78,18 @@ export const Dashboard = () => {
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
       try {
-        const response = await getOutputResponse(myLearningId);
-        setOutput(response.data.body[0]);
+        const outputResponse = await getOutputResponse(myLearningId);
+        setOutput(outputResponse.data.body[0]);
+
+        const noteResponse = await getNotes(myLearningId);
+
+        setNotes(noteResponse.data.body);
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
     };
 
-    if (myLearningId) {
-      fetchData(myLearningId);
-    }
+    if (myLearningId) fetchData(myLearningId);
 
     return () => {
       console.log('Output retrieved');
@@ -157,6 +144,45 @@ export const Dashboard = () => {
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
+  const isLaptop = useMediaQuery('(min-width: 1023px)');
+
+  const handleDelete = async (id: string) => {
+    const response = await deleteNote(id);
+
+    setNotes(notes.filter((note) => note.id !== id));
+  };
+
+  const handleCreate = async () => {
+    if (!myLearningId) return;
+
+    const response = await createNote(myLearningId);
+
+    const newNote = {
+      id: response.data.body[0].id,
+      title: response.data.body[0].title,
+      content: response.data.body[0].content,
+      createdAt: response.data.body[0].created_at,
+    };
+
+    setNotes([...notes, newNote]);
+    setIsDrawerOpen(false);
+  };
+
+  const handleEdit = async (selectedNote: Note) => {
+    const id = selectedNote.id;
+
+    const updatedNote = {
+      ...selectedNote,
+      title: selectedNote.title ? selectedNote.title : 'Undefined',
+      content: selectedNote.content,
+    };
+
+    const response = await editNote(updatedNote.id, updatedNote.title, updatedNote.content);
+
+    setNotes(notes.map((note) => (note.id === id ? updatedNote : note)));
+    setIsDrawerOpen(false);
+  };
+
   const tabs = [
     { name: 'summary', label: 'Summary' },
     { name: 'video', label: 'Video recommendation' },
@@ -188,7 +214,12 @@ export const Dashboard = () => {
 
             {showText && <span className="ml-4">New note</span>}
           </summary>
-          {/* <NewNoteSection handleCreate={handleCreate} notes={notes} /> */}
+          <NewNoteSection
+            handleCreate={handleCreate}
+            handleEdit={handleEdit}
+            handleDelete={handleDelete}
+            notes={notes}
+          />
         </motion.details>
       </div>
       <ContentLayout title="Dashboard">
@@ -196,7 +227,7 @@ export const Dashboard = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
+                <Link href="">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -210,6 +241,7 @@ export const Dashboard = () => {
             {tabs.map((tab) => (
               <li key={tab.name}>
                 <button
+                  type="button"
                   className={`px-6 py-2 cursor-pointer ${
                     activeTab === tab.name ? 'bg-navy text-white rounded-t-3xl' : 'text-gray'
                   }`}
@@ -233,15 +265,7 @@ export const Dashboard = () => {
                   {activeTab === tab && tab === 'summary' && summaryData != null && (
                     <SummaryCard summaryData={summaryData} />
                   )}
-                  {activeTab === tab && tab === 'qna' && questions.length > 0 && (
-                    <QuestionAndAnswer questions={questions} />
-                  )}
-                  {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
-                    <FurtherInfoCard furtherInfo={furtherInfoData} />
-                  )}
-                  {activeTab === tab && tab === 'action-items' && (
-                    <ActionCard learningId={myLearningId} />
-                  )}
+                  {activeTab === tab && tab === 'video' && <VideoCard videos={videos} />}
                   {activeTab === tab && tab === 'qna' && questions.length > 0 && (
                     <QuestionAndAnswer questions={questions} />
                   )}

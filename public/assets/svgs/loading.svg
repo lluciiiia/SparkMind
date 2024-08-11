@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_레이어_1" data-name="레이어_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 439.91 446.24">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #e9edf1;
+      }
+
+      .cls-2 {
+        fill: #c8d2dc;
+      }
+
+      .cls-3 {
+        fill: #a2abb8;
+      }
+
+      .cls-4 {
+        fill: #dce6eb;
+      }
+
+      .cls-5 {
+        fill: #4e5a61;
+      }
+
+      .cls-6 {
+        fill: #7e8b96;
+      }
+
+      .cls-7 {
+        fill: #b9c3cd;
+      }
+
+      .cls-8 {
+        fill: #909ba6;
+      }
+
+      .cls-9 {
+        fill: #5f6c75;
+      }
+    </style>
+  </defs>
+  <circle class="cls-5" cx="223.45" cy="78.04" r="45.89"/>
+  <circle class="cls-9" cx="111.13" cy="119.7" r="44.84"/>
+  <circle class="cls-6" cx="63.92" cy="219.47" r="42.42"/>
+  <circle class="cls-8" cx="96.11" cy="321.1" r="40.9"/>
+  <circle class="cls-3" cx="188.79" cy="376.25" r="38.57"/>
+  <circle class="cls-7" cx="289.74" cy="361.58" r="36.6"/>
+  <circle class="cls-2" cx="359.36" cy="289.89" r="35.26"/>
+  <circle class="cls-4" cx="370.57" cy="197.65" r="32.92"/>
+  <circle class="cls-1" cx="327.11" cy="117.95" r="29.39"/>
+</svg>

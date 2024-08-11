@@ -25,7 +25,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
     if (uuid === undefined) {
       return NextResponse.json({ status: 401, message: 'Unauthorized' });
     }
-    console.log('user 🆔 : ' + uuid);
 
     const { data, error } = await supabaseClient
       .from('transcriptdata')

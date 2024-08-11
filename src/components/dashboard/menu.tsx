@@ -2,7 +2,9 @@
 
 import { ChevronRight, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useQueryState } from 'nuqs';
+import React, { useEffect, useState } from 'react';
 
 import { CollapseMenuButton } from '@/components/dashboard/collapse-menu-button';
 import { Button } from '@/components/ui/button';
@@ -17,10 +19,25 @@ interface MenuProps {
 }
 
 export function Menu({ isOpen }: MenuProps) {
+  const [id, setId] = useQueryState('id');
+  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const myLearningId = searchParams.get('id');
+    if (myLearningId) {
+      setId(myLearningId);
+    }
+    setLoading(false);
+  }, [searchParams, setId]);
+
   const pathname = usePathname();
-  const menuList = getMenuList(pathname);
-  const supabase = createClient();
-  const router = useRouter();
+  const menuList = getMenuList(pathname, id);
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
       <nav className="w-full h-full mt-8">
