@@ -1,5 +1,5 @@
 'use client';
-import { Toaster } from '@/components/ui/sonner';
+import { Toaster } from 'sonner';
 import type React from 'react';
 
 export const Events: React.FC<
