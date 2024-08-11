@@ -38,7 +38,6 @@ const handleRedirect = ({
   res: NextResponse;
   redirect: boolean;
 } => {
-
   if (user) {
     return { res: NextResponse.next(), redirect: true };
   }
@@ -48,12 +47,14 @@ const handleRedirect = ({
     return { res: nextRes, redirect: true };
   }
 
-  if (!user
-    && req.nextUrl.pathname !== '/signin/password_signin'
-    && req.nextUrl.pathname !== '/auth/error'
-    && req.nextUrl.pathname !== '/auth/callback'
-    && req.nextUrl.pathname !== '/auth/reset_password'
-    && req.nextUrl.pathname !== '/') {
+  if (
+    !user &&
+    req.nextUrl.pathname !== '/signin/password_signin' &&
+    req.nextUrl.pathname !== '/auth/error' &&
+    req.nextUrl.pathname !== '/auth/callback' &&
+    req.nextUrl.pathname !== '/auth/reset_password' &&
+    req.nextUrl.pathname !== '/'
+  ) {
     const nextRes = NextResponse.redirect(new URL('/signin/password_signin', req.url));
     return { res: nextRes, redirect: true };
   }
