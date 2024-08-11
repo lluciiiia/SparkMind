@@ -1,6 +1,6 @@
 import { createClient } from '@/utils/supabase/client';
 import axios from 'axios';
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,13 +31,9 @@ export async function saveYoutubeOutput(
     key: apiKey,
   };
 
-  if (pageToken) {
-    params.pageToken = pageToken;
-  }
+  if (pageToken) params.pageToken = pageToken;
 
   const response = await axios.get('https://www.googleapis.com/youtube/v3/search', { params });
-
-  console.log(JSON.stringify(response.data));
 
   const supabase = createClient();
 

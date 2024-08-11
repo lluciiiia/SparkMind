@@ -6,7 +6,6 @@ const supabase = createClient();
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const video_id = req.nextUrl.searchParams.get('videoid');
-    console.log('video_id 🆔 : ' + video_id);
 
     if (video_id !== null) {
       const transcript = await getTranscript(video_id);
@@ -16,8 +15,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
       let basicQue = await getBasicQuestion(video_id);
 
       if (!basicQue) {
-        //if user give other input like text and keyword then basic question are not we can seee
-        // return NextResponse.json({ status: 200, body: [] });
         basicQue = [];
       }
 

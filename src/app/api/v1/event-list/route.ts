@@ -10,7 +10,6 @@ const supabase = createClient();
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const video_id = req.nextUrl.searchParams.get('LearningId');
-    console.log('video_id 🆔 : ' + video_id);
 
     if (video_id !== null) {
       const transcript = await getTranscript(video_id);
@@ -82,7 +81,6 @@ async function getEventList(transcript: string): Promise<any> {
   try {
     const result = await genModel.generateContent(prompt.trim());
     const eventList = JSON.parse(await result.response.text());
-    console.log('this are event List are', eventList);
     return eventList;
   } catch (error) {
     console.error('Error fetching event list:', error);

@@ -53,7 +53,6 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
     const fetchDiscussData = async () => {
       const response = await axios.get(`/api/v1/discussions?videoid=${video_id}`);
       if (response.status === 200) {
-        console.log('this is response : ' + JSON.stringify(response.data));
         setBasicQuestion(response.data.basicQue);
         setTranscript(response.data.transcript);
       } else {
@@ -94,12 +93,10 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
 
   const onSubmit = useCallback(
     async (event?: React.FormEvent<HTMLFormElement>) => {
-      console.log('onSubmit', event);
       try {
         event?.preventDefault();
         if (input.trim()) {
           setLoading(true);
-          console.log('transcript' + transcript);
 
           const newMessage: Message = {
             id: Date.now(),
