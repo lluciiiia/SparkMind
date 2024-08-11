@@ -28,7 +28,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json({ status: 404, check: false });
   } catch (err) {
-    console.log('Error when getaction-preview from DB : ' + (err as Error).message);
+    console.log('Error when getting action-previews from DB : ' + (err as Error).message);
     return NextResponse.json({ status: 400, message: 'Internal Server Error' });
   }
 }
