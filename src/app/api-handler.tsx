@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { PiKeyReturnDuotone } from 'react-icons/pi';
 
 export const getYoutubeResponse = async (input: string) => {
   const params: { query: string; pageToken?: string | null } = {
@@ -10,15 +11,22 @@ export const getYoutubeResponse = async (input: string) => {
   return { data: response.data };
 };
 
-export const saveOutput = async (input: string, myLearningId: string) => {
-  const response = await axios.post(`/api/v1/outputs?id=${myLearningId}`, {
+export const processInput = async (input: string, myLearningId: string) => {
+  return await axios.post(`/api/v1/outputs/input-processing?id=${myLearningId}`, {
     input: input,
   });
-
-  return { data: response.data };
 };
 
-export const getOutputResponse = async (myLearningId: string) => {
+export const processFinalizing = async (input: string, myLearningId: string, outputId: string) => {
+  return await axios.post(
+    `/api/v1/outputs/finalize-processing?id=${myLearningId}&output-id=${outputId}`,
+    {
+      input: input,
+    },
+  );
+};
+
+export const getOutput = async (myLearningId: string) => {
   const params: { id: string } = {
     id: myLearningId,
   };
