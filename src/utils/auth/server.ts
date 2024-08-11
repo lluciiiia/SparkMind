@@ -67,7 +67,6 @@ export async function signInWithEmail(formData: FormData) {
       'You could not be signed in.',
       error.message,
     );
-    throw new Error('error in request signIn With Email');
   } else if (data) {
     cookieStore.set('preferredSignInView', 'email_signin', { path: '/' });
     redirectPath = getStatusRedirect(
@@ -110,7 +109,6 @@ export async function requestPasswordUpdate(formData: FormData) {
 
   if (error) {
     redirectPath = getErrorRedirect('/signin/forgot_password', error.message, 'Please try again.');
-    throw new Error('error in request Password Update');
   } else if (data) {
     redirectPath = getStatusRedirect(
       '/signin/forgot_password',
@@ -131,20 +129,18 @@ export async function requestPasswordUpdate(formData: FormData) {
 
 export async function signInWithPassword(formData: FormData) {
   const cookieStore = cookies();
-
   const email = String(formData.get('email')).trim();
   const password = String(formData.get('password')).trim();
   let redirectPath: string;
 
   const supabase = createClient();
   const { error, data } = await supabase.auth.signInWithPassword({
-    email: email,
-    password: password,
+    email,
+    password,
   });
 
   if (error) {
     redirectPath = getErrorRedirect('/signin/password_signin', 'Sign in failed.', error.message);
-    throw new Error('this is error in signInWithPassword');
   } else if (data.user) {
     cookieStore.set('preferredSignInView', 'password_signin', { path: '/' });
     redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
@@ -185,7 +181,6 @@ export async function signUp(formData: FormData) {
 
   if (error) {
     redirectPath = getErrorRedirect('/signin/signup', 'Sign up failed.', error.message);
-    throw new Error('this is error in signUp');
   } else if (data.session) {
     redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
   } else if (data.user && data.user.identities && data.user.identities.length == 0) {
@@ -236,7 +231,6 @@ export async function updatePassword(formData: FormData) {
       'Your password could not be updated.',
       error.message,
     );
-    throw new Error('error in request Password Update');
   } else if (data.user) {
     redirectPath = getStatusRedirect('/', 'Success!', 'Your password has been updated.');
   } else {
