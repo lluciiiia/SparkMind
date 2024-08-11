@@ -61,10 +61,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
       params: { learningid: learningid },
     });
 
-    if (res.status === 200) {
-      console.log('this is check :' + res.data.exists);
-      return res.data.exists;
-    }
+    if (res.status === 200) return res.data.exists;
+
     return false;
   };
 
@@ -79,8 +77,6 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   useEffect(() => {
     if (date) {
       const filteredList = initTodoList.filter((todo) => {
-        console.log('calander date : ' + formatDate(todo.start_dateTime));
-        console.log('todo date : ' + formatDate(date.toISOString()));
         return formatDate(todo.start_dateTime) === formatDate(date.toISOString());
       });
       setTodoList(filteredList);
@@ -94,7 +90,6 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
       });
 
       const eventList = JSON.stringify(eventlistRes.data);
-      console.log('eventList' + eventList);
 
       const secnd = (await JSON.parse(eventList)) as any;
       const VSlList: Event[] = secnd.body;
@@ -120,8 +115,6 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
           timeZone: eventList[rowIndex].end.timeZone,
         },
       }));
-
-      console.log('selectedTask : ' + selectedTask);
 
       const res = await axios.post('/api/v1/create-event', {
         selectedTask: selectedTask,
@@ -157,30 +150,25 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
       params: { learningid: learningid },
     });
 
-    console.log('check check :' + JSON.stringify(res));
+    if (res.status === 200) return res.data.check;
 
-    if (res.status === 200) {
-      console.log('this is check :' + res.data.check);
-      return res.data.check;
-    }
     return false;
   };
 
   const getTodoTaskFormDB = async (learningId: string) => {
     try {
-      const eventlistRes = await axios.get('/api/v1/get-todotask', {
+      const eventlistRes = await axios.get('/api/v1/todo-tasks', {
         params: { learning_id: learningId },
       });
 
       if (eventlistRes.status === 200) {
-        console.log('todo_task : ' + JSON.stringify(eventlistRes.data.todo_task));
         setTodoList(eventlistRes.data.todo_task);
         setinitTdoLisit(eventlistRes.data.todo_task);
       } else {
         setTodoList([]);
       }
     } catch (err) {
-      console.log('getTodoTaskFormDB gives error :' + (err as Error).message);
+      console.log('getTodoTaskFormDB gives error:' + (err as Error).message);
       setTodoList([]);
     }
   };
