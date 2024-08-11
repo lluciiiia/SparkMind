@@ -1,14 +1,47 @@
-import { createClient } from '@/utils/supabase/client';
-import axios from 'axios';
-
 import { type NextRequest, NextResponse } from 'next/server';
 import { saveFurtherInfoOutput } from './helpers/further-info';
 import { saveQuizOutput } from './helpers/qna';
 import { saveSummaryOutput } from './helpers/summary';
 import { saveYoutubeOutput } from './helpers/youtube';
 
+import {
+  getAndSaveOutputByLearningId,
+  getMyLearningById,
+  getOutputByLearningId,
+  saveMyLearningInput,
+} from './repository';
+
 export const dynamic = 'force-dynamic';
-const supabase = createClient();
+
+export async function GET(req: NextRequest) {
+  try {
+    const url = new URL(req.url);
+    const myLearningId = url.searchParams.get('id');
+
+    if (!myLearningId) {
+      return NextResponse.json({ error: 'Error extracting myLearningId' }, { status: 400 });
+    }
+
+    const { data: myLearning, error: myLearningError } = await getMyLearningById(myLearningId);
+    if (!myLearning)
+      return NextResponse.json({
+        status: 404,
+        error: 'Error getting my learning',
+      });
+
+    const output = await getOutputByLearningId(myLearningId);
+    if (!output)
+      return NextResponse.json({
+        status: 404,
+        error: 'Error getting output',
+      });
+
+    return NextResponse.json({ status: 200, body: output });
+  } catch (error) {
+    console.error('Error saving output in DB:', error);
+    return NextResponse.json({ error: 'Failed to save output in DB' }, { status: 500 });
+  }
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +72,7 @@ export async function POST(req: NextRequest) {
 
     await saveMyLearningInput(myLearningId, input);
 
-    const { data: output, error: outputError } = await getOutputByLearningId(myLearningId);
+    const { data: output, error: outputError } = await getAndSaveOutputByLearningId(myLearningId);
     if (outputError) {
       console.log('outputError: ', outputError);
       return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
@@ -67,42 +100,4 @@ export async function POST(req: NextRequest) {
     console.error('Error saving output in DB:', error);
     return NextResponse.json({ error: 'Failed to save output in DB' }, { status: 500 });
   }
-}
-
-async function getMyLearningById(id: string) {
-  return await supabase.from('mylearnings').select('id, input').eq('id', id);
-}
-
-async function saveMyLearningInput(id: string, input: string) {
-  return await supabase.from('mylearnings').update({ input }).eq('id', id);
-}
-
-async function getOutputByLearningId(learningId: string) {
-  const { data, error } = await supabase
-    .from('outputs')
-    .select('*')
-    .eq('learning_id', learningId)
-    .maybeSingle();
-
-  if (error) {
-    console.error('Error fetching output:', error);
-    throw new Error('Error fetching output');
-  }
-
-  // If output exists, return it
-  if (data) return { data, error };
-
-  // If output does not exist, create a new one
-  const { data: newOutput, error: insertError } = await supabase
-    .from('outputs')
-    .insert([{ learning_id: learningId }])
-    .select()
-    .single(); // Insert and return the new record
-
-  if (insertError) {
-    console.error('Error creating output:', insertError);
-    throw new Error('Error creating output');
-  }
-
-  return { data: newOutput, error: insertError };
 }

@@ -6,7 +6,6 @@ import { signInWithEmail } from '@/utils/auth/server';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 // Define prop type with allowPassword boolean
 interface EmailSignInProps {
@@ -20,16 +19,9 @@ export const EmailSignIn = ({ allowPassword, redirectMethod, disableButton }: Em
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    try {
-      setIsSubmitting(true); // Disable the button while the request is being handled
-      await handleRequest(e, signInWithEmail, router);
-    }
-    catch (err) {
-      toast.error("Sign in with your Google account, or if you don't have one, try again later.");
-    }
-    finally {
-      setIsSubmitting(false);
-    }
+    setIsSubmitting(true); // Disable the button while the request is being handled
+    await handleRequest(e, signInWithEmail, router);
+    setIsSubmitting(false);
   };
 
   return (
@@ -46,7 +38,7 @@ export const EmailSignIn = ({ allowPassword, redirectMethod, disableButton }: Em
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              className="w-full p-3 rounded-md"
+              className="w-full p-3 rounded-md bg-zinc-800"
             />
           </div>
           <Button

@@ -98,7 +98,7 @@ export const NewDashboard = () => {
   };
 
   const handleVideoUpload = async () => {
-    if (!selectedFile || !myLearningId) return;
+    if (!selectedFile) return;
 
     try {
       const formData = new FormData();
@@ -148,9 +148,7 @@ export const NewDashboard = () => {
   };
 
   const submitChanges = async () => {
-
     try {
-
       setIsLoading(true);
 
       if (!myLearningId) return;
@@ -166,11 +164,9 @@ export const NewDashboard = () => {
       }
 
       await handleUpload(input, myLearningId);
-    }
-    catch (err) {
+    } catch (err) {
       throw new Error((err as Error).message);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
