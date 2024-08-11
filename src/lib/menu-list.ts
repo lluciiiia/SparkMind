@@ -1,4 +1,4 @@
-import { Folder, LayoutDashboard, NotebookText, Square, SquarePlus } from 'lucide-react';
+import { Book, Folder, House, Square, SquarePlus } from 'lucide-react';
 
 type Submenu = {
   href: string;
@@ -19,23 +19,23 @@ type Group = {
   menus: Menu[];
 };
 
-export function getMenuList(pathname: string): Group[] {
+export function getMenuList(pathname: string, id: string | null): Group[] {
   return [
     {
       groupLabel: '',
       menus: [
         {
-          href: '/dashboard',
-          label: 'Dashboard',
-          active: pathname.includes('/dashboard'),
-          icon: LayoutDashboard,
+          href: `/dashboard?id=${id}`,
+          label: 'Home',
+          active: pathname.includes(`/dashboard`),
+          icon: House,
           submenus: [],
         },
         {
-          href: '/notes',
-          label: 'My Notes',
-          active: pathname.includes('/mynotes'),
-          icon: NotebookText,
+          href: `/my-learning`,
+          label: 'My Learning',
+          active: pathname.includes(`/my-learning`),
+          icon: Folder,
           submenus: [],
         },
       ],
@@ -44,30 +44,30 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: '',
       menus: [
         {
-          href: '/upload',
+          href: `/upload?id=${id}`,
           label: 'Upload',
-          active: pathname.includes('/upload'),
+          active: pathname.includes(`/upload`),
           icon: SquarePlus,
           submenus: [
             {
-              href: '/allresources',
+              href: `/allresources?id=${id}`,
               label: 'All Resources',
-              active: pathname.includes('/allresources'),
+              active: pathname.includes(`/allresources`),
             },
             {
-              href: '/video',
+              href: `/videoupload?id=${id}`,
               label: 'Video',
-              active: pathname.includes('/video'),
+              active: pathname.includes(`/videoupload`),
             },
             {
-              href: '/text',
+              href: `/textupload?id=${id}`,
               label: 'Text',
-              active: pathname.includes('/text'),
+              active: pathname.includes(`/textupload`),
             },
             {
-              href: '/keywords',
+              href: `/keywordsupload?id=${id}`,
               label: 'Keywords',
-              active: pathname.includes('/keywords'),
+              active: pathname.includes(`/keywordsupload`),
             },
           ],
         },

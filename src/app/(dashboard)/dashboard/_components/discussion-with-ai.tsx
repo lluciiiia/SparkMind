@@ -8,7 +8,7 @@ import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import type { Message } from './interfaces'; // Adjust the path as needed
+import type { Message } from './interfaces';
 
 import { API_KEY, genAI, safetySettings } from '@/app/api/v1/gemini-settings';
 
@@ -51,13 +51,13 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
 
   useEffect(() => {
     const fetchDiscussData = async () => {
-      const response = await axios.get(`/api/v1/getdiscuss?videoid=${video_id}`);
+      const response = await axios.get(`/api/v1/discussions?videoid=${video_id}`);
       if (response.status === 200) {
-        console.log('this is response : ' + response.data);
         setBasicQuestion(response.data.basicQue);
         setTranscript(response.data.transcript);
+      } else {
+        console.log('Something goes Wrong in Discuss with ai feature');
       }
-      console.log('Something goes Wrong in Discuss with ai feature');
     };
     fetchDiscussData();
   }, [video_id]);
@@ -72,7 +72,6 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
         },
       ],
     });
-
     setChatSession(Session);
   }, [transcript]);
 
@@ -86,6 +85,11 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
   const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent default form submission on "Enter" key press
+    }
+  };
 
   const onSubmit = useCallback(
     async (event?: React.FormEvent<HTMLFormElement>) => {
@@ -93,14 +97,16 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
         event?.preventDefault();
         if (input.trim()) {
           setLoading(true);
+
           const newMessage: Message = {
             id: Date.now(),
             text: input,
             sender: 'user',
           };
+
           setResponses((prevResponses) => [...prevResponses, newMessage]);
 
-          const question = `Given the previous transcript, Based on the transcript, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
+          const question = `Given the previous transcript or summary, Based on the transcript or summary, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
 
           const chatResponse = await chatSession.sendMessage(question);
 
@@ -173,6 +179,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
             <PlaceholdersAndVanishInput
               placeholders={[]}
               onChange={handleDiscussInputChange}
+              //onKeyDown={handleKeyDown}
               onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
                 event.preventDefault();
                 onSubmit();

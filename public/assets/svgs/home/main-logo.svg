@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_레이어_1" data-name="레이어_1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 205.91 64.81">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #f0f2f5;
+      }
+
+      .cls-2 {
+        font-family: MillerText-Bold, 'Miller Text';
+        font-size: 23px;
+        font-weight: 700;
+      }
+
+      .cls-3 {
+        fill: #cde1fa;
+      }
+
+      .cls-4 {
+        fill: #fff;
+      }
+
+      .cls-5 {
+        fill: #036;
+      }
+
+      .cls-6 {
+        letter-spacing: -.02em;
+      }
+
+      .cls-7 {
+        fill: none;
+        stroke: #036;
+        stroke-miterlimit: 10;
+        stroke-width: .8px;
+      }
+    </style>
+  </defs>
+  <text class="cls-2" transform="translate(79.56 39.9)"><tspan x="0" y="0">Spark</tspan><tspan class="cls-6" x="64.26" y="0">M</tspan><tspan x="86.39" y="0">ind</tspan></text>
+  <path class="cls-5" d="M1.88,32.9c0,16.06,13.02,29.08,29.08,29.08s29.08-13.02,29.08-29.08H1.88Z"/>
+  <path class="cls-3" d="M1.88,32.9C1.88,16.84,14.9,3.82,30.96,3.82s29.08,13.02,29.08,29.08H1.88Z"/>
+  <path class="cls-1" d="M14.94,32.9c0,8.85,7.17,16.02,16.02,16.02s16.02-7.17,16.02-16.02H14.94Z"/>
+  <path class="cls-4" d="M14.94,32.9c0-8.85,7.17-16.02,16.02-16.02s16.02,7.17,16.02,16.02H14.94Z"/>
+  <circle class="cls-5" cx="20.42" cy="32.9" r="1.73"/>
+  <circle class="cls-5" cx="41.49" cy="33.1" r="1.73"/>
+  <path class="cls-7" d="M40.68,28.82c-1.6-3.87-5.41-6.59-9.86-6.59-5.89,0-10.66,4.77-10.66,10.66"/>
+  <path class="cls-7" d="M20.97,37.63c1.6,3.87,5.41,6.59,9.86,6.59,5.89,0,10.66-4.77,10.66-10.66"/>
+  <line class="cls-7" x1="20.42" y1="32.9" x2="41.36" y2="32.9"/>
+</svg>

@@ -28,13 +28,12 @@ import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
-import { getYoutubeResponse, saveOutput } from './api-handler';
+import { getYoutubeResponse, saveOutput } from '../../../api-handler';
 //Circle Loading Style
 import '@/styles/css/Circle-loader.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { generateHash, storeData } from './hash-handler';
 
 export const NewDashboard = () => {
   const searchParams = useSearchParams();
@@ -94,14 +93,11 @@ export const NewDashboard = () => {
       const pathURL = URL.createObjectURL(file);
       setSelectedFile(file);
       setObjectURL(pathURL);
-      console.log(objectURL);
     }
   };
 
   const handleVideoUpload = async () => {
     if (!selectedFile) return;
-
-    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -137,8 +133,6 @@ export const NewDashboard = () => {
       return data.keywordsArr;
     } catch (err: any) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -153,19 +147,27 @@ export const NewDashboard = () => {
   };
 
   const submitChanges = async () => {
-    if (!myLearningId) return;
+    try {
+      setIsLoading(true);
 
-    let input;
-    if (fileType === 'video') {
-      const keyWordsArray = await handleVideoUpload();
-      input = keyWordsArray.toString();
-    } else if (fileType == 'text') {
-      input = content;
-    } else if (fileType == 'keywords') {
-      input = keywords;
+      if (!myLearningId) return;
+
+      let input;
+      if (fileType === 'video') {
+        const keyWordsArray = await handleVideoUpload();
+        input = keyWordsArray.toString();
+      } else if (fileType == 'text') {
+        input = content;
+      } else if (fileType == 'keywords') {
+        input = keywords;
+      }
+
+      await handleUpload(input, myLearningId);
+    } catch (err) {
+      throw new Error((err as Error).message);
+    } finally {
+      setIsLoading(false);
     }
-
-    await handleUpload(input, myLearningId);
   };
 
   return (

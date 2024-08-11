@@ -32,8 +32,6 @@ const uploadStreamToGCS = async (destination: string) => {
 };
 
 const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
-  console.log('hello videoid : ' + videoid);
-  console.log('Extracting and uploading audio ...');
   const destFileName = `output${videoid}.wav`;
   const gcsUri = `gs://${bucketName}/${destFileName}`;
 
@@ -77,8 +75,6 @@ const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<s
 
 const transcribeAudio = async (gcsUri: string): Promise<string> => {
   const client = new SpeechClient();
-  //const gcsUri = `gs://geminiai-transcript/output.wav`;
-  console.log('gcsUri : ' + gcsUri);
 
   const audio = {
     uri: gcsUri,
@@ -173,7 +169,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({ message: 'Use POST method to extract and transcribe audio.' });
 }
 
-export async function POST(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   try {
     if (!API_KEY) return new Response('Missing API key', { status: 400 });
 
@@ -194,7 +190,70 @@ export async function POST(req: NextRequest) {
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
-    console.log('user 🆔 : ' + uuid);
+    if (uuid === undefined)
+      return NextResponse.json({ error: 'Please Login or SignUp' }, { status: 500 });
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const video_id = learning_id;
+
+    const gcsUri = await extractAndUploadAudio(buffer, video_id);
+    const transcription = await transcribeAudio(gcsUri);
+
+    //delete the Audio file form Google Clode bucket
+    deleteAudioFile(video_id);
+
+    //extract keywords
+    const reliventData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
+
+    if (!reliventData) {
+      return NextResponse.json({ error: 'No data found' }, { status: 400 });
+    }
+
+    const keywordsArr = reliventData.keywords;
+    const questionsArr = reliventData.questions;
+
+    //now time to insert the transcript and keyword into supabase
+    const { error } = await supabaseClient
+      .from('transcriptdata')
+      .update({
+        transcript: transcription,
+        keywords: keywordsArr,
+        basic_questions: questionsArr,
+      })
+      .eq('uuid', uuid)
+      .eq('videoid', video_id);
+
+    if (error) {
+      console.log('Occur while trascription is upload in DB: ' + error.details);
+    }
+
+    return NextResponse.json({ keywordsArr, transcription });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    if (!API_KEY) return new Response('Missing API key', { status: 400 });
+
+    const formData = await req.formData();
+
+    const file = formData.get('file') as Blob | null;
+    const learning_id = formData.get('learningid') as string;
+
+    if (learning_id === null) {
+      console.error('leaning Id is missing');
+    }
+
+    if (!file) {
+      return NextResponse.json({ error: 'File blob is required.' }, { status: 400 });
+    }
+
+    var supabaseClient = createClient();
+
+    const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
     if (uuid === undefined) {
       console.log('Please Login or SignUp');

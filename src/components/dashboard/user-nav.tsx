@@ -1,5 +1,9 @@
 'use client';
 
+import { LayoutGrid, LogOut, User } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,12 +16,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { LayoutGrid, LogOut, User } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 import { createClient } from '@/utils/supabase/client';
 import { redirect } from 'next/navigation';
+import { Router } from 'next/router';
 import { useEffect, useState } from 'react';
 
 export function UserNav() {
@@ -52,10 +54,9 @@ export function UserNav() {
   }, []);
 
   const handleSignOut = async () => {
-    // 'user server'
     const supabase = createClient();
     await supabase.auth.signOut();
-    //return redirect('/signin');
+    return router.push('/');
   };
 
   return (
@@ -87,12 +88,12 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="hover:cursor-pointer" asChild>
+          {/* <DropdownMenuItem className="hover:cursor-pointer" asChild>
             <Link href="/dashboard" className="flex items-center">
               <LayoutGrid className="w-4 h-4 mr-3 text-muted-foreground" />
               Dashboard
             </Link>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem className="hover:cursor-pointer" asChild>
             <Link href="/account" className="flex items-center">
               <User className="w-4 h-4 mr-3 text-muted-foreground" />
