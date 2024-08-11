@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/custom";
-import { handleRequest } from "@/utils/auth/client";
-import { requestPasswordUpdate } from "@/utils/auth/server";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Button } from '@/components/custom';
+import { handleRequest } from '@/utils/auth/client';
+import { requestPasswordUpdate } from '@/utils/auth/server';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 // Define prop type with allowEmail boolean
 interface ForgotPasswordProps {
@@ -19,7 +19,7 @@ export const ForgotPassword = ({
   redirectMethod,
   disableButton,
 }: ForgotPasswordProps) => {
-  const router = redirectMethod === "client" ? useRouter() : null;
+  const router = redirectMethod === 'client' ? useRouter() : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,10 +30,7 @@ export const ForgotPassword = ({
 
   return (
     <div className="my-8">
-      <form
-        noValidate={true}
-        className="mb-4"
-        onSubmit={(e) => handleSubmit(e)}>
+      <form noValidate={true} className="mb-4" onSubmit={(e) => handleSubmit(e)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
             <label htmlFor="email">Email</label>
@@ -53,7 +50,8 @@ export const ForgotPassword = ({
             type="submit"
             className="mt-1"
             loading={isSubmitting}
-            disabled={disableButton}>
+            disabled={disableButton}
+          >
             Send Email
           </Button>
         </div>
