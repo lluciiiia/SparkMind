@@ -74,8 +74,6 @@ export const ReUploadVideo = () => {
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
-  const isLaptop = useMediaQuery('(min-width: 1023px)');
-
   const [fileType, setFileType] = useState<'video'>();
 
   const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +82,6 @@ export const ReUploadVideo = () => {
       const pathURL = URL.createObjectURL(file);
       setSelectedFile(file);
       setObjectURL(pathURL);
-      console.log(objectURL);
     }
   };
 
@@ -107,7 +104,6 @@ export const ReUploadVideo = () => {
 
       // @ts-ignore trust me bro
       const data = (await res.json()) as any;
-      console.log(data);
 
       //clean up old setState
       setSelectedFile(null);

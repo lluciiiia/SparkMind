@@ -14,7 +14,6 @@ async function fetchSummaryData(query: string): Promise<string> {
   const result = await genModel.generateContent(query);
   const response = result.response;
   const text = await response.text();
-  console.log('Generated text:', text);
   return text;
 }
 
