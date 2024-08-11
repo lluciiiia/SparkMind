@@ -54,7 +54,7 @@ import {
   deleteNote,
   editNote,
   getNotes,
-  getOutputResponse,
+  getOutput,
 } from "../../../api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
@@ -84,7 +84,7 @@ export const Dashboard = () => {
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
       try {
-        const outputResponse = await getOutputResponse(myLearningId);
+        const outputResponse = await getOutput(myLearningId);
         setOutput(outputResponse.data.body[0]);
 
         const noteResponse = await getNotes(myLearningId);
