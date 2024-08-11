@@ -16,8 +16,6 @@ const NotesPage = async () => {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log(user);
-
   const { notes, setNotes } = useNotes();
 
   useIsomorphicLayoutEffect(() => {

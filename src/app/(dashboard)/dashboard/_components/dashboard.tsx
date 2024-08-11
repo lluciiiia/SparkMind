@@ -53,6 +53,7 @@ import {
 
 import axios from 'axios';
 import { getOutputResponse } from './api-handler';
+import ActionCard from './cards/ActionCard';
 import FurtherInfoCard from './cards/FurtherInfo';
 import QuestionAndAnswer from './cards/QuestionAndAnswer';
 
@@ -241,17 +242,13 @@ export const Dashboard = () => {
                   {activeTab === tab && tab === 'action-items' && (
                     <ActionCard learningId={myLearningId} />
                   )}
-                  {activeTab === tab &&
-                    tab === "qna" &&
-                    questions.length > 0 && (
-                      <QuestionAndAnswer questions={questions} />
-                    )}
-                  {activeTab === tab &&
-                    tab === "further-info" &&
-                    furtherInfoData != null && (
-                      <FurtherInfoCard furtherInfo={furtherInfoData} />
-                    )}
-                  {activeTab === tab && tab === "action-items" && (
+                  {activeTab === tab && tab === 'qna' && questions.length > 0 && (
+                    <QuestionAndAnswer questions={questions} />
+                  )}
+                  {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
+                    <FurtherInfoCard furtherInfo={furtherInfoData} />
+                  )}
+                  {activeTab === tab && tab === 'action-items' && (
                     <ActionCard learningId={myLearningId} />
                   )}
                   {activeTab != tab && (

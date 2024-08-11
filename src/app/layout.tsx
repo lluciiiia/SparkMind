@@ -1,4 +1,3 @@
-import { GeistSans } from 'geist/font/sans';
 import '@/styles/css/globals.css';
 import { Providers } from '@/providers';
 import { constructMetadata, constructViewport } from '@/utils';
@@ -20,7 +19,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={GeistSans.className}
       suppressHydrationWarning
       data-a11y-animated-images="system"
       data-a11y-link-underlines="false"

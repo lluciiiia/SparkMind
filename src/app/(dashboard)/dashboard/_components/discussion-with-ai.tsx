@@ -1,16 +1,16 @@
 'use client';
 
-import { Card } from "@/components/ui/card";
-import LoadingIndicator from "@/components/ui/custom/LoadingIndicator";
-import { PlaceholdersAndVanishInput } from "@/components/ui/custom/placeholders-and-vanish-input";
-import axios from "axios";
-import type React from "react";
-import { useCallback, useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import type { Message } from "./interfaces"; // Adjust the path as needed
+import { Card } from '@/components/ui/card';
+import LoadingIndicator from '@/components/ui/custom/LoadingIndicator';
+import { PlaceholdersAndVanishInput } from '@/components/ui/custom/placeholders-and-vanish-input';
+import axios from 'axios';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import type { Message } from './interfaces'; // Adjust the path as needed
 
-import { API_KEY, genAI, safetySettings } from "@/app/api/v1/gemini-settings";
+import { API_KEY, genAI, safetySettings } from '@/app/api/v1/gemini-settings';
 
 interface DiscussionWithAIProps {
   learningid: string | null;
@@ -25,7 +25,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
     console.error('Missing Learning Key' + learningid);
   }
 
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState<string>('');
   const [responses, setResponses] = useState<Message[]>([]);
   const [chatSession, setChatSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -51,15 +51,13 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
 
   useEffect(() => {
     const fetchDiscussData = async () => {
-      const response = await axios.get(
-        `/api/v1/getdiscuss?videoid=${video_id}`,
-      );
+      const response = await axios.get(`/api/v1/getdiscuss?videoid=${video_id}`);
       if (response.status === 200) {
         console.log('this is response : ' + response.data);
         setBasicQuestion(response.data.basicQue);
         setTranscript(response.data.transcript);
       }
-      console.log("Something goes Wrong in Discuss with ai feature");
+      console.log('Something goes Wrong in Discuss with ai feature');
     };
     fetchDiscussData();
   }, [video_id]);
@@ -69,7 +67,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
       generationConfig,
       history: [
         {
-          role: "user",
+          role: 'user',
           parts: [{ text: transcript! }],
         },
       ],
@@ -98,7 +96,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
           const newMessage: Message = {
             id: Date.now(),
             text: input,
-            sender: "user",
+            sender: 'user',
           };
           setResponses((prevResponses) => [...prevResponses, newMessage]);
 
@@ -109,12 +107,12 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
           const aiMessage: Message = {
             id: Date.now(),
             text: chatResponse.response.text(),
-            sender: "ai",
+            sender: 'ai',
           };
           setResponses((prevResponses) => [...prevResponses, aiMessage]);
 
           setLoading(false);
-          setInput("");
+          setInput('');
         }
       } catch (error) {
         console.log(error);

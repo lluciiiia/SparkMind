@@ -14,7 +14,7 @@ export const saveOutput = async (input: string, myLearningId: string) => {
   const response = await axios.post(`/api/v1/save-output?id=${myLearningId}`, {
     input: input,
   });
-  console.log("response: ", response);
+  console.log('response: ', response);
 
   return { data: response.data };
 };
