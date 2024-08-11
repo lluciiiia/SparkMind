@@ -13,9 +13,7 @@ import Link from 'next/link';
 import '@/styles/css/Circle-loader.css';
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
-  if (!learningId) {
-    console.error('LearningId is Missing in ActionCard');
-  }
+  if (!learningId) console.error('LearningId is Missing in ActionCard');
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -85,7 +83,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
 
   const getListOfEvent = async (LearningId: any) => {
     try {
-      const eventlistRes = await axios.get('/api/v1/geteventlist', {
+      const eventlistRes = await axios.get('/api/v1/event-list', {
         params: { LearningId: LearningId },
       });
 
@@ -146,7 +144,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   };
 
   const getIsActionPreviewDone = async (learningid: string) => {
-    const res = await axios.get('/api/v1/getaction-preview', {
+    const res = await axios.get('/api/v1/action-previews', {
       params: { learningid: learningid },
     });
 
@@ -179,7 +177,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         {videoNotAvailable === true ? (
           <div className="flex h-full w-full justify-center items-center">
             <p>
-              No videos were found. Please give Calendar access in the Sign-in and upload the video.
+              No videos or relevant data were found for creating the event. Please grant Calendar access during sign-in and upload the video.
             </p>
           </div>
         ) : (

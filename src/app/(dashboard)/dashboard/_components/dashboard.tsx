@@ -82,7 +82,6 @@ export const Dashboard = () => {
         setOutput(outputResponse.data.body[0]);
 
         const noteResponse = await getNotes(myLearningId);
-        console.log('notes: ', noteResponse.data.body);
 
         setNotes(noteResponse.data.body);
       } catch (error) {
@@ -90,9 +89,7 @@ export const Dashboard = () => {
       }
     };
 
-    if (myLearningId) {
-      fetchData(myLearningId);
-    }
+    if (myLearningId) fetchData(myLearningId);
 
     return () => {
       console.log('Output retrieved');
@@ -159,8 +156,6 @@ export const Dashboard = () => {
     if (!myLearningId) return;
 
     const response = await createNote(myLearningId);
-
-    console.log('note id: ' + response.data.body[0].id);
 
     const newNote = {
       id: response.data.body[0].id,

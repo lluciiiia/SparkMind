@@ -4,11 +4,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const learningid = req.nextUrl.searchParams.get('learning_id');
-    console.log('todo task learningid 🆔 : ' + learningid);
 
     const supabaseClient = createClient();
-
-    console.log('Learningid 🆔 : ' + learningid);
 
     if (learningid !== null) {
       const { data, error } = await supabaseClient
@@ -28,7 +25,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json({ status: 404, check: false });
   } catch (err) {
-    console.log('Error when getaction-preview from DB : ' + (err as Error).message);
+    console.log('Error when getting action-previews from DB : ' + (err as Error).message);
     return NextResponse.json({ status: 400, message: 'Internal Server Error' });
   }
 }

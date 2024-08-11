@@ -3,6 +3,31 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 const supabase = createClient();
 
+export async function GET(req: NextRequest, res: NextResponse) {
+  try {
+    const video_id = req.nextUrl.searchParams.get('videoid');
+
+    if (video_id !== null) {
+      const transcript = await getTranscript(video_id);
+
+      if (!transcript) return NextResponse.json({ status: 404, error: 'Transcript not found' });
+
+      let basicQue = await getBasicQuestion(video_id);
+
+      if (!basicQue) {
+        basicQue = [];
+      }
+
+      return NextResponse.json({ status: 200, basicQue: basicQue, transcript: transcript });
+    } else {
+      return new NextResponse('video_id is required', { status: 400 });
+    }
+  } catch (error) {
+    console.log('Error when getting discussions: ' + error);
+  }
+  return NextResponse.json({ status: 400, error: 'video_id is required' });
+}
+
 async function getTranscript(videoid: string) {
   try {
     // new things we are store learning_id in video id in DB
@@ -63,34 +88,4 @@ async function getBasicQuestion(videoid: string) {
   } catch (err) {
     console.log('Error when feach Transcript from DB : ' + err);
   }
-}
-
-export async function GET(req: NextRequest, res: NextResponse) {
-  try {
-    const video_id = req.nextUrl.searchParams.get('videoid');
-    console.log('video_id 🆔 : ' + video_id);
-
-    if (video_id !== null) {
-      const transcript = await getTranscript(video_id);
-
-      if (!transcript) {
-        return NextResponse.json({ status: 404, error: 'Transcript not found' });
-      }
-
-      let basicQue = await getBasicQuestion(video_id);
-
-      if (!basicQue) {
-        //if user give other input like text and keyword then basic question are not we can seee
-        // return NextResponse.json({ status: 200, body: [] });
-        basicQue = [];
-      }
-
-      return NextResponse.json({ status: 200, basicQue: basicQue, transcript: transcript });
-    } else {
-      return new NextResponse('video_id is required', { status: 400 });
-    }
-  } catch (error) {
-    console.log('Error in GetDiscuss api : ' + error);
-  }
-  return NextResponse.json({ status: 400, error: 'video_id is required' });
 }

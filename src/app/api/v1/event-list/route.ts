@@ -2,12 +2,33 @@ import { createClient } from '@/utils/supabase/client';
 import { type NextRequest, NextResponse } from 'next/server';
 
 import { API_KEY, genAI, model, safetySettings } from '@/app/api/v1/gemini-settings';
-//Gemini - ai Import
-import { GoogleGenerativeAI, HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 
 export const dynamic = 'force-dynamic';
 
 const supabase = createClient();
+
+export async function GET(req: NextRequest, res: NextResponse) {
+  try {
+    const video_id = req.nextUrl.searchParams.get('LearningId');
+
+    if (video_id !== null) {
+      const transcript = await getTranscript(video_id);
+
+      if (!transcript) return NextResponse.json({ status: 404, error: 'Transcript not found' });
+
+      const eventList = await getEventList(transcript);
+
+      if (!eventList) return NextResponse.json({ status: 400, body: 'eventList is empty' });
+
+      return NextResponse.json({ status: 200, body: eventList });
+    } else {
+      return new NextResponse('video_id is required', { status: 400 });
+    }
+  } catch (error) {
+    console.log('Error when getting event list: ' + error);
+  }
+  return NextResponse.json({ status: 400, error: 'video_id is required' });
+}
 
 async function getEventList(transcript: string): Promise<any> {
   if (!API_KEY) return new Response('Missing API key', { status: 400 });
@@ -60,7 +81,6 @@ async function getEventList(transcript: string): Promise<any> {
   try {
     const result = await genModel.generateContent(prompt.trim());
     const eventList = JSON.parse(await result.response.text());
-    console.log('this are event List are', eventList);
     return eventList;
   } catch (error) {
     console.error('Error fetching event list:', error);
@@ -91,32 +111,4 @@ async function getTranscript(videoid: string) {
   } catch (err) {
     console.log('Error when feach Transcript from DB : ' + err);
   }
-}
-
-export async function GET(req: NextRequest, res: NextResponse) {
-  try {
-    const video_id = req.nextUrl.searchParams.get('LearningId');
-    console.log('video_id 🆔 : ' + video_id);
-
-    if (video_id !== null) {
-      const transcript = await getTranscript(video_id);
-
-      if (!transcript) {
-        return NextResponse.json({ status: 404, error: 'Transcript not found' });
-      }
-
-      const eventList = await getEventList(transcript);
-
-      if (!eventList) {
-        return NextResponse.json({ status: 400, body: 'eventList is empty' });
-      }
-
-      return NextResponse.json({ status: 200, body: eventList });
-    } else {
-      return new NextResponse('video_id is required', { status: 400 });
-    }
-  } catch (error) {
-    console.log('Error in GetEventList api : ' + error);
-  }
-  return NextResponse.json({ status: 400, error: 'video_id is required' });
 }

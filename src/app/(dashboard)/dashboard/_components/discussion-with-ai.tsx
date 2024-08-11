@@ -8,7 +8,7 @@ import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import type { Message } from './interfaces'; // Adjust the path as needed
+import type { Message } from './interfaces';
 
 import { API_KEY, genAI, safetySettings } from '@/app/api/v1/gemini-settings';
 
@@ -51,9 +51,8 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
 
   useEffect(() => {
     const fetchDiscussData = async () => {
-      const response = await axios.get(`/api/v1/getdiscuss?videoid=${video_id}`);
+      const response = await axios.get(`/api/v1/discussions?videoid=${video_id}`);
       if (response.status === 200) {
-        console.log('this is response : ' + JSON.stringify(response.data));
         setBasicQuestion(response.data.basicQue);
         setTranscript(response.data.transcript);
       } else {
@@ -94,12 +93,10 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
 
   const onSubmit = useCallback(
     async (event?: React.FormEvent<HTMLFormElement>) => {
-      console.log('onSubmit', event);
       try {
         event?.preventDefault();
         if (input.trim()) {
           setLoading(true);
-          console.log('transcript' + transcript);
 
           const newMessage: Message = {
             id: Date.now(),
