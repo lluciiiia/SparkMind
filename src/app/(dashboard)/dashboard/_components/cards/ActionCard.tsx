@@ -116,7 +116,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         },
       }));
 
-      const res = await axios.post('/api/v1/create-event', {
+      const res = await axios.post('/api/v1/events', {
         selectedTask: selectedTask,
         learningId: learningId,
       });
