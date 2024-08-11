@@ -20,7 +20,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
       }
 
       if (data && data.length > 0) {
-        console.log('is_task_preview_done value : ', data[0].is_task_preview_done);
         return NextResponse.json({ status: 200, check: data[0].is_task_preview_done });
       } else {
         console.log('No data found for learning_id:', learningid);
@@ -30,7 +29,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json({ status: 404, check: false });
   } catch (err) {
-    console.log('Error when getaction-preview from DB : ' + (err as Error).message);
+    console.log('Error when getting action-previews from DB : ' + (err as Error).message);
     return NextResponse.json({ status: 400, message: 'Internal Server Error' });
   }
 }
