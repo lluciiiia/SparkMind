@@ -1,11 +1,11 @@
-import { PING, PONG } from '../../constants';
-import type { ScraperQueueItemType } from '../../schema';
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { PING, PONG } from '../../constants';
+import type { ScraperQueueItemType } from '../../schema';
 
 export function Scraper() {
   const [scraper, setScraper] = React.useState<ScraperQueueItemType | null>(null);
-  let censored: boolean = false;
+  let censored = false;
   const processItem = async (item: ScraperQueueItemType): Promise<void> => {
     const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
     const url = tab.url;
@@ -47,7 +47,7 @@ export function Scraper() {
       .then((postResponse) => postResponse.json())
       .catch((error) => {
         throw new Error(`${error instanceof Error ? error.message : 'Internal server error'}`);
-      })
+      });
   };
   return (
     <div className="flex h-full w-full mt-3 items-center justify-center mx-auto my-auto flex-col">
@@ -84,15 +84,10 @@ export function Scraper() {
         }}
         disabled={scraper?.status === 'pending'}
       >
-
         {<span className="ml-2">Scrape this website</span>}
       </button>
       {scraper?.status === 'pending' && <span className="ml-2">Pending...</span>}
-      {scraper?.status === 'done' &&
-        <span className="ml-2">
-          Done
-        </span>
-      }
+      {scraper?.status === 'done' && <span className="ml-2">Done</span>}
       {scraper?.status === 'error' && <span className="ml-2">Error</span>}
       {censored && <span className="ml-2">This site contains censored content</span>}
     </div>

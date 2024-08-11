@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../../../../styles/css/markdown.css';
 type Paragraph = { title: string; data: string };
 type Props = { summaryData: any };
 import { Card } from '@/components/ui/card';
