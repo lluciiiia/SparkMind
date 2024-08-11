@@ -1,10 +1,11 @@
 <a href="https://sparkmind.vercel.app/">
-  <img alt="SparkMind - AI-driven learning hub platform." src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
+  
   <h1 align="center">SparkMind</h1> 
+  <img alt="SparkMind - AI-driven learning hub platform." src="./public/assets/images/SparkMind_homepage.png">
 </a>
 
 <p align="center">
- AI-driven learning hub platform.
+ AI-driven learning hub platform
 </p>
 
 <p align="center">
@@ -14,9 +15,9 @@
   <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
   <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
 </p>
-<br/>
 
 ## Team
+
 - [Seokyung Kim](https://github.com/lluciiiia)
 - [Krishna Dharsandia](https://github.com/KRISHNA-DHARSANDIA)
 - [Mike Odnis](https://github.com/WomB0ComB0)
@@ -26,9 +27,11 @@
 ## Features
 
 - **Diverse Learning Material Input Support**
+
   - Accepts various types of input: Video, Text, Keywords and Topics.
 
 - **Generated Study Materials**
+
   - **Summary**: Provides concise summaries of learning materials.
   - **Video Recommendations**: Suggests relevant videos for further understanding.
   - **Q&A**: Generates exercise questions to help master the concepts.
@@ -36,13 +39,16 @@
   - **Action Items**: Identifies tasks from videos, adds them to Google Calendar, and sends reminder emails through Gmail.
 
 - **Note Taking**
+
   - **Grammar Refinement**: Corrects grammatical errors in notes.
   - **Concise Version**: Summarizes and simplifies lengthy or disorganized notes.
 
 - **AI-Powered Discussion**
+
   - Engage in further discussions with AI about the learning materials to enhance comprehension with AI-generated recommended questions based on user input.
 
 - **Extended Learning Materials**
+
   - Allows adding extra learning materials, integrating new inputs with existing ones for comprehensive study support.
 
 - **Learning History**
@@ -50,8 +56,7 @@
 
 ## Demo
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
-
+You can view a fully working demo on [Youtube](https://www.youtube.com/watch?v=E4RNDZsB56E).
 
 ## Clone and run locally
 
@@ -85,7 +90,3 @@ You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](http
    ```
 
    The starter kit should now be running on [localhost:3000](http://localhost:3000/).
-
-## Feedback and issues
-
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
