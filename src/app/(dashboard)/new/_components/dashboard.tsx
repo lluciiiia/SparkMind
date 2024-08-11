@@ -100,8 +100,6 @@ export const NewDashboard = () => {
   const handleVideoUpload = async () => {
     if (!selectedFile) return;
 
-    setIsLoading(true);
-
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
@@ -136,8 +134,6 @@ export const NewDashboard = () => {
       return data.keywordsArr;
     } catch (err: any) {
       console.error(err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -152,19 +148,31 @@ export const NewDashboard = () => {
   };
 
   const submitChanges = async () => {
-    if (!myLearningId) return;
 
-    let input;
-    if (fileType === 'video') {
-      const keyWordsArray = await handleVideoUpload();
-      input = keyWordsArray.toString();
-    } else if (fileType == 'text') {
-      input = content;
-    } else if (fileType == 'keywords') {
-      input = keywords;
+    try {
+
+      setIsLoading(true);
+
+      if (!myLearningId) return;
+
+      let input;
+      if (fileType === 'video') {
+        const keyWordsArray = await handleVideoUpload();
+        input = keyWordsArray.toString();
+      } else if (fileType == 'text') {
+        input = content;
+      } else if (fileType == 'keywords') {
+        input = keywords;
+      }
+
+      await handleUpload(input, myLearningId);
     }
-
-    await handleUpload(input, myLearningId);
+    catch (err) {
+      throw new Error((err as Error).message);
+    }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   return (
