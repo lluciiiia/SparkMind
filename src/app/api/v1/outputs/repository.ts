@@ -49,3 +49,10 @@ export async function getOutputByLearningId(learningId: string) {
 
   return data;
 }
+
+export async function getOutputById(id: string) {
+  return await supabase
+    .from('outputs')
+    .select('id, youtube, summary, questions, further_info')
+    .eq('id', id);
+}

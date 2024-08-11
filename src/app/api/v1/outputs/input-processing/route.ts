@@ -1,47 +1,17 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { saveFurtherInfoOutput } from './helpers/further-info';
-import { saveQuizOutput } from './helpers/qna';
-import { saveSummaryOutput } from './helpers/summary';
-import { saveYoutubeOutput } from './helpers/youtube';
+import { saveFurtherInfoOutput } from '../helpers/further-info';
+import { saveQuizOutput } from '../helpers/qna';
+import { saveSummaryOutput } from '../helpers/summary';
+import { saveYoutubeOutput } from '../helpers/youtube';
 
 import {
   getAndSaveOutputByLearningId,
   getMyLearningById,
   getOutputByLearningId,
   saveMyLearningInput,
-} from './repository';
+} from '../repository';
 
 export const dynamic = 'force-dynamic';
-
-export async function GET(req: NextRequest) {
-  try {
-    const url = new URL(req.url);
-    const myLearningId = url.searchParams.get('id');
-
-    if (!myLearningId) {
-      return NextResponse.json({ error: 'Error extracting myLearningId' }, { status: 400 });
-    }
-
-    const { data: myLearning, error: myLearningError } = await getMyLearningById(myLearningId);
-    if (!myLearning)
-      return NextResponse.json({
-        status: 404,
-        error: 'Error getting my learning',
-      });
-
-    const output = await getOutputByLearningId(myLearningId);
-    if (!output)
-      return NextResponse.json({
-        status: 404,
-        error: 'Error getting output',
-      });
-
-    return NextResponse.json({ status: 200, body: output });
-  } catch (error) {
-    console.error('Error saving output in DB:', error);
-    return NextResponse.json({ error: 'Failed to save output in DB' }, { status: 500 });
-  }
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -78,13 +48,6 @@ export async function POST(req: NextRequest) {
 
     const summaryResponse = await saveSummaryOutput(myLearningId, input, output);
     if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
-
-    const quizResponse = await saveQuizOutput(input, myLearningId, output);
-    if (quizResponse.status != 200) return NextResponse.json({ status: quizResponse.status });
-
-    const furtherInfoResponse = await saveFurtherInfoOutput(input, myLearningId, output);
-    if (furtherInfoResponse.status != 200)
-      return NextResponse.json({ status: furtherInfoResponse.status });
 
     return NextResponse.json({ status: 200, outputId: output.id });
   } catch (error) {

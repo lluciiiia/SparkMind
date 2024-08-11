@@ -67,12 +67,11 @@ export default async function SignIn({
             <Image src={logo} alt="logo" width={250} height={250} />
           </div>
           <Card
-            className='bg-[#cde1fa] rounded-lg'
+            className="bg-[#cde1fa] rounded-lg"
             title={
               viewProp === 'forgot_password'
                 ? 'Reset Password'
-                :
-                viewProp === 'update_password'
+                : viewProp === 'update_password'
                   ? 'Update Password'
                   : viewProp === 'signup'
                     ? 'Sign Up'

@@ -1,21 +1,29 @@
-import axios from "axios";
+import axios from 'axios';
+import { PiKeyReturnDuotone } from 'react-icons/pi';
 
 export const getYoutubeResponse = async (input: string) => {
   const params: { query: string; pageToken?: string | null } = {
     query: input,
   };
 
-  const response = await axios.get("/api/v1/youtube", { params });
+  const response = await axios.get('/api/v1/youtube', { params });
 
   return { data: response.data };
 };
 
-export const saveOutput = async (input: string, myLearningId: string) => {
-  const response = await axios.post(`/api/v1/outputs?id=${myLearningId}`, {
+export const processInput = async (input: string, myLearningId: string) => {
+  return await axios.post(`/api/v1/outputs/input-processing?id=${myLearningId}`, {
     input: input,
   });
+};
 
-  return { data: response.data };
+export const processFinalizing = async (input: string, myLearningId: string, outputId: string) => {
+  return await axios.post(
+    `/api/v1/outputs/finalize-processing?id=${myLearningId}&output-id=${outputId}`,
+    {
+      input: input,
+    },
+  );
 };
 
 export const getOutput = async (myLearningId: string) => {
@@ -23,13 +31,13 @@ export const getOutput = async (myLearningId: string) => {
     id: myLearningId,
   };
 
-  const response = await axios.get("/api/v1/outputs", { params });
+  const response = await axios.get('/api/v1/outputs', { params });
   return { data: response.data };
 };
 
 export const createNote = async (myLearningId: string) => {
   const response = await axios.post(`/api/v1/notes?id=${myLearningId}`);
-  console.log("response: " + response.data);
+  console.log('response: ' + response.data);
   return { data: response.data };
 };
 
