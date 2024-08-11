@@ -1,13 +1,12 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/custom';
-import { handleRequest } from '@/utils/auth/client';
-import { signUp } from '@/utils/auth/server';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import type React from 'react';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { Button } from "@/components/custom";
+import { handleRequest } from "@/utils/auth/client";
+import { signUp } from "@/utils/auth/server";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState } from "react";
 
 // Define prop type with allowEmail boolean
 interface SignUpProps {
@@ -16,24 +15,21 @@ interface SignUpProps {
 }
 
 export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
-  const router = redirectMethod === 'client' ? useRouter() : null;
+  const router = redirectMethod === "client" ? useRouter() : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    try {
-      setIsSubmitting(true); // Disable the button while the request is being handled
-      await handleRequest(e, signUp, router);
-      toast.success('Please verify your email account after you log in');
-    } catch {
-      toast.error("Sign in with your Google account, or if you don't have one, try again later.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsSubmitting(true); // Disable the button while the request is being handled
+    await handleRequest(e, signUp, router);
+    setIsSubmitting(false);
   };
 
   return (
     <div className="my-8">
-      <form noValidate={true} className="mb-4" onSubmit={(e) => handleSubmit(e)}>
+      <form
+        noValidate={true}
+        className="mb-4"
+        onSubmit={(e) => handleSubmit(e)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
             <label htmlFor="email">Email</label>
@@ -45,7 +41,7 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              className="w-full p-3 rounded-md"
+              className="w-full p-3 rounded-md bg-zinc-800"
             />
             <label htmlFor="password">Password</label>
             <input
@@ -54,15 +50,14 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
               type="password"
               name="password"
               autoComplete="current-password"
-              className="w-full p-3 rounded-md"
+              className="w-full p-3 rounded-md bg-zinc-800"
             />
           </div>
           <Button
             variant="slim"
             type="submit"
-            className="mt-1 hover:bg-[#003366]"
-            loading={isSubmitting}
-          >
+            className="mt-1"
+            loading={isSubmitting}>
             Sign up
           </Button>
         </div>
