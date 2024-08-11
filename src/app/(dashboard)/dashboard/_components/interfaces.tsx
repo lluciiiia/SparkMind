@@ -1,7 +1,7 @@
 export interface Message {
   id: number;
   text: string;
-  sender: 'user' | 'ai';
+  sender: "user" | "ai";
 }
 
 export interface Transcript {
@@ -45,6 +45,8 @@ export interface VideoCardProps {
 
 export interface ActionCardProps {
   learningId: string | null;
+  reRenderData: boolean;
+  setReRender: any;
 }
 
 export interface NoteCardProps {
