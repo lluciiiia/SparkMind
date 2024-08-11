@@ -6,7 +6,6 @@ import { requestPasswordUpdate } from '@/utils/auth/server';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 // Define prop type with allowEmail boolean
 interface ForgotPasswordProps {
@@ -25,17 +24,8 @@ export const ForgotPassword = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true); // Disable the button while the request is being handled
-
-    try {
-      await handleRequest(e, requestPasswordUpdate, router);
-    }
-    catch (err) {
-      toast.error("Sign in with your Google account, or if you don't have one, try again later.");
-    }
-    finally {
-      setIsSubmitting(false);
-    }
-
+    await handleRequest(e, requestPasswordUpdate, router);
+    setIsSubmitting(false);
   };
 
   return (
