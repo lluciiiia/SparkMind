@@ -28,11 +28,7 @@ import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
-import {
-  processFinalizing,
-  processInput,
-  // saveOutput,
-} from '../../../api-handler';
+import { saveOutput } from '../../../api-handler';
 //Circle Loading Style
 import '@/styles/css/Circle-loader.css';
 import { useRouter } from 'next/navigation';
@@ -141,14 +137,7 @@ export const NewDashboard = () => {
 
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
-      const processInputResponse = await processInput(input, myLearningId);
-
-      if (processInputResponse.status === 200) {
-        await processFinalizing(input, myLearningId, processInputResponse.data.outputId);
-      } else {
-        console.error('processInput failed:', processInputResponse);
-        return;
-      }
+      await saveOutput(input, myLearningId);
 
       router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
