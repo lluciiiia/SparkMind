@@ -9,6 +9,8 @@ interface Props {
 export default async function ReuplaodResources() {
   const supabase = createClient();
 
+  console.log('id is here');
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
