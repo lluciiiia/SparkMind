@@ -6,6 +6,49 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 //const SCOPES = 'https://www.googleapis.com/auth/calendar';
 
+export async function POST(req: NextRequest, res: NextResponse) {
+  try {
+    const data = (await req.json()) as { selectedTask: Event[]; learningId: string };
+
+    const supabaseClient = createClient();
+    const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
+
+    if (uuid === undefined) {
+      return NextResponse.json({ status: 400, error: 'User not authenticated' });
+    }
+
+    const selectedTask: Event[] = data.selectedTask;
+    const learningId: string = data.learningId;
+
+    console.log('selectedTask : ' + selectedTask);
+
+    // Use type assertion to add uuid to the request object
+    (req as any).uuid = uuid;
+
+    let accessToken;
+
+    // rotateToken is useful for Refresh Google Access token
+    await rotateToken(req, res, async () => {
+      accessToken = (req as any).accessToken;
+    });
+
+    if (accessToken !== undefined) {
+      const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
+      const todolist = (await storeCalendarEvent(
+        selectedTask,
+        learningId,
+        calendarEvents,
+      )) as TodoType[];
+      return NextResponse.json({ status: 200, todolist });
+    }
+
+    return NextResponse.json({ status: 400, error: 'Access token might be error or undefined' });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    return NextResponse.json({ status: 500, error: 'Error creating event' });
+  }
+}
+
 function generateRandomString(length: number) {
   let result = '';
   const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -99,46 +142,3 @@ const storeCalendarEvent = async (
     return;
   }
 };
-
-export async function POST(req: NextRequest, res: NextResponse) {
-  try {
-    const data = (await req.json()) as { selectedTask: Event[]; learningId: string };
-
-    const supabaseClient = createClient();
-    const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
-
-    if (uuid === undefined) {
-      return NextResponse.json({ status: 400, error: 'User not authenticated' });
-    }
-
-    const selectedTask: Event[] = data.selectedTask;
-    const learningId: string = data.learningId;
-
-    console.log('selectedTask : ' + selectedTask);
-
-    // Use type assertion to add uuid to the request object
-    (req as any).uuid = uuid;
-
-    let accessToken;
-
-    // rotateToken is useful for Refresh Google Access token
-    await rotateToken(req, res, async () => {
-      accessToken = (req as any).accessToken;
-    });
-
-    if (accessToken !== undefined) {
-      const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
-      const todolist = (await storeCalendarEvent(
-        selectedTask,
-        learningId,
-        calendarEvents,
-      )) as TodoType[];
-      return NextResponse.json({ status: 200, todolist });
-    }
-
-    return NextResponse.json({ status: 400, error: 'Access token might be error or undefined' });
-  } catch (error) {
-    console.error('Error creating event:', error);
-    return NextResponse.json({ status: 500, error: 'Error creating event' });
-  }
-}
