@@ -36,7 +36,7 @@ export default function Home() {
 
   const handleSubmit = async (videoid: any) => {
     try {
-      const eventlistRes = await axios.get('/api/v1/geteventlist', {
+      const eventlistRes = await axios.get('/api/v1/event-list', {
         params: { videoid },
       });
 
