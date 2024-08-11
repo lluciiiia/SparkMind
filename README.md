@@ -56,7 +56,7 @@
 
 ## Demo
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+You can view a fully working demo on [Youtube](https://www.youtube.com/watch?v=E4RNDZsB56E).
 
 ## Clone and run locally
 
