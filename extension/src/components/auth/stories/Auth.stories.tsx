@@ -28,9 +28,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
-    onSignIn: (email: string, password: string) => {
-      console.log('Sign In:', email, password);
-    },
+    onSignIn: (email: string, password: string): void => {},
     onScreenChange: () => {
       console.log('Screen Change');
     },
