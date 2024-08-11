@@ -177,7 +177,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         {videoNotAvailable === true ? (
           <div className="flex h-full w-full justify-center items-center">
             <p>
-              No videos were found. Please give Calendar access in the Sign-in and upload the video.
+              No videos or relevant data were found for creating the event. Please grant Calendar access during sign-in and upload the video.
             </p>
           </div>
         ) : (

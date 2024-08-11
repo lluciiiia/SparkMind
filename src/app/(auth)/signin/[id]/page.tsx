@@ -62,23 +62,24 @@ export default async function SignIn({
   return (
     <>
       <div className="absolute top-0 left-0 flex justify-center h-screen w-screen z-50">
-        <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
-          <div className="flex justify-center pb-12 ">
+        <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80">
+          <div className="flex justify-center pb-12">
             <Image src={logo} alt="logo" width={250} height={250} />
           </div>
           <Card
+            className='bg-[#cde1fa] rounded-lg'
             title={
-              // viewProp === 'forgot_password'
-              //   ? 'Reset Password'
-              //:
-              viewProp === 'update_password'
-                ? 'Update Password'
-                : viewProp === 'signup'
-                  ? 'Sign Up'
-                  : 'Sign In'
+              viewProp === 'forgot_password'
+                ? 'Reset Password'
+                :
+                viewProp === 'update_password'
+                  ? 'Update Password'
+                  : viewProp === 'signup'
+                    ? 'Sign Up'
+                    : 'Sign In'
             }
           >
-            {/* {viewProp === 'password_signin' && (
+            {viewProp === 'password_signin' && (
               <PasswordSignIn allowEmail={allowEmail} redirectMethod={redirectMethod} />
             )}
             {viewProp === 'email_signin' && (
@@ -98,11 +99,11 @@ export default async function SignIn({
             {viewProp === 'update_password' && <UpdatePassword redirectMethod={redirectMethod} />}
             {viewProp === 'signup' && (
               <SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
-            )} */}
+            )}
             {viewProp !== 'update_password' && viewProp !== 'signup' && allowOauth && (
               <>
-                {/* <span className="text-center">Third-party sign-in</span> */}
-                {/* <Separator /> */}
+                <span className="text-center">Third-party sign-in</span>
+                <Separator />
                 <OauthSignIn />
               </>
             )}

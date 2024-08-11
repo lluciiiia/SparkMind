@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest): Promise<NextResponse> {
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|media|favicon.ico|favicon-16x16.png|favicon-32x32.png|apple-touch-icon.png|android-chrome-192x192.png|android-chrome-512x512.png|robots.txt|sitemap.xml|site.webmanifest|monitoring).*)',
+    '/((?!api|_next/static|_next/image|media|favicon.ico|favicon-16x16.png|favicon-32x32.png|apple-touch-icon.png|android-chrome-192x192.png|android-chrome-512x512.png|robots.txt|sitemap.xml|site.webmanifest|monitoring|auth|signin).*)',
   ],
 };
 
@@ -38,6 +38,7 @@ const handleRedirect = ({
   res: NextResponse;
   redirect: boolean;
 } => {
+
   if (user) {
     return { res: NextResponse.next(), redirect: true };
   }
@@ -47,14 +48,12 @@ const handleRedirect = ({
     return { res: nextRes, redirect: true };
   }
 
-  if (
-    !user &&
-    req.nextUrl.pathname !== '/signin/password_signin' &&
-    req.nextUrl.pathname !== '/auth/error' &&
-    req.nextUrl.pathname !== '/auth/callback' &&
-    req.nextUrl.pathname !== '/auth/reset_password' &&
-    req.nextUrl.pathname !== '/'
-  ) {
+  if (!user
+    && req.nextUrl.pathname !== '/signin/password_signin'
+    && req.nextUrl.pathname !== '/auth/error'
+    && req.nextUrl.pathname !== '/auth/callback'
+    && req.nextUrl.pathname !== '/auth/reset_password'
+    && req.nextUrl.pathname !== '/') {
     const nextRes = NextResponse.redirect(new URL('/signin/password_signin', req.url));
     return { res: nextRes, redirect: true };
   }
