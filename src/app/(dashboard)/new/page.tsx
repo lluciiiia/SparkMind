@@ -9,8 +9,6 @@ interface Props {
 export default async function DashboardPage() {
   const supabase = createClient();
 
-  console.log('id is here');
-
   const {
     data: { user },
   } = await supabase.auth.getUser();

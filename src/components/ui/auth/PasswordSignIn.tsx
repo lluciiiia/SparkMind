@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 // Define prop type with allowEmail boolean
 interface PasswordSignInProps {
@@ -20,7 +21,14 @@ export const PasswordSignIn = ({ allowEmail, redirectMethod }: PasswordSignInPro
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true); // Disable the button while the request is being handled
-    await handleRequest(e, signInWithPassword, router);
+
+    try {
+      await handleRequest(e, signInWithPassword, router);
+    }
+    catch (err) {
+      toast.error("Sign in with your Google account, or if you don't have one, try again later.");
+    }
+
     setIsSubmitting(false);
   };
 
@@ -38,7 +46,7 @@ export const PasswordSignIn = ({ allowEmail, redirectMethod }: PasswordSignInPro
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              className="w-full p-3 rounded-md bg-zinc-800"
+              className="w-full p-3 rounded-md"
             />
             <label htmlFor="password">Password</label>
             <input
@@ -47,10 +55,10 @@ export const PasswordSignIn = ({ allowEmail, redirectMethod }: PasswordSignInPro
               type="password"
               name="password"
               autoComplete="current-password"
-              className="w-full p-3 rounded-md bg-zinc-800"
+              className="w-full p-3 rounded-md"
             />
           </div>
-          <Button variant="slim" type="submit" className="mt-1" loading={isSubmitting}>
+          <Button variant="slim" type="submit" className="mt-1 hover:bg-[#003366] hover:text-white" loading={isSubmitting}>
             Sign in
           </Button>
         </div>

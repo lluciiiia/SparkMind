@@ -9,8 +9,6 @@ interface Props {
 export default async function VideoUploadPage() {
   const supabase = createClient();
 
-  console.log('id is here');
-
   const {
     data: { user },
   } = await supabase.auth.getUser();

@@ -98,13 +98,14 @@ export const ReUploadResource = () => {
   };
 
   const handleVideoUpload = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !myLearningId) return;
 
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
       if (myLearningId !== null) {
         formData.append('learningid', myLearningId);
+        console.log('here we are' + myLearningId);
       }
 
       const res = await fetch('/api/v1/extract-transcribe', {
@@ -154,7 +155,12 @@ export const ReUploadResource = () => {
       let input;
       if (fileType === 'video') {
         const keyWordsArray = await handleVideoUpload();
-        input = keyWordsArray.toString();
+        if (keyWordsArray.toString() !== undefined && keyWordsArray !== null) {
+          input = keyWordsArray.toString();
+        }
+        else {
+          input = '';
+        }
       } else if (fileType == 'text') {
         input = content;
       } else if (fileType == 'keywords') {

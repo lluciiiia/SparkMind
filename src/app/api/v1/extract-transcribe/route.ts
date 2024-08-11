@@ -9,7 +9,7 @@ import {
   // generationConfig,
   safetySettings,
 } from '@/app/api/v1/gemini-settings';
-import { type NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
 //supabse
@@ -184,6 +184,7 @@ export async function PATCH(req: NextRequest) {
 
     if (learning_id === null) {
       console.error('leaning Id is missing');
+      return NextResponse.json({ error: 'Learning is required' }, { status: 400 });
     }
 
     if (!file) {
@@ -195,6 +196,7 @@ export async function PATCH(req: NextRequest) {
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
     console.log('user 🆔 : ' + uuid);
+    console.log('learning_id from extract-transcript api 🆔 : ' + learning_id);
 
     if (uuid === undefined) {
       console.log('Please Login or SignUp');
@@ -234,6 +236,7 @@ export async function PATCH(req: NextRequest) {
 
     if (error) {
       console.log('Occur while trascription is upload in DB: ' + error.details);
+      return NextResponse.json({ error: error.details }, { status: 400 });
     }
 
     return NextResponse.json({ keywordsArr, transcription });
@@ -253,6 +256,7 @@ export async function POST(req: NextRequest) {
 
     if (learning_id === null) {
       console.error('leaning Id is missing');
+      return NextResponse.json({ error: 'Learning is required' }, { status: 400 });
     }
 
     if (!file) {
@@ -263,12 +267,14 @@ export async function POST(req: NextRequest) {
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
-    console.log('user 🆔 : ' + uuid);
 
     if (uuid === undefined) {
       console.log('Please Login or SignUp');
       return NextResponse.json({ error: 'Please Login or SignUp' }, { status: 500 });
     }
+
+    console.log('user 🆔 : ' + uuid);
+    console.log('learning_id from extract-transcript api 🆔 : ' + learning_id);
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
