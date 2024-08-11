@@ -27,7 +27,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         console.log('is video exists  : ', exists);
         return NextResponse.json({ status: 200, exists: exists });
       } else {
-        console.log('No data found for learning_id:', learningid);
+        console.log('No data found for learningid:', learningid);
         return NextResponse.json({ status: 404, check: false });
       }
     }
