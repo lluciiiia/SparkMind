@@ -28,10 +28,13 @@ import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
-import { getYoutubeResponse, saveOutput } from '../../../api-handler';
+import {
+  processFinalizing,
+  processInput,
+  // saveOutput,
+} from '../../../api-handler';
 //Circle Loading Style
 import '@/styles/css/Circle-loader.css';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
@@ -138,7 +141,14 @@ export const NewDashboard = () => {
 
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
-      const response = await saveOutput(input, myLearningId);
+      const processInputResponse = await processInput(input, myLearningId);
+
+      if (processInputResponse.status === 200) {
+        await processFinalizing(input, myLearningId, processInputResponse.data.outputId);
+      } else {
+        console.error('processInput failed:', processInputResponse);
+        return;
+      }
 
       router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
