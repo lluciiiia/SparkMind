@@ -4,7 +4,6 @@ import { type NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const learningid = req.nextUrl.searchParams.get('learningid');
-    console.log('learningid 🆔 : ' + learningid);
 
     const supabaseClient = createClient();
 
@@ -22,7 +21,6 @@ export async function GET(req: NextRequest, res: NextResponse) {
       if (data && data.length > 0) {
         return NextResponse.json({ status: 200, check: data[0].is_task_preview_done });
       } else {
-        console.log('No data found for learning_id:', learningid);
         return NextResponse.json({ status: 404, check: false });
       }
     }

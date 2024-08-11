@@ -4,11 +4,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const learningid = req.nextUrl.searchParams.get('learning_id');
-    console.log('todo task learningid 🆔 : ' + learningid);
 
     const supabaseClient = createClient();
-
-    console.log('Learningid 🆔 : ' + learningid);
 
     if (learningid !== null) {
       const { data, error } = await supabaseClient

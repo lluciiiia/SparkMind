@@ -14,7 +14,6 @@ export const UploadComponent = () => {
       const pathURL = URL.createObjectURL(file);
       setSelectedFile(file);
       setObjectURL(pathURL);
-      console.log(objectURL);
     }
   };
 
