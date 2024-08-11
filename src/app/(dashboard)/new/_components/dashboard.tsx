@@ -98,7 +98,7 @@ export const NewDashboard = () => {
   };
 
   const handleVideoUpload = async () => {
-    if (!selectedFile || !myLearningId) return;
+    if (!selectedFile) return;
 
     try {
       const formData = new FormData();

@@ -24,7 +24,7 @@ import { Label } from '@/components/ui/label';
 import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
 import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 import { getYoutubeResponse, saveOutput } from '@/app/api-handler';
@@ -33,12 +33,10 @@ import '@/styles/css/Circle-loader.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
 
 export const ReUploadVideo = () => {
   const searchParams = useSearchParams();
-  const myLearningId = searchParams.get('id') as string;
-  const [learningid, setLearningId] = useState<string>(myLearningId);
+  const myLearningId = searchParams.get('id');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -49,10 +47,6 @@ export const ReUploadVideo = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  useEffect(() => {
-    setLearningId(myLearningId);
-  }, [learningid])
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -87,27 +81,21 @@ export const ReUploadVideo = () => {
   const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      if (file.size <= 5 * 1024 * 1024) {
-        const pathURL = URL.createObjectURL(file);
-        setSelectedFile(file);
-        setObjectURL(pathURL);
-        console.log(objectURL);
-      }
-      else {
-        toast.error('File size must be less than 5MB because we are in the testing phase.');
-      }
+      const pathURL = URL.createObjectURL(file);
+      setSelectedFile(file);
+      setObjectURL(pathURL);
+      console.log(objectURL);
     }
   };
 
   const handleVideoUpload = async () => {
-    if (!selectedFile || !learningid) return;
+    if (!selectedFile) return;
 
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
-      if (learningid !== null) {
-        console.log('videinput from learning id : ' + learningid);
-        formData.append('learningid', learningid);
+      if (myLearningId !== null) {
+        formData.append('learningid', myLearningId);
       }
 
       const res = await fetch('/api/v1/extract-transcribe', {
