@@ -11,6 +11,17 @@ export const getYoutubeResponse = async (input: string) => {
   return { data: response.data };
 };
 
+export const saveOutput = async (input: string, myLearningId: string) => {
+  const processInputResponse = await processInput(input, myLearningId);
+
+  if (processInputResponse.status === 200) {
+    await processFinalizing(input, myLearningId, processInputResponse.data.outputId);
+  } else {
+    console.error('processInput failed:', processInputResponse);
+    return;
+  }
+};
+
 export const processInput = async (input: string, myLearningId: string) => {
   return await axios.post(`/api/v1/outputs/input-processing?id=${myLearningId}`, {
     input: input,
