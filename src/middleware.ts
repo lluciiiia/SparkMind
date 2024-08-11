@@ -1,5 +1,6 @@
 import { updateSession } from '@/utils/supabase/middleware';
 import type { User } from '@supabase/supabase-js';
+import { url } from 'inspector';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -37,13 +38,23 @@ const handleRedirect = ({
   res: NextResponse;
   redirect: boolean;
 } => {
+
+  if (user) {
+    return { res: NextResponse.next(), redirect: true };
+  }
+
   if (req.nextUrl.pathname.includes('/signin') && user) {
-    const nextRes = NextResponse.redirect(req.nextUrl.href.replace('/signin', '/dashboard'));
+    const nextRes = NextResponse.redirect(req.nextUrl.href.replace('/signin', '/my-learning'));
     return { res: nextRes, redirect: true };
   }
 
-  if (req.nextUrl.pathname.includes('/dashboard') && !user) {
-    const nextRes = NextResponse.redirect(req.nextUrl.href.replace('/dashboard', '/signin'));
+  if (!user
+    && req.nextUrl.pathname !== '/signin/password_signin'
+    && req.nextUrl.pathname !== '/auth/error'
+    && req.nextUrl.pathname !== '/auth/callback'
+    && req.nextUrl.pathname !== '/auth/reset_password'
+    && req.nextUrl.pathname !== '/') {
+    const nextRes = NextResponse.redirect(new URL('/signin/password_signin', req.url));
     return { res: nextRes, redirect: true };
   }
 
