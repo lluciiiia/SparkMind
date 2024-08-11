@@ -147,7 +147,7 @@ const DiscussWithGeminiAI: React.FC<Props> = () => {
             <div className='w-full max-w-4xl p-4'>
                 <h1 className='text-2xl font-bold mb-4'>Discuss with Gemini AI</h1>
             </div>
-            <div className="flex flex-col space-y-2 w-full max-w-4xl px-4 h-4/5 overflow-y-scroll mb-10 no-scrollbar">
+            <div className="flex flex-col space-y-3 w-full max-w-4xl px-4 h-4/5 overflow-y-scroll mb-10 no-scrollbar">
                 {responses.map((response, index) => (
                     response.sender === 'user' ?
                         (
