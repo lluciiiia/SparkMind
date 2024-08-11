@@ -32,8 +32,6 @@ const uploadStreamToGCS = async (destination: string) => {
 };
 
 const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
-  console.log('hello videoid : ' + videoid);
-  console.log('Extracting and uploading audio ...');
   const destFileName = `output${videoid}.wav`;
   const gcsUri = `gs://${bucketName}/${destFileName}`;
 
@@ -77,8 +75,6 @@ const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<s
 
 const transcribeAudio = async (gcsUri: string): Promise<string> => {
   const client = new SpeechClient();
-  //const gcsUri = `gs://geminiai-transcript/output.wav`;
-  console.log('gcsUri : ' + gcsUri);
 
   const audio = {
     uri: gcsUri,
@@ -194,12 +190,8 @@ export async function PATCH(req: NextRequest) {
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
-    console.log('user 🆔 : ' + uuid);
-
-    if (uuid === undefined) {
-      console.log('Please Login or SignUp');
+    if (uuid === undefined)
       return NextResponse.json({ error: 'Please Login or SignUp' }, { status: 500 });
-    }
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
@@ -262,8 +254,6 @@ export async function POST(req: NextRequest) {
     var supabaseClient = createClient();
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
-
-    console.log('user 🆔 : ' + uuid);
 
     if (uuid === undefined) {
       console.log('Please Login or SignUp');

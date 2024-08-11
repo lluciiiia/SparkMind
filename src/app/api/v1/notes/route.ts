@@ -1,4 +1,3 @@
-import type { NoteType } from '@/schema/notes';
 import { createClient } from '@/utils/supabase/server';
 import { type NextRequest, NextResponse } from 'next/server';
 
@@ -62,8 +61,6 @@ export async function PUT(req: NextRequest) {
     if (!id) return NextResponse.json({ error: 'Missing note ID' }, { status: 400 });
 
     const body = (await req.json()) as { title: string; content: string };
-
-    console.log(id, body.title, body.content);
 
     const { data, error } = await supabase
       .from('notes')

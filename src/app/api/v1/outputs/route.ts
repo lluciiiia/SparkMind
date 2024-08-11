@@ -66,7 +66,6 @@ export async function POST(req: NextRequest) {
       });
 
     if (myLearningError) {
-      console.log('myLearningError: ', myLearningError);
       return NextResponse.json({ error: 'Error getting my learning' }, { status: 500 });
     }
 
@@ -74,7 +73,6 @@ export async function POST(req: NextRequest) {
 
     const { data: output, error: outputError } = await getAndSaveOutputByLearningId(myLearningId);
     if (outputError) {
-      console.log('outputError: ', outputError);
       return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
     }
 

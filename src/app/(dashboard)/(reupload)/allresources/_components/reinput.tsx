@@ -93,7 +93,6 @@ export const ReUploadResource = () => {
       const pathURL = URL.createObjectURL(file);
       setSelectedFile(file);
       setObjectURL(pathURL);
-      console.log(objectURL);
     }
   };
 
@@ -116,15 +115,6 @@ export const ReUploadResource = () => {
 
       // @ts-ignore trust me bro
       const data = (await res.json()) as any;
-      console.log(data);
-
-      // right now not usefull to display the transcript
-      // setFetchedTranscript(data.transcription);
-      // setKeywords(data.keywordsArr);
-
-      //const value = { 'title': 'Video File' };
-
-      // handleCreate(value);
 
       //clean up old setState
       setSelectedFile(null);

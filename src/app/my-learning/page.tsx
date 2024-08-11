@@ -93,12 +93,7 @@ export const MyLearning = () => {
 
       const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-      //setUserId(uuid);
-
-      if (!uuid) {
-        console.log('User Id is not get');
-        throw new Error('User ID not returned from superbase');
-      }
+      if (!uuid) throw new Error('User ID not returned from superbase');
 
       const res = await axios.get(`/api/v1/store-learnings?userId=${uuid}`);
       if (res.status === 200) {
@@ -147,22 +142,13 @@ export const MyLearning = () => {
     month: 'short' as const,
     year: 'numeric' as const,
   };
-  const DateDiplay = new Date().toLocaleDateString('en-GB', options);
 
   const handleAddCard = async () => {
     const supabaseClient = createClient();
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-    if (!uuid) {
-      console.log('User Id is not get');
-      throw new Error('User ID not returned from superbase');
-    }
-
-    if (!uuid) {
-      console.log('User Is is not get');
-      return;
-    }
+    if (!uuid) throw new Error('User ID not returned from superbase');
 
     const data = {
       uuid: uuid,
@@ -174,17 +160,7 @@ export const MyLearning = () => {
       const res = await axios.post('/api/v1/store-learnings', data);
       if (res.status === 200) {
         const newLearningId = res.data.body[0].id;
-        console.log('Learning id : ' + res.data.body[0].id);
         redirectToDashboard(newLearningId);
-        // const newCard = {
-        //   id: res.data.body[0].id,
-        //   index: cards.length,
-        //   title: "Undefined",
-        //   date: DateDiplay,
-        // };
-        // const updatedCards = [newCard, ...cards];
-        // setCards(updatedCards);
-        // setOriginalCards(updatedCards);
       } else {
         console.error('Error storing data:', res.data.error);
       }
@@ -200,10 +176,7 @@ export const MyLearning = () => {
 
         const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-        if (!uuid) {
-          console.log('User Id is not get');
-          throw new Error('User ID not returned from superbase');
-        }
+        if (!uuid) throw new Error('User ID not returned from superbase');
 
         const response = await axios.delete('/api/v1/store-learnings', {
           data: { id, uuid },
@@ -241,7 +214,6 @@ export const MyLearning = () => {
 
   function handleEdit(id: string): void {
     const filteredCard = cards.find((card) => card.id === id);
-    console.log(filteredCard);
     if (filteredCard) {
       const parsedDate = parseDateUTC(filteredCard.date);
       setCurrTitle(filteredCard.title);
@@ -261,10 +233,7 @@ export const MyLearning = () => {
 
       const userId = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-      if (!userId) {
-        console.log('User Id is not get');
-        throw new Error('User ID not returned from superbase');
-      }
+      if (!userId) throw new Error('User ID not returned from superbase');
 
       const response = await axios.patch('/api/v1/store-learnings', {
         id: card.id,
@@ -289,8 +258,6 @@ export const MyLearning = () => {
       } else {
         console.error('Error updating data:', response.data.body);
       }
-
-      //toggleSort(); // for sort the cards after date changes
     } catch (error) {
       console.error('Error Update my learning ', (error as Error).message);
     }
