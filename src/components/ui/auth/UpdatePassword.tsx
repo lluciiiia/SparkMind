@@ -6,7 +6,6 @@ import { updatePassword } from '@/utils/auth/server';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
-import { toast } from 'sonner';
 
 interface UpdatePasswordProps {
   redirectMethod: string;
@@ -17,17 +16,9 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    try {
-      setIsSubmitting(true); // Disable the button while the request is being handled
-      await handleRequest(e, updatePassword, router);
-    }
-    catch {
-      toast.error("Sign in with your Google account, or if you don't have one, try again later.");
-    }
-    finally {
-      setIsSubmitting(false);
-    }
-
+    setIsSubmitting(true); // Disable the button while the request is being handled
+    await handleRequest(e, updatePassword, router);
+    setIsSubmitting(false);
   };
 
   return (
