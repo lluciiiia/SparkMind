@@ -18,7 +18,7 @@ const uploadscreen = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
+                <Link href="/dashboard">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
           </BreadcrumbList>

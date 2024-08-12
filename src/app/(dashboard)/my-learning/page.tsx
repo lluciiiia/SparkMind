@@ -26,7 +26,7 @@ import {
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FaPlus, FaSearch } from 'react-icons/fa';
+import { FaEdit, FaEye, FaPlus, FaSearch } from 'react-icons/fa';
 import { PiDotsThreeOutlineVerticalThin } from 'react-icons/pi';
 
 import { UserNav } from '@/components/dashboard/user-nav';
@@ -45,9 +45,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { ScrollBar } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { createClient } from '@/utils/supabase/client';
+import { ScrollArea } from '@radix-ui/react-scroll-area';
 import axios from 'axios';
-import { Link } from 'lucide-react';
+import Link from 'next/link';
 
 type Cards = {
   id: string;
@@ -123,7 +127,7 @@ export const MyLearning = () => {
         console.error('Error fetching data:', res.data.body);
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      throw new Error('Error fetching data : ' + (error as Error).message);
     }
   };
 
@@ -141,13 +145,6 @@ export const MyLearning = () => {
     init();
   }, []);
 
-  //for Diplay in card
-  const options = {
-    day: 'numeric' as const,
-    month: 'short' as const,
-    year: 'numeric' as const,
-  };
-
   const handleAddCard = async () => {
     const supabaseClient = createClient();
 
@@ -157,7 +154,7 @@ export const MyLearning = () => {
 
     const data = {
       uuid: uuid,
-      title: 'Undefined',
+      title: 'New Note',
       date: dateFormatter(new Date()),
     };
 
@@ -170,7 +167,7 @@ export const MyLearning = () => {
         console.error('Error storing data:', res.data.error);
       }
     } catch (error) {
-      console.error('Error storing data:', error);
+      throw new Error('Error storing data : ' + (error as Error).message);
     }
   };
 
@@ -196,7 +193,7 @@ export const MyLearning = () => {
         }
       }
     } catch (error) {
-      console.error('Error when Delete my learning : ', (error as Error).message);
+      throw new Error('Error when Delete my learning : ' + (error as Error).message);
     }
   };
 
@@ -264,7 +261,7 @@ export const MyLearning = () => {
         console.error('Error updating data:', response.data.body);
       }
     } catch (error) {
-      console.error('Error Update my learning ', (error as Error).message);
+      throw new Error('Error Update my learning : ' + (error as Error).message);
     }
   };
 
@@ -311,11 +308,11 @@ export const MyLearning = () => {
 
   return (
     <ContentLayout title="My Learning">
-      <Breadcrumb>
+      <Breadcrumb className={`flex flex-row items-center justify-between`}>
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/">Home</Link>
+              <Link href="/dashboard">Home</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -323,85 +320,73 @@ export const MyLearning = () => {
             <BreadcrumbPage>My Learning</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
+        <div className="flex flex-row items-center ml-6">
+          <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
+            <FaSearch size={18} />
+          </div>
+          <input
+            type="text"
+            className="border border-gray-300 rounded-lg px-4 py-2 h-9 pl-10 bg-[#e6e6e6]"
+            placeholder="Search"
+            onChange={(e) => handleSearch(e.target.value)}
+          />
+        </div>
       </Breadcrumb>
-      <section className="bg-[#fef9f5] h-screen">
-        <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4 `}>
+      <section className="bg-[#fef9f5] min-h-screen">
+        <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4`}>
           <div className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <div className="mr-4">
-                  <Image
-                    src={'/assets/images/logo.png'}
-                    alt="logo"
-                    width={10}
-                    height={10}
-                    className="w-12 h-12"
-                  />
-                </div>
-                <div className="flex flex-row items-center ml-6">
-                  <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
-                    <FaSearch size={18} />
-                  </div>
-                  <input
-                    type="text"
-                    className="border border-gray-300 rounded-lg px-4 py-2 h-9 pl-10 bg-[#e6e6e6]"
-                    placeholder="Search"
-                    onChange={(e) => handleSearch(e.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
             <div className="flex flex-row items-center">
               <h1 className="text-4xl font-mediums text-black">My</h1>
-              <div className="ml-10 w-4 h-4 rounded-full  bg-black"></div>
+              <div className="ml-10 w-4 h-4 rounded-full bg-black"></div>
               <div className="w-full h-1 bg-black"></div>
             </div>
             <div className="flex sm:flex-row flex-col sm:items-center">
               <h1 className="text-4xl font-mediums text-black">Learnings</h1>
-              <div className="sm:ml-10 md:mt-0 mt-2 flex items-center">
-                <div className="switch-toggle border dark:border-black border-black">
-                  <input
-                    className="switch-toggle-checkbox"
-                    type="checkbox"
-                    id="Recent-Date"
-                    onClick={toggleSort}
-                  />
-                  <label className="switch-toggle-label dark:bg-black" htmlFor="Recent-Date">
-                    <span>Recent</span>
-                    <span>Date</span>
-                  </label>
-                </div>
+              <div className="sm:ml-10 md:mt-0 mt-2 flex items-center mx-auto">
+                <Tabs defaultValue="recent" onValueChange={toggleSort}>
+                  <TabsList>
+                    <TabsTrigger value="recent">Recent</TabsTrigger>
+                    <TabsTrigger value="date">Date</TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
             </div>
           </div>
-          <article
-            className={`h-[33rem] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 grid-flow-dense gap-y-20 sm:mx-16 mx-4 pb-8`}
-          >
-            <div
-              className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex items-center justify-center`}
+          <ScrollArea className="h-full w-full">
+            <article
+              className={`h-full w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 pb-8`}
             >
-              <Button
-                className="bg-transparent border-dashed border-2 border-blue-500 w-[150px] h-[150px] mx-auto hover:bg-transparent hover:border-blue-500 hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleAddCard();
-                }}
-              >
-                <FaPlus size={24} color="#60a5fa" />
-              </Button>
-            </div>
-            {cards.map((card) => (
-              <LearningCard
-                id={card.id}
-                key={card.id}
-                title={card.title}
-                date={card.date}
-                onEdit={handleEdit}
-                bgColor={colorMap.get(card.index) || '#ffffff'}
-                handleDashboardScreen={redirectToMyLearningPage}
-              />
-            ))}
-          </article>
+              <div className={`w-full h-full flex items-center justify-center`}>
+                <Button
+                  className={`
+                    bg-transparent border-dashed border-2 border-blue-500 w-full 
+                    h-full mx-auto hover:bg-transparent hover:border-blue-500 
+                    hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl
+                    flex flex-col justify-center items-center
+                    p-8
+                  `}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleAddCard();
+                  }}
+                >
+                  <FaPlus size={24} color="#60a5fa" />
+                </Button>
+              </div>
+              {cards.map((card) => (
+                <LearningCard
+                  id={card.id}
+                  key={card.id}
+                  title={card.title}
+                  date={card.date}
+                  onEdit={handleEdit}
+                  bgColor={colorMap.get(card.index) || '#ffffff'}
+                  handleDashboardScreen={redirectToMyLearningPage}
+                />
+              ))}
+            </article>
+            <ScrollBar orientation={`vertical`} />
+          </ScrollArea>
           <Dialog open={isDialogOpen}>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
@@ -460,7 +445,7 @@ export const MyLearning = () => {
         </div>
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-            <div className="Circleloader"></div>
+            <div className="Circleloader" />
           </div>
         )}
       </section>
@@ -483,30 +468,49 @@ const LearningCard = ({
   bgColor: string;
   handleDashboardScreen: (id: string) => void;
 }) => {
+  const [isHover, setIsHover] = useState(false);
   return (
-    <Card
-      className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex flex-col justify-between
-    rounded-tl-none rounded-tr-3xl rounded-b-3xl shadow-xl border-none cursor-pointer`}
-      style={{ backgroundColor: bgColor }}
-      onClick={() => handleDashboardScreen(id)}
+    <div
+      className="relative w-full h-full"
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
     >
-      <CardHeader className="flex items-center">
-        <CardTitle className="w-full text-left text-black">{title}</CardTitle>
-      </CardHeader>
-      <CardFooter className="flex justify-between items-center ">
-        <div className="text-left text-black">{date}</div>
-        <Button
-          variant="outline"
-          className="bg-gray-500 border-none shadow-xl hover:bg-gray-600"
-          onClick={(e) => {
-            onEdit(id);
-            e.stopPropagation();
-          }}
+      <Card
+        className={`
+          w-full h-full flex flex-col justify-between
+          rounded-tl-none rounded-tr-3xl rounded-b-3xl shadow-xl border-none cursor-pointer
+        `}
+        style={{
+          backgroundColor: bgColor,
+          filter: isHover ? 'brightness(0.5)' : 'brightness(1)',
+        }}
+      >
+        <CardHeader className="flex items-center">
+          <CardTitle className="w-full text-left text-black">{title}</CardTitle>
+        </CardHeader>
+        <CardFooter className="flex justify-between items-center ">
+          <div className="text-left text-black">{date}</div>
+        </CardFooter>
+      </Card>
+      {isHover && (
+        <div
+          className="absolute inset-0 bg-opacity-50 flex items-center justify-center transition-opacity"
+          onClick={(e) => e.stopPropagation()}
         >
-          <PiDotsThreeOutlineVerticalThin size={20} className="text-white" />
-        </Button>
-      </CardFooter>
-    </Card>
+          <div className="flex space-x-4">
+            <div
+              className="bg-white p-2 rounded-full cursor-pointer"
+              onClick={() => handleDashboardScreen(id)}
+            >
+              <FaEye size={24} className="text-black" title="View" />
+            </div>
+            <div className="bg-white p-2 rounded-full cursor-pointer" onClick={() => onEdit(id)}>
+              <FaEdit size={24} className="text-black" title="Edit" />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

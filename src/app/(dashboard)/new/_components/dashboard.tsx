@@ -31,6 +31,7 @@ import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 import { saveOutput } from '../../../api-handler';
 //Circle Loading Style
 import '@/styles/css/Circle-loader.css';
+import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
@@ -176,7 +177,7 @@ export const NewDashboard = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
+                <Link href="/dashboard">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

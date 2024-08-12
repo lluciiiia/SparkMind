@@ -38,7 +38,7 @@ export const UploadComponent = () => {
       setFetchedTranscript(data.transcription);
       setKeywords(data.keywordsArr);
     } catch (err: any) {
-      console.error(err);
+      throw new Error('Error when extract transcribe : ' + (err as Error).message);
     }
   };
 
