@@ -38,6 +38,9 @@ import Image from 'next/image';
 
 import { createClient } from '@/utils/supabase/client';
 import axios from 'axios';
+import { ContentLayout } from '@/components';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb';
+import { Link } from 'lucide-react';
 
 
 type Cards = {
@@ -301,6 +304,20 @@ export const MyLearning = () => {
   };
 
   return (
+    <ContentLayout title="My Learning">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/">Home</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>My Learning</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
     <section className="bg-[#fef9f5] h-screen">
       <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4 `}>
         <div className="p-4">
@@ -326,10 +343,6 @@ export const MyLearning = () => {
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
-            </div>
-            <div className="flex items-center justify-end flex-1 space-x-2">
-              <ModeToggle />
-              <UserNav />
             </div>
           </div>
           <div className="flex flex-row items-center">
@@ -445,6 +458,7 @@ export const MyLearning = () => {
         </div>
       )}
     </section>
+    </ContentLayout>
   );
 };
 

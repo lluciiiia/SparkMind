@@ -32,7 +32,7 @@ import {
   Transcript,
   type VideoItem,
 } from './interfaces';
-import { NewNoteSection } from './new-note';
+import { NewNoteSection } from '../../notes/_components';
 
 import ActionCard from './cards/ActionCard';
 import SummaryCard from './cards/SummaryCard';

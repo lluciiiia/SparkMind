@@ -39,10 +39,7 @@ export const Results = ({
         </TabsTrigger>
       </TabsList>
       <TabsContent value="new">
-        <>
-          <Scraper />
-          <></>
-        </>
+        <Scraper />
       </TabsContent>
       <TabsContent value="recent">
         <ScrollArea>

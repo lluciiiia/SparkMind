@@ -18,7 +18,7 @@ import { SpeechClient } from '@google-cloud/speech';
 //Google Cloude imports
 import { Storage } from '@google-cloud/storage';
 
-const bucketName = 'geminiai-transcript'; // Replace with your bucket name
+const bucketName: string = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
 const uploadStreamToGCS = async (destination: string) => {
   const storage = new Storage();
