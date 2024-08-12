@@ -14,6 +14,12 @@ declare global {
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string;
       STRIPE_SECRET_KEY: string;
       STRIPE_WEBHOOK_SECRET: string;
+      GCP_PROJECT_ID: string;
+      GCP_PRIVATE_KEY_ID: string;
+      GCP_PRIVATE_KEY: string;
+      GCP_CLIENT_EMAIL: string;
+      GCP_CLIENT_ID: string;
+      GCP_CLIENT_X509_CERT_URL: string;
     }
   }
 }
