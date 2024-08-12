@@ -17,12 +17,19 @@ import { createClient } from '@/utils/supabase/server';
 import { SpeechClient } from '@google-cloud/speech';
 //Google Cloude imports
 import { Storage } from '@google-cloud/storage';
+import { serviceAccount } from '@/constants';
+import ffmpegPath from 'ffmpeg-static';
+
 
 const bucketName: string = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
 const uploadStreamToGCS = async (destination: string) => {
-  const storage = new Storage();
+  const storage = new Storage({
+    keyFilename: serviceAccount.private_key,
+    projectId: serviceAccount.project_id,
+  });
   const bucket = storage.bucket(bucketName);
+
   const file = bucket.file(destination);
   const passThroughStream = file.createWriteStream({
     resumable: false,
@@ -31,11 +38,16 @@ const uploadStreamToGCS = async (destination: string) => {
   return passThroughStream;
 };
 
+// for Extrack KeyWord from Transcript
 const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
   const destFileName = `output${videoid}.wav`;
   const gcsUri = `gs://${bucketName}/${destFileName}`;
 
-  const ffmpeg = spawn('ffmpeg', [
+  if(!ffmpegPath){
+    throw new Error('ffmpegPath not avalable right now');
+  }
+
+  const ffmpeg = spawn(ffmpegPath, [
     '-i',
     'pipe:0',
     '-ac',
@@ -61,7 +73,7 @@ const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<s
         console.log('Audio uploaded to GCS successfully. ⭐✅');
         resolve(gcsUri);
       })
-      .on('error', reject); //shows processig status
+      .on('error', reject);
 
     ffmpeg.stderr.on('data', (data) => {
       console.error(`ffmpeg stderr: ${data}`);
@@ -109,50 +121,44 @@ interface AIresponse {
 }
 
 // for Extrack KeyWord from Transcript
-const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
-  const destFileName = `output${videoid}.wav`;
-  const gcsUri = `gs://${bucketName}/${destFileName}`;
+const extractKeywordsAndQuestions = async (transcript: string) => {
+  try {
+    //configaration based on different type of output
+    const generationConfig = {
+      temperature: 0.7,
+      topP: 0.85,
+      topK: 50,
+      maxOutputTokens: 1048576,
+      responseMimeType: 'application/json',
+    };
 
-  if(!ffmpegPath){
-    throw new Error('ffmpegPath not avalable right now');
+    const genModel = genAI.getGenerativeModel({
+      model,
+      generationConfig,
+      safetySettings,
+    });
+
+    const inputMessage = `
+    {
+      "role": "Global Expert in extracting information from transcripts",
+      "context": "Process the following transcript to extract the most important and relevant keywords and five small 3 to 5 word questions. Keywords should be used for finding related YouTube videos and other online resources. Questions should be used for discussion with AI and other online resources and in the question not use any special character like inverted comma and other. Ensure both keywords and questions are specific to the context of the transcript and highly relevant.",
+      "transcript": "${transcript.replace(/"/g, '\\"')}",
+      "response_format": "json",
+      "example": { "keywords": ["example keyword"], "questions": ["example question"] }
+    }`;
+
+    const result = await genModel.generateContent(inputMessage);
+    //const result = await chatSession.sendMessage(inputMessage);
+    const responseText = result.response.text();
+    console.log(responseText);
+    const sanitizedResponseText = responseText.replace(/\r?\n|\r/g, '');
+    const extractedData = (await JSON.parse(sanitizedResponseText)) as AIresponse;
+
+    return extractedData;
+  } catch (error) {
+    console.error('Error in extract Keywords And Questions:', (error as Error).message);
+    throw new Error(`Error in extract Keywords And Questions: ${(error as Error).message}`);
   }
-
-  const ffmpeg = spawn(ffmpegPath, [
-    '-i',
-    'pipe:0',
-    '-ac',
-    '1',
-    '-acodec',
-    'pcm_s16le',
-    '-ar',
-    '16000',
-    '-f',
-    'wav',
-    'pipe:1',
-  ]);
-
-  const uploadStream = await uploadStreamToGCS(destFileName);
-
-  return new Promise((resolve, reject) => {
-    ffmpeg.stdin.write(buffer);
-    ffmpeg.stdin.end();
-
-    ffmpeg.stdout
-      .pipe(uploadStream)
-      .on('finish', () => {
-        console.log('Audio uploaded to GCS successfully. ⭐✅');
-        resolve(gcsUri);
-      })
-      .on('error', reject); //shows processig status
-
-    ffmpeg.stderr.on('data', (data) => {
-      console.error(`ffmpeg stderr: ${data}`);
-    });
-
-    ffmpeg.on('error', (error) => {
-      reject(`ffmpeg error: ${error}`);
-    });
-  });
 };
 
 const deleteAudioFile = (videoid: string) => {
