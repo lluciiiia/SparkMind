@@ -21,6 +21,7 @@ import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { z } from 'zod';
+import { NewNoteSection } from '../../notes/_components';
 import {
   type FurtherInfo,
   Message,
@@ -32,7 +33,6 @@ import {
   Transcript,
   type VideoItem,
 } from './interfaces';
-import { NewNoteSection } from '../../notes/_components';
 
 import ActionCard from './cards/ActionCard';
 import SummaryCard from './cards/SummaryCard';

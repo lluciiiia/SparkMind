@@ -5,7 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PING, PONG } from '@/constants';
 import { createAPIClient } from '@/lib';
-import { InputSchema, ScrapeSchema, type ScraperQueueItemType, inputSchema, scrapeSchema } from '@/schema/scrape';
+import {
+  type InputSchema,
+  type ScrapeSchema,
+  type ScraperQueueItemType,
+  inputSchema,
+  scrapeSchema,
+} from '@/schema/scrape';
 import { createClient } from '@/utils/supabase/client';
 import type React from 'react';
 import { memo, useState } from 'react';
@@ -13,11 +19,9 @@ import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { AiFrame } from './AiFrame';
 
-import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 import { fetchDescriptionFromURL } from '@/lib/scrape';
 import { debounce } from '@/utils';
-
-
+import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 
 export const Scraper: React.FC = memo(() => {
   const [scraper, setScraper] = useState<ScraperQueueItemType | null>(null);
@@ -83,7 +87,7 @@ export const Scraper: React.FC = memo(() => {
     try {
       const response = await fetch(`${PING}${url}`, { method: 'GET' });
       console.log('response', response);
-      const data = await response.json() as ScrapeSchema;
+      const data = (await response.json()) as ScrapeSchema;
       console.log('data', data);
       if (data) {
         const updatedScraperItem: ScraperQueueItemType = {
@@ -112,7 +116,10 @@ export const Scraper: React.FC = memo(() => {
         });
         console.log('postResponse', postResponse);
         if (postResponse.ok) {
-          const postData = await postResponse.json() as Extract<InputSchema, { url: string, text: string, created_at: Date, updated_at: Date }>;
+          const postData = (await postResponse.json()) as Extract<
+            InputSchema,
+            { url: string; text: string; created_at: Date; updated_at: Date }
+          >;
 
           if (postData) {
             toast.success('Scraping was successful');
@@ -167,12 +174,17 @@ export const Scraper: React.FC = memo(() => {
           } text-white py-2 px-4 rounded text-lg font-bold border-none outline-none shadow-md transition-colors duration-300 flex items-center justify-center gap-2`}
           data-testid="scrape-all"
           disabled={!url || scraper?.status === 'pending'}
-          onClick={(e) =>  handleSubmit(e)}
+          onClick={(e) => handleSubmit(e)}
         >
           <span className="ml-2">Scrape website</span>
         </Button>
       </form>
-      <AiFrame topic={topic} websiteData={websiteData} uuid={uuid} isLoading={scraper?.status === 'pending'} />
+      <AiFrame
+        topic={topic}
+        websiteData={websiteData}
+        uuid={uuid}
+        isLoading={scraper?.status === 'pending'}
+      />
     </>
   );
 });
