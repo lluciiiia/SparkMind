@@ -105,10 +105,8 @@ export async function DELETE(req: NextRequest) {
     const { uuid, id }: any = await req.json();
     const supabase = createClient();
 
-    // Log the parameters to help with debugging
     console.log('Deleting record with Learning ID: ' + id + ', and UUID: ' + uuid);
 
-    // Perform the delete operation
     const { data, error } = await supabase
       .from('mylearnings')
       .delete()
@@ -122,7 +120,6 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ status: 200, body: data });
   } catch (error) {
-    console.error('Error in Delete API:', (error as Error).message);
     return NextResponse.json({
       status: 500,
       error: `Something went wrong: ${(error as Error).message}`,

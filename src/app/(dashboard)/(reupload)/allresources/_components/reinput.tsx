@@ -123,7 +123,7 @@ export const ReUploadResource = () => {
 
       return data.keywordsArr;
     } catch (err: any) {
-      console.error(err);
+      throw new Error('Error when extract transcribe : ' + (err as Error).message);
     }
   };
 
@@ -132,7 +132,7 @@ export const ReUploadResource = () => {
       const response = await saveOutput(input, myLearningId);
       router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
-      console.error(err);
+      throw new Error('Error when save output : ' + (err as Error).message);
     }
   };
 
@@ -153,7 +153,7 @@ export const ReUploadResource = () => {
 
       await handleUpload(input, myLearningId);
     } catch (err: any) {
-      console.error(err);
+      throw new Error('Error when submit changes : ' + (err as Error).message);
     } finally {
       setIsLoading(false);
     }

@@ -5,6 +5,7 @@ import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
 import { useStore } from '@/hooks/use-store';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from 'usehooks-ts';
+
 export default function AdminPanelLayout({
   children,
 }: {
@@ -23,7 +24,7 @@ export default function AdminPanelLayout({
           sidebar?.isOpen === false
             ? isLaptop
               ? 'w-[calc(100%)] lg:ml-[90px]'
-              : 'w-[calc(100%-4rem)] lg:ml-[90px]'
+              : 'w-[calc(100%-2rem)] lg:ml-[90px]'
             : isLaptop
               ? 'w-[calc(100%-90px)] lg:ml-[90px]'
               : 'w-[calc(100%-18rem)] lg:ml-72',

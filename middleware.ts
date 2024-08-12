@@ -1,4 +1,4 @@
-import  updateSession  from '@/utils/supabase';
+import { updateSession } from '@/utils/supabase/middleware';
 import type { User } from '@supabase/supabase-js';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
