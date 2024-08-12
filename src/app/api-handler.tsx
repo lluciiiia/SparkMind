@@ -17,8 +17,7 @@ export const saveOutput = async (input: string, myLearningId: string) => {
   if (processInputResponse.status === 200) {
     await processFinalizing(input, myLearningId, processInputResponse.data.outputId);
   } else {
-    console.error('processInput failed:', processInputResponse);
-    return;
+    throw new Error('processInput failed : ' + processInputResponse);
   }
 };
 
@@ -48,7 +47,6 @@ export const getOutput = async (myLearningId: string) => {
 
 export const createNote = async (myLearningId: string) => {
   const response = await axios.post(`/api/v1/notes?id=${myLearningId}`);
-  console.log('response: ' + response.data);
   return { data: response.data };
 };
 

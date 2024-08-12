@@ -42,7 +42,6 @@ export const searchYouTube = async (query: string) => {
 
     console.log(JSON.stringify(results, null, 2));
   } catch (error) {
-    console.error('Error fetching data from YouTube:', error);
-    throw new Error('Failed to fetch data from YouTube');
+    throw new Error('Error fetching data from YouTube : ' + (error as Error).message);
   }
 };

@@ -95,7 +95,6 @@ export function createAPIClient() {
       );
       return res.data;
     } catch (error) {
-      console.error(`Failed to update note with id ${note.id}:`, error);
       throw new Error(
         `Error updating note with id ${note.id}: ${error instanceof Error ? error.message : 'Unknown error'}`,
       );
