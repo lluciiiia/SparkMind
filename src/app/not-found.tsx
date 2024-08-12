@@ -39,8 +39,9 @@ const NotFound = React.memo(() => {
             text-[#0257AC] text-[1.2rem]
           `}
         >
-          Just like a marathon, coding can sometimes lead us off track. But don't worry, we're here
-          to help you cross the finish line. Let's get you back to the starting block.
+          It looks like you've lost your way in SparkMind. The page you're looking for doesn't
+          exist. Try exploring our platform to learn new concepts, improve your skills, and compete
+          against other users.
         </p>
         <Button className="bg-[#0257AC] text-white mt-4" onClick={() => router.push('/')}>
           Return to the starting line

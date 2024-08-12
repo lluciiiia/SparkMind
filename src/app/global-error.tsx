@@ -34,10 +34,10 @@ export default function GlobalError({
         <p
           className={`
 					text-center text-lg
-						text-[#3C2415] mt-2
+						text-[#0257AC] mt-2
 						`}
         >
-          {error.message}
+          {error instanceof Error ? `${error.message}\n${error.stack}` : null}
         </p>
         <Button
           className={`

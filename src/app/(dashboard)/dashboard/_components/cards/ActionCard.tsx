@@ -10,10 +10,10 @@ import '@/styles/css/custom-scroll.css';
 import { Calendar as Calendericon } from 'lucide-react';
 import Link from 'next/link';
 
-import '@/styles/css/Circle-loader.css';
-
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
-  if (!learningId) console.error('LearningId is Missing in ActionCard');
+  if (!learningId) {
+    console.error('LearningId is Missing in ActionCard');
+  }
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 

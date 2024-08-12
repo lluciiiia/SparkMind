@@ -1,4 +1,4 @@
-import { Book, Folder, House, Square, SquarePlus } from 'lucide-react';
+import { Book, Filter, Folder, House, Square, SquarePlus } from 'lucide-react';
 
 type Submenu = {
   href: string;
@@ -38,20 +38,13 @@ export function getMenuList(pathname: string, id: string | null): Group[] {
           icon: Folder,
           submenus: [],
         },
-        // {
-        //   href: `/myresources?id=${id}`,
-        //   label: 'My Resources',
-        //   active: pathname.includes(`/myresources`),
-        //   icon: Folder,
-        //   submenus: [],
-        // },
-        // {
-        //   href: `/myqna?id=${id}`,
-        //   label: 'My QnA',
-        //   active: pathname.includes(`/myqna`),
-        //   icon: Folder,
-        //   submenus: [],
-        // },
+        {
+          href: `/scrape`,
+          label: 'Scrape',
+          active: pathname.includes(`/scrape`),
+          icon: Filter,
+          submenus: [],
+        },
       ],
     },
     {

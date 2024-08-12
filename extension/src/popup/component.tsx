@@ -1,72 +1,50 @@
-import { Hello } from '@src/components/hello';
-import { Scroller } from '@src/components/scroller';
 import React from 'react';
-import browser, { type Tabs } from 'webextension-polyfill';
+
+import { Api, ScraperQueue } from '@src/classes';
+import { Scraper } from '@src/components/scraper/component';
+import { PONG } from '@src/constants';
+import type { ScraperQueueItemType } from '@src/schema';
+import supabase from '@src/supabase/supabase';
+import { getCurrentUser } from '@src/utils/auth';
+import Browser from 'webextension-polyfill';
 import css from './styles.module.css';
 
-// // // //
-
-// Scripts to execute in current tab
-const scrollToTopPosition = 0;
-const scrollToBottomPosition = 9999999;
-
-function scrollWindow(position: number) {
-  window.scroll(0, position);
-}
-
-/**
- * Executes a string of Javascript on the current tab
- * @param code The string of code to execute on the current tab
- */
-function executeScript(position: number): void {
-  // Query for the active tab in the current window
-  browser.tabs.query({ active: true, currentWindow: true }).then((tabs: Tabs.Tab[]) => {
-    // Pulls current tab from browser.tabs.query response
-    const currentTab: Tabs.Tab | number = tabs[0];
-
-    // Short circuits function execution is current tab isn't found
-    if (!currentTab) {
-      return;
-    }
-    const currentTabId: number = currentTab.id as number;
-
-    // Executes the script in the current tab
-    browser.scripting
-      .executeScript({
-        target: {
-          tabId: currentTabId,
-        },
-        func: scrollWindow,
-        args: [position],
-      })
-      .then(() => {
-        console.log('Done Scrolling');
-      });
-  });
-}
-
-// // // //
-
 export function Popup() {
-  // Sends the `popupMounted` event
+  const signInWithGoogle = async () => {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+    });
+
+    if (data?.url) {
+      await Browser.runtime.sendMessage({
+        action: 'signInWithGoogle',
+        payload: { url: data.url },
+      });
+    }
+  };
+
   React.useEffect(() => {
-    browser.runtime.sendMessage({ popupMounted: true });
+    try {
+      Browser.runtime.sendMessage({ popupMounted: true });
+    } catch (error) {
+      console.error('Error in popup.tsx:', error);
+      throw new Error(`${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+    // getCurrentUser().then((resp) => {
+    //   if (resp) {
+    //     console.log('user id:', resp.user.id);
+    //   } else {
+    //     console.log('user is not found');
+    //   }
+    // });
   }, []);
 
-  // Renders the component tree
   return (
     <div className={css.popupContainer}>
       <div className="mx-4 my-4">
-        <Hello />
+        {/* <button onClick={signInWithGoogle}>Sign In with Google</button> */}
+        <Scraper />
         <hr />
-        <Scroller
-          onClickScrollTop={() => {
-            executeScript(scrollToTopPosition);
-          }}
-          onClickScrollBottom={() => {
-            executeScript(scrollToBottomPosition);
-          }}
-        />
       </div>
     </div>
   );

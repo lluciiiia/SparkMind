@@ -9,6 +9,15 @@ export const Slugify = (text: string) => {
     .replace(/[^\w-]+/g, '');
 };
 
+export const debounce = (fn: Function, time = 300): Function => {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (this: any, ...args: any[]) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      fn.apply(this, args);
+    }, time);
+  };
+};
 export const isValidObjectId = (val: string): boolean => /^[0-9a-fA-F]{24}$/.test(val);
 
 export const ScrollIntoCenterView = (href: string) => {
@@ -25,7 +34,7 @@ export const ScrollIntoCenterView = (href: string) => {
   }
 };
 
-export const getURL = (path = '') => {
+export const getURL = (path = ''): string => {
   // Check if NEXT_PUBLIC_SITE_URL is set and non-empty. Set this to your site URL in production env.
   let url =
     process?.env?.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.trim() !== ''

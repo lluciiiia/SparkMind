@@ -16,6 +16,9 @@
 # production
 /build
 
+# supabase
+/supabase/
+
 # misc
 .DS_Store
 *.pem
@@ -54,5 +57,11 @@ package-lock.json
 bun.lockb
 .vercel
 
+# Ignore all service worker files with hashes
+service-worker*.js
+service-worker*.js.map
+swe-worker-development.js
+workbox-*.js
+workbox-*.js.map
 #supabase
 /supabase/

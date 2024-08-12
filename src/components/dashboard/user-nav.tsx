@@ -27,11 +27,11 @@ export function UserNav() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
-  const route = useRouter();
+  const supabase = createClient();
+  const router = useRouter();
 
   const getUserInfo = async () => {
     try {
-      const supabase = createClient();
       const { data, error } = await supabase.auth.getUser();
       if (error) {
         console.error('Error fetching user data:', error.message);
@@ -56,7 +56,7 @@ export function UserNav() {
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    return route.push('/');
+    return router.push('/');
   };
 
   return (
