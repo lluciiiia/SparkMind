@@ -53,3 +53,6 @@ pnpm-workspace.yaml
 package-lock.json
 bun.lockb
 .vercel
+
+#supabase
+/supabase/
