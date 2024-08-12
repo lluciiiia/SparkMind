@@ -12,14 +12,13 @@ import {
 import { type NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
+import { serviceAccount } from '@/constants';
 //supabse
 import { createClient } from '@/utils/supabase/server';
 import { SpeechClient } from '@google-cloud/speech';
 //Google Cloude imports
 import { Storage } from '@google-cloud/storage';
-import { serviceAccount } from '@/constants';
 import ffmpegPath from 'ffmpeg-static';
-
 
 const bucketName: string = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
@@ -43,7 +42,7 @@ const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<s
   const destFileName = `output${videoid}.wav`;
   const gcsUri = `gs://${bucketName}/${destFileName}`;
 
-  if(!ffmpegPath){
+  if (!ffmpegPath) {
     throw new Error('ffmpegPath not avalable right now');
   }
 
@@ -142,7 +141,7 @@ const extractKeywordsAndQuestions = async (transcript: string) => {
     {
       "role": "Global Expert in extracting information from transcripts",
       "context": "Process the following transcript to extract the most important and relevant keywords and five small 3 to 5 word questions. Keywords should be used for finding related YouTube videos and other online resources. Questions should be used for discussion with AI and other online resources and in the question not use any special character like inverted comma and other. Ensure both keywords and questions are specific to the context of the transcript and highly relevant.",
-      "transcript": "${transcript.replace(/"/g, '\\"')}",
+      "transcript": "${transcript.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}",
       "response_format": "json",
       "example": { "keywords": ["example keyword"], "questions": ["example question"] }
     }`;
