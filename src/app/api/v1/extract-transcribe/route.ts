@@ -12,16 +12,16 @@ import {
 import { type NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
+import { PassThrough, Readable } from 'stream';
 import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
-import { Readable, PassThrough } from 'stream';
 
+import { serviceAccount } from '@/constants/service';
 //supabse
 import { createClient } from '@/utils/supabase/server';
 import { SpeechClient } from '@google-cloud/speech';
 //Google Cloude imports
 import { Storage } from '@google-cloud/storage';
-import { serviceAccount } from '@/constants/service';
 
 const bucketName = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
@@ -171,9 +171,7 @@ const deleteAudioFile = (videoid: string) => {
   const file = bucket.file(destFileName);
   file
     .delete()
-    .then((data) => {
-      
-    })
+    .then((data) => {})
     .catch((error) => {
       console.log('Error while deleting Audio File from GCloud : ' + error);
       return error;

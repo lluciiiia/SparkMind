@@ -49,8 +49,7 @@ export default function Home() {
 
       setshowList(VSlList);
     } catch (error) {
-      console.error('Error creating event:', error);
-      alert('Error creating event');
+      throw new Error('Error creating event : ' + (error as Error).message);
     }
   };
 
@@ -65,8 +64,7 @@ export default function Home() {
         alert(`Error: ${res.data.message}`);
       }
     } catch (err) {
-      console.error('Error get video list:', err);
-      alert('Error get video list');
+      throw new Error('Error get video list : ' + (err as Error).message);
     }
   };
 
@@ -110,7 +108,7 @@ export default function Home() {
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/">Home</Link>
+              <Link href="/dashboard">Home</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
