@@ -17,7 +17,6 @@ import React, { memo } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-
 export const Search = memo(({ search }: { search: string }) => {
   const searchParams = useSearchParams();
   const pathname = usePathname();

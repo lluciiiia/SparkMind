@@ -1,7 +1,6 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
-
 @import "./Circle-loader.css";
 @import "./custom-scroll.css";
 @import "./custom-styles.css";

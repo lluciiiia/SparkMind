@@ -2,12 +2,11 @@
 
 import { userAgent } from '@/constants';
 import type { InputSchema, OutputSchema } from '@/schema/scrape';
-import ogs from 'open-graph-scraper';
 import { createClient } from '@/utils/supabase/server';
+import ogs from 'open-graph-scraper';
 import { v4 as uuidv4 } from 'uuid';
 
-const studyGuidePrompt = (topic: string, 
-websiteData: string): string => `
+const studyGuidePrompt = (topic: string, websiteData: string): string => `
 You are a helpful AI assistant creating a 
 concise and informative study guide on the 
 topic of "${topic}" using information extracted 
@@ -40,32 +39,29 @@ aid understanding.
 const fetchDescriptionFromURL = async (url: string) => {
   const options = {
     url,
-      fetchOptions: { headers: { 'user-agent': userAgent } }
-    };
+    fetchOptions: { headers: { 'user-agent': userAgent } },
+  };
 
-    try {
-        const { result } = await ogs(options);
-        return result.ogDescription || 'No description found';
-      } catch (error) {
-        throw new Error(`${error instanceof Error ? error.message : 'An unknown error occurred'}`);
-      }
-    };
+  try {
+    const { result } = await ogs(options);
+    return result.ogDescription || 'No description found';
+  } catch (error) {
+    throw new Error(`${error instanceof Error ? error.message : 'An unknown error occurred'}`);
+  }
+};
 
 const insertScraperOutput = async (textOutput: string, promptName: string, uuid: string) => {
   const supabase = createClient();
-  
+
   const newOutput = {
     output_id: uuid,
     text_output: textOutput,
     created_at: new Date(),
     updated_at: new Date(),
-    prompt_name: promptName
+    prompt_name: promptName,
   };
 
-  const { data, error } = await supabase
-    .from('scraper_output')
-    .insert(newOutput)
-    .select();
+  const { data, error } = await supabase.from('scraper_output').insert(newOutput).select();
 
   if (error) {
     console.error('Error inserting scraper output:', error);
@@ -121,4 +117,10 @@ const fetchRecentScrapes = async (query: string): Promise<OutputSchema[]> => {
   return data;
 };
 
-export { fetchAllScrapes, fetchRecentScrapes, fetchDescriptionFromURL, insertScraperOutput, studyGuidePrompt };
+export {
+  fetchAllScrapes,
+  fetchRecentScrapes,
+  fetchDescriptionFromURL,
+  insertScraperOutput,
+  studyGuidePrompt,
+};

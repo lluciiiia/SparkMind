@@ -36,12 +36,18 @@ import { assignColors } from '@/utils/assignColors';
 
 import Image from 'next/image';
 
+import { ContentLayout } from '@/components';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 import { createClient } from '@/utils/supabase/client';
 import axios from 'axios';
-import { ContentLayout } from '@/components';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbSeparator, BreadcrumbPage } from '@/components/ui/breadcrumb';
 import { Link } from 'lucide-react';
-
 
 type Cards = {
   id: string;
@@ -318,146 +324,146 @@ export const MyLearning = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
-    <section className="bg-[#fef9f5] h-screen">
-      <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4 `}>
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <div className="mr-4">
-                <Image
-                  src={'/assets/images/logo.png'}
-                  alt="logo"
-                  width={10}
-                  height={10}
-                  className="w-12 h-12"
-                />
-              </div>
-              <div className="flex flex-row items-center ml-6">
-                <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
-                  <FaSearch size={18} />
+      <section className="bg-[#fef9f5] h-screen">
+        <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4 `}>
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <div className="mr-4">
+                  <Image
+                    src={'/assets/images/logo.png'}
+                    alt="logo"
+                    width={10}
+                    height={10}
+                    className="w-12 h-12"
+                  />
                 </div>
-                <input
-                  type="text"
-                  className="border border-gray-300 rounded-lg px-4 py-2 h-9 pl-10 bg-[#e6e6e6]"
-                  placeholder="Search"
-                  onChange={(e) => handleSearch(e.target.value)}
-                />
+                <div className="flex flex-row items-center ml-6">
+                  <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
+                    <FaSearch size={18} />
+                  </div>
+                  <input
+                    type="text"
+                    className="border border-gray-300 rounded-lg px-4 py-2 h-9 pl-10 bg-[#e6e6e6]"
+                    placeholder="Search"
+                    onChange={(e) => handleSearch(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-row items-center">
+              <h1 className="text-4xl font-mediums text-black">My</h1>
+              <div className="ml-10 w-4 h-4 rounded-full  bg-black"></div>
+              <div className="w-full h-1 bg-black"></div>
+            </div>
+            <div className="flex sm:flex-row flex-col sm:items-center">
+              <h1 className="text-4xl font-mediums text-black">Learnings</h1>
+              <div className="sm:ml-10 md:mt-0 mt-2 flex items-center">
+                <div className="switch-toggle border dark:border-black border-black">
+                  <input
+                    className="switch-toggle-checkbox"
+                    type="checkbox"
+                    id="Recent-Date"
+                    onClick={toggleSort}
+                  />
+                  <label className="switch-toggle-label dark:bg-black" htmlFor="Recent-Date">
+                    <span>Recent</span>
+                    <span>Date</span>
+                  </label>
+                </div>
               </div>
             </div>
           </div>
-          <div className="flex flex-row items-center">
-            <h1 className="text-4xl font-mediums text-black">My</h1>
-            <div className="ml-10 w-4 h-4 rounded-full  bg-black"></div>
-            <div className="w-full h-1 bg-black"></div>
-          </div>
-          <div className="flex sm:flex-row flex-col sm:items-center">
-            <h1 className="text-4xl font-mediums text-black">Learnings</h1>
-            <div className="sm:ml-10 md:mt-0 mt-2 flex items-center">
-              <div className="switch-toggle border dark:border-black border-black">
-                <input
-                  className="switch-toggle-checkbox"
-                  type="checkbox"
-                  id="Recent-Date"
-                  onClick={toggleSort}
-                />
-                <label className="switch-toggle-label dark:bg-black" htmlFor="Recent-Date">
-                  <span>Recent</span>
-                  <span>Date</span>
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <article
-          className={`h-[33rem] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 grid-flow-dense gap-y-20 sm:mx-16 mx-4 pb-8`}
-        >
-          <div
-            className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex items-center justify-center`}
+          <article
+            className={`h-[33rem] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 grid-flow-dense gap-y-20 sm:mx-16 mx-4 pb-8`}
           >
-            <Button
-              className="bg-transparent border-dashed border-2 border-blue-500 w-[150px] h-[150px] mx-auto hover:bg-transparent hover:border-blue-500 hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl"
-              onClick={(e) => {
-                e.preventDefault();
-                handleAddCard();
-              }}
+            <div
+              className={`w-[14rem] h-[150px] sm:h-[200px] md:h-[250px] flex items-center justify-center`}
             >
-              <FaPlus size={24} color="#60a5fa" />
-            </Button>
-          </div>
-          {cards.map((card) => (
-            <LearningCard
-              id={card.id}
-              key={card.id}
-              title={card.title}
-              date={card.date}
-              onEdit={handleEdit}
-              bgColor={colorMap.get(card.index) || '#ffffff'}
-              handleDashboardScreen={redirectToMyLearningPage}
-            />
-          ))}
-        </article>
-        <Dialog open={isDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit Details</DialogTitle>
-              <DialogDescription>
-                Make changes to your Learning here. Click save when you're done.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="titleinput" className="text-right">
-                  Title
-                </Label>
-                <Input
-                  type="text"
-                  id="titleinput"
-                  value={currTitle}
-                  className="col-span-3"
-                  onChange={(e) => setCurrTitle(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="dateinput" className="text-right">
-                  Date
-                </Label>
-                <Input
-                  type="date"
-                  id="dateinput"
-                  value={currDate.toISOString().substring(0, 10)}
-                  className="col-span-3"
-                  onChange={handleDateChange}
-                />
-              </div>
+              <Button
+                className="bg-transparent border-dashed border-2 border-blue-500 w-[150px] h-[150px] mx-auto hover:bg-transparent hover:border-blue-500 hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAddCard();
+                }}
+              >
+                <FaPlus size={24} color="#60a5fa" />
+              </Button>
             </div>
-            <DialogFooter>
-              <div className="w-full flex justify-between">
-                <Button
-                  type="submit"
-                  className="bg-red-500 hover:bg-red-900 text-white"
-                  onClick={() => handleDelete(editingCardId)}
-                >
-                  Delete
-                </Button>
-                <div>
-                  <Button type="submit" className="mr-2" onClick={cancelChanges}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" onClick={() => saveChanges(editingCardId)}>
-                    Save changes
-                  </Button>
+            {cards.map((card) => (
+              <LearningCard
+                id={card.id}
+                key={card.id}
+                title={card.title}
+                date={card.date}
+                onEdit={handleEdit}
+                bgColor={colorMap.get(card.index) || '#ffffff'}
+                handleDashboardScreen={redirectToMyLearningPage}
+              />
+            ))}
+          </article>
+          <Dialog open={isDialogOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Edit Details</DialogTitle>
+                <DialogDescription>
+                  Make changes to your Learning here. Click save when you're done.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="titleinput" className="text-right">
+                    Title
+                  </Label>
+                  <Input
+                    type="text"
+                    id="titleinput"
+                    value={currTitle}
+                    className="col-span-3"
+                    onChange={(e) => setCurrTitle(e.target.value)}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="dateinput" className="text-right">
+                    Date
+                  </Label>
+                  <Input
+                    type="date"
+                    id="dateinput"
+                    value={currDate.toISOString().substring(0, 10)}
+                    className="col-span-3"
+                    onChange={handleDateChange}
+                  />
                 </div>
               </div>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </div>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-          <div className="Circleloader"></div>
+              <DialogFooter>
+                <div className="w-full flex justify-between">
+                  <Button
+                    type="submit"
+                    className="bg-red-500 hover:bg-red-900 text-white"
+                    onClick={() => handleDelete(editingCardId)}
+                  >
+                    Delete
+                  </Button>
+                  <div>
+                    <Button type="submit" className="mr-2" onClick={cancelChanges}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" onClick={() => saveChanges(editingCardId)}>
+                      Save changes
+                    </Button>
+                  </div>
+                </div>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
-      )}
-    </section>
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+            <div className="Circleloader"></div>
+          </div>
+        )}
+      </section>
     </ContentLayout>
   );
 };

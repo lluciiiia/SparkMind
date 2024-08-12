@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import { Slide } from '@/components/animation';
 import {
@@ -12,54 +12,59 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchAllScrapes } from '@/lib/scrape';
 import type { OutputSchema } from '@/schema';
-import { useState, memo } from 'react';
+import { memo, useState } from 'react';
 import { toast } from 'sonner';
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 
-const All = memo(({ query, page = 1, all }: { query: string; page: number; all: OutputSchema[] }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const totalPages = Math.ceil(all.length / 20);
-  useIsomorphicLayoutEffect(() => {
-    setIsLoading(true);
-  }, [query, page]);
-  return (
-    <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {isLoading
-          ? Array.from({ length: 20 }).map((_, index) => (
-              <Skeleton key={index} className="h-[200px] w-full rounded-lg" />
-            ))
-          : all.slice((page - 1) * 20, page * 20).map((scrape: OutputSchema, index: number) => {
-              return (
-                <Slide delay={index * 0.1} key={scrape.output_id}>
-                  <ScrapeCard all={scrape} />
-                </Slide>
-              );
-            })}
-      </div>
-      <Pagination className="mt-8">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href={`?query=${query}&page=${page - 1}`} isActive={page === 1} />
-          </PaginationItem>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-            <PaginationItem key={pageNum}>
-              <PaginationLink href={`?query=${query}&page=${pageNum}`} isActive={pageNum === page}>
-                {pageNum}
-              </PaginationLink>
+const All = memo(
+  ({ query, page = 1, all }: { query: string; page: number; all: OutputSchema[] }) => {
+    const [isLoading, setIsLoading] = useState(true);
+    const totalPages = Math.ceil(all.length / 20);
+    useIsomorphicLayoutEffect(() => {
+      setIsLoading(true);
+    }, [query, page]);
+    return (
+      <>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {isLoading
+            ? Array.from({ length: 20 }).map((_, index) => (
+                <Skeleton key={index} className="h-[200px] w-full rounded-lg" />
+              ))
+            : all.slice((page - 1) * 20, page * 20).map((scrape: OutputSchema, index: number) => {
+                return (
+                  <Slide delay={index * 0.1} key={scrape.output_id}>
+                    <ScrapeCard all={scrape} />
+                  </Slide>
+                );
+              })}
+        </div>
+        <Pagination className="mt-8">
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious href={`?query=${query}&page=${page - 1}`} isActive={page === 1} />
             </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext
-              href={`?query=${query}&page=${page + 1}`}
-              isActive={page === totalPages}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-    </>
-  );
-});
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <PaginationItem key={pageNum}>
+                <PaginationLink
+                  href={`?query=${query}&page=${pageNum}`}
+                  isActive={pageNum === page}
+                >
+                  {pageNum}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            <PaginationItem>
+              <PaginationNext
+                href={`?query=${query}&page=${page + 1}`}
+                isActive={page === totalPages}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </>
+    );
+  },
+);
 
 export { All };
 
