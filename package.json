@@ -214,5 +214,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vhpx/google-gemini-competition.git"
-  }
+  },
+  "module": "index.ts"
 }

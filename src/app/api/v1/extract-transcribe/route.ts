@@ -109,44 +109,50 @@ interface AIresponse {
 }
 
 // for Extrack KeyWord from Transcript
-const extractKeywordsAndQuestions = async (transcript: string) => {
-  try {
-    //configaration based on different type of output
-    const generationConfig = {
-      temperature: 0.7,
-      topP: 0.85,
-      topK: 50,
-      maxOutputTokens: 1048576,
-      responseMimeType: 'application/json',
-    };
+const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
+  const destFileName = `output${videoid}.wav`;
+  const gcsUri = `gs://${bucketName}/${destFileName}`;
 
-    const genModel = genAI.getGenerativeModel({
-      model,
-      generationConfig,
-      safetySettings,
+  if(!ffmpegPath){
+    throw new Error('ffmpegPath not avalable right now');
+  }
+
+  const ffmpeg = spawn(ffmpegPath, [
+    '-i',
+    'pipe:0',
+    '-ac',
+    '1',
+    '-acodec',
+    'pcm_s16le',
+    '-ar',
+    '16000',
+    '-f',
+    'wav',
+    'pipe:1',
+  ]);
+
+  const uploadStream = await uploadStreamToGCS(destFileName);
+
+  return new Promise((resolve, reject) => {
+    ffmpeg.stdin.write(buffer);
+    ffmpeg.stdin.end();
+
+    ffmpeg.stdout
+      .pipe(uploadStream)
+      .on('finish', () => {
+        console.log('Audio uploaded to GCS successfully. ⭐✅');
+        resolve(gcsUri);
+      })
+      .on('error', reject); //shows processig status
+
+    ffmpeg.stderr.on('data', (data) => {
+      console.error(`ffmpeg stderr: ${data}`);
     });
 
-    const inputMessage = `
-    {
-      "role": "Global Expert in extracting information from transcripts",
-      "context": "Process the following transcript to extract the most important and relevant keywords and five small 3 to 5 word questions. Keywords should be used for finding related YouTube videos and other online resources. Questions should be used for discussion with AI and other online resources and in the question not use any special character like inverted comma and other. Ensure both keywords and questions are specific to the context of the transcript and highly relevant.",
-      "transcript": "${transcript.replace(/"/g, '\\"')}",
-      "response_format": "json",
-      "example": { "keywords": ["example keyword"], "questions": ["example question"] }
-    }`;
-
-    const result = await genModel.generateContent(inputMessage);
-    //const result = await chatSession.sendMessage(inputMessage);
-    const responseText = result.response.text();
-    console.log(responseText);
-    const sanitizedResponseText = responseText.replace(/\r?\n|\r/g, '');
-    const extractedData = (await JSON.parse(sanitizedResponseText)) as AIresponse;
-
-    return extractedData;
-  } catch (error) {
-    console.error('Error in extract Keywords And Questions:', (error as Error).message);
-    throw new Error(`Error in extract Keywords And Questions: ${(error as Error).message}`);
-  }
+    ffmpeg.on('error', (error) => {
+      reject(`ffmpeg error: ${error}`);
+    });
+  });
 };
 
 const deleteAudioFile = (videoid: string) => {
