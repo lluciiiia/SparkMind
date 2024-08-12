@@ -12,4 +12,4 @@ const serviceAccount = {
   universe_domain: "googleapis.com"
 };
 
-export default serviceAccount;
+export { serviceAccount };
