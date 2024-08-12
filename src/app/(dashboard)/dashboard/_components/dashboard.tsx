@@ -25,7 +25,6 @@ import { useRef, useState } from "react";
 import { FaCaretLeft, FaCaretRight, FaTimes } from "react-icons/fa";
 import { PiNoteBlankFill } from "react-icons/pi";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "usehooks-ts";
-import { z } from "zod";
 import { NewNoteSection } from "../../notes/_components";
 import {
   type FurtherInfo,
