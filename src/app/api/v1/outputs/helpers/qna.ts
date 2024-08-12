@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { genAI, generationConfig, model, safetySettings } from '../../gemini-settings';
 
 dotenv.config();
+
 // Define the Zod schema
 const quizSchema = z.array(
   z.object({

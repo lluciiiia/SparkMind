@@ -1,7 +1,12 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+@import "./Circle-loader.css";
+@import "./custom-scroll.css";
 @import "./custom-styles.css";
+@import "./fonts.css";
+@import "./LoadingIndicator.css";
+@import "./toggle-switch.css";
 
 @layer base {
   :root {
@@ -78,4 +83,8 @@
   position: absolute;
   left: 0;
   font-weight: bold;
+}
+
+html {
+  font-family: Poppins, sans-serif;
 }

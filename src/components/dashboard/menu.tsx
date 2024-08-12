@@ -12,7 +12,8 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { getMenuList } from '@/lib/menu-list';
 import { cn } from '@/lib/utils';
-
+import { createClient } from '@/utils/supabase/client';
+import { useRouter } from 'next/navigation';
 interface MenuProps {
   isOpen: boolean | undefined;
 }
@@ -114,7 +115,10 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => {}}
+                    onClick={() => {
+                      supabase.auth.signOut();
+                      router.push('/signin');
+                    }}
                     variant="outline"
                     className="justify-center w-full h-10 mt-5"
                   >

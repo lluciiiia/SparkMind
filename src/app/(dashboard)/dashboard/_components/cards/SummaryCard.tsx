@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import '../../../../../styles/css/markdown.css';
+import React from 'react';
 type Paragraph = { title: string; data: string };
 
 import { Card } from '@/components/ui/card';
 import { marked } from 'marked';
+import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 
 type Props = { summaryData: string };
 export default function SummaryCard({ summaryData }: Props) {
-  const [htmlContent, setHtmlContent] = useState('');
+  const [htmlContent, setHtmlContent] = React.useState('');
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const fetchData = async () => {
       const content = await marked(summaryData);
       setHtmlContent(content);

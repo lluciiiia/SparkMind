@@ -1,4 +1,4 @@
-import type { ComponentMeta } from '@storybook/react';
+import type { Meta } from '@storybook/react';
 import * as React from 'react';
 import { Popup } from '../component';
 
@@ -7,6 +7,6 @@ import { Popup } from '../component';
 export default {
   title: 'Components/Popup',
   component: Popup,
-} as ComponentMeta<typeof Popup>;
+} as Meta<typeof Popup>;
 
 export const Render = () => <Popup />;
