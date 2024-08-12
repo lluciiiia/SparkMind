@@ -5,35 +5,50 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PING, PONG } from '@/constants';
 import { createAPIClient } from '@/lib';
-import { type ScraperQueueItemType, inputSchema, scrapeSchema } from '@/schema/scrape';
+import { InputSchema, ScrapeSchema, type ScraperQueueItemType, inputSchema, scrapeSchema } from '@/schema/scrape';
 import { createClient } from '@/utils/supabase/client';
 import type React from 'react';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { AiFrame } from './AiFrame';
 
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 import { fetchDescriptionFromURL } from '@/lib/scrape';
+import { debounce } from '@/utils';
 
 
 
-export const Scraper = () => {
+export const Scraper: React.FC = memo(() => {
   const [scraper, setScraper] = useState<ScraperQueueItemType | null>(null);
   const [url, setUrl] = useState<string>('');
   const [websiteData, setWebsiteData] = useState<string>('');
   const [topic, setTopic] = useState<string>('');
+  const [uuid, setUuid] = useState<string>('');
 
   useIsomorphicLayoutEffect(() => {
-    if (!url) return;
+    if (!url || !isValidURL(url)) return;
     const fetchDescription = async () => {
-      const description = await fetchDescriptionFromURL(url);
-      setTopic(description);
+      try {
+        const description = await fetchDescriptionFromURL(url);
+        setTopic(description);
+      } catch (error) {
+        console.error('Error fetching description:', error);
+        setTopic('No description available');
+      }
     };
     fetchDescription();
   }, [url]);
 
-  const { fetch } = createAPIClient();
+  const isValidURL = (string: string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+
   const supabaseClient = createClient();
 
   const getUser = async () => {
@@ -48,21 +63,29 @@ export const Scraper = () => {
     return user?.id;
   };
 
-  const processItem = async (item: ScraperQueueItemType) => {
+  const processItem = async (item: ScraperQueueItemType): Promise<void> => {
+    const newUuid = uuidv4();
+    setUuid(newUuid);
     if (!url) {
-      toast.error('No URL found');
+      toast.error('Please enter a URL before scraping');
       return;
     }
+    console.log('item', item);
+    console.log('url', url);
     setScraper(item);
     const user_id = await getUser();
+    console.log('user_id', user_id);
     if (!user_id) {
-      toast.error('No user ID found');
+      toast.error('No user ID found. Please log in and try again.');
       return;
     }
 
     try {
-      const response = await fetch(`${PING}${url}`, { method: 'GET' }, scrapeSchema);
-      if (response.success) {
+      const response = await fetch(`${PING}${url}`, { method: 'GET' });
+      console.log('response', response);
+      const data = await response.json() as ScrapeSchema;
+      console.log('data', data);
+      if (data) {
         const updatedScraperItem: ScraperQueueItemType = {
           ...item,
           url,
@@ -70,32 +93,40 @@ export const Scraper = () => {
           finishedAt: new Date(),
         };
         setScraper(updatedScraperItem);
-        setWebsiteData(response.data[0].filteredTexts.join('\n'));
-        const postResponse = await fetch(
-          PONG,
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              user_id,
-              url: url,
-              text: response.data[0].filteredTexts.join('\n'),
-              created_at: new Date(),
-              updated_at: new Date(),
-            }),
+        setWebsiteData(data.filteredTexts ? data.filteredTexts.join('\n') : '');
+        console.log(`filteredTexts`, data.filteredTexts);
+        console.log('websiteData', websiteData);
+        const postResponse = await fetch(PONG, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-          inputSchema,
-        );
+          body: JSON.stringify({
+            input_id: newUuid,
+            user_id,
+            url,
+            text: data.filteredTexts ? data.filteredTexts.join('\n') : '',
+            created_at: new Date(),
+            updated_at: new Date(),
+          }),
+        });
+        console.log('postResponse', postResponse);
+        if (postResponse.ok) {
+          const postData = await postResponse.json() as Extract<InputSchema, { url: string, text: string, created_at: Date, updated_at: Date }>;
 
-        if (postResponse.success) {
-          toast.success('Scraping was successful');
+          if (postData) {
+            toast.success('Scraping was successful');
+          } else {
+            toast.error('Failed to save scraping results');
+          }
         } else {
-          toast.error('Scraping was not successful or response is invalid');
+          toast.error('Failed to save scraping results');
         }
       } else {
-        toast.error('Scraping was not successful or response is invalid');
+        throw new Error('Scraping was not successful or response is invalid');
       }
     } catch (error) {
-      toast.error(`${error instanceof Error ? error.message : 'Internal server error'}`);
+      toast.error(`Error: ${error instanceof Error ? error.message : 'An unknown error occurred'}`);
     }
   };
 
@@ -110,17 +141,19 @@ export const Scraper = () => {
     };
     processItem(item);
   };
+  const handleChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value);
+  }, 500);
 
   return (
     <>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+      <form className="flex flex-col gap-4">
         <div>
           <Label htmlFor="url">URL</Label>
           <Input
             id="url"
             type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={(e) => handleChange(e)}
             placeholder="Enter URL"
             className={scraper?.status === 'pending' ? 'cursor-not-allowed' : ''}
           />
@@ -128,17 +161,18 @@ export const Scraper = () => {
         <Button
           type="submit"
           className={`${
-            scraper?.status === 'pending'
+            !url || scraper?.status === 'pending'
               ? 'bg-gray-500 cursor-not-allowed opacity-50 pointer-events-none'
               : 'bg-blue-500 cursor-pointer opacity-100 pointer-events-auto'
           } text-white py-2 px-4 rounded text-lg font-bold border-none outline-none shadow-md transition-colors duration-300 flex items-center justify-center gap-2`}
           data-testid="scrape-all"
-          disabled={scraper?.status === 'pending'}
+          disabled={!url || scraper?.status === 'pending'}
+          onClick={(e) =>  handleSubmit(e)}
         >
           <span className="ml-2">Scrape website</span>
         </Button>
       </form>
-      <AiFrame topic={topic} websiteData={websiteData} />
+      <AiFrame topic={topic} websiteData={websiteData} uuid={uuid} isLoading={scraper?.status === 'pending'} />
     </>
   );
-};
+});

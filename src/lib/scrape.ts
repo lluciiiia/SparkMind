@@ -4,6 +4,38 @@ import { userAgent } from '@/constants';
 import type { InputSchema, OutputSchema } from '@/schema/scrape';
 import ogs from 'open-graph-scraper';
 import { createClient } from '@/utils/supabase/server';
+import { v4 as uuidv4 } from 'uuid';
+
+const studyGuidePrompt = (topic: string, 
+websiteData: string): string => `
+You are a helpful AI assistant creating a 
+concise and informative study guide on the 
+topic of "${topic}" using information extracted 
+from the provided website content.
+
+## Website Content:
+
+\`\`\`
+${websiteData} 
+\`\`\`
+
+## Study Guide Requirements:
+
+* **Concise and Focused:**  Prioritize key 
+concepts and essential information for 
+understanding the topic. 
+* **Organized Structure:** Divide the content 
+into logical sections (e.g., Introduction, Key 
+Concepts, Examples, Applications, Summary) 
+using headings and subheadings.
+* **Clear Language:** Use plain language and 
+avoid jargon where possible.
+* **Examples and Illustrations:** When 
+applicable, include illustrative examples to 
+aid understanding.
+
+## Begin generating the study guide:
+`;
 
 const fetchDescriptionFromURL = async (url: string) => {
   const options = {
@@ -18,36 +50,29 @@ const fetchDescriptionFromURL = async (url: string) => {
         throw new Error(`${error instanceof Error ? error.message : 'An unknown error occurred'}`);
       }
     };
-const scrape = async (user_id: UUID): Promise<{ prompt_name: string; output: OutputSchema[] }> => {
-  const supabaseServer = createClient();
 
-  try {
-    const { data: inputData, error: inputError } = await supabaseServer
-      .from('scraper_input')
-      .select('*')
-      .eq('user_id', user_id)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
+const insertScraperOutput = async (textOutput: string, promptName: string, uuid: string) => {
+  const supabase = createClient();
+  
+  const newOutput = {
+    output_id: uuid,
+    text_output: textOutput,
+    created_at: new Date(),
+    updated_at: new Date(),
+    prompt_name: promptName
+  };
 
-    if (inputError) throw new Error(`Error fetching scraper input: ${inputError.message}`);
-    if (!inputData) throw new Error('No scraper input found for the user');
+  const { data, error } = await supabase
+    .from('scraper_output')
+    .insert(newOutput)
+    .select();
 
-    const { data: outputData, error: outputError } = await supabaseServer
-      .from('scraper_output')
-      .select('*')
-      .eq('prompt_name', inputData.prompt_name);
-
-    if (outputError) throw new Error(`Error fetching scraper output: ${outputError.message}`);
-
-    return {
-      prompt_name: inputData.prompt_name,
-      output: outputData || [],
-    };
-  } catch (error) {
-    console.error('Error in scrape function:', error);
+  if (error) {
+    console.error('Error inserting scraper output:', error);
     throw error;
   }
+
+  return data;
 };
 
 const fetchAllScrapes = async (query: string): Promise<OutputSchema[]> => {
@@ -96,4 +121,4 @@ const fetchRecentScrapes = async (query: string): Promise<OutputSchema[]> => {
   return data;
 };
 
-export { fetchAllScrapes, fetchRecentScrapes, scrape, fetchDescriptionFromURL };
+export { fetchAllScrapes, fetchRecentScrapes, fetchDescriptionFromURL, insertScraperOutput, studyGuidePrompt };

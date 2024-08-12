@@ -1,4 +1,4 @@
-import { Book, Folder, House, Square, SquarePlus } from 'lucide-react';
+import { Book, Filter, Folder, House, Square, SquarePlus } from 'lucide-react';
 
 type Submenu = {
   href: string;
@@ -36,6 +36,13 @@ export function getMenuList(pathname: string, id: string | null): Group[] {
           label: 'My Learning',
           active: pathname.includes(`/my-learning`),
           icon: Folder,
+          submenus: [],
+        },
+        {
+          href: `/scrape`,
+          label: 'Scrape',
+          active: pathname.includes(`/scrape`),
+          icon: Filter,
           submenus: [],
         },
       ],

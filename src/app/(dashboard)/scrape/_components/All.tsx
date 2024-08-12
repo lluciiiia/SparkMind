@@ -12,11 +12,11 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import { fetchAllScrapes } from '@/lib/scrape';
 import type { OutputSchema } from '@/schema';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { toast } from 'sonner';
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 
-const All = ({ query, page = 1, all }: { query: string; page: number; all: OutputSchema[] }) => {
+const All = memo(({ query, page = 1, all }: { query: string; page: number; all: OutputSchema[] }) => {
   const [isLoading, setIsLoading] = useState(true);
   const totalPages = Math.ceil(all.length / 20);
   useIsomorphicLayoutEffect(() => {
@@ -59,7 +59,7 @@ const All = ({ query, page = 1, all }: { query: string; page: number; all: Outpu
       </Pagination>
     </>
   );
-};
+});
 
 export { All };
 

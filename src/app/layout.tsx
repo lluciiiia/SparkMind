@@ -1,14 +1,8 @@
 import '@/styles/css/globals.css';
 import { Providers } from '@/providers';
 import { constructMetadata, constructViewport } from '@/utils';
-import { Poppins } from '@next/font/google';
-import type { NextWebVitalsMetric } from 'next/app';
 
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-poppins',
-});
+import type { NextWebVitalsMetric } from 'next/app';
 
 export const metadata = constructMetadata();
 export const viewport = constructViewport();
@@ -31,7 +25,7 @@ export default function RootLayout({
       data-a11y-link-underlines="false"
       data-turbo-loaded
     >
-      <body className={`${poppins.variable} font-sans bg-background overflow-hidden`}>
+      <body className={`bg-background overflow-hidden`}>
         <Providers>{children}</Providers>
       </body>
     </html>
