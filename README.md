@@ -56,7 +56,7 @@
 
 ## Demo
 
-You can view a fully working demo on [Youtube](https://www.youtube.com/watch?v=J5_yPs4gQoE).
+You can view a fully working demo on [Youtube](https://youtu.be/MJtmCqJjejw?si=j9s7jFL7Lc4eXv8B).
 
 ## Clone and run locally
 
