@@ -146,7 +146,6 @@
     "mkdirp": "^3.0.1",
     "postcss-import": "^16.1.0",
     "supabase": "^1.183.5",
-    "types": "file:next/font/google",
     "typescript": "5.5.3",
     "vitest": "^2.0.2"
   },
