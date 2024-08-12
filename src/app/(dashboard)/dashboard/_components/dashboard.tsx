@@ -44,13 +44,7 @@ import NoteCard from './note';
 import { API_KEY } from '@/app/api/v1/gemini-settings';
 
 import axios from 'axios';
-import {
-  createNote,
-  deleteNote,
-  editNote,
-  getNotes,
-  getOutputResponse,
-} from '../../../api-handler';
+import { createNote, deleteNote, editNote, getNotes, getOutput } from '../../../api-handler';
 import FurtherInfoCard from './cards/FurtherInfo';
 import QuestionAndAnswer from './cards/QuestionAndAnswer';
 
@@ -78,7 +72,7 @@ export const Dashboard = () => {
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
       try {
-        const outputResponse = await getOutputResponse(myLearningId);
+        const outputResponse = await getOutput(myLearningId);
         setOutput(outputResponse.data.body[0]);
 
         const noteResponse = await getNotes(myLearningId);

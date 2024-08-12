@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { PiKeyReturnDuotone } from 'react-icons/pi';
 
 export const getYoutubeResponse = async (input: string) => {
   const params: { query: string; pageToken?: string | null } = {
@@ -11,14 +12,32 @@ export const getYoutubeResponse = async (input: string) => {
 };
 
 export const saveOutput = async (input: string, myLearningId: string) => {
-  const response = await axios.post(`/api/v1/outputs?id=${myLearningId}`, {
-    input: input,
-  });
+  const processInputResponse = await processInput(input, myLearningId);
 
-  return { data: response.data };
+  if (processInputResponse.status === 200) {
+    await processFinalizing(input, myLearningId, processInputResponse.data.outputId);
+  } else {
+    console.error('processInput failed:', processInputResponse);
+    return;
+  }
 };
 
-export const getOutputResponse = async (myLearningId: string) => {
+export const processInput = async (input: string, myLearningId: string) => {
+  return await axios.post(`/api/v1/outputs/input-processing?id=${myLearningId}`, {
+    input: input,
+  });
+};
+
+export const processFinalizing = async (input: string, myLearningId: string, outputId: string) => {
+  return await axios.post(
+    `/api/v1/outputs/finalize-processing?id=${myLearningId}&output-id=${outputId}`,
+    {
+      input: input,
+    },
+  );
+};
+
+export const getOutput = async (myLearningId: string) => {
   const params: { id: string } = {
     id: myLearningId,
   };
