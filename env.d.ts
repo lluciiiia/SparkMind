@@ -1,6 +1,7 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
+      NEXT_PHASE: 'phase-production-build' | 'phase-development-build';
       NEXT_PUBLIC_VERCEL_ENV: 'development' | 'production';
       NEXT_PUBLIC_SUPABASE_URL: string;
       NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
