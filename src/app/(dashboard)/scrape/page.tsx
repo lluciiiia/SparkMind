@@ -10,7 +10,7 @@ import {
 import { fetchAllScrapes, fetchRecentScrapes } from '@/lib/scrape';
 import { createClient } from '@/utils/supabase/client';
 import type { AuthResponse } from '@supabase/supabase-js';
-import { Link } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 import { toast } from 'sonner';
 import { Search } from './_components';
@@ -31,7 +31,7 @@ const ScrapePage = async ({
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
-              <Link href="/">Home</Link>
+              <Link href="/dashboard">Home</Link>
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />

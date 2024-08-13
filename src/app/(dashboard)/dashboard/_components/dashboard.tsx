@@ -79,7 +79,7 @@ export const Dashboard = () => {
 
         setNotes(noteResponse.data.body);
       } catch (error) {
-        console.error('Error fetching data: ', error);
+        throw new Error('Error fetching data : ' + (error as Error).message);
       }
     };
 

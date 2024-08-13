@@ -64,8 +64,7 @@ const insertScraperOutput = async (textOutput: string, promptName: string, uuid:
   const { data, error } = await supabase.from('scraper_output').insert(newOutput).select();
 
   if (error) {
-    console.error('Error inserting scraper output:', error);
-    throw error;
+    throw new Error('Error inserting scraper output : ' + error.message);
   }
 
   return data;

@@ -34,7 +34,6 @@ export const search = async (query: string) => {
     });
     return result;
   } catch (error) {
-    console.error(error);
-    throw error;
+    throw new Error('Error when search : ' + (error as Error).message);
   }
 };
