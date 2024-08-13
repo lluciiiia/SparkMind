@@ -1,6 +1,8 @@
 import { createClient } from '@/utils/supabase/client';
 import { type NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const learningid = req.nextUrl.searchParams.get('learningid');
@@ -32,4 +34,3 @@ export async function GET(req: NextRequest, res: NextResponse) {
   }
 }
 
-export const dynamic = 'force-dynamic';

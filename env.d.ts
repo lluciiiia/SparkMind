@@ -26,6 +26,7 @@ declare global {
       GCP_CLIENT_EMAIL: string;
       GCP_CLIENT_ID: string;
       GCP_CLIENT_X509_CERT_URL: string;
+      NEXT_RUNTIME: 'edge' | 'nodejs';
     }
   }
 }

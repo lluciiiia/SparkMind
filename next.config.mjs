@@ -1,8 +1,6 @@
 import pwa from '@ducanh2912/next-pwa';
 import { withSentryConfig } from '@sentry/nextjs';
 import webpack from "webpack";
-// import MillionLint from "@million/lint";
-// import million from "million/compiler";
 
 const withPwa = pwa({
   cacheOnFrontEndNav: true,
@@ -54,6 +52,7 @@ const config = {
         path: false,
         'diagnostics_channel': false,
         'async_hooks': false,
+        'worker_threads': false,
       };
     }
 
@@ -105,7 +104,6 @@ const millionConfig = {
 };
 
 const finalConfig = withPwa(config);
-
 export default withSentryConfig(finalConfig, {
   org: 'womb0comb0',
   project: 'spark-mind',
