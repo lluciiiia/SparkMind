@@ -1,16 +1,8 @@
-import { GeistSans } from 'geist/font/sans';
 import '@/styles/css/globals.css';
 import { Providers } from '@/providers';
 import { constructMetadata, constructViewport } from '@/utils';
-import { Poppins } from '@next/font/google';
 import type { NextWebVitalsMetric } from 'next/app';
 import Script from "next/script";
-
-const poppins = Poppins({
-  subsets: ['latin'],
-  weight: '400',
-  variable: '--font-poppins',
-});
 
 export const metadata = constructMetadata();
 export const viewport = constructViewport();
@@ -28,7 +20,6 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={GeistSans.className}
       suppressHydrationWarning
       data-a11y-animated-images="system"
       data-a11y-link-underlines="false"
@@ -42,7 +33,7 @@ export default function RootLayout({
 
         <Script strategy="lazyOnload" id="ga">
           {`
-          window.ga_user_id = window.localStorage.getItem('ga_user_id') || '' + Date.now() + Math.floor(Math.random()*1e4);
+            window.ga_user_id = window.localStorage.getItem('ga_user_id') || '' + Date.now() + Math.floor(Math.random()*1e4);
           window.localStorage.setItem('ga_user_id', window.ga_user_id);
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -53,10 +44,18 @@ export default function RootLayout({
           });
         `}
         </Script>
-        <Script> if (!crossOriginIsolated) SharedArrayBuffer = ArrayBuffer </Script>
+        <Script> 
+          {`
+            if (!crossOriginIsolated) {
+              SharedArrayBuffer = ArrayBuffer
+            } 
+          `}
+        </Script>
       </head>
-      <body className={`${poppins.variable} font-sans bg-background overflow-hidden`}>
-        <Providers>{children}</Providers>
+      <body className={`bg-background overflow-hidden`}>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

@@ -10,10 +10,10 @@ import '@/styles/css/custom-scroll.css';
 import { Calendar as Calendericon } from 'lucide-react';
 import Link from 'next/link';
 
-import '@/styles/css/Circle-loader.css';
-
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
-  if (!learningId) console.error('LearningId is Missing in ActionCard');
+  if (!learningId) {
+    console.error('LearningId is Missing in ActionCard');
+  }
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -46,7 +46,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
           }
         }
       } catch (error) {
-        console.error('not enough permissions to access calander : ' + (error as Error).message);
+        throw new Error('not enough permissions to access calander : ' + (error as Error).message);
       } finally {
         setIsLoading(false);
       }
@@ -229,10 +229,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                           defaultValue={item.description}
                           className="text-sm block w-full"
                         />
-                        <select
-                          className="w-32 focus:ring-0 mt-2 border
-                                               border-[#003366] p-1 rounded-lg"
-                        >
+                        <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
                           <option value="Asia/Calcutta">Asia/Calcutta</option>
                           <option value="PST">PST</option>
                           <option value="CST">CST</option>

@@ -33,9 +33,9 @@ export default function GlobalError({
         </p>
         <p
           className={`
-                    text-center text-lg
-                        text-[#0257AC] mt-2
-                        `}
+					text-center text-lg
+						text-[#0257AC] mt-2
+						`}
         >
           {error instanceof Error ? `${error.message}\n${error.stack}` : null}
         </p>

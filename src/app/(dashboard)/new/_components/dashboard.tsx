@@ -31,6 +31,7 @@ import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 import { saveOutput } from '../../../api-handler';
 //Circle Loading Style
 import '@/styles/css/Circle-loader.css';
+import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
@@ -41,7 +42,7 @@ export const NewDashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const [showText, setShowText] = useState(false);
+  const [_showText, setShowText] = useState(false);
   const [keywords, setKeywords] = useState('');
   const [content, setContent] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -176,7 +177,7 @@ export const NewDashboard = () => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href="/">Home</Link>
+                <Link href="/dashboard">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -197,7 +198,7 @@ export const NewDashboard = () => {
                   <div className="cursor-pointer">
                     <NewInputIcon></NewInputIcon>
                   </div>
-                  <span className="text-lg mt-4">Upload the files to get started</span>
+                  <span className="mt-4 text-lg">Upload the files to get started</span>
                 </div>
               </DialogTrigger>
               <DialogContent className="rounded-2xl sm:rounded-2xl">
@@ -299,8 +300,8 @@ export const NewDashboard = () => {
                       <video controls src={objectURL}></video>
                     </div>
                     {isLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                        <div className="Circleloader"></div>
+                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-white bg-opacity-20 backdrop-blur-sm">
+                        <div className="loader"></div>
                       </div>
                     )}
                   </div>

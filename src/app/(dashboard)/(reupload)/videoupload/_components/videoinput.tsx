@@ -154,7 +154,7 @@ export const ReUploadVideo = () => {
       //return data.keywordsArr;
       return ['fdsfds'];
     } catch (err: any) {
-      console.error(err);
+      throw new Error('Error when extract transcribe : ' + (err as Error).message);
     }
   };
 
@@ -184,7 +184,7 @@ export const ReUploadVideo = () => {
       const response = await saveOutput(input, myLearningId);
       router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
-      console.error(err);
+      throw new Error('Error when save output : ' + (err as Error).message);
     }
   };
 

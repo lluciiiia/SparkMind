@@ -21,6 +21,7 @@ import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { z } from 'zod';
+import { NewNoteSection } from '../../notes/_components';
 import {
   type FurtherInfo,
   Message,
@@ -32,7 +33,6 @@ import {
   Transcript,
   type VideoItem,
 } from './interfaces';
-import { NewNoteSection } from './new-note';
 
 import ActionCard from './cards/ActionCard';
 import SummaryCard from './cards/SummaryCard';
@@ -79,7 +79,7 @@ export const Dashboard = () => {
 
         setNotes(noteResponse.data.body);
       } catch (error) {
-        console.error('Error fetching data: ', error);
+        throw new Error('Error fetching data : ' + (error as Error).message);
       }
     };
 

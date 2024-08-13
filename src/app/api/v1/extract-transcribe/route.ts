@@ -12,6 +12,10 @@ import {
 import { type NextRequest, NextResponse } from 'next/server';
 import { v4 as uuidv4 } from 'uuid';
 
+import { PassThrough, Readable } from 'stream';
+import ffmpeg from 'fluent-ffmpeg';
+
+import { serviceAccount } from '@/constants/service';
 //supabse
 import { createClient } from '@/utils/supabase/server';
 import { SpeechClient } from '@google-cloud/speech';
@@ -21,10 +25,9 @@ import { Storage } from '@google-cloud/storage';
 const bucketName = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
 const uploadStreamToGCS = async (destination: string) => {
-
   const storage = new Storage({
-    keyFilename: '@/../gemini-competition-2024.json',
-    projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+    projectId: serviceAccount.project_id,
+    credentials: serviceAccount,
   });
   const bucket = storage.bucket(bucketName);
 
@@ -36,44 +39,48 @@ const uploadStreamToGCS = async (destination: string) => {
   return passThroughStream;
 };
 
+const bufferToStream = (buffer: Buffer): Readable => {
+  const stream = new Readable();
+  stream.push(buffer);
+  stream.push(null); // End the stream
+  return stream;
+};
+
 const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
   const destFileName = `output${videoid}.wav`;
   const gcsUri = `gs://${bucketName}/${destFileName}`;
 
-  const ffmpeg = spawn('ffmpeg', [
-    '-i',
-    'pipe:0',
-    '-ac',
-    '1',
-    '-acodec',
-    'pcm_s16le',
-    '-ar',
-    '16000',
-    '-f',
-    'wav',
-    'pipe:1',
-  ]);
-
+  // Create a PassThrough stream to pipe ffmpeg output
+  const passThroughStream = new PassThrough();
   const uploadStream = await uploadStreamToGCS(destFileName);
 
   return new Promise((resolve, reject) => {
-    ffmpeg.stdin.write(buffer);
-    ffmpeg.stdin.end();
+    // Use fluent-ffmpeg to process the buffer and pipe the output
+    ffmpeg()
+      .input(bufferToStream(buffer))
+      .inputFormat('mp4') // Adjust this based on your video format
+      .audioChannels(1)
+      .audioCodec('pcm_s16le')
+      .audioFrequency(16000)
+      .format('wav')
+      .pipe(passThroughStream, { end: true });
 
-    ffmpeg.stdout
+    // Pipe ffmpeg output to GCS upload stream
+    passThroughStream
       .pipe(uploadStream)
       .on('finish', () => {
         console.log('Audio uploaded to GCS successfully. ⭐✅');
         resolve(gcsUri);
       })
-      .on('error', reject); //shows processig status
+      .on('error', (err) => {
+        console.error(`GCS upload error: ${err}`);
+        reject(`GCS upload error: ${err}`);
+      });
 
-    ffmpeg.stderr.on('data', (data) => {
-      console.error(`ffmpeg stderr: ${data}`);
-    });
-
-    ffmpeg.on('error', (error) => {
-      reject(`ffmpeg error: ${error}`);
+    // Handle errors from fluent-ffmpeg
+    passThroughStream.on('error', (error) => {
+      console.error(`ffmpeg processing error: ${error}`);
+      reject(`ffmpeg processing error: ${error}`);
     });
   });
 };
@@ -103,7 +110,7 @@ const transcribeAudio = async (gcsUri: string): Promise<string> => {
     .results!.map((result) => result.alternatives![0].transcript)
     .join('\n');
 
-  console.log('Audio trascripted sccussfully .... :)');
+  console.log('Audio transcribed successfully .... :)');
   console.log(transcription);
   return transcription;
 };
@@ -113,10 +120,10 @@ interface AIresponse {
   questions: string[];
 }
 
-// for Extrack KeyWord from Transcript
+// for Extract Keyword from Transcript
 const extractKeywordsAndQuestions = async (transcript: string) => {
   try {
-    //configaration based on different type of output
+    // Configuration based on different types of output
     const generationConfig = {
       temperature: 0.7,
       topP: 0.85,
@@ -135,13 +142,12 @@ const extractKeywordsAndQuestions = async (transcript: string) => {
     {
       "role": "Global Expert in extracting information from transcripts",
       "context": "Process the following transcript to extract the most important and relevant keywords and five small 3 to 5 word questions. Keywords should be used for finding related YouTube videos and other online resources. Questions should be used for discussion with AI and other online resources and in the question not use any special character like inverted comma and other. Ensure both keywords and questions are specific to the context of the transcript and highly relevant.",
-      "transcript": "${transcript.replace(/"/g, '\\"')}",
+      "transcript": "${transcript.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}",
       "response_format": "json",
       "example": { "keywords": ["example keyword"], "questions": ["example question"] }
     }`;
 
     const result = await genModel.generateContent(inputMessage);
-    //const result = await chatSession.sendMessage(inputMessage);
     const responseText = result.response.text();
     console.log(responseText);
     const sanitizedResponseText = responseText.replace(/\r?\n|\r/g, '');
@@ -155,15 +161,16 @@ const extractKeywordsAndQuestions = async (transcript: string) => {
 };
 
 const deleteAudioFile = (videoid: string) => {
-  const storage = new Storage();
+  const storage = new Storage({
+    projectId: serviceAccount.project_id,
+    credentials: serviceAccount,
+  });
   const bucket = storage.bucket(bucketName);
   const destFileName = `output${videoid}.wav`;
   const file = bucket.file(destFileName);
   file
     .delete()
-    .then((data) => {
-      console.log(`${destFileName} deleted.`);
-    })
+    .then((data) => {})
     .catch((error) => {
       console.log('Error while deleting Audio File from GCloud : ' + error);
       return error;
@@ -184,7 +191,7 @@ export async function PATCH(req: NextRequest) {
     const learning_id = formData.get('learningid') as string;
 
     if (learning_id === null) {
-      console.error('leaning Id is missing');
+      console.error('learning Id is missing');
     }
 
     if (!file) {
@@ -205,18 +212,18 @@ export async function PATCH(req: NextRequest) {
     const gcsUri = await extractAndUploadAudio(buffer, video_id);
     const transcription = await transcribeAudio(gcsUri);
 
-    //delete the Audio file form Google Clode bucket
+    //delete the Audio file form Google Cloud bucket
     deleteAudioFile(video_id);
 
     //extract keywords
-    const reliventData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
+    const relevantData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
 
-    if (!reliventData) {
+    if (!relevantData) {
       return NextResponse.json({ error: 'No data found' }, { status: 400 });
     }
 
-    const keywordsArr = reliventData.keywords;
-    const questionsArr = reliventData.questions;
+    const keywordsArr = relevantData.keywords;
+    const questionsArr = relevantData.questions;
 
     //now time to insert the transcript and keyword into supabase
     const { error } = await supabaseClient
@@ -230,7 +237,7 @@ export async function PATCH(req: NextRequest) {
       .eq('videoid', video_id);
 
     if (error) {
-      console.log('Occur while trascription is upload in DB: ' + error.details);
+      console.log('Occur while transcription is upload in DB: ' + error.details);
     }
 
     return NextResponse.json({ keywordsArr, transcription });
@@ -249,7 +256,7 @@ export async function POST(req: NextRequest) {
     const learning_id = formData.get('learningid') as string;
 
     if (learning_id === null) {
-      console.error('leaning Id is missing');
+      console.error('learning Id is missing');
     }
 
     if (!file) {
@@ -272,18 +279,16 @@ export async function POST(req: NextRequest) {
     const gcsUri = await extractAndUploadAudio(buffer, video_id);
     const transcription = await transcribeAudio(gcsUri);
 
-    //delete the Audio file form Google Clode bucket
     deleteAudioFile(video_id);
 
-    //extract keywords
-    const reliventData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
+    const relevantData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
 
-    if (!reliventData) {
+    if (!relevantData) {
       return NextResponse.json({ error: 'No data found' }, { status: 400 });
     }
 
-    const keywordsArr = reliventData.keywords;
-    const questionsArr = reliventData.questions;
+    const keywordsArr = relevantData.keywords;
+    const questionsArr = relevantData.questions;
 
     //now time to insert the transcript and keyword into supabase
     const { error } = await supabaseClient.from('transcriptdata').insert({
@@ -295,7 +300,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      console.log('Occur while trascription is upload in DB: ' + error.details);
+      console.log('Occur while transcription is upload in DB: ' + error.details);
     }
 
     return NextResponse.json({ keywordsArr, transcription });

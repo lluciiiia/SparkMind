@@ -1,0 +1,32 @@
+.btn {
+    @apply inline-flex;
+    @apply items-center;
+    @apply justify-center;
+    @apply px-4;
+    @apply py-2;
+    @apply rounded-lg;
+    @apply border;
+    @apply border-transparent;
+    @apply text-sm;
+    @apply font-medium;
+    @apply whitespace-nowrap;
+    @apply rounded-md;
+    @apply shadow-sm;
+    @apply text-white;
+    @apply bg-[#003366];
+    @apply hover:bg-[#002651];
+    @apply focus:outline-none;
+    @apply focus:ring-2;
+    @apply focus:ring-offset-2;
+    @apply focus:ring-[#004a94];
+    @apply disabled:opacity-50;
+    @apply disabled:cursor-not-allowed;
+    @apply disabled:bg-gray-500;
+    @apply disabled:text-white;
+    @apply disabled:border-gray-500;
+    @apply disabled:shadow-none;
+    @apply disabled:ring-0;
+    @apply disabled:ring-offset-0;
+    @apply disabled:ring-offset-white;
+    @apply disabled:ring-offset-2;
+}

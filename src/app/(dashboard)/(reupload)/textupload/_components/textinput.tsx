@@ -86,7 +86,7 @@ export const ReUploadText = () => {
       const response = await saveOutput(input, myLearningId);
       router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {
-      console.error(err);
+      throw new Error('Error when handle upload : ' + (err as Error).message);
     } finally {
       setIsLoading(false);
     }
