@@ -29,7 +29,7 @@ export async function getCurrentUser(): Promise<null | { user: User; accessToken
         return { user, accessToken: supabaseAccessToken };
       }
     } catch (e: any) {
-      console.error('Error: ', e);
+      throw new Error('Error: ' + (e as Error).message);
     }
   }
 

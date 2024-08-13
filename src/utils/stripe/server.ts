@@ -28,7 +28,7 @@ export async function checkoutWithStripe(
 
     if (error || !user) {
       console.error(error);
-      throw new Error('Could not get user session.');
+      throw new Error(`${error?.cause}:${error?.name}`);
     }
 
     // Retrieve or create the customer in Stripe
