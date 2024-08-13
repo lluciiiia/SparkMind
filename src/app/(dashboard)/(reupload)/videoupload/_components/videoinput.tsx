@@ -1,5 +1,4 @@
 'use client';
-
 import { ContentLayout } from '@/components/dashboard/content-layout';
 import {
   Breadcrumb,
@@ -24,7 +23,7 @@ import { Label } from '@/components/ui/label';
 import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
 import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 import { getYoutubeResponse, saveOutput } from '@/app/api-handler';
@@ -33,6 +32,11 @@ import '@/styles/css/Circle-loader.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
+
+
+//ffmpeg import
+import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
+import { fileTypeFromBuffer } from "file-type";
 
 export const ReUploadVideo = () => {
   const searchParams = useSearchParams();
@@ -47,6 +51,10 @@ export const ReUploadVideo = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [objectURL, setObjectURL] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const ffmpeg = useRef<FFmpeg | null>(null);
+  const currentFSls = useRef<string[]>([]);
+  const [href, setHref] = useState("");
+  const [isFFmpegLoaded, setIsFFmpegLoaded] = useState(false);
 
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
@@ -89,32 +97,87 @@ export const ReUploadVideo = () => {
     if (!selectedFile) return;
 
     try {
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      if (myLearningId !== null) {
-        formData.append('learningid', myLearningId);
+      if (ffmpeg.current && isFFmpegLoaded) {
+
+        console.log('FFmpeg is loaded, starting the process...');
+
+        ffmpeg.current.FS("writeFile", selectedFile.name, await fetchFile(selectedFile));
+
+        currentFSls.current = ffmpeg.current.FS("readdir", ".");
+        console.log("start executing the command");
+
+        await ffmpeg.current.run(
+          '-i',
+          selectedFile.name,
+          'output.wav'
+        );
+
+        console.log('Command execution completed.');
+        const FSls = ffmpeg.current.FS("readdir", ".");
+        const outputFiles = FSls.filter((i) => !currentFSls.current.includes(i));
+
+        if (outputFiles.length === 1) {
+          const data = ffmpeg.current.FS("readFile", outputFiles[0]);
+
+          const objectURL = URL.createObjectURL(
+            new Blob([new Uint8Array(data.buffer)], { type: 'audio/wav' })
+          );
+          setHref(objectURL);
+          console.log(objectURL + "objectURL");
+        }
+      }
+      else {
+        console.error('FFmpeg is not loaded or not available.');
       }
 
-      const res = await fetch('/api/v1/extract-transcribe', {
-        method: 'PATCH',
-        body: formData,
-      });
+      // const formData = new FormData();
+      // formData.append('file', setHref.toString());
+      // if (myLearningId !== null) {
+      //   formData.append('learningid', myLearningId);
+      // }
 
-      if (!res.ok) throw new Error(await res.text());
+      // const res = await fetch('/api/v1/extract-transcribe', {
+      //   method: 'PATCH',
+      //   body: formData,
+      // });
 
-      // @ts-ignore trust me bro
-      const data = (await res.json()) as any;
+      // if (!res.ok) throw new Error(await res.text());
+
+      // // @ts-ignore trust me bro
+      // const data = (await res.json()) as any;
 
       //clean up old setState
       setSelectedFile(null);
       setObjectURL(null);
       setFileType(undefined);
 
-      return data.keywordsArr;
+      //return data.keywordsArr;
+      return ['fdsfds'];
     } catch (err: any) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      ffmpeg.current = createFFmpeg({
+        log: true,
+        corePath: 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+      });
+
+      try {
+        ffmpeg.current.setProgress(({ ratio }) => {
+          console.log(ratio);
+        });
+        console.log("Loading FFmpeg...");
+        await ffmpeg.current.load();
+        setIsFFmpegLoaded(true);  // Mark FFmpeg as loaded
+        console.log("FFmpeg loaded successfully.");
+      } catch (err) {
+        console.error('Error loading FFmpeg:', (err as Error).message);
+      }
+    })();
+  }, []);
 
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
@@ -133,7 +196,7 @@ export const ReUploadVideo = () => {
 
       let input;
       if (fileType === 'video') {
-        const keyWordsArray = await handleVideoUpload();
+        const keyWordsArray = await handleVideoUpload() as string[];
         input = keyWordsArray.toString();
       }
       await handleUpload(input, myLearningId);

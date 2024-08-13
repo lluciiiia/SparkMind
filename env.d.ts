@@ -1,3 +1,5 @@
+import { Json } from "@/types/supabase";
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
@@ -14,8 +16,10 @@ declare global {
       NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: string;
       STRIPE_SECRET_KEY: string;
       STRIPE_WEBHOOK_SECRET: string;
+      GOOGLE_CLOUD_PROJECT_ID: string;
+      GOOGLE_CLOUD_CREDENTIALS: string;
     }
   }
 }
 
-export type {};
+export type { };

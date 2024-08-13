@@ -21,10 +21,12 @@ import { Storage } from '@google-cloud/storage';
 const bucketName = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
 const uploadStreamToGCS = async (destination: string) => {
-  const storage = new Storage();
+
+  const storage = new Storage({
+    keyFilename: '@/../gemini-competition-2024.json',
+    projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+  });
   const bucket = storage.bucket(bucketName);
-  
-  storage.authClient.fromAPIKey(process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY);
 
   const file = bucket.file(destination);
   const passThroughStream = file.createWriteStream({
