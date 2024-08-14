@@ -25,21 +25,23 @@ import { Storage } from '@google-cloud/storage';
 
 const bucketName = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
-const uploadStreamToGCS = async (destination: string) => {
+const uploadStreamToGCS = async (destFileName: string) => {
   const storage = new Storage({
     projectId: serviceAccount.project_id,
     credentials: serviceAccount,
   });
   const bucket = storage.bucket(bucketName);
 
-  const file = bucket.file(destination);
+  const file = bucket.file(destFileName);
   const passThroughStream = file.createWriteStream({
     resumable: false,
     contentType: 'audio/wav',
   });
+
   return passThroughStream;
 };
 
+// Convert Buffer to Readable Stream
 const bufferToStream = (buffer: Buffer): Readable => {
   const stream = new Readable();
   stream.push(buffer);
@@ -47,7 +49,7 @@ const bufferToStream = (buffer: Buffer): Readable => {
   return stream;
 };
 
-const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
+const UploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
   const destFileName = `output${videoid}.wav`;
   const gcsUri = `gs://${bucketName}/${destFileName}`;
 
@@ -56,27 +58,19 @@ const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<s
   const uploadStream = await uploadStreamToGCS(destFileName);
 
   return new Promise((resolve, reject) => {
-    // Use fluent-ffmpeg to process the buffer and pipe the output
-    ffmpeg()
-      .input(bufferToStream(buffer))
-      .inputFormat('mp4') // Adjust this based on your video format
-      .audioChannels(1)
-      .audioCodec('pcm_s16le')
-      .audioFrequency(16000)
-      .format('wav')
-      .pipe(passThroughStream, { end: true });
 
     // Pipe ffmpeg output to GCS upload stream
-    passThroughStream
+    bufferToStream(buffer)
+      .pipe(passThroughStream)
       .pipe(uploadStream)
       .on('finish', () => {
         console.log('Audio uploaded to GCS successfully. ⭐✅');
         resolve(gcsUri);
       })
       .on('error', (err) => {
-        console.error(`GCS upload error: ${err}`);
-        reject(`GCS upload error: ${err}`);
-      });
+        console.error(`GCS upload error: ${err.message}`);
+        reject(`GCS upload error: ${err.message}`);
+      })
 
     // Handle errors from fluent-ffmpeg
     passThroughStream.on('error', (error) => {
@@ -161,7 +155,7 @@ const extractKeywordsAndQuestions = async (transcript: string) => {
   }
 };
 
-const deleteAudioFile = (videoid: string) => {
+const deleteAudioFile = async (videoid: string) => {
   const storage = new Storage({
     projectId: serviceAccount.project_id,
     credentials: serviceAccount,
@@ -171,7 +165,7 @@ const deleteAudioFile = (videoid: string) => {
   const file = bucket.file(destFileName);
   file
     .delete()
-    .then((data) => {})
+    .then((data) => { })
     .catch((error) => {
       console.log('Error while deleting Audio File from GCloud : ' + error);
       return error;
@@ -191,8 +185,8 @@ export async function PATCH(req: NextRequest) {
     const file = formData.get('file') as Blob | null;
     const learning_id = formData.get('learningid') as string;
 
-    if (learning_id === null) {
-      console.error('learning Id is missing');
+    if (!learning_id) {
+      return NextResponse.json({ error: 'learning Id is missing' }, { status: 500 });
     }
 
     if (!file) {
@@ -203,18 +197,18 @@ export async function PATCH(req: NextRequest) {
 
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
-    if (uuid === undefined)
+    if (uuid === undefined) {
       return NextResponse.json({ error: 'Please Login or SignUp' }, { status: 500 });
+    }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-
     const video_id = learning_id;
 
-    const gcsUri = await extractAndUploadAudio(buffer, video_id);
+    const gcsUri = await UploadAudio(buffer, video_id);
     const transcription = await transcribeAudio(gcsUri);
 
     //delete the Audio file form Google Cloud bucket
-    deleteAudioFile(video_id);
+    await deleteAudioFile(video_id);
 
     //extract keywords
     const relevantData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
@@ -257,7 +251,7 @@ export async function POST(req: NextRequest) {
     const learning_id = formData.get('learningid') as string;
 
     if (learning_id === null) {
-      console.error('learning Id is missing');
+      return NextResponse.json({ error: 'learning Id is missing' }, { status: 500 });
     }
 
     if (!file) {
@@ -277,10 +271,10 @@ export async function POST(req: NextRequest) {
 
     const video_id = learning_id;
 
-    const gcsUri = await extractAndUploadAudio(buffer, video_id);
+    const gcsUri = await UploadAudio(buffer, video_id);
     const transcription = await transcribeAudio(gcsUri);
 
-    deleteAudioFile(video_id);
+    await deleteAudioFile(video_id);
 
     const relevantData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
 

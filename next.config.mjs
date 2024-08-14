@@ -20,6 +20,40 @@ const withPwa = pwa({
  * @type {import("next/dist/server/config").NextConfig}
  */
 const config = {
+  reactStrictMode: true,
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        worker_threads: false,
+      };
+
+      config.plugins.push(
+        new webpack.ProvidePlugin({
+          process: "process/browser",
+          Buffer: ["buffer", "Buffer"],
+        }),
+        new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
+          const mod = resource.request.replace(/^node:/, "");
+          switch (mod) {
+            case "buffer":
+              resource.request = "buffer";
+              break;
+            case "stream":
+              resource.request = "readable-stream";
+              break;
+            default:
+              throw new Error(`Module not found: ${mod}`);
+          }
+        })
+      );
+    }
+
+    return config;
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -43,41 +77,6 @@ const config = {
       },
     },
   },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        fs: false,
-        os: false,
-        http: false,
-        https: false,
-        zlib: false,
-        path: false,
-        'diagnostics_channel': false,
-        'async_hooks': false,
-      };
-    }
-
-    config.plugins.push(
-      new webpack.ProvidePlugin({
-        process: "process/browser",
-        Buffer: ["buffer", "Buffer"],
-      }),
-      new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
-        const mod = resource.request.replace(/^node:/, "");
-        switch (mod) {
-          case "buffer":
-            resource.request = "buffer";
-            break;
-          case "stream":
-            resource.request = "readable-stream";
-            break;
-          default:
-            throw new Error(`Not found ${mod}`);
-        }
-      })
-    );
-    return config;
-  },
   async headers() {
     return [
       {
@@ -94,6 +93,28 @@ const config = {
             value:
               'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
           },
+        ],
+      },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'require-corp',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+        ],
+      },
+      {
+        source: "/static/:all*",
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=9999999999, must-revalidate',
+          }
         ],
       },
     ];
