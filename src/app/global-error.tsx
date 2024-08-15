@@ -5,8 +5,6 @@ import { Card } from '@/components/ui/card';
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 import * as Sentry from '@sentry/nextjs';
 
-import { useEffect } from 'react';
-
 export default function GlobalError({
   error,
   reset,
