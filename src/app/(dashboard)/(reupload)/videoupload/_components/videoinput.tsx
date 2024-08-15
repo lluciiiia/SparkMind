@@ -38,6 +38,8 @@ import { useSearchParams } from 'next/navigation';
 //ffmpeg
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
 
+import corepath from '@/../public/static/v0.11.0/ffmpeg-core'
+
 export const ReUploadVideo = () => {
   const searchParams = useSearchParams();
   const myLearningId = searchParams.get('id');
