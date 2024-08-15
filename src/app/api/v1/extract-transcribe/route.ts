@@ -22,14 +22,17 @@ import { createClient } from '@/utils/supabase/server';
 import { SpeechClient } from '@google-cloud/speech';
 //Google Cloude imports
 import { Storage } from '@google-cloud/storage';
+import { GoogleAuth } from 'google-auth-library';
 
 const bucketName = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
 const uploadStreamToGCS = async (destFileName: string) => {
+
+
   const storage = new Storage({
-    projectId: serviceAccount.project_id,
-    credentials: serviceAccount,
+    credentials: serviceAccount
   });
+
   const bucket = storage.bucket(bucketName);
 
   const file = bucket.file(destFileName);
