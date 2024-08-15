@@ -1,8 +1,7 @@
 import pwa from '@ducanh2912/next-pwa';
 import { withSentryConfig } from '@sentry/nextjs';
-import webpack from "webpack";
-// import MillionLint from "@million/lint";
-// import million from "million/compiler";
+import webpack from 'webpack';
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const withPwa = pwa({
   cacheOnFrontEndNav: true,
@@ -20,6 +19,40 @@ const withPwa = pwa({
  * @type {import("next/dist/server/config").NextConfig}
  */
 const config = {
+  reactStrictMode: true,
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        worker_threads: false,
+      };
+
+      config.plugins.push(
+        new webpack.ProvidePlugin({
+          process: "process/browser",
+          Buffer: ["buffer", "Buffer"],
+        }),
+        new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
+          const mod = resource.request.replace(/^node:/, "");
+          switch (mod) {
+            case "buffer":
+              resource.request = "buffer";
+              break;
+            case "stream":
+              resource.request = "readable-stream";
+              break;
+            default:
+              throw new Error(`Module not found: ${mod}`);
+          }
+        })
+      );
+    }
+
+    return config;
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -43,41 +76,6 @@ const config = {
       },
     },
   },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        fs: false,
-        os: false,
-        http: false,
-        https: false,
-        zlib: false,
-        path: false,
-        'diagnostics_channel': false,
-        'async_hooks': false,
-      };
-    }
-
-    config.plugins.push(
-      new webpack.ProvidePlugin({
-        process: "process/browser",
-        Buffer: ["buffer", "Buffer"],
-      }),
-      new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
-        const mod = resource.request.replace(/^node:/, "");
-        switch (mod) {
-          case "buffer":
-            resource.request = "buffer";
-            break;
-          case "stream":
-            resource.request = "readable-stream";
-            break;
-          default:
-            throw new Error(`Not found ${mod}`);
-        }
-      })
-    );
-    return config;
-  },
   async headers() {
     return [
       {
@@ -96,6 +94,28 @@ const config = {
           },
         ],
       },
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'require-corp',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+        ],
+      },
+      {
+        source: "/static/:all*",
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=9999999999, must-revalidate',
+          }
+        ],
+      },
     ];
   },
 };
@@ -106,7 +126,11 @@ const millionConfig = {
 
 const finalConfig = withPwa(config);
 
-export default withSentryConfig(finalConfig, {
+const withBundleAnalyzerConfig = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default withSentryConfig(withBundleAnalyzerConfig(finalConfig), {
   org: 'womb0comb0',
   project: 'spark-mind',
   silent: !process.env.CI,
