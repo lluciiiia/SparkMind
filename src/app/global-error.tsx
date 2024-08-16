@@ -2,8 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import * as Sentry from '@sentry/nextjs';
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
+import * as Sentry from '@sentry/nextjs';
 
 export default function GlobalError({
   error,
@@ -15,6 +15,7 @@ export default function GlobalError({
   useIsomorphicLayoutEffect(() => {
     Sentry.captureException(error);
   }, [error]);
+
   return (
     <section
       className={`
