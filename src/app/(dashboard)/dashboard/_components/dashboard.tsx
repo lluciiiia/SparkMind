@@ -197,11 +197,9 @@ export const Dashboard = () => {
           transition={{ type: 'spring', stiffness: 100 }}
         >
           <summary
-            className={`left-0 relative p-2 ${
-              isOpen ? 'rounded-l-md' : 'rounded-md'
-            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
-              isOpen ? 'justify-start' : 'justify-center'
-            }`}
+            className={`left-0 relative p-2 ${isOpen ? 'rounded-l-md' : 'rounded-md'
+              } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${isOpen ? 'justify-start' : 'justify-center'
+              }`}
           >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} />
@@ -236,9 +234,8 @@ export const Dashboard = () => {
               <li key={tab.name}>
                 <button
                   type="button"
-                  className={`px-6 py-2 cursor-pointer ${
-                    activeTab === tab.name ? 'bg-navy text-white rounded-t-3xl' : 'text-gray'
-                  }`}
+                  className={`px-6 py-2 cursor-pointer ${activeTab === tab.name ? 'bg-navy text-white rounded-t-3xl' : 'text-gray'
+                    }`}
                   onClick={() => setActiveTab(tab.name)}
                 >
                   {tab.label}
