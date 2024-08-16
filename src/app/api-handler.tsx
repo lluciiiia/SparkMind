@@ -118,3 +118,18 @@ export const getListOfEvents = async (
   });
   return response.data;
 };
+
+export const getTodoTasks = async (myLearningId: string) => {
+  const response = await axios.get("/api/v1/todo-tasks", {
+    params: { learning_id: myLearningId },
+  });
+  return response;
+};
+
+export const createEvents = async (selectedTask: any, myLearningId: string) => {
+  const response = await axios.post("/api/v1/events", {
+    selectedTask: selectedTask,
+    learningId: myLearningId,
+  });
+  return response;
+};

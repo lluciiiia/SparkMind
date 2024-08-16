@@ -10,6 +10,7 @@ import "@/styles/css/custom-scroll.css";
 import { Calendar as Calendericon } from "lucide-react";
 import Link from "next/link";
 import {
+  createEvents,
   getIsActionPreviewDone,
   getIsVideoUploaded,
   getListOfEvents,
@@ -17,9 +18,7 @@ import {
 } from "@/app/api-handler";
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
-  if (!learningId) {
-    console.error("LearningId is Missing in ActionCard");
-  }
+  if (!learningId) console.error("LearningId is Missing in ActionCard");
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -27,7 +26,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   const [eventList, setEventList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
   const [isListPreview, setListPreview] = useState<boolean>(false);
-  const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
+  const [initTodoList, setInitTodoList] = useState<TodoType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [videoNotAvailable, setVideoNotAvailable] = useState<boolean>(false);
 
@@ -96,6 +95,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
 
   const handleCreateEvent = async () => {
     try {
+      if (!learningId) return;
+
       const selectedTask = selectedRowsidx.map((rowIndex) => ({
         summary: eventList[rowIndex].summary,
         description: eventList[rowIndex].description,
@@ -109,16 +110,13 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         },
       }));
 
-      const res = await axios.post("/api/v1/events", {
-        selectedTask: selectedTask,
-        learningId: learningId,
-      });
+      const response = await createEvents(selectedTask, learningId);
 
-      if (res.data.status === 200) {
-        setTodoList(res.data.todolist);
-        setinitTdoLisit(res.data.todolist);
+      if (response.data.status === 200) {
+        setTodoList(response.data.todolist);
+        setInitTodoList(response.data.todolist);
       } else {
-        alert(`Error create-event: ${res.data.message}`);
+        alert(`Error create-event: ${response.data.message}`);
       }
 
       setListPreview(false);
@@ -144,7 +142,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
 
       if (response.status === 200) {
         setTodoList(response.data.todo_task);
-        setinitTdoLisit(response.data.todo_task);
+        setInitTodoList(response.data.todo_task);
       } else {
         setTodoList([]);
       }
