@@ -36,7 +36,7 @@
   - **Video Recommendations**: Suggests relevant videos for further understanding.
   - **Q&A**: Generates exercise questions to help master the concepts.
   - **Further Information**: Offers additional resources for deeper learning.
-  - **Action Items**: Identifies tasks from videos, adds them to Google Calendar, and sends reminder emails through Gmail.
+  - **Action Items**: Identifies tasks from videos or other input types, adds them to Google Calendar, and sends reminder emails through Gmail.
 
 - **Note Taking**
 
