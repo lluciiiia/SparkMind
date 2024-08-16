@@ -38,8 +38,6 @@ import { useSearchParams } from 'next/navigation';
 //ffmpeg
 import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
 
-import corepath from '@/../public/static/v0.11.0/ffmpeg-core'
-
 export const ReUploadVideo = () => {
   const searchParams = useSearchParams();
   const myLearningId = searchParams.get('id');
@@ -155,10 +153,10 @@ export const ReUploadVideo = () => {
           const data = ffmpeg.current.FS("readFile", outputFiles[0]);
 
           //for debugging 
-          // const objectURL = URL.createObjectURL(
-          //   new Blob([new Uint8Array(data.buffer)], { type: 'audio/wav' })
-          // );
-          // console.log("objectURL : " + objectURL);
+          const objectURL = URL.createObjectURL(
+            new Blob([new Uint8Array(data.buffer)], { type: 'audio/wav' })
+          );
+          console.log("objectURL : " + objectURL);
 
           const blob = new Blob([new Uint8Array(data.buffer)], { type: 'audio/wav' });
 

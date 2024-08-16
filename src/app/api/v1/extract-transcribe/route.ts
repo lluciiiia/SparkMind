@@ -16,22 +16,19 @@ import { PassThrough, Readable } from 'stream';
 import ffmpegPath from 'ffmpeg-static';
 import ffmpeg from 'fluent-ffmpeg';
 
+
 import { serviceAccount } from '@/constants/service';
 //supabse
 import { createClient } from '@/utils/supabase/server';
 import { SpeechClient } from '@google-cloud/speech';
 //Google Cloude imports
 import { Storage } from '@google-cloud/storage';
-import { GoogleAuth } from 'google-auth-library';
 
 const bucketName = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
 const uploadStreamToGCS = async (destFileName: string) => {
 
-
-  const storage = new Storage({
-    credentials: serviceAccount
-  });
+  const storage = new Storage();
 
   const bucket = storage.bucket(bucketName);
 
@@ -52,8 +49,8 @@ const bufferToStream = (buffer: Buffer): Readable => {
   return stream;
 };
 
-const UploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
-  const destFileName = `output${videoid}.wav`;
+const UploadAudio = async (buffer: Buffer, filename: string): Promise<string> => {
+  const destFileName = `output${filename}.wav`;
   const gcsUri = `gs://${bucketName}/${destFileName}`;
 
   // Create a PassThrough stream to pipe ffmpeg output
@@ -207,11 +204,13 @@ export async function PATCH(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const video_id = learning_id;
 
-    const gcsUri = await UploadAudio(buffer, video_id);
+    const filename = uuid + '_' + video_id;
+
+    const gcsUri = await UploadAudio(buffer, filename);
     const transcription = await transcribeAudio(gcsUri);
 
     //delete the Audio file form Google Cloud bucket
-    await deleteAudioFile(video_id);
+    await deleteAudioFile(filename);
 
     //extract keywords
     const relevantData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
@@ -270,14 +269,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Please Login or SignUp' }, { status: 500 });
     }
 
+
     const buffer = Buffer.from(await file.arrayBuffer());
 
     const video_id = learning_id;
+    const filename = uuid + '_' + video_id;
 
-    const gcsUri = await UploadAudio(buffer, video_id);
+    const gcsUri = await UploadAudio(buffer, filename);
     const transcription = await transcribeAudio(gcsUri);
 
-    await deleteAudioFile(video_id);
+    await deleteAudioFile(filename);
 
     const relevantData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
 
