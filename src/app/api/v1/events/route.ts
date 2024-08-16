@@ -20,6 +20,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const selectedTask: Event[] = data.selectedTask;
     const learningId: string = data.learningId;
 
+    console.log('selectedTask : ' + selectedTask);
+
     // Use type assertion to add uuid to the request object
     (req as any).uuid = uuid;
 
@@ -93,6 +95,7 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
     }
   }
 
+  console.log('this is Repose Array : ' + responseArray);
   return responseArray;
 };
 
@@ -102,14 +105,15 @@ const storeCalendarEvent = async (
   calendarEvents: string[],
 ) => {
   try {
+    console.log('this is event list : ' + eventList);
     const supabaseClient = createClient();
 
-    const todoTasks: TodoType[] = [];
+    const TodoTasksList: TodoType[] = [];
 
     let idx = 0;
 
     eventList.forEach((event) => {
-      todoTasks.push({
+      TodoTasksList.push({
         summary: event.summary,
         description: event.description,
         start_dateTime: event.start.dateTime,
@@ -122,7 +126,7 @@ const storeCalendarEvent = async (
     const { error } = await supabaseClient
       .from('outputs')
       .update({
-        todo_task: todoTasks,
+        todo_task: TodoTasksList,
         is_task_preview_done: true,
       })
       .eq('learning_id', learning_id);
@@ -132,7 +136,7 @@ const storeCalendarEvent = async (
       return;
     }
 
-    return todoTasks;
+    return TodoTasksList;
   } catch (err) {
     console.error('Error Store TodoTask:', (err as Error).message);
     return;
