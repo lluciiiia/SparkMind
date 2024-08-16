@@ -5,14 +5,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 import {
   Dialog,
@@ -21,20 +14,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { FaEdit, FaEye, FaPlus, FaSearch } from 'react-icons/fa';
-import { PiDotsThreeOutlineVerticalThin } from 'react-icons/pi';
-
-import { UserNav } from '@/components/dashboard/user-nav';
-import { ModeToggle } from '@/providers/theme/mode-toggle';
 
 import { assignColors } from '@/utils/assignColors';
-
-import Image from 'next/image';
 
 import { ContentLayout } from '@/components';
 import {
@@ -46,8 +32,7 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { ScrollBar } from '@/components/ui/scroll-area';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createClient } from '@/utils/supabase/client';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
 import axios from 'axios';
