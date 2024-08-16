@@ -6,15 +6,15 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import type { ActionCardProps, Event, TodoType } from '../interfaces';
 import '@/styles/css/custom-scroll.css';
+import { Calendar as Calendericon } from 'lucide-react';
+import Link from 'next/link';
 import {
   createEvents,
   getIsActionPreviewDone,
   getIsVideoUploaded,
   getListOfEvents,
   getTodoTasks,
-} from '@/app/api-handler';
-import { Calendar as Calendericon } from 'lucide-react';
-import Link from 'next/link';
+} from '../../../../api-handlers/api-handler';
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   if (!learningId) console.error('LearningId is Missing in ActionCard');

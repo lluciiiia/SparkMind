@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabase
       .from('notes')
-      .insert([{ learning_id: myLearningId }])
+      .insert([{ learning_id: myLearningId, title: 'Undefined' }])
       .select();
 
     if (error) {
