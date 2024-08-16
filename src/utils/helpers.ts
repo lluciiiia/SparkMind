@@ -109,7 +109,7 @@ const getToastRedirect = (
 
   if (toastDescription) {
     redirectPath += `&${descriptionKey}=${encodeURIComponent(toastDescription)}`;
-  }
+  }  
 
   if (disableButton) {
     redirectPath += `&disable_button=true`;
