@@ -36,13 +36,20 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
           if (checkid === true) {
             const check = await getIsActionPreviewDone(learningId);
             if (check === false) {
-              await getListOfEvent(learningId);
+              await getListOfEvent(learningId, false);
               setListPreview(true);
             } else {
               await getTodoTaskFormDB(learningId);
             }
           } else {
-            setVideoNotAvailable(true);
+            const check = await getIsActionPreviewDone(learningId);
+            if (check === false) {
+              await getListOfEvent(learningId, true);
+              setListPreview(true);
+            } else {
+              await getTodoTaskFormDB(learningId);
+            }
+            // setVideoNotAvailable(true);
           }
         }
       } catch (error) {
@@ -81,10 +88,10 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     }
   }, [date, initTodoList]);
 
-  const getListOfEvent = async (LearningId: any) => {
+  const getListOfEvent = async (LearningId: any, getfromtext?: boolean) => {
     try {
       const eventlistRes = await axios.get('/api/v1/event-list', {
-        params: { LearningId: LearningId },
+        params: { LearningId: LearningId, getfromtext: getfromtext },
       });
 
       const eventList = JSON.stringify(eventlistRes.data);

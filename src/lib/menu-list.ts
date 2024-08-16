@@ -61,11 +61,11 @@ export function getMenuList(pathname: string, id: string | null): Group[] {
               label: 'All Resources',
               active: pathname.includes(`/allresources`),
             },
-            {
-              href: `/videoupload?id=${id}`,
-              label: 'Video',
-              active: pathname.includes(`/videoupload`),
-            },
+            // {
+            //   href: `/videoupload?id=${id}`,
+            //   label: 'Video',
+            //   active: pathname.includes(`/videoupload`),
+            // },
             {
               href: `/textupload?id=${id}`,
               label: 'Text',

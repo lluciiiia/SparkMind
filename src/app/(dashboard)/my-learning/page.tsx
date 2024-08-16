@@ -354,7 +354,7 @@ export const MyLearning = () => {
           </div>
           <ScrollArea className="h-full w-full">
             <article
-              className={`h-full w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 pb-8`}
+              className={`h-[60vh] overflow-y-auto w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 pb-8 pr-3`}
             >
               <div className={`w-full h-full flex items-center justify-center`}>
                 <Button
