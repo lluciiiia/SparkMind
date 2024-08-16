@@ -2,9 +2,9 @@
 
 import { genAI } from '@/app/api/v1/gemini-settings';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { insertScraperOutput } from '@/lib/scrape';
 import { studyGuidePrompt } from '@/lib/scrape';
-import { OutputSchema } from '@/schema';
 import { debounce } from '@/utils';
 import { createClient } from '@/utils/supabase/client';
 import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
@@ -18,7 +18,7 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
     const [htmlContent, setHtmlContent] = useState<string>('');
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [isInserted, setIsInserted] = useState<boolean>(false);
-
+    const [sessionStorageContent, setSessionStorageContent] = useState<string>('');
     const googleGenerativeAI = useMemo(() => genAI, []);
 
     const model = useMemo(
@@ -80,7 +80,6 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
 
           if (error) {
             if (error.code === 'PGRST116') {
-              // No data found, proceed with content generation
               setIsInserted(false);
               debouncedGenerateContent(topic, websiteData);
             } else {
@@ -88,6 +87,8 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
             }
           } else if (data) {
             setHtmlContent(data.text_output);
+            setSessionStorageContent(data.text_output);
+            window.sessionStorage.setItem('scraper_output', data.text_output);
             setIsInserted(true);
           } else {
             setIsInserted(false);
@@ -102,7 +103,6 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
 
       checkExistingData();
     }, [topic, websiteData, debouncedGenerateContent, uuid]);
-
     return (
       <Card>
         <CardHeader>
@@ -110,9 +110,9 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
         </CardHeader>
         <CardContent>
           {isLoading || parentIsLoading ? (
-            <div>Loading...</div>
+            <Skeleton className="h-96 w-full" />
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+            <div dangerouslySetInnerHTML={{ __html: sessionStorageContent ? sessionStorageContent : htmlContent }} />
           )}
         </CardContent>
       </Card>

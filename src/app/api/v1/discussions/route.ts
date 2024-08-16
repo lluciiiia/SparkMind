@@ -6,31 +6,39 @@ const supabase = createClient();
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const video_id = req.nextUrl.searchParams.get('videoid');
+    console.log('Received video_id:', video_id);
 
-    if (video_id !== null) {
-      const transcript = await getTranscript(video_id);
-
-      if (!transcript) return NextResponse.json({ status: 404, error: 'Transcript not found' });
-
-      let basicQue = await getBasicQuestion(video_id);
-
-      if (!basicQue) {
-        basicQue = [];
-      }
-
-      return NextResponse.json({ status: 200, basicQue: basicQue, transcript: transcript });
-    } else {
-      return new NextResponse('video_id is required', { status: 400 });
+    if (!video_id) {
+      console.error('video_id is null or undefined');
+      return NextResponse.json({ status: 400, error: 'video_id is required' });
     }
+
+    const transcript = await getTranscript(video_id);
+
+    if (!transcript) {
+      console.error('Transcript not found for video_id:', video_id);
+      return NextResponse.json({ status: 404, error: 'Transcript not found' });
+    }
+
+    let basicQue = await getBasicQuestion(video_id);
+
+    if (!basicQue) {
+      basicQue = [];
+    }
+
+    return NextResponse.json({ status: 200, basicQue: basicQue, transcript: transcript });
   } catch (error) {
-    console.log('Error when getting discussions: ' + error);
+    console.error('Error when getting discussions:', error);
+    return NextResponse.json({ status: 500, error: 'Internal server error' });
   }
-  return NextResponse.json({ status: 400, error: 'video_id is required' });
 }
 
 async function getTranscript(videoid: string) {
   try {
-    // new things we are store learning_id in video id in DB
+    if (!videoid) {
+      return NextResponse.json({ status: 400, error: 'video_id is required' });
+    }
+
     const { data: transcriptData, error: transcriptError } = await supabase
       .from('transcriptdata')
       .select('transcript')
@@ -48,7 +56,7 @@ async function getTranscript(videoid: string) {
       const { data: summaryData, error: summaryError } = await supabase
         .from('outputs')
         .select('summary')
-        .eq('learning_id', videoid); // learning id and video id is same of no woory about that
+        .eq('learning_id', videoid);
 
       if (summaryError) {
         console.log('Error fetching summary from DB: ' + summaryError.message);
@@ -63,7 +71,8 @@ async function getTranscript(videoid: string) {
       }
     }
   } catch (err) {
-    console.log('Error when feach Transcript from DB : ' + err);
+    console.log('Error when fetch Transcript from DB: ' + err);
+    return null;
   }
 }
 

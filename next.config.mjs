@@ -1,6 +1,6 @@
 import pwa from '@ducanh2912/next-pwa';
 import { withSentryConfig } from '@sentry/nextjs';
-import webpack from "webpack";
+import webpack from 'webpack';
 // import MillionLint from "@million/lint";
 // import million from "million/compiler";
 
@@ -20,7 +20,36 @@ const withPwa = pwa({
  * @type {import("next/dist/server/config").NextConfig}
  */
 const config = {
-  reactStrictMode: true,
+  async headers() {
+    return [
+      {
+        source: '/api/v1/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
+          {
+            key: 'Access-Control-Allow-Headers',
+            value:
+              'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
+          },
+        ],
+      },
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Cross-Origin-Embedder-Policy', value: 'credentialless' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self'; img-src 'self' https: data:; font-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https:;",
+          },
+        ],
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -33,27 +62,28 @@ const config = {
 
       config.plugins.push(
         new webpack.ProvidePlugin({
-          process: "process/browser",
-          Buffer: ["buffer", "Buffer"],
+          process: 'process/browser',
+          Buffer: ['buffer', 'Buffer'],
         }),
         new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
-          const mod = resource.request.replace(/^node:/, "");
+          const mod = resource.request.replace(/^node:/, '');
           switch (mod) {
-            case "buffer":
-              resource.request = "buffer";
+            case 'buffer':
+              resource.request = 'buffer';
               break;
-            case "stream":
-              resource.request = "readable-stream";
+            case 'stream':
+              resource.request = 'readable-stream';
               break;
             default:
               throw new Error(`Module not found: ${mod}`);
           }
-        })
+        }),
       );
     }
 
     return config;
   },
+  reactStrictMode: true,
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -64,7 +94,18 @@ const config = {
     },
   },
   images: {
-    unoptimized: true,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/a/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'storage.googleapis.com',
+        pathname: '/v0/b/sparkmind-gemini-transcript/o/**',
+      },
+    ],
   },
   experimental: {
     optimizeCss: true,
@@ -76,39 +117,6 @@ const config = {
         },
       },
     },
-  },
-  async headers() {
-    return [
-      {
-        source: '/api/v1/:path*',
-        headers: [
-          { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: '*' },
-          {
-            key: 'Access-Control-Allow-Methods',
-            value: 'GET,DELETE,PATCH,POST,PUT',
-          },
-          {
-            key: 'Access-Control-Allow-Headers',
-            value:
-              'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
-          },
-        ],
-      },
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'Cross-Origin-Embedder-Policy',
-            value: 'require-corp',
-          },
-          {
-            key: 'Cross-Origin-Opener-Policy',
-            value: 'same-origin',
-          },
-        ],
-      },
-    ];
   },
 };
 

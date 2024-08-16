@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 import { NewDashboard } from './_components';
 
 export default async function DashboardPage() {
-  
   const supabase = createClient();
 
   const {

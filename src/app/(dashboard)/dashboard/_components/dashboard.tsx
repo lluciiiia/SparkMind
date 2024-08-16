@@ -76,10 +76,16 @@ export const Dashboard = () => {
         setOutput(outputResponse.data.body[0]);
 
         const noteResponse = await getNotes(myLearningId);
-
-        setNotes(noteResponse.data.body);
+        setNotes(
+          noteResponse.data.body && noteResponse.data.body.length > 0
+            ? noteResponse.data.body
+            : [{ id: 'default', title: 'Create a new note!', content: '' }],
+        );
       } catch (error) {
-        throw new Error('Error fetching data : ' + (error as Error).message);
+        console.error('Error fetching data:', error);
+        setNotes([
+          { id: 'default', title: 'Create a new note!', content: '', createdAt: new Date() },
+        ]);
       }
     };
 
@@ -88,7 +94,7 @@ export const Dashboard = () => {
     return () => {
       console.log('Output retrieved');
     };
-  }, []);
+  }, [myLearningId]);
 
   useEffect(() => {
     if (output?.youtube) {

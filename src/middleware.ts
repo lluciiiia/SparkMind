@@ -37,7 +37,6 @@ const handleRedirect = ({
   res: NextResponse;
   redirect: boolean;
 } => {
-
   if (user) {
     return { res, redirect: false };
   }
