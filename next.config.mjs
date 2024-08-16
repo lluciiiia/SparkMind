@@ -1,5 +1,6 @@
 import pwa from '@ducanh2912/next-pwa';
 import { withSentryConfig } from '@sentry/nextjs';
+import webpack from 'webpack';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const withPwa = pwa({
