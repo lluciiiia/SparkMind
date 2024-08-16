@@ -1,6 +1,6 @@
 import pwa from '@ducanh2912/next-pwa';
-import { withSentryConfig } from '@sentry/nextjs';
 import withBundleAnalyzer from '@next/bundle-analyzer';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const withPwa = pwa({
   cacheOnFrontEndNav: true,

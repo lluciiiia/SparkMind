@@ -1,11 +1,9 @@
 import { createClient } from '@/utils/supabase/server';
-import { type NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest, res: NextResponse) {
-  await headers.apply({
-    
-  })
+  await headers.apply({});
   try {
     const learningid = req.nextUrl.searchParams.get('learningid');
 
