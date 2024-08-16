@@ -211,6 +211,7 @@ export const ReUploadResource = () => {
                       </Button> */}
                       <Button
                         variant="outline"
+                        disabled={true}
                         className="w-full"
                         onClick={() => setFileType('video')}
                       >
@@ -269,7 +270,7 @@ export const ReUploadResource = () => {
                   </div>
                 )}
 
-                {fileType === 'video' && (
+                {/* {fileType === 'video' && (
                   <>
                     <DialogTitle>Choose Video File</DialogTitle>
                     <input
@@ -280,7 +281,7 @@ export const ReUploadResource = () => {
                       className="rounded-md"
                     />
                   </>
-                )}
+                )} */}
 
                 {fileType === 'video' && objectURL && (
                   <div className="grid gap-2">

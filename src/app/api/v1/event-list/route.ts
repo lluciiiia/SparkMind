@@ -10,9 +10,10 @@ const supabase = createClient();
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const video_id = req.nextUrl.searchParams.get('LearningId');
+    const istextinput = req.nextUrl.searchParams.get('getfromtext') === 'true' ? true : false;
 
     if (video_id !== null) {
-      const transcript = await getTranscript(video_id);
+      const transcript = await getTranscript(video_id, istextinput);
 
       if (!transcript) return NextResponse.json({ status: 404, error: 'Transcript not found' });
 
@@ -88,25 +89,46 @@ async function getEventList(transcript: string): Promise<any> {
   }
 }
 
-async function getTranscript(videoid: string) {
+async function getTranscript(videoid: string, istextinput: boolean) {
   try {
     //this is only for declaretion
 
-    const { data, error } = await supabase
-      .from('transcriptdata')
-      .select('transcript')
-      .eq('videoid', videoid);
+    if (istextinput === true) {
 
-    if (error) {
-      console.log('Error fetching transcript from DB: ' + error.message);
-      return null;
+      const { data, error } = await supabase
+        .from('outputs')
+        .select('summary')
+        .eq('learning_id', videoid);
+
+      if (error) {
+        console.log('Error fetching transcript from DB: ' + error.message);
+        return null;
+      }
+
+      if (data && data.length > 0) {
+        return data[0].summary;
+      } else {
+        console.log('No summary found for the provided video id');
+        return null;
+      }
     }
+    else {
+      const { data, error } = await supabase
+        .from('transcriptdata')
+        .select('transcript')
+        .eq('videoid', videoid);
 
-    if (data && data.length > 0) {
-      return data[0].transcript;
-    } else {
-      console.log('No transcript found for the provided UUID');
-      return null;
+      if (error) {
+        console.log('Error fetching transcript from DB: ' + error.message);
+        return null;
+      }
+
+      if (data && data.length > 0) {
+        return data[0].transcript;
+      } else {
+        console.log('No transcript found for the provided videoid');
+        return null;
+      }
     }
   } catch (err) {
     console.log('Error when feach Transcript from DB : ' + err);
