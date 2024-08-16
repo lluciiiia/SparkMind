@@ -1,6 +1,5 @@
 import pwa from '@ducanh2912/next-pwa';
 import { withSentryConfig } from '@sentry/nextjs';
-import webpack from "webpack";
 // import MillionLint from "@million/lint";
 // import million from "million/compiler";
 
@@ -42,41 +41,6 @@ const config = {
         },
       },
     },
-  },
-  webpack: (config, { isServer }) => {
-    if (!isServer) {
-      config.resolve.fallback = {
-        fs: false,
-        os: false,
-        http: false,
-        https: false,
-        zlib: false,
-        path: false,
-        'diagnostics_channel': false,
-        'async_hooks': false,
-      };
-    }
-
-    config.plugins.push(
-      new webpack.ProvidePlugin({
-        process: "process/browser",
-        Buffer: ["buffer", "Buffer"],
-      }),
-      new webpack.NormalModuleReplacementPlugin(/node:/, (resource) => {
-        const mod = resource.request.replace(/^node:/, "");
-        switch (mod) {
-          case "buffer":
-            resource.request = "buffer";
-            break;
-          case "stream":
-            resource.request = "readable-stream";
-            break;
-          default:
-            throw new Error(`Not found ${mod}`);
-        }
-      })
-    );
-    return config;
   },
   async headers() {
     return [
