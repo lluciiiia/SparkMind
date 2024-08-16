@@ -1,19 +1,24 @@
-'use client';
+"use client";
 
-import { Calendar } from '@/components/ui/calendar';
-import { Card } from '@/components/ui/card';
-import axios from 'axios';
-import type React from 'react';
-import { useEffect, useState } from 'react';
-import type { ActionCardProps, Event, TodoType } from '../interfaces';
-import '@/styles/css/custom-scroll.css';
-import { Calendar as Calendericon } from 'lucide-react';
-import Link from 'next/link';
+import { Calendar } from "@/components/ui/calendar";
+import { Card } from "@/components/ui/card";
+import axios from "axios";
+import type React from "react";
+import { useEffect, useState } from "react";
+import type { ActionCardProps, Event, TodoType } from "../interfaces";
+import "@/styles/css/custom-scroll.css";
+import { Calendar as Calendericon } from "lucide-react";
+import Link from "next/link";
+import {
+  createEvents,
+  getIsActionPreviewDone,
+  getIsVideoUploaded,
+  getListOfEvents,
+  getTodoTasks,
+} from "@/app/api-handler";
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
-  if (!learningId) {
-    console.error('LearningId is Missing in ActionCard');
-  }
+  if (!learningId) console.error("LearningId is Missing in ActionCard");
 
   const [date, setDate] = useState<Date | undefined>(new Date());
 
@@ -21,7 +26,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   const [eventList, setEventList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
   const [isListPreview, setListPreview] = useState<boolean>(false);
-  const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
+  const [initTodoList, setInitTodoList] = useState<TodoType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [videoNotAvailable, setVideoNotAvailable] = useState<boolean>(false);
 
@@ -29,85 +34,69 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     const ActionData = async () => {
       try {
         setIsLoading(true);
-        if (learningId) {
-          //fist check is video is uploaded on not
-          const checkid = await isVideoUploaded(learningId);
+        if (!learningId) return;
 
-          if (checkid === true) {
-            const check = await getIsActionPreviewDone(learningId);
-            if (check === false) {
-              await getListOfEvent(learningId, false);
-              setListPreview(true);
-            } else {
-              await getTodoTaskFormDB(learningId);
-            }
-          } else {
-            const check = await getIsActionPreviewDone(learningId);
-            if (check === false) {
-              await getListOfEvent(learningId, true);
-              setListPreview(true);
-            } else {
-              await getTodoTaskFormDB(learningId);
-            }
-            // setVideoNotAvailable(true);
-          }
+        const isVideoUploaded = await getIsVideoUploaded(learningId);
+        const isActionPreviewDone = await getIsActionPreviewDone(learningId);
+
+        if (!isActionPreviewDone) {
+          await getListOfEvents(learningId, !isVideoUploaded);
+          setListPreview(true);
+        } else {
+          await getTodoTaskFromDB(learningId);
         }
       } catch (error) {
-        throw new Error('not enough permissions to access calander : ' + (error as Error).message);
+        throw new Error(
+          "Not enough permissions to access calendar: " +
+            (error as Error).message
+        );
       } finally {
         setIsLoading(false);
       }
     };
+
     ActionData();
   }, []);
-
-  const isVideoUploaded = async (learningid: string) => {
-    const res = await axios.get('/api/v1/check-video', {
-      params: { learningid: learningid },
-    });
-
-    if (res.status === 200) return res.data.exists;
-
-    return false;
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
   useEffect(() => {
     if (date) {
       const filteredList = initTodoList.filter((todo) => {
-        return formatDate(todo.start_dateTime) === formatDate(date.toISOString());
+        return (
+          formatDate(todo.start_dateTime) === formatDate(date.toISOString())
+        );
       });
       setTodoList(filteredList);
     }
   }, [date, initTodoList]);
 
-  const getListOfEvent = async (LearningId: any, getfromtext?: boolean) => {
+  const getListOfEvents = async (LearningId: string, getFromText?: boolean) => {
     try {
-      const eventlistRes = await axios.get('/api/v1/event-list', {
-        params: { LearningId: LearningId, getfromtext: getfromtext },
-      });
+      const response = await getListOfEvents(LearningId, getFromText);
 
-      const eventList = JSON.stringify(eventlistRes.data);
+      const eventList = JSON.stringify(response);
 
       const secnd = (await JSON.parse(eventList)) as any;
       const VSlList: Event[] = secnd.body;
 
       setEventList(VSlList);
     } catch (error) {
-      console.error('Error creating event :', error);
-      alert('Error creating event : ' + (error as Error).message);
+      console.error("Error creating event :", error);
+      alert("Error creating event : " + (error as Error).message);
     }
   };
 
   const handleCreateEvent = async () => {
     try {
+      if (!learningId) return;
+
       const selectedTask = selectedRowsidx.map((rowIndex) => ({
         summary: eventList[rowIndex].summary,
         description: eventList[rowIndex].description,
@@ -121,21 +110,18 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         },
       }));
 
-      const res = await axios.post('/api/v1/events', {
-        selectedTask: selectedTask,
-        learningId: learningId,
-      });
+      const response = await createEvents(selectedTask, learningId);
 
-      if (res.data.status === 200) {
-        setTodoList(res.data.todolist);
-        setinitTdoLisit(res.data.todolist);
+      if (response.data.status === 200) {
+        setTodoList(response.data.todolist);
+        setInitTodoList(response.data.todolist);
       } else {
-        alert(`Error create-event: ${res.data.message}`);
+        alert(`Error create-event: ${response.data.message}`);
       }
 
       setListPreview(false);
     } catch (err) {
-      console.log('Error in creating Event ' + (err as Error).message);
+      console.log("Error in creating Event " + (err as Error).message);
       return;
     }
   };
@@ -150,30 +136,20 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     });
   };
 
-  const getIsActionPreviewDone = async (learningid: string) => {
-    const res = await axios.get('/api/v1/action-previews', {
-      params: { learningid: learningid },
-    });
-
-    if (res.status === 200) return res.data.check;
-
-    return false;
-  };
-
-  const getTodoTaskFormDB = async (learningId: string) => {
+  const getTodoTaskFromDB = async (learningId: string) => {
     try {
-      const eventlistRes = await axios.get('/api/v1/todo-tasks', {
-        params: { learning_id: learningId },
-      });
+      const response = await getTodoTasks(learningId);
 
-      if (eventlistRes.status === 200) {
-        setTodoList(eventlistRes.data.todo_task);
-        setinitTdoLisit(eventlistRes.data.todo_task);
+      if (response.status === 200) {
+        setTodoList(response.data.todo_task);
+        setInitTodoList(response.data.todo_task);
       } else {
         setTodoList([]);
       }
     } catch (err) {
-      console.log('getTodoTaskFormDB gives error:' + (err as Error).message);
+      console.log(
+        "Error occurs in getTodoTaskFromDB:" + (err as Error).message
+      );
       setTodoList([]);
     }
   };
@@ -184,8 +160,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         {videoNotAvailable === true ? (
           <div className="flex h-full w-full justify-center items-center">
             <p>
-              No videos or relevant data were found for creating the event. Please grant Calendar
-              access during sign-in and upload the video.
+              No videos or relevant data were found for creating the event.
+              Please grant Calendar access during sign-in and upload the video.
             </p>
           </div>
         ) : (
@@ -194,12 +170,13 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
               {isListPreview === true ? (
                 <div className="w-full pl-4 h-full overflow-y-auto">
                   <div className="flex flex-row justify-between items-center">
-                    <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
+                    <h2 className="text-xl font-bold border-b pb-2 mb-4">
+                      List of Event
+                    </h2>
                     <button
                       onClick={() => handleCreateEvent()}
-                      className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2"
-                    >
-                      {' '}
+                      className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2">
+                      {" "}
                       Create Selected Task
                     </button>
                   </div>
@@ -213,19 +190,25 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                             onChange={() => handleCheckboxChange(index)}
                           />
                           <p className="text-sm mr-2">
-                            {item.start.dateTime.slice(0, 16).split('T')[0]}
+                            {item.start.dateTime.slice(0, 16).split("T")[0]}
                             {/* - {item.end.dateTime.slice(0, 16)} */}
                           </p>
                           <p className="text-orange-600">
-                            {new Date(item.start.dateTime).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}{' '}
-                            -{' '}
-                            {new Date(item.end.dateTime).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
+                            {new Date(item.start.dateTime).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}{" "}
+                            -{" "}
+                            {new Date(item.end.dateTime).toLocaleTimeString(
+                              [],
+                              {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              }
+                            )}
                           </p>
                         </div>
                         <input
@@ -267,22 +250,30 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
                         <div key={index} className="border-b pb-4">
                           <div className="flex flex-row items-center">
                             <p className="text-sm font-bold mr-2">
-                              {item.start_dateTime.slice(0, 16).split('T')[0]}
+                              {item.start_dateTime.slice(0, 16).split("T")[0]}
                             </p>
                             <p className="text-orange-600 font-bold">
-                              {new Date(item.start_dateTime).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}{' '}
-                              -{' '}
-                              {new Date(item.end_dateTime).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
+                              {new Date(item.start_dateTime).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}{" "}
+                              -{" "}
+                              {new Date(item.end_dateTime).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}
                             </p>
                           </div>
                           <div className="flex flex-row items-center">
-                            <p className="text-lg font-semibold mr-2">{item.summary}</p>
+                            <p className="text-lg font-semibold mr-2">
+                              {item.summary}
+                            </p>
                             <Link href={item.event_link}>
                               <Calendericon className="h-5 w-5" />
                             </Link>
