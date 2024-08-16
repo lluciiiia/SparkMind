@@ -18,6 +18,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { createClient } from '@/utils/supabase/client';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { Router } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -69,7 +70,9 @@ export function UserNav() {
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="#" alt="Avatar" />
                   <AvatarFallback className="bg-transparent">
-                    {avatarUrl && <img src={avatarUrl} alt={`${userName}'s avatar`} />}
+                    {avatarUrl && (
+                      <Image src={avatarUrl} alt={`${userName}'s avatar`} width={32} height={32} />
+                    )}
                   </AvatarFallback>
                 </Avatar>
               </Button>

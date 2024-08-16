@@ -19,7 +19,11 @@ interface MenuProps {
 }
 
 export function Menu({ isOpen }: MenuProps) {
-  const [id, setId] = useQueryState('id');
+  const [id, setId] = useQueryState('id', {
+    parse: String,
+    defaultValue: '0',
+    clearOnDefault: true,
+  });
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
 

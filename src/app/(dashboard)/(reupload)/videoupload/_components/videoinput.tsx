@@ -24,7 +24,7 @@ import { Label } from '@/components/ui/label';
 import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
 import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 import { getYoutubeResponse, saveOutput } from '@/app/api-handler';
@@ -34,9 +34,8 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
-
 //ffmpeg
-import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
+import { type FFmpeg, createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 export const ReUploadVideo = () => {
   const searchParams = useSearchParams();
@@ -85,7 +84,6 @@ export const ReUploadVideo = () => {
 
   useEffect(() => {
     (async () => {
-
       try {
         setIsLoading(true);
 
@@ -97,19 +95,17 @@ export const ReUploadVideo = () => {
         ffmpeg.current.setProgress(({ ratio }) => {
           console.log(ratio);
         });
-        console.log("Loading FFmpeg...");
+        console.log('Loading FFmpeg...');
         await ffmpeg.current.load();
         setIsFFmpegLoaded(true);
-        console.log("FFmpeg loaded successfully.");
+        console.log('FFmpeg loaded successfully.');
       } catch (err) {
         console.error('Error loading FFmpeg:', (err as Error).message);
-      }
-      finally {
+      } finally {
         setIsLoading(false);
       }
     })();
   }, []);
-
 
   const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -125,38 +121,37 @@ export const ReUploadVideo = () => {
 
     try {
       if (ffmpeg.current && isFFmpegLoaded) {
-
         console.log('FFmpeg is loaded, starting the process...');
 
-        ffmpeg.current.FS("writeFile", selectedFile.name, await fetchFile(selectedFile));
+        ffmpeg.current.FS('writeFile', selectedFile.name, await fetchFile(selectedFile));
 
-        currentFSls.current = ffmpeg.current.FS("readdir", ".");
-        console.log("start executing the command");
+        currentFSls.current = ffmpeg.current.FS('readdir', '.');
+        console.log('start executing the command');
 
         await ffmpeg.current.run(
           '-i',
           selectedFile.name,
           '-ar',
-          '16000',                // Sample rate
+          '16000', // Sample rate
           '-ac',
-          '1',                    // Number of audio channels (mono)
+          '1', // Number of audio channels (mono)
           '-acodec',
-          'pcm_s16le',            // Audio codec
-          'output.wav'
+          'pcm_s16le', // Audio codec
+          'output.wav',
         );
 
         console.log('Command execution completed.');
-        const FSls = ffmpeg.current.FS("readdir", ".");
+        const FSls = ffmpeg.current.FS('readdir', '.');
         const outputFiles = FSls.filter((i) => !currentFSls.current.includes(i));
 
         if (outputFiles.length === 1) {
-          const data = ffmpeg.current.FS("readFile", outputFiles[0]);
+          const data = ffmpeg.current.FS('readFile', outputFiles[0]);
 
-          //for debugging 
+          //for debugging
           const objectURL = URL.createObjectURL(
-            new Blob([new Uint8Array(data.buffer)], { type: 'audio/wav' })
+            new Blob([new Uint8Array(data.buffer)], { type: 'audio/wav' }),
           );
-          console.log("objectURL : " + objectURL);
+          console.log('objectURL : ' + objectURL);
 
           const blob = new Blob([new Uint8Array(data.buffer)], { type: 'audio/wav' });
 
@@ -167,25 +162,27 @@ export const ReUploadVideo = () => {
             formData.append('learningid', myLearningId);
           }
 
-          const res = await fetch('/api/v1/extract-transcribe', {
-            method: 'PATCH',
-            body: formData,
-          });
+          try {
+            const res = await fetch('/api/v1/extract-transcribe', {
+              method: 'PATCH',
+              body: formData,
+            });
+            if (!res.ok) throw new Error(await res.text());
 
-          if (!res.ok) throw new Error(await res.text());
+            // @ts-ignore trust me bro
+            const response = (await res.json()) as any;
 
-          // @ts-ignore trust me bro
-          const response = (await res.json()) as any;
+            //clean up old setState
+            setSelectedFile(null);
+            setObjectURL(null);
+            setFileType(undefined);
 
-          //clean up old setState
-          setSelectedFile(null);
-          setObjectURL(null);
-          setFileType(undefined);
-
-          return response.keywordsArr;
+            return response.keywordsArr;
+          } catch (err: any) {
+            throw new Error('Error when extract transcribe : ' + (err as Error).message);
+          }
         }
-      }
-      else {
+      } else {
         throw new Error('FFmpeg is not loaded or not available.');
       }
     } catch (err: any) {

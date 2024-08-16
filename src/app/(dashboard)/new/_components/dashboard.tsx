@@ -24,7 +24,7 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
@@ -36,7 +36,7 @@ import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
 //ffmpeg
-import { createFFmpeg, fetchFile, FFmpeg } from "@ffmpeg/ffmpeg";
+import { type FFmpeg, createFFmpeg, fetchFile } from '@ffmpeg/ffmpeg';
 
 export const NewDashboard = () => {
   const searchParams = useSearchParams();
@@ -58,7 +58,6 @@ export const NewDashboard = () => {
 
   useEffect(() => {
     (async () => {
-
       try {
         setIsLoading(true);
 
@@ -70,14 +69,13 @@ export const NewDashboard = () => {
         ffmpeg.current.setProgress(({ ratio }) => {
           console.log(ratio);
         });
-        console.log("Loading FFmpeg...");
+        console.log('Loading FFmpeg...');
         await ffmpeg.current.load();
         setIsFFmpegLoaded(true);
-        console.log("FFmpeg loaded successfully.");
+        console.log('FFmpeg loaded successfully.');
       } catch (err) {
         console.error('Error loading FFmpeg:', (err as Error).message);
-      }
-      finally {
+      } finally {
         setIsLoading(false);
       }
     })();
@@ -135,34 +133,33 @@ export const NewDashboard = () => {
 
     try {
       if (ffmpeg.current && isFFmpegLoaded) {
-
         console.log('FFmpeg is loaded, starting the process...');
 
-        ffmpeg.current.FS("writeFile", selectedFile.name, await fetchFile(selectedFile));
+        ffmpeg.current.FS('writeFile', selectedFile.name, await fetchFile(selectedFile));
 
-        currentFSls.current = ffmpeg.current.FS("readdir", ".");
-        console.log("start executing the command");
+        currentFSls.current = ffmpeg.current.FS('readdir', '.');
+        console.log('start executing the command');
 
         await ffmpeg.current.run(
           '-i',
           selectedFile.name,
           '-ar',
-          '16000',                // Sample rate
+          '16000', // Sample rate
           '-ac',
-          '1',                    // Number of audio channels (mono)
+          '1', // Number of audio channels (mono)
           '-acodec',
-          'pcm_s16le',            // Audio codec
-          'output.wav'
+          'pcm_s16le', // Audio codec
+          'output.wav',
         );
 
         console.log('Command execution completed.');
-        const FSls = ffmpeg.current.FS("readdir", ".");
+        const FSls = ffmpeg.current.FS('readdir', '.');
         const outputFiles = FSls.filter((i) => !currentFSls.current.includes(i));
 
         if (outputFiles.length === 1) {
-          const data = ffmpeg.current.FS("readFile", outputFiles[0]);
+          const data = ffmpeg.current.FS('readFile', outputFiles[0]);
 
-          //for debugging 
+          //for debugging
           // const objectURL = URL.createObjectURL(
           //   new Blob([new Uint8Array(data.buffer)], { type: 'audio/wav' })
           // );
@@ -194,8 +191,7 @@ export const NewDashboard = () => {
 
           return response.keywordsArr;
         }
-      }
-      else {
+      } else {
         throw new Error('FFmpeg is not loaded or not available.');
       }
     } catch (err: any) {
