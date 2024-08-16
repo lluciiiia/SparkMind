@@ -7,6 +7,7 @@ export const FeaturesCard = ({
     <article
       className={`
         flex flex-col gap-4
+        
       `}
     >
 

@@ -5,13 +5,38 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { insertScraperOutput } from '@/lib/scrape';
 import { studyGuidePrompt } from '@/lib/scrape';
+<<<<<<< HEAD
 import { debounce } from '@/utils';
+=======
+import { OutputSchema } from '@/schema';
+>>>>>>> origin/main
 import { createClient } from '@/utils/supabase/client';
 import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 import { marked } from 'marked';
 import type React from 'react';
-import { memo, useCallback, useMemo, useState } from 'react';
-import { useIsomorphicLayoutEffect } from 'usehooks-ts';
+import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
+
+const useDebounce = (func: Function, delay: number) => {
+  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const debouncedFunc = useCallback(
+    (...args: any[]) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => func(...args), delay);
+    },
+    [func, delay]
+  );
+
+  const cancel = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  }, []);
+
+  return [debouncedFunc, cancel] as const;
+};
 
 const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLoading: boolean }> =
   memo(({ topic, websiteData, uuid, isLoading: parentIsLoading }) => {
@@ -35,25 +60,24 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
       [googleGenerativeAI],
     );
 
+    console.log("Model configuration:", model);
+
     const generateContent = useCallback(
       async (topic: string, websiteData: string) => {
         if (!topic || !websiteData || isInserted) return;
         setIsLoading(true);
 
         try {
-          const prompt = studyGuidePrompt(topic, websiteData);
-          const result = await model.generateContent({
-            contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          });
-          const response = result.response;
-          const text = response.text();
+          const prompt = await studyGuidePrompt(topic, websiteData);
+          const result = await model.generateContent(prompt);
+          const text = result.response.text();
           const content = await marked(text);
           setHtmlContent(content);
           await insertScraperOutput(text, topic, uuid);
           setIsInserted(true);
         } catch (error) {
           console.error('Error generating content:', error);
-          setHtmlContent('<p>Error generating content. Please try again.</p>');
+          setHtmlContent(`<p>Error generating content. Please try again.</p>`);
         } finally {
           setIsLoading(false);
         }
@@ -61,14 +85,11 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
       [model, uuid, isInserted],
     );
 
-    const debouncedGenerateContent = useMemo(
-      () => debounce(generateContent, 1000),
-      [generateContent],
-    );
+    useEffect(() => {
+      let isMounted = true;
 
-    useIsomorphicLayoutEffect(() => {
       const checkExistingData = async () => {
-        if (!topic || !websiteData || !uuid) return;
+        if (!topic || !websiteData || !uuid || isInserted) return;
 
         try {
           const supabase = createClient();
@@ -78,6 +99,7 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
             .eq('output_id', uuid)
             .maybeSingle();
 
+<<<<<<< HEAD
           if (error) {
             if (error.code === 'PGRST116') {
               setIsInserted(false);
@@ -86,23 +108,41 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
               throw error;
             }
           } else if (data) {
+=======
+          if (!isMounted) return;
+
+          if (error && error.code !== 'PGRST116') {
+            throw error;
+          }
+
+          if (data) {
+>>>>>>> origin/main
             setHtmlContent(data.text_output);
             setSessionStorageContent(data.text_output);
             window.sessionStorage.setItem('scraper_output', data.text_output);
             setIsInserted(true);
           } else {
-            setIsInserted(false);
-            debouncedGenerateContent(topic, websiteData);
+            await generateContent(topic, websiteData);
           }
         } catch (error) {
           console.error('Error checking existing data:', error);
-          setIsInserted(false);
-          debouncedGenerateContent(topic, websiteData);
+          if (isMounted) {
+            setHtmlContent(`<p>Error checking existing data. Please try again.</p>`);
+          }
         }
       };
 
       checkExistingData();
+<<<<<<< HEAD
     }, [topic, websiteData, debouncedGenerateContent, uuid]);
+=======
+
+      return () => {
+        isMounted = false;
+      };
+    }, [topic, websiteData, uuid, generateContent, isInserted]);
+
+>>>>>>> origin/main
     return (
       <Card>
         <CardHeader>

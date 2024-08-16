@@ -20,7 +20,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       .select();
 
     if (error) {
-      console.log('this is error : ' + error.message);
       return NextResponse.json({ status: 400, body: error.message });
     }
 
@@ -77,7 +76,6 @@ export async function PATCH(req: NextRequest) {
     const { id, title, date, uuid } = (await req.json()) as UpdateLearningData;
     const supabase = createClient();
 
-    console.log('this is id : ' + id);
 
     const { data, error } = await supabase
       .from('mylearnings')
@@ -104,8 +102,6 @@ export async function DELETE(req: NextRequest) {
   try {
     const { uuid, id }: any = await req.json();
     const supabase = createClient();
-
-    console.log('Deleting record with Learning ID: ' + id + ', and UUID: ' + uuid);
 
     const { data, error } = await supabase
       .from('mylearnings')
