@@ -25,21 +25,20 @@ import { Storage } from '@google-cloud/storage';
 
 const bucketName = 'sparkmind-gemini-transcript'; // Replace with your bucket name
 
-const uploadStreamToGCS = async (destination: string) => {
-  const storage = new Storage({
-    projectId: serviceAccount.project_id,
-    credentials: serviceAccount,
-  });
+const uploadStreamToGCS = async (destFileName: string) => {
+  const storage = new Storage();
   const bucket = storage.bucket(bucketName);
 
-  const file = bucket.file(destination);
+  const file = bucket.file(destFileName);
   const passThroughStream = file.createWriteStream({
     resumable: false,
     contentType: 'audio/wav',
   });
+
   return passThroughStream;
 };
 
+// Convert Buffer to Readable Stream
 const bufferToStream = (buffer: Buffer): Readable => {
   const stream = new Readable();
   stream.push(buffer);
@@ -47,42 +46,30 @@ const bufferToStream = (buffer: Buffer): Readable => {
   return stream;
 };
 
-const extractAndUploadAudio = async (buffer: Buffer, videoid: string): Promise<string> => {
-  const destFileName = `output${videoid}.wav`;
+const UploadAudio = async (buffer: Buffer, filename: string): Promise<string> => {
+  const destFileName = `output${filename}.wav`;
   const gcsUri = `gs://${bucketName}/${destFileName}`;
 
-  // Create a PassThrough stream to pipe ffmpeg output
-  const passThroughStream = new PassThrough();
-  const uploadStream = await uploadStreamToGCS(destFileName);
+  const storage = new Storage();
+  const bucket = storage.bucket(bucketName);
+  const file = bucket.file(destFileName);
 
   return new Promise((resolve, reject) => {
-    // Use fluent-ffmpeg to process the buffer and pipe the output
-    ffmpeg()
-      .input(bufferToStream(buffer))
-      .inputFormat('mp4') // Adjust this based on your video format
-      .audioChannels(1)
-      .audioCodec('pcm_s16le')
-      .audioFrequency(16000)
-      .format('wav')
-      .pipe(passThroughStream, { end: true });
+    const writeStream = file.createWriteStream({
+      resumable: false,
+      contentType: 'audio/wav',
+    });
 
-    // Pipe ffmpeg output to GCS upload stream
-    passThroughStream
-      .pipe(uploadStream)
+    bufferToStream(buffer)
+      .pipe(writeStream)
       .on('finish', () => {
         console.log('Audio uploaded to GCS successfully. ⭐✅');
         resolve(gcsUri);
       })
       .on('error', (err) => {
-        console.error(`GCS upload error: ${err}`);
-        reject(`GCS upload error: ${err}`);
+        console.error(`GCS upload error: ${err.message}`);
+        reject(`GCS upload error: ${err.message}`);
       });
-
-    // Handle errors from fluent-ffmpeg
-    passThroughStream.on('error', (error) => {
-      console.error(`ffmpeg processing error: ${error}`);
-      reject(`ffmpeg processing error: ${error}`);
-    });
   });
 };
 
@@ -161,21 +148,19 @@ const extractKeywordsAndQuestions = async (transcript: string) => {
   }
 };
 
-const deleteAudioFile = (videoid: string) => {
-  const storage = new Storage({
-    projectId: serviceAccount.project_id,
-    credentials: serviceAccount,
-  });
+const deleteAudioFile = async (videoid: string) => {
+  const storage = new Storage();
   const bucket = storage.bucket(bucketName);
   const destFileName = `output${videoid}.wav`;
   const file = bucket.file(destFileName);
-  file
-    .delete()
-    .then((data) => {})
-    .catch((error) => {
-      console.log('Error while deleting Audio File from GCloud : ' + error);
-      return error;
-    });
+
+  try {
+    await file.delete();
+    console.log(`File ${destFileName} deleted successfully.`);
+  } catch (error) {
+    console.error('Error while deleting Audio File from GCloud:', error);
+    throw error;
+  }
 };
 
 export async function GET(request: NextRequest) {
@@ -184,66 +169,83 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    if (!API_KEY) return new Response('Missing API key', { status: 400 });
+    if (!API_KEY) {
+      console.error('Missing API key');
+      return NextResponse.json({ error: 'Missing API key' }, { status: 400 });
+    }
 
     const formData = await req.formData();
 
     const file = formData.get('file') as Blob | null;
     const learning_id = formData.get('learningid') as string;
 
-    if (learning_id === null) {
-      console.error('learning Id is missing');
+    if (!learning_id) {
+      console.error('Learning ID is missing');
+      return NextResponse.json({ error: 'Learning ID is missing' }, { status: 400 });
     }
 
     if (!file) {
-      return NextResponse.json({ error: 'File blob is required.' }, { status: 400 });
+      console.error('File blob is required');
+      return NextResponse.json({ error: 'File blob is required' }, { status: 400 });
     }
 
-    var supabaseClient = createClient();
+    const supabaseClient = createClient();
 
-    const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !userData.user) {
+      console.error('User authentication error:', userError?.message || 'User not found');
+      return NextResponse.json({ error: 'Please Login or SignUp' }, { status: 401 });
+    }
 
-    if (uuid === undefined)
-      return NextResponse.json({ error: 'Please Login or SignUp' }, { status: 500 });
-
+    const uuid = userData.user.id;
     const buffer = Buffer.from(await file.arrayBuffer());
-
     const video_id = learning_id;
+    const filename = `${uuid}_${video_id}`;
 
-    const gcsUri = await extractAndUploadAudio(buffer, video_id);
-    const transcription = await transcribeAudio(gcsUri);
+    try {
+      const gcsUri = await UploadAudio(buffer, filename);
+      const transcription = await transcribeAudio(gcsUri);
+      await deleteAudioFile(filename);
 
-    //delete the Audio file form Google Cloud bucket
-    deleteAudioFile(video_id);
+      const relevantData = await extractKeywordsAndQuestions(transcription);
+      if (!relevantData || Object.keys(relevantData).length === 0) {
+        console.error('No relevant data extracted from transcription');
+        return NextResponse.json({ error: 'Failed to extract relevant data' }, { status: 500 });
+      }
 
-    //extract keywords
-    const relevantData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
+      const { keywords: keywordsArr, questions: questionsArr } = relevantData;
 
-    if (!relevantData) {
-      return NextResponse.json({ error: 'No data found' }, { status: 400 });
+      const { error: updateError } = await supabaseClient
+        .from('transcriptdata')
+        .update({
+          transcript: transcription,
+          keywords: keywordsArr,
+          basic_questions: questionsArr,
+        })
+        .eq('uuid', uuid)
+        .eq('videoid', video_id);
+
+      if (updateError) {
+        console.error('Error updating transcription data:', updateError);
+        return NextResponse.json({ error: 'Failed to update transcription data' }, { status: 500 });
+      }
+
+      return NextResponse.json({ keywordsArr, transcription });
+    } catch (processingError) {
+      console.error('Error processing audio:', processingError);
+      return NextResponse.json(
+        {
+          error: `Error processing audio file: ${processingError instanceof Error ? processingError.message : processingError}`,
+        },
+        { status: 500 },
+      );
     }
-
-    const keywordsArr = relevantData.keywords;
-    const questionsArr = relevantData.questions;
-
-    //now time to insert the transcript and keyword into supabase
-    const { error } = await supabaseClient
-      .from('transcriptdata')
-      .update({
-        transcript: transcription,
-        keywords: keywordsArr,
-        basic_questions: questionsArr,
-      })
-      .eq('uuid', uuid)
-      .eq('videoid', video_id);
-
-    if (error) {
-      console.log('Occur while transcription is upload in DB: ' + error.details);
-    }
-
-    return NextResponse.json({ keywordsArr, transcription });
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+    console.error('Unexpected error:', error);
+    return NextResponse.json(
+      { error: `An unexpected error occurred: ${error instanceof Error ? error.message : error}` },
+      { status: 500 },
+    );
   }
 }
 
@@ -257,7 +259,7 @@ export async function POST(req: NextRequest) {
     const learning_id = formData.get('learningid') as string;
 
     if (learning_id === null) {
-      console.error('learning Id is missing');
+      return NextResponse.json({ error: 'learning Id is missing' }, { status: 500 });
     }
 
     if (!file) {
@@ -276,11 +278,12 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await file.arrayBuffer());
 
     const video_id = learning_id;
+    const filename = uuid + '_' + video_id;
 
-    const gcsUri = await extractAndUploadAudio(buffer, video_id);
+    const gcsUri = await UploadAudio(buffer, filename);
     const transcription = await transcribeAudio(gcsUri);
 
-    deleteAudioFile(video_id);
+    await deleteAudioFile(filename);
 
     const relevantData = (await extractKeywordsAndQuestions(transcription)) as AIresponse;
 

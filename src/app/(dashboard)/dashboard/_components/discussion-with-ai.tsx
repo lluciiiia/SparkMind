@@ -51,12 +51,20 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
 
   useEffect(() => {
     const fetchDiscussData = async () => {
-      const response = await axios.get(`/api/v1/discussions?videoid=${video_id}`);
-      if (response.status === 200) {
-        setBasicQuestion(response.data.basicQue);
-        setTranscript(response.data.transcript);
-      } else {
-        console.log('Something goes Wrong in Discuss with ai feature');
+      try {
+        if (!video_id) {
+          console.error('video_id is null or undefined');
+          return;
+        }
+        const response = await axios.get(`/api/v1/discussions?videoid=${video_id}`);
+        if (response.status === 200) {
+          setBasicQuestion(response.data.basicQue);
+          setTranscript(response.data.transcript);
+        } else {
+          console.error('Error in Discuss with AI feature:', response.data.error);
+        }
+      } catch (error) {
+        console.error('Error when fetching discussions:', error);
       }
     };
     fetchDiscussData();
