@@ -101,3 +101,10 @@ export const getIsVideoUploaded = async (myLearningId: string) => {
 
   return response.status === 200 && response.data.exists;
 };
+
+export const getIsActionPreviewDone = async (myLearningId: string) => {
+  const response = await axios.get("/api/v1/action-previews", {
+    params: { learningid: myLearningId },
+  });
+  return response.status === 200 && response.data.check;
+};

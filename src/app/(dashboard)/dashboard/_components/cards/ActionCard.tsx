@@ -9,7 +9,7 @@ import type { ActionCardProps, Event, TodoType } from "../interfaces";
 import "@/styles/css/custom-scroll.css";
 import { Calendar as Calendericon } from "lucide-react";
 import Link from "next/link";
-import { getIsVideoUploaded } from "@/app/api-handler";
+import { getIsActionPreviewDone, getIsVideoUploaded } from "@/app/api-handler";
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   if (!learningId) {
@@ -144,16 +144,6 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         return [...prevSelectedRows, index];
       }
     });
-  };
-
-  const getIsActionPreviewDone = async (learningid: string) => {
-    const res = await axios.get("/api/v1/action-previews", {
-      params: { learningid: learningid },
-    });
-
-    if (res.status === 200) return res.data.check;
-
-    return false;
   };
 
   const getTodoTaskFormDB = async (learningId: string) => {
