@@ -6,6 +6,7 @@ import { updatePassword } from '@/utils/auth/server';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface UpdatePasswordProps {
   redirectMethod: string;
@@ -16,9 +17,17 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true); // Disable the button while the request is being handled
-    await handleRequest(e, updatePassword, router);
-    setIsSubmitting(false);
+    try {
+      setIsSubmitting(true); // Disable the button while the request is being handled
+      await handleRequest(e, updatePassword, router);
+    }
+    catch {
+      toast.error("Sign in with your Google account, or if you don't have one, try again later.");
+    }
+    finally {
+      setIsSubmitting(false);
+    }
+
   };
 
   return (
@@ -33,7 +42,7 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
               type="password"
               name="password"
               autoComplete="current-password"
-              className="w-full p-3 rounded-md bg-zinc-800"
+              className="w-full p-3 rounded-md"
             />
             <label htmlFor="passwordConfirm">Confirm New Password</label>
             <input
@@ -42,7 +51,7 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
               type="password"
               name="passwordConfirm"
               autoComplete="current-password"
-              className="w-full p-3 rounded-md bg-zinc-800"
+              className="w-full p-3 rounded-md"
             />
           </div>
           <Button variant="slim" type="submit" className="mt-1" loading={isSubmitting}>
