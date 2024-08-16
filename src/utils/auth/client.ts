@@ -9,9 +9,7 @@ import { redirectToPath } from './server';
 
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement>,
-  requestFunc: (
-    formData: FormData,
-  ) => Promise<{
+  requestFunc: (formData: FormData) => Promise<{
     redirectPath: string;
     toastMessage: { type: 'success' | 'error'; message: string };
   }>,
