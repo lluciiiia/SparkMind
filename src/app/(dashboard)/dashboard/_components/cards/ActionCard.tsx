@@ -2,7 +2,6 @@
 
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
-import axios from 'axios';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import type { ActionCardProps, Event, TodoType } from '../interfaces';
@@ -40,7 +39,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
         const isActionPreviewDone = await getIsActionPreviewDone(learningId);
 
         if (!isActionPreviewDone) {
-          await getListOfEvents(learningId, !isVideoUploaded);
+          await handleGetListOfEvents(learningId, !isVideoUploaded);
           setListPreview(true);
         } else {
           await getTodoTaskFromDB(learningId);
@@ -72,7 +71,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     }
   }, [date, initTodoList]);
 
-  const getListOfEvents = async (LearningId: string, getFromText?: boolean) => {
+  const handleGetListOfEvents = async (LearningId: string, getFromText?: boolean) => {
     try {
       const response = await getListOfEvents(LearningId, getFromText);
 
