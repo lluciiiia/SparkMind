@@ -5,11 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { insertScraperOutput } from '@/lib/scrape';
 import { studyGuidePrompt } from '@/lib/scrape';
-<<<<<<< HEAD
 import { debounce } from '@/utils';
-=======
-import { OutputSchema } from '@/schema';
->>>>>>> origin/main
 import { createClient } from '@/utils/supabase/client';
 import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 import { marked } from 'marked';
@@ -99,7 +95,6 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
             .eq('output_id', uuid)
             .maybeSingle();
 
-<<<<<<< HEAD
           if (error) {
             if (error.code === 'PGRST116') {
               setIsInserted(false);
@@ -108,15 +103,6 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
               throw error;
             }
           } else if (data) {
-=======
-          if (!isMounted) return;
-
-          if (error && error.code !== 'PGRST116') {
-            throw error;
-          }
-
-          if (data) {
->>>>>>> origin/main
             setHtmlContent(data.text_output);
             setSessionStorageContent(data.text_output);
             window.sessionStorage.setItem('scraper_output', data.text_output);
@@ -133,16 +119,7 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
       };
 
       checkExistingData();
-<<<<<<< HEAD
     }, [topic, websiteData, debouncedGenerateContent, uuid]);
-=======
-
-      return () => {
-        isMounted = false;
-      };
-    }, [topic, websiteData, uuid, generateContent, isInserted]);
-
->>>>>>> origin/main
     return (
       <Card>
         <CardHeader>
