@@ -1,6 +1,7 @@
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
+      ANALYZE: string;
       NEXT_PHASE: 'phase-production-build' | 'phase-development-build';
       NEXT_PUBLIC_VERCEL_ENV: 'development' | 'production';
       NEXT_PUBLIC_SUPABASE_URL: string;
@@ -25,6 +26,7 @@ declare global {
       GCP_CLIENT_EMAIL: string;
       GCP_CLIENT_ID: string;
       GCP_CLIENT_X509_CERT_URL: string;
+      SENTRY_AUTH_TOKEN: string;
     }
   }
 }

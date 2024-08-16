@@ -1,1 +1,0 @@
-import{B as n}from"./browser-polyfill-BZs9fRMg.js";try{n.runtime.onMessage.addListener((r,o,e)=>(console.log("request",r),console.log("sender",o),e({error:"Unknown action"}),!0))}catch(r){throw console.error("Error in background.js:",r),new Error("Error in background.js:",r)}

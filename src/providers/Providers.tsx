@@ -1,6 +1,6 @@
 'use client';
 import { NotesProvider } from '@/context';
-import { TRPCReactProvider } from '@/trpc/react';
+// import { TRPCReactProvider } from '@/trpc/react';
 import type { JSXElementConstructor, ReactNode } from 'react';
 import { Events, ThemeProvider } from '.';
 
@@ -21,7 +21,7 @@ export const Providers: React.FC<
               enableSystem: true,
             },
           ],
-          [TRPCReactProvider, {}],
+          // [TRPCReactProvider, {}],
           [Events, {}],
           [NotesProvider, {}],
         ]}

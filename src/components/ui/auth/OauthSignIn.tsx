@@ -24,16 +24,6 @@ export const OauthSignIn = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // useEffect(() => {
-  //   const initiateOAuth = async () => {
-  //     setIsSubmitting(true);
-  //     await signInWithOAuth(); // Automatically use the first provider or select one as needed
-  //     setIsSubmitting(false);
-  //   };
-
-  //   initiateOAuth();
-  // }, []); // Empty dependency array ensures this runs only once on mount
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true); // Disable the button while the request is being handled
     await signInWithOAuth();
