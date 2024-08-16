@@ -13,6 +13,7 @@ import {
   getIsActionPreviewDone,
   getIsVideoUploaded,
   getListOfEvents,
+  getTodoTasks,
 } from "@/app/api-handler";
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
@@ -43,7 +44,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
           await getListOfEvents(learningId, !isVideoUploaded);
           setListPreview(true);
         } else {
-          await getTodoTaskFormDB(learningId);
+          await getTodoTaskFromDB(learningId);
         }
       } catch (error) {
         throw new Error(
@@ -137,20 +138,20 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     });
   };
 
-  const getTodoTaskFormDB = async (learningId: string) => {
+  const getTodoTaskFromDB = async (learningId: string) => {
     try {
-      const eventlistRes = await axios.get("/api/v1/todo-tasks", {
-        params: { learning_id: learningId },
-      });
+      const response = await getTodoTasks(learningId);
 
-      if (eventlistRes.status === 200) {
-        setTodoList(eventlistRes.data.todo_task);
-        setinitTdoLisit(eventlistRes.data.todo_task);
+      if (response.status === 200) {
+        setTodoList(response.data.todo_task);
+        setinitTdoLisit(response.data.todo_task);
       } else {
         setTodoList([]);
       }
     } catch (err) {
-      console.log("getTodoTaskFormDB gives error:" + (err as Error).message);
+      console.log(
+        "Error occurs in getTodoTaskFromDB:" + (err as Error).message
+      );
       setTodoList([]);
     }
   };
