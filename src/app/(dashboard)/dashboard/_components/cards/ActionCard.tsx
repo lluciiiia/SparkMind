@@ -9,7 +9,11 @@ import type { ActionCardProps, Event, TodoType } from "../interfaces";
 import "@/styles/css/custom-scroll.css";
 import { Calendar as Calendericon } from "lucide-react";
 import Link from "next/link";
-import { getIsActionPreviewDone, getIsVideoUploaded } from "@/app/api-handler";
+import {
+  getIsActionPreviewDone,
+  getIsVideoUploaded,
+  getListOfEvents,
+} from "@/app/api-handler";
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
   if (!learningId) {
@@ -84,13 +88,11 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     }
   }, [date, initTodoList]);
 
-  const getListOfEvent = async (LearningId: any, getfromtext?: boolean) => {
+  const getListOfEvent = async (LearningId: string, getFromText?: boolean) => {
     try {
-      const eventlistRes = await axios.get("/api/v1/event-list", {
-        params: { LearningId: LearningId, getfromtext: getfromtext },
-      });
+      const response = await getListOfEvents(LearningId, getFromText);
 
-      const eventList = JSON.stringify(eventlistRes.data);
+      const eventList = JSON.stringify(response);
 
       const secnd = (await JSON.parse(eventList)) as any;
       const VSlList: Event[] = secnd.body;

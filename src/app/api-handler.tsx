@@ -108,3 +108,13 @@ export const getIsActionPreviewDone = async (myLearningId: string) => {
   });
   return response.status === 200 && response.data.check;
 };
+
+export const getListOfEvents = async (
+  myLearningId: string,
+  getFromText?: boolean
+) => {
+  const response = await axios.get("/api/v1/event-list", {
+    params: { LearningId: myLearningId, getfromtext: getFromText },
+  });
+  return response.data;
+};
