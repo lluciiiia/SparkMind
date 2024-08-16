@@ -17,41 +17,27 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect } from 'react';
 import { useRef, useState } from 'react';
-import { FaCaretLeft, FaCaretRight, FaTimes } from 'react-icons/fa';
+import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
-import { z } from 'zod';
 import { NewNoteSection } from '../../notes/_components';
-import {
-  type FurtherInfo,
-  Message,
-  type Note,
-  type Output,
-  type ParsedVideoData,
-  Props,
-  type Question,
-  Transcript,
-  type VideoItem,
-} from './interfaces';
+import type { FurtherInfo, Note, Output, ParsedVideoData, Question, VideoItem } from './interfaces';
 
 import ActionCard from './cards/ActionCard';
 import SummaryCard from './cards/SummaryCard';
 import VideoCard from './cards/VideoCard';
-//discuss with AI Imports
 import DiscussionWithAI from './discussion-with-ai';
-import NoteCard from './note';
 
 import { API_KEY } from '@/app/api/v1/gemini-settings';
 
-import axios from 'axios';
-import { createNote, deleteNote, editNote, getNotes, getOutput } from '../../../api-handler';
+import { createNote, deleteNote, editNote, getNotes } from '../../../api-handlers/notes';
+
+import { getOutput } from '../../../api-handlers/api-handler';
 import FurtherInfoCard from './cards/FurtherInfo';
 import QuestionAndAnswer from './cards/QuestionAndAnswer';
 
 export const Dashboard = () => {
-  if (!API_KEY) {
-    console.error('Missing API key');
-  }
+  if (!API_KEY) console.error('Missing API key');
 
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);

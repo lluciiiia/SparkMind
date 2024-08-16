@@ -41,11 +41,8 @@ export default function Home() {
       });
 
       const eventList = await JSON.stringify(eventlistRes.data);
-      console.log('eventList' + eventList);
       const secnd = (await JSON.parse(eventList)) as any;
       const VSlList: Event[] = secnd.body;
-
-      console.log('this is list of working : ' + VSlList);
 
       setshowList(VSlList);
     } catch (error) {
