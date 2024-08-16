@@ -22,14 +22,16 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-import { TextIcon, VideoIcon } from 'lucide-react';
+import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
-import { saveOutput } from '../../../api-handlers/api-handler';
+import { saveOutput } from '../../../api-handler';
+//Circle Loading Style
 import '@/styles/css/Circle-loader.css';
+import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useSearchParams } from 'next/navigation';
 
