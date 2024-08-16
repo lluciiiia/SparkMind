@@ -9,7 +9,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa';
-import type { Note } from './interfaces';
+import type { Note } from '../../dashboard/_components/interfaces';
 
 export const NewNoteSection: React.FC<{
   handleCreate: () => void;
