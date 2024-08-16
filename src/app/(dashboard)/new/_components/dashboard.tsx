@@ -224,6 +224,7 @@ export const NewDashboard = () => {
                         variant="outline"
                         className="w-full"
                         onClick={() => setFileType('video')}
+                        disabled
                       >
                         <VideoIcon className="w-4 h-4 mr-1" />
                         Video
