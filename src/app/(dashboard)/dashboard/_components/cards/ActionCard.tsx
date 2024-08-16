@@ -42,7 +42,13 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
               await getTodoTaskFormDB(learningId);
             }
           } else {
-            await getListOfEvent(learningId, true);
+            const check = await getIsActionPreviewDone(learningId);
+            if (check === false) {
+              await getListOfEvent(learningId, true);
+              setListPreview(true);
+            } else {
+              await getTodoTaskFormDB(learningId);
+            }
             // setVideoNotAvailable(true);
           }
         }

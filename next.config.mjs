@@ -1,7 +1,6 @@
 import pwa from '@ducanh2912/next-pwa';
 import { withSentryConfig } from '@sentry/nextjs';
-// import MillionLint from "@million/lint";
-// import million from "million/compiler";
+import withBundleAnalyzer from '@next/bundle-analyzer';
 
 const withPwa = pwa({
   cacheOnFrontEndNav: true,
@@ -70,7 +69,11 @@ const millionConfig = {
 
 const finalConfig = withPwa(config);
 
-export default withSentryConfig(finalConfig, {
+const withBundleAnalyzerConfig = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+export default withSentryConfig(withBundleAnalyzerConfig(finalConfig), {
   org: 'womb0comb0',
   project: 'spark-mind',
   silent: !process.env.CI,

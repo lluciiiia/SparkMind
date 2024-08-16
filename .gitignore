@@ -63,5 +63,9 @@ service-worker*.js.map
 swe-worker-development.js
 workbox-*.js
 workbox-*.js.map
+
 #supabase
 /supabase/
+
+# analyze
+/analyze/
