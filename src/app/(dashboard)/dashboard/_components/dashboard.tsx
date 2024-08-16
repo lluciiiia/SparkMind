@@ -49,7 +49,7 @@ import {
   getNotes,
 } from "../../../api-handlers/notes";
 
-import { getOutput } from "../../../api-handler";
+import { getOutput } from "../../../api-handlers/api-handler";
 import FurtherInfoCard from "./cards/FurtherInfo";
 import QuestionAndAnswer from "./cards/QuestionAndAnswer";
 
