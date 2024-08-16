@@ -44,7 +44,7 @@ export async function getAndSaveOutputByLearningId(learningId: string) {
 export async function getOutputByLearningId(learningId: string) {
   const { data, error } = await supabase
     .from('outputs')
-    .select('id, youtube, summary, questions, further_info')
+    .select('id, youtube, summary, questions, further_info, todo_task')
     .eq('learning_id', learningId);
 
   return data;

@@ -51,6 +51,7 @@ export const Dashboard = () => {
   const [questions, setQuestions] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState(null);
   const [furtherInfoData, setFurtherInfoData] = useState<any[]>([]);
+  const [actionItemsData, setActionItemsData] = useState<{} | null>(null);
 
   const [output, setOutput] = useState<Output | null>(null);
   const myLearningId = searchParams.get('id');
@@ -95,6 +96,11 @@ export const Dashboard = () => {
     if (output?.further_info) {
       const parsedData = JSON.parse(output.further_info) as FurtherInfo[];
       setFurtherInfoData(parsedData);
+    }
+
+    if (output?.todo_task) {
+      const parsedData = output.todo_task;
+      setActionItemsData(parsedData ? parsedData : null);
     }
   }, [output]);
 
@@ -252,8 +258,8 @@ export const Dashboard = () => {
                   {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
                     <FurtherInfoCard furtherInfo={furtherInfoData} />
                   )}
-                  {activeTab === tab && tab === 'action-items' && (
-                    <ActionCard learningId={myLearningId} />
+                  {activeTab === tab && tab === 'action-items' && actionItemsData != null && (
+                    <ActionCard learningId={myLearningId} actionItemsData={actionItemsData} />
                   )}
                   {activeTab != tab && (
                     <Card
