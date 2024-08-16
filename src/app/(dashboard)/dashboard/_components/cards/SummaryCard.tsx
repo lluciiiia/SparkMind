@@ -1,13 +1,14 @@
-import React from 'react';
+import React from "react";
 type Paragraph = { title: string; data: string };
+import "../../../../../styles/css/markdown.css";
 
-import { Card } from '@/components/ui/card';
-import { marked } from 'marked';
-import { useIsomorphicLayoutEffect } from 'usehooks-ts';
+import { Card } from "@/components/ui/card";
+import { marked } from "marked";
+import { useIsomorphicLayoutEffect } from "usehooks-ts";
 
 type Props = { summaryData: string };
 export default function SummaryCard({ summaryData }: Props) {
-  const [htmlContent, setHtmlContent] = React.useState('');
+  const [htmlContent, setHtmlContent] = React.useState("");
 
   useIsomorphicLayoutEffect(() => {
     const fetchData = async () => {
