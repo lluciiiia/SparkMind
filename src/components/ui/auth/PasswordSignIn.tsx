@@ -23,8 +23,7 @@ export const PasswordSignIn = ({ allowEmail, redirectMethod }: PasswordSignInPro
     setIsSubmitting(true); // Disable the button while the request is being handled
     try {
       await handleRequest(e, signInWithPassword, router);
-    }
-    catch (err) {
+    } catch (err) {
       toast.error("Sign in with your Google account, or if you don't have one, try again later.");
     }
     setIsSubmitting(false);

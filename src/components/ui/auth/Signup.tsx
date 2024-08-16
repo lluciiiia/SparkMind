@@ -23,15 +23,13 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
     try {
       setIsSubmitting(true); // Disable the button while the request is being handled
       await handleRequest(e, signUp, router);
-    }
-    catch {
+    } catch {
       //backup option if any type of other error comes
       toast.error("Sign in with your Google account, or if you don't have one, try again later", {
         duration: 5000,
-        className: 'bg-red-300 text-white'
+        className: 'bg-red-300 text-white',
       });
-    }
-    finally {
+    } finally {
       setIsSubmitting(false);
     }
   };

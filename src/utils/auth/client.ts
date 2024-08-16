@@ -4,12 +4,17 @@ import { getURL } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/client';
 import type { Provider } from '@supabase/supabase-js';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
-import { redirectToPath } from './server';
 import { toast } from 'sonner';
+import { redirectToPath } from './server';
 
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement>,
-  requestFunc: (formData: FormData) => Promise<{ redirectPath: string; toastMessage: { type: "success" | "error"; message: string; }; }>,
+  requestFunc: (
+    formData: FormData,
+  ) => Promise<{
+    redirectPath: string;
+    toastMessage: { type: 'success' | 'error'; message: string };
+  }>,
   router: AppRouterInstance | null = null,
 ): Promise<boolean | void> {
   // Prevent default form submission refresh
@@ -21,12 +26,12 @@ export async function handleRequest(
   if (toastMessage.type === 'success') {
     toast.success(toastMessage.message, {
       duration: 5000,
-      className: 'bg-green-300 text-white'
+      className: 'bg-green-300 text-white',
     });
   } else if (toastMessage.type === 'error') {
     toast.error(toastMessage.message, {
       duration: 5000,
-      className: 'bg-red-300 text-white'
+      className: 'bg-red-300 text-white',
     });
   }
 

@@ -49,7 +49,6 @@ export const ReUploadVideo = () => {
   const [objectURL, setObjectURL] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-
   useIsomorphicLayoutEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
@@ -86,8 +85,7 @@ export const ReUploadVideo = () => {
         setSelectedFile(file);
         setObjectURL(pathURL);
         console.log(objectURL);
-      }
-      else {
+      } else {
         toast.error('File size must be less than 5MB because we are in the testing phase.');
       }
     }

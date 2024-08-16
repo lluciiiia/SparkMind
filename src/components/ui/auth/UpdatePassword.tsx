@@ -20,14 +20,11 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
     try {
       setIsSubmitting(true); // Disable the button while the request is being handled
       await handleRequest(e, updatePassword, router);
-    }
-    catch {
+    } catch {
       toast.error("Sign in with your Google account, or if you don't have one, try again later.");
-    }
-    finally {
+    } finally {
       setIsSubmitting(false);
     }
-
   };
 
   return (

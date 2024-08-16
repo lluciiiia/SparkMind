@@ -28,14 +28,11 @@ export const ForgotPassword = ({
 
     try {
       await handleRequest(e, requestPasswordUpdate, router);
-    }
-    catch (err) {
+    } catch (err) {
       toast.error("Sign in with your Google account, or if you don't have one, try again later.");
-    }
-    finally {
+    } finally {
       setIsSubmitting(false);
     }
-
   };
 
   return (

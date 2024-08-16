@@ -2,8 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 import * as Sentry from '@sentry/nextjs';
+import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 
 export default function GlobalError({
   error,
