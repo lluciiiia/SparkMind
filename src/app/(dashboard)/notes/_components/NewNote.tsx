@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { getConciseNote, getGrammarNote } from '@/app/api-handler';
-import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField } from '@/components/ui/form';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import Image from 'next/image';
-import type React from 'react';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { FaPlus } from 'react-icons/fa';
-import type { Note } from './interfaces';
+import { getConciseNote, getGrammarNote } from "@/app/api-handler";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormField } from "@/components/ui/form";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import Image from "next/image";
+import type React from "react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { FaPlus } from "react-icons/fa";
+import type { Note } from "../../dashboard/_components/interfaces";
 
 export const NewNoteSection: React.FC<{
   handleCreate: () => void;
@@ -44,21 +44,21 @@ export const NewNoteSection: React.FC<{
 
   const handleGrammar = async (content: string) => {
     const response = await getGrammarNote(content);
-    setOriginalContent(form.getValues('content'));
-    form.setValue('content', response.data.correctedNote);
+    setOriginalContent(form.getValues("content"));
+    form.setValue("content", response.data.correctedNote);
     setIsRevertEnabled(true); // Enable revert after grammar change
   };
 
   const handleConcise = async (content: string) => {
     const response = await getConciseNote(content);
-    setOriginalContent(form.getValues('content'));
-    form.setValue('content', response.data.concisedNote);
+    setOriginalContent(form.getValues("content"));
+    form.setValue("content", response.data.concisedNote);
     setIsRevertEnabled(true); // Enable revert after concise change
   };
 
   const handleRevert = () => {
     if (originalContent !== null) {
-      form.setValue('content', originalContent);
+      form.setValue("content", originalContent);
       setIsRevertEnabled(false); // Disable revert after reverting
     }
   };
@@ -70,8 +70,7 @@ export const NewNoteSection: React.FC<{
         className="bg-transparent border-dashed border-2 rounded-r-2xl rounded-bl-2xl border-navy w-[75px] h-[75px]"
         onClick={() => {
           handleCreate();
-        }}
-      >
+        }}>
         <FaPlus size={24} color="#003366" />
       </Button>
 
@@ -82,7 +81,9 @@ export const NewNoteSection: React.FC<{
             {/* Header with title and close button */}
             <div className="flex justify-between items-center mb-4">
               <span className="text-white text-xl font-bold">Note</span>
-              <button className="text-white" onClick={() => setIsModalOpen(false)}>
+              <button
+                className="text-white"
+                onClick={() => setIsModalOpen(false)}>
                 Close
               </button>
             </div>
@@ -91,8 +92,7 @@ export const NewNoteSection: React.FC<{
               <Form {...form}>
                 <form
                   onSubmit={form.handleSubmit(onSubmit)}
-                  className="flex flex-col gap-4 h-full text-white"
-                >
+                  className="flex flex-col gap-4 h-full text-white">
                   <FormField
                     control={form.control}
                     name="title"
@@ -127,38 +127,34 @@ export const NewNoteSection: React.FC<{
                       type="button"
                       className="bg-white text-navy text-sm py-1 px-2 rounded"
                       onClick={() => {
-                        const content = form.watch('content');
+                        const content = form.watch("content");
                         handleGrammar(content);
-                      }}
-                    >
+                      }}>
                       Grammar
                     </button>
                     <button
                       type="button"
                       className="bg-white text-navy text-sm py-1 px-2 rounded"
                       onClick={() => {
-                        const content = form.watch('content');
+                        const content = form.watch("content");
                         handleConcise(content);
-                      }}
-                    >
+                      }}>
                       Concise
                     </button>
                     <button
                       type="button"
                       className={`bg-white text-navy text-sm py-1 px-2 rounded ${
-                        !isRevertEnabled ? 'opacity-50 cursor-not-allowed' : ''
+                        !isRevertEnabled ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                       onClick={() => {
                         handleRevert();
                       }}
-                      disabled={!isRevertEnabled}
-                    >
+                      disabled={!isRevertEnabled}>
                       Revert
                     </button>
                     <button
                       type="submit"
-                      className="bg-white text-navy text-sm py-1 px-2 rounded ml-auto"
-                    >
+                      className="bg-white text-navy text-sm py-1 px-2 rounded ml-auto">
                       Save
                     </button>
                   </div>
@@ -174,8 +170,7 @@ export const NewNoteSection: React.FC<{
           {notes.map((note, i) => (
             <div
               key={i}
-              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl overflow-hidden"
-            >
+              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl overflow-hidden">
               {/* Content of the note */}
               <div className="p-4 overflow-hidden">
                 <div className="flex">
@@ -183,14 +178,13 @@ export const NewNoteSection: React.FC<{
                   <div
                     className="ml-auto cursor-pointer"
                     style={{
-                      position: 'relative',
-                      width: '30px',
-                      height: '30px',
+                      position: "relative",
+                      width: "30px",
+                      height: "30px",
                     }}
                     onClick={() => {
                       handleDelete(note.id);
-                    }}
-                  >
+                    }}>
                     <Image
                       src={`/assets/svgs/x_icon.svg`}
                       alt={`Cancel Icon`}
@@ -204,8 +198,7 @@ export const NewNoteSection: React.FC<{
                   onClick={() => {
                     setSelectedNote(note);
                     setIsModalOpen(true);
-                  }}
-                >
+                  }}>
                   <p className="text-lg text-gray-700 overflow-hidden break-words ">
                     {note.content}
                   </p>
