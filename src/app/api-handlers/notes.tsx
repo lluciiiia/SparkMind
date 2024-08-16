@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from 'axios';
 
 export const createNote = async (myLearningId: string) => {
   const response = await axios.post(`/api/v1/notes?id=${myLearningId}`);
