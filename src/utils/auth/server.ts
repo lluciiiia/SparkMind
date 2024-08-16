@@ -20,7 +20,7 @@ export async function SignOut(formData: FormData) {
 
   const supabase = createClient();
   const { error } = await supabase.auth.signOut();
-  let toastMessage: { type: 'success' | 'error', message: string };
+  let toastMessage: { type: 'success' | 'error'; message: string };
 
   if (error) {
     return getErrorRedirect(
@@ -28,7 +28,10 @@ export async function SignOut(formData: FormData) {
       'Hmm... Something went wrong.',
       'You could not be signed out.',
     );
-    toastMessage = { type: 'error', message: 'Hmm... Something went wrong You could not be signed out.' };
+    toastMessage = {
+      type: 'error',
+      message: 'Hmm... Something went wrong You could not be signed out.',
+    };
   }
 
   return '/signin';
@@ -40,7 +43,7 @@ export async function signInWithEmail(formData: FormData) {
 
   const email = String(formData.get('email')).trim();
   let redirectPath: string;
-  let toastMessage: { type: 'success' | 'error', message: string };
+  let toastMessage: { type: 'success' | 'error'; message: string };
 
   if (!isValidEmail(email)) {
     redirectPath = getErrorRedirect(
@@ -71,7 +74,7 @@ export async function signInWithEmail(formData: FormData) {
       'You could not be signed in.',
       error.message,
     );
-    toastMessage = { type: 'error', message: 'Sign in failed. Please try again.' }
+    toastMessage = { type: 'error', message: 'Sign in failed. Please try again.' };
   } else if (data) {
     cookieStore.set('preferredSignInView', 'email_signin', { path: '/' });
     redirectPath = getStatusRedirect(
@@ -80,14 +83,20 @@ export async function signInWithEmail(formData: FormData) {
       'Please check your email for a magic link. You may now close this tab.',
       true,
     );
-    toastMessage = { type: 'success', message: 'Please check your email for a password reset link.' };
+    toastMessage = {
+      type: 'success',
+      message: 'Please check your email for a password reset link.',
+    };
   } else {
     redirectPath = getErrorRedirect(
       '/signin/email_signin',
       'Hmm... Something went wrong.',
       'You could not be signed in.',
     );
-    toastMessage = { type: 'error', message: 'Something went wrong. Password reset email could not be sent.' };
+    toastMessage = {
+      type: 'error',
+      message: 'Something went wrong. Password reset email could not be sent.',
+    };
   }
 
   return { redirectPath, toastMessage };
@@ -99,7 +108,7 @@ export async function requestPasswordUpdate(formData: FormData) {
   // Get form data
   const email = String(formData.get('email')).trim();
   let redirectPath: string;
-  let toastMessage: { type: 'success' | 'error', message: string };
+  let toastMessage: { type: 'success' | 'error'; message: string };
 
   if (!isValidEmail(email)) {
     redirectPath = getErrorRedirect(
@@ -126,27 +135,32 @@ export async function requestPasswordUpdate(formData: FormData) {
       'Please check your email for a password reset link. You may now close this tab.',
       true,
     );
-    toastMessage = { type: 'success', message: 'Please check your email for a password reset link.' };
+    toastMessage = {
+      type: 'success',
+      message: 'Please check your email for a password reset link.',
+    };
   } else {
     redirectPath = getErrorRedirect(
       '/signin/forgot_password',
       'Hmm... Something went wrong.',
       'Password reset email could not be sent.',
     );
-    toastMessage = { type: 'error', message: 'Something went wrong. Password reset email could not be sent.' };
+    toastMessage = {
+      type: 'error',
+      message: 'Something went wrong. Password reset email could not be sent.',
+    };
   }
 
   return { redirectPath, toastMessage };
 }
 
 export async function signInWithPassword(formData: FormData) {
-
   const cookieStore = cookies();
 
   const email = String(formData.get('email')).trim();
   const password = String(formData.get('password')).trim();
   let redirectPath: string;
-  let toastMessage: { type: 'success' | 'error', message: string };
+  let toastMessage: { type: 'success' | 'error'; message: string };
 
   const supabase = createClient();
   const { error, data } = await supabase.auth.signInWithPassword({
@@ -180,7 +194,7 @@ export async function signUp(formData: FormData) {
   const password = String(formData.get('password')).trim();
   let redirectPath: string;
 
-  let toastMessage: { type: 'success' | 'error', message: string };
+  let toastMessage: { type: 'success' | 'error'; message: string };
 
   if (!isValidEmail(email)) {
     redirectPath = getErrorRedirect(
@@ -212,21 +226,31 @@ export async function signUp(formData: FormData) {
       'Sign up failed.',
       'There is already an account associated with this email address. Try resetting your password.',
     );
-    toastMessage = { type: 'error', message: 'There is already an account associated with this email address. Try resetting your password.' };
+    toastMessage = {
+      type: 'error',
+      message:
+        'There is already an account associated with this email address. Try resetting your password.',
+    };
   } else if (data.user) {
     redirectPath = getStatusRedirect(
       '/',
       'Success!',
       'Please check your email for a confirmation link. You may now close this tab.',
     );
-    toastMessage = { type: 'success', message: 'Please check your email for a confirmation link. You may now close this tab.' };
+    toastMessage = {
+      type: 'success',
+      message: 'Please check your email for a confirmation link. You may now close this tab.',
+    };
   } else {
     redirectPath = getErrorRedirect(
       '/signin/signup',
       'Hmm... Something went wrong.',
       'You could not be signed up.',
     );
-    toastMessage = { type: 'error', message: 'Hmm... Something went wrong. You could not be signed up.' };
+    toastMessage = {
+      type: 'error',
+      message: 'Hmm... Something went wrong. You could not be signed up.',
+    };
   }
 
   return { redirectPath, toastMessage };
@@ -236,7 +260,7 @@ export async function updatePassword(formData: FormData) {
   const password = String(formData.get('password')).trim();
   const passwordConfirm = String(formData.get('passwordConfirm')).trim();
   let redirectPath: string;
-  let toastMessage: { type: 'success' | 'error', message: string };
+  let toastMessage: { type: 'success' | 'error'; message: string };
 
   // Check that the password and confirmation match
   if (password !== passwordConfirm) {
@@ -261,7 +285,6 @@ export async function updatePassword(formData: FormData) {
       error.message,
     );
     toastMessage = { type: 'error', message: 'Your password could not be updated.' };
-
   } else if (data.user) {
     redirectPath = getStatusRedirect('/', 'Success!', 'Your password has been updated.');
     toastMessage = { type: 'success', message: 'Your password has been updated.' };
@@ -271,7 +294,10 @@ export async function updatePassword(formData: FormData) {
       'Hmm... Something went wrong.',
       'Your password could not be updated.',
     );
-    toastMessage = { type: 'error', message: 'Something went wrong. Your password could not be updated.' };
+    toastMessage = {
+      type: 'error',
+      message: 'Something went wrong. Your password could not be updated.',
+    };
   }
 
   return { redirectPath, toastMessage };
