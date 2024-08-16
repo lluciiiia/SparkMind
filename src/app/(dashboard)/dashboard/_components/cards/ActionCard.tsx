@@ -34,38 +34,27 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     const ActionData = async () => {
       try {
         setIsLoading(true);
-        if (learningId) {
-          //fist check is video is uploaded on not
-          const checkid = await getIsVideoUploaded(learningId);
+        if (!learningId) return;
 
-          if (checkid === true) {
-            const check = await getIsActionPreviewDone(learningId);
-            if (check === false) {
-              await getListOfEvent(learningId, false);
-              setListPreview(true);
-            } else {
-              await getTodoTaskFormDB(learningId);
-            }
-          } else {
-            const check = await getIsActionPreviewDone(learningId);
-            if (check === false) {
-              await getListOfEvent(learningId, true);
-              setListPreview(true);
-            } else {
-              await getTodoTaskFormDB(learningId);
-            }
-            // setVideoNotAvailable(true);
-          }
+        const isVideoUploaded = await getIsVideoUploaded(learningId);
+        const isActionPreviewDone = await getIsActionPreviewDone(learningId);
+
+        if (!isActionPreviewDone) {
+          await getListOfEvents(learningId, !isVideoUploaded);
+          setListPreview(true);
+        } else {
+          await getTodoTaskFormDB(learningId);
         }
       } catch (error) {
         throw new Error(
-          "Not enough permissions to access calander : " +
+          "Not enough permissions to access calendar: " +
             (error as Error).message
         );
       } finally {
         setIsLoading(false);
       }
     };
+
     ActionData();
   }, []);
 
@@ -88,7 +77,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     }
   }, [date, initTodoList]);
 
-  const getListOfEvent = async (LearningId: string, getFromText?: boolean) => {
+  const getListOfEvents = async (LearningId: string, getFromText?: boolean) => {
     try {
       const response = await getListOfEvents(LearningId, getFromText);
 
