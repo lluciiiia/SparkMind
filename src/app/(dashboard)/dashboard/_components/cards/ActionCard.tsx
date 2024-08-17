@@ -13,9 +13,7 @@ import { createEvents } from '../../../../api-handlers/api-handler';
 const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
   if (!learningId) console.error('LearningId is Missing in ActionCard');
 
-  const currentDate = new Date();
   const [todoList, setTodoList] = useState<Event[]>([]);
-  const [filteredTodoList, setFilteredTodoList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
 
   useEffect(() => {
@@ -30,27 +28,6 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
 
     ActionData();
   }, []);
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  useEffect(() => {
-    console.log('todoList: ' + todoList);
-    console.log('currentDate: ' + currentDate);
-    if (currentDate) {
-      const formattedCurrentDate = formatDate(currentDate.toISOString());
-      const filteredList = todoList.filter((todo) => {
-        return todo.start.dateTime === formattedCurrentDate;
-      });
-      console.log('filtered: ', filteredList);
-      setFilteredTodoList(filteredList);
-    }
-  }, [todoList]);
 
   const handleCreateEvent = async () => {
     try {
@@ -73,7 +50,6 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
 
       if (response.data.status === 200) {
         setTodoList(response.data.todolist);
-        // setFilteredTodoList(response.data.todolist);
       } else {
         alert(`Error create-event: ${response.data.message}`);
       }
