@@ -1,3 +1,4 @@
+import { ACTION_ITEMS_SYSTEM_INSTRUCTION } from '@/app/api/gemini-system-instructions';
 import { API_KEY, genAI, model, safetySettings } from '@/app/api/v1/gemini-settings';
 import { createClient } from '@/utils/supabase/server';
 import { type NextRequest, NextResponse } from 'next/server';
@@ -108,35 +109,12 @@ async function getEventList(transcript: string): Promise<any> {
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const formattedDate = date.toISOString().split('T')[0];
 
-  const prompt = `Extract tasks and deadlines from the meeting transcript provided below and structure them in JSON format suitable for scheduling with the Google Calendar API. Then, create the corresponding events in the calendar.
-  
-      TimeZone: ${timeZone}
-      Date: ${formattedDate}
-  
-      Transcript:
-      ${transcript}
-  
-      Note: Remove attendance details and ensure the tasks include relevant titles, descriptions, and deadlines.
-      
-      JSON Format Example:
-      [
-          {
-              "summary": "Task Title",
-              "description": "Task Description",
-              "start": {
-                  "dateTime": "2024-06-23T10:00:00+05:30",
-                  "timeZone": "GMT+5:30"
-              },
-              "end": {
-                  "dateTime": "2024-06-23T11:00:00+05:30",
-                  "timeZone": "GMT+5:30"
-              }
-          },
-          ...
-      ]`;
+  const systemInstruction = ACTION_ITEMS_SYSTEM_INSTRUCTION.replace('{{timeZone}}', timeZone)
+    .replace('{{formattedDate}}', formattedDate)
+    .replace('{{transcript}}', transcript);
 
   try {
-    const result = await genModel.generateContent(prompt.trim());
+    const result = await genModel.generateContent(systemInstruction.trim());
     return JSON.parse(result.response.text());
   } catch (error) {
     console.error('Error fetching event list:', error);

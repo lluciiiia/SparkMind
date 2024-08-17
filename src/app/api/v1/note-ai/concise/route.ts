@@ -1,3 +1,4 @@
+import { CONCISE_NOTE_SYSTEM_INSTRUCTION } from '@/app/api/gemini-system-instructions';
 import { type NextRequest, NextResponse } from 'next/server';
 import { API_KEY, genAI, generationConfig, model, safetySettings } from '../../gemini-settings';
 
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       safetySettings,
     });
 
-    const prompt = SYSTEM_INSTRUCTION + note;
+    const prompt = CONCISE_NOTE_SYSTEM_INSTRUCTION + note;
 
     const geminiRes = await genModel.generateContent(prompt);
 
@@ -26,6 +27,3 @@ export async function POST(req: NextRequest, res: NextResponse) {
     });
   }
 }
-
-const SYSTEM_INSTRUCTION = `Task: Make the given text more concise while preserving its original meaning and essential information. Ensure clarity and maintain the tone and style of the original text.
-Text: `;
