@@ -40,27 +40,63 @@ export const GRAMMAR_NOTE_SYSTEM_INSTRUCTION = `Task: Correct the grammar of the
 Text: `;
 
 export const SUMMARY_SYSTEM_INSTRUCTION = `
-Please generate a comprehensive summary about "{{topic}}". Your summary should be detailed and well-organized. Follow the Markdown format below:
+Please generate a comprehensive summary about "{{topic}}". Your summary should be detailed and well-organized.
 
-## Title: <title>
+Include the following sections in your summary:
 
-**Summary:**
+**Overview**
+   - Provide a general introduction and purpose of "{{topic}}".
 
-1. **<Title of Paragraph 1>**
-   <Content of Paragraph 1>
+**Key Components/Features**
+   - Describe the main components or features of "{{topic}}".
 
-2. **<Title of Paragraph 2>**
-   <Content of Paragraph 2>
+**Functionality/Use Cases**
+   - Explain how "{{topic}}" is used or its functionality in practical scenarios.
 
-3. **<Title of Paragraph 3>**
-   <Content of Paragraph 3>
+**Benefits/Advantages**
+   - Highlight the benefits or advantages of "{{topic}}".
+
+**Challenges/Considerations**
+   - Discuss any challenges or considerations related to "{{topic}}".
+
+**Examples/Case Studies**
+   - Provide examples or case studies that illustrate the application or impact of "{{topic}}".
+
+**Conclusion**
+   - Summarize the key points and overall significance of "{{topic}}".
+
+Follow the Markdown format below for each section:
+
+# Title: <title>
+
+## <Title of Section 1>
+<ul>
+  <li>Content of Section 1</li>
+</ul>
+
+## <Title of Section 2>
+<ul>
+  <li>Content of Section 2</li>
+</ul>
+
+## <Title of Section 3>
+<ul>
+  <li>Content of Section 3</li>
+</ul>
 
 ...
 
-n. **<Title of Last Paragraph>**
-   <Content of Last Paragraph>
+**<Title of Last Section>**
+<ul>
+  <li>Content of Section n</li>
+</ul>
 
-Ensure that each section is clearly defined with a title followed by its content. Each title should be in bold and followed by its corresponding content. Use a numbered list for the paragraphs to maintain the order.
+Ensure that each section is clearly defined with a title followed by its content. 
+Each title should be in bold and followed by its corresponding content. 
+Make sure to use <li></li> for each content section within <ul></ul> to separate clearly from titles.
+Always use <strong></strong> instead of ** **, when the bold text are needed. 
+Feel free to add more sections depending on the topic.
+Do not request additional input or clarification; generate the content directly based on the topic.
 `;
 
 export const ACTION_ITEMS_SYSTEM_INSTRUCTION = `Extract tasks and deadlines from the meeting transcript provided below and structure them in JSON format suitable for scheduling with the Google Calendar API. Then, create the corresponding events in the calendar.
