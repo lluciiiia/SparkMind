@@ -258,8 +258,11 @@ export const Dashboard = () => {
                   {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
                     <FurtherInfoCard furtherInfo={furtherInfoData} />
                   )}
-                  {activeTab === tab && tab === 'action-items' && actionItemsData != null && (
-                    <ActionCard learningId={myLearningId} actionItemsData={actionItemsData} />
+                  {activeTab === tab && tab === 'action-items' && (
+                    <ActionCard
+                      learningId={myLearningId}
+                      actionItemsData={actionItemsData ? actionItemsData : []}
+                    />
                   )}
                   {activeTab != tab && (
                     <Card

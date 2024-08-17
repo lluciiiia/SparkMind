@@ -1,20 +1,17 @@
-"use client";
+'use client';
 
-import { Calendar } from "@/components/ui/calendar";
-import { Card } from "@/components/ui/card";
-import type React from "react";
-import { useEffect, useState } from "react";
-import type { ActionCardProps, Event, TodoType } from "../interfaces";
-import "@/styles/css/custom-scroll.css";
-import { Calendar as Calendericon } from "lucide-react";
-import Link from "next/link";
-import { createEvents } from "../../../../api-handlers/api-handler";
+import { Calendar } from '@/components/ui/calendar';
+import { Card } from '@/components/ui/card';
+import type React from 'react';
+import { useEffect, useState } from 'react';
+import type { ActionCardProps, Event, TodoType } from '../interfaces';
+import '@/styles/css/custom-scroll.css';
+import { Calendar as Calendericon } from 'lucide-react';
+import Link from 'next/link';
+import { createEvents } from '../../../../api-handlers/api-handler';
 
-const ActionCard: React.FC<ActionCardProps> = ({
-  learningId,
-  actionItemsData,
-}) => {
-  if (!learningId) console.error("LearningId is Missing in ActionCard");
+const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
+  if (!learningId) console.error('LearningId is Missing in ActionCard');
 
   const currentDate = new Date();
   const [todoList, setTodoList] = useState<Event[]>([]);
@@ -27,32 +24,30 @@ const ActionCard: React.FC<ActionCardProps> = ({
         console.log(actionItemsData);
         setTodoList(actionItemsData);
       } catch (error) {
-        throw new Error(
-          "Not enough permissions to access calendar: " +
-            (error as Error).message
-        );
+        throw new Error('Not enough permissions to access calendar: ' + (error as Error).message);
       }
     };
 
     ActionData();
-  }, [actionItemsData]);
+  }, []);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
 
   useEffect(() => {
-    console.log("currentDate: " + currentDate);
+    console.log('todoList: ' + todoList);
+    console.log('currentDate: ' + currentDate);
     if (currentDate) {
       const formattedCurrentDate = formatDate(currentDate.toISOString());
       const filteredList = todoList.filter((todo) => {
         return todo.start.dateTime === formattedCurrentDate;
       });
-      console.log("filtered: ", filteredList);
+      console.log('filtered: ', filteredList);
       setFilteredTodoList(filteredList);
     }
   }, [todoList]);
@@ -83,7 +78,7 @@ const ActionCard: React.FC<ActionCardProps> = ({
         alert(`Error create-event: ${response.data.message}`);
       }
     } catch (err) {
-      console.log("Error in creating Event " + (err as Error).message);
+      console.log('Error in creating Event ' + (err as Error).message);
       return;
     }
   };
@@ -101,24 +96,15 @@ const ActionCard: React.FC<ActionCardProps> = ({
   return (
     <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
       <div className="flex flex-row h-full rounded-t-3xl w-full justify-between">
-        {/* {Array.isArray(todoList) && todoList.length === 0 ? (
-          <div className="flex h-full w-full justify-center items-center">
-            <p>
-              No videos or relevant data were found for creating the event.
-              Please grant Calendar access during sign-in and upload the video.
-            </p>
-          </div>
-        ) : ( */}
-        <>
+        {todoList.length > 0 ? (
           <div className="w-full">
             <div className="w-full pl-4 h-full overflow-y-auto">
               <div className="flex flex-row justify-between items-center">
-                <h2 className="text-xl font-bold border-b pb-2 mb-4">
-                  List of Event
-                </h2>
+                <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
                 <button
                   onClick={() => handleCreateEvent()}
-                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2">
+                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2"
+                >
                   Create Selected Task
                 </button>
               </div>
@@ -132,17 +118,17 @@ const ActionCard: React.FC<ActionCardProps> = ({
                         onChange={() => handleCheckboxChange(index)}
                       />
                       <p className="text-sm mr-2">
-                        {item.start.dateTime.slice(0, 16).split("T")[0]}
+                        {item.start.dateTime.slice(0, 16).split('T')[0]}
                       </p>
                       <p className="text-orange-600">
                         {new Date(item.start.dateTime).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
+                          hour: '2-digit',
+                          minute: '2-digit',
                         })}
                         -
                         {new Date(item.end.dateTime).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
+                          hour: '2-digit',
+                          minute: '2-digit',
                         })}
                       </p>
                     </div>
@@ -150,10 +136,7 @@ const ActionCard: React.FC<ActionCardProps> = ({
                       defaultValue={item.summary}
                       className="text-lg font-semibold w-96 block"
                     />
-                    <textarea
-                      defaultValue={item.description}
-                      className="text-sm block w-full"
-                    />
+                    <textarea defaultValue={item.description} className="text-sm block w-full" />
                     <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
                       <option value="Asia/Calcutta">Asia/Calcutta</option>
                       <option value="PST">PST</option>
@@ -166,8 +149,16 @@ const ActionCard: React.FC<ActionCardProps> = ({
               </div>
             </div>
           </div>
-        </>
-        {/* )} */}
+        ) : (
+          <>
+            <div className="flex h-full w-full justify-center items-center">
+              <p>
+                No videos or relevant data were found for creating the event. Please grant Calendar
+                access during sign-in and upload the video.
+              </p>
+            </div>
+          </>
+        )}
       </div>
     </Card>
   );
