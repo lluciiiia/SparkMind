@@ -47,9 +47,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
       }));
 
       const response = await createEvents(selectedTask, learningId);
-
-      if (response.data.status === 200) {
-        setTodoList(response.data.todolist);
+      if (response.status == 200) {
+        alert(`Successfully created a new event! Check your Google Calendar!`);
       } else {
         alert(`Error create-event: ${response.data.message}`);
       }
