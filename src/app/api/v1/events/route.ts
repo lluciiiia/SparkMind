@@ -19,8 +19,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const selectedTask: Event[] = data.selectedTask;
     const learningId: string = data.learningId;
 
-    console.log('selectedTask : ' + JSON.stringify(selectedTask));
-
     // Use type assertion to add uuid to the request object
     (req as any).uuid = uuid;
 
@@ -30,8 +28,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
     await rotateToken(req, res, async () => {
       accessToken = (req as any).accessToken;
     });
-
-    console.log('Access token: ' + accessToken);
 
     if (accessToken !== undefined) {
       const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
