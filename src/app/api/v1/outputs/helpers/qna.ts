@@ -1,3 +1,4 @@
+import { QNA_SYSTEM_INSTRUCTION } from '@/app/api/gemini-system-instructions';
 import { createClient } from '@/utils/supabase/client';
 import dotenv from 'dotenv';
 import { NextResponse } from 'next/server';
@@ -76,7 +77,6 @@ function parseQuizText(text: string) {
   return questions;
 }
 
-// Example function to simulate fetching data from the Google Gemini API
 async function fetchQuizData(query: string) {
   const genModel = genAI.getGenerativeModel({
     model,
@@ -91,14 +91,12 @@ async function fetchQuizData(query: string) {
   return quizSchema.parse(parsedData);
 }
 
-// Example function to build the quiz based on the query
 export async function saveQuizOutput(query: string, myLearningId: string, output: any) {
   try {
-    const systemInstruction = SYSTEM_INSTRUCTION.replace('{{query}}', query);
+    const systemInstruction = QNA_SYSTEM_INSTRUCTION.replace('{{query}}', query);
     const quizData = await fetchQuizData(systemInstruction);
     const supabase = createClient();
 
-    // Example format to build the quiz
     const quiz = quizData.map((item, index) => ({
       id: index + 1,
       question: item.question,
@@ -150,38 +148,3 @@ export async function saveQuizOutput(query: string, myLearningId: string, output
     );
   }
 }
-
-const SYSTEM_INSTRUCTION = `
-Please generate 10 quiz questions about "{{query}}". Format the output exactly as follows:
-
-## {{query}} Quiz:
-
-**Instructions:** Choose the best answer for each question.
-
-1. **Question 1?**
-    a) Option A
-    b) Option B
-    c) Option C
-    d) Option D
-
-2. **Question 2?**
-    a) Option A
-    b) Option B
-    c) Option C
-    d) Option D
-
-...
-
-10. **Question 10?**
-    a) Option A
-    b) Option B
-    c) Option C
-    d) Option D
-
-## Answer Key:
-
-1. **a) Option A**
-2. **b) Option B**
-...
-10. **d) Option D**
-`;

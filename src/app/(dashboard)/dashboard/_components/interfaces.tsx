@@ -37,6 +37,7 @@ export interface Output {
   summary: string;
   questions: string;
   further_info: string;
+  todo_task: any;
 }
 
 export interface VideoCardProps {
@@ -45,6 +46,7 @@ export interface VideoCardProps {
 
 export interface ActionCardProps {
   learningId: string | null;
+  actionItemsData: any | null;
 }
 
 export interface NoteCardProps {
