@@ -64,11 +64,7 @@ async function getTranscript(supabase: any, videoid: string, istextinput: boolea
 
       if (error) return null;
 
-      if (data && data.length > 0) {
-        return data[0].summary;
-      } else {
-        return null;
-      }
+      return data?.length ? data[0].summary : null;
     } else {
       const { data, error } = await supabase
         .from('transcriptdata')
@@ -77,11 +73,7 @@ async function getTranscript(supabase: any, videoid: string, istextinput: boolea
 
       if (error) return null;
 
-      if (data && data.length > 0) {
-        return data[0].transcript;
-      } else {
-        return null;
-      }
+      return data?.[0]?.transcript || null;
     }
   } catch (err) {
     console.log('Error when fetching Transcript from DB : ' + err);
