@@ -1,6 +1,12 @@
 import { GRAMMAR_NOTE_SYSTEM_INSTRUCTION } from '@/app/api/gemini-system-instructions';
+import {
+  API_KEY,
+  genAI,
+  generationConfig,
+  model,
+  safetySettings,
+} from '@/app/api/v1/gemini-settings';
 import { type NextRequest, NextResponse } from 'next/server';
-import { API_KEY, genAI, generationConfig, model, safetySettings } from '../../gemini-settings';
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {

@@ -1,14 +1,18 @@
 'use client';
 
+import type {
+  ActionCardProps,
+  Event,
+  TodoType,
+} from '@/app/(dashboard)/dashboard/_components/interfaces';
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import type { ActionCardProps, Event, TodoType } from '../interfaces';
 import '@/styles/css/custom-scroll.css';
+import { createEvents } from '@/app/api-handlers/api-handler';
 import { Calendar as Calendericon } from 'lucide-react';
 import Link from 'next/link';
-import { createEvents } from '../../../../api-handlers/api-handler';
 
 const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
   if (!learningId) console.error('LearningId is Missing in ActionCard');
