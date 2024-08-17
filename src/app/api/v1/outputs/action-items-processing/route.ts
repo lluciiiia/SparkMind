@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const transcript = await getTranscript(supabase, myLearningId, !isVideoUploaded);
     if (!transcript) return NextResponse.json({ error: 'Transcript not found' }, { status: 404 });
 
-    const todoList = await getEventList(transcript);
+    const todoList = await generateTodoList(transcript);
     await saveTodoList(supabase, outputId, todoList);
 
     return NextResponse.json({ status: 200 });
@@ -88,7 +88,7 @@ async function getTranscript(supabase: any, videoid: string, istextinput: boolea
   }
 }
 
-async function getEventList(transcript: string): Promise<any> {
+async function generateTodoList(transcript: string): Promise<any> {
   if (!API_KEY) throw new Error('Missing API key');
 
   const generationConfig = {
