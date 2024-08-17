@@ -1,23 +1,25 @@
-'use client';
+"use client";
 
-import { Calendar } from '@/components/ui/calendar';
-import { Card } from '@/components/ui/card';
-import type React from 'react';
-import { useEffect, useState } from 'react';
-import type { ActionCardProps, Event, TodoType } from '../interfaces';
-import '@/styles/css/custom-scroll.css';
-import { Calendar as Calendericon } from 'lucide-react';
-import Link from 'next/link';
-import { createEvents } from '../../../../api-handlers/api-handler';
+import { Calendar } from "@/components/ui/calendar";
+import { Card } from "@/components/ui/card";
+import type React from "react";
+import { useEffect, useState } from "react";
+import type { ActionCardProps, Event, TodoType } from "../interfaces";
+import "@/styles/css/custom-scroll.css";
+import { Calendar as Calendericon } from "lucide-react";
+import Link from "next/link";
+import { createEvents } from "../../../../api-handlers/api-handler";
 
-const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
-  if (!learningId) console.error('LearningId is Missing in ActionCard');
+const ActionCard: React.FC<ActionCardProps> = ({
+  learningId,
+  actionItemsData,
+}) => {
+  if (!learningId) console.error("LearningId is Missing in ActionCard");
 
   const currentDate = new Date();
   const [todoList, setTodoList] = useState<Event[]>([]);
   // const [filteredTodoList, setFilteredTodoList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
-  const [isListPreview, setListPreview] = useState<boolean>(false);
 
   useEffect(() => {
     const ActionData = async () => {
@@ -25,7 +27,10 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
         console.log(actionItemsData);
         setTodoList(actionItemsData);
       } catch (error) {
-        throw new Error('Not enough permissions to access calendar: ' + (error as Error).message);
+        throw new Error(
+          "Not enough permissions to access calendar: " +
+            (error as Error).message
+        );
       }
     };
 
@@ -35,8 +40,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
@@ -79,10 +84,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
       } else {
         alert(`Error create-event: ${response.data.message}`);
       }
-
-      setListPreview(false);
     } catch (err) {
-      console.log('Error in creating Event ' + (err as Error).message);
+      console.log("Error in creating Event " + (err as Error).message);
       return;
     }
   };
@@ -113,11 +116,12 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
             {/* {isListPreview === true ? ( */}
             <div className="w-full pl-4 h-full overflow-y-auto">
               <div className="flex flex-row justify-between items-center">
-                <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
+                <h2 className="text-xl font-bold border-b pb-2 mb-4">
+                  List of Event
+                </h2>
                 <button
                   onClick={() => handleCreateEvent()}
-                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2"
-                >
+                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2">
                   Create Selected Task
                 </button>
               </div>
@@ -131,17 +135,17 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
                         onChange={() => handleCheckboxChange(index)}
                       />
                       <p className="text-sm mr-2">
-                        {item.start.dateTime.slice(0, 16).split('T')[0]}
+                        {item.start.dateTime.slice(0, 16).split("T")[0]}
                         {/* - {item.end.dateTime.slice(0, 16)} */}
                       </p>
                       <p className="text-orange-600">
                         {new Date(item.start.dateTime).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })}
                         {new Date(item.end.dateTime).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
+                          hour: "2-digit",
+                          minute: "2-digit",
                         })}
                       </p>
                     </div>
@@ -149,7 +153,10 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
                       defaultValue={item.summary}
                       className="text-lg font-semibold w-96 block"
                     />
-                    <textarea defaultValue={item.description} className="text-sm block w-full" />
+                    <textarea
+                      defaultValue={item.description}
+                      className="text-sm block w-full"
+                    />
                     <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
                       <option value="Asia/Calcutta">Asia/Calcutta</option>
                       <option value="PST">PST</option>
