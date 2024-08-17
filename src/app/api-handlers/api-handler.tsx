@@ -50,9 +50,8 @@ export const getOutput = async (myLearningId: string) => {
 };
 
 export const createEvents = async (selectedTask: any, myLearningId: string) => {
-  const response = await axios.post('/api/v1/events', {
+  return await axios.post('/api/v1/events', {
     selectedTask: selectedTask,
     learningId: myLearningId,
   });
-  return response;
 };
