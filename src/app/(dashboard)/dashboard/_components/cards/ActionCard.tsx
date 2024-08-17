@@ -18,7 +18,7 @@ const ActionCard: React.FC<ActionCardProps> = ({
 
   const currentDate = new Date();
   const [todoList, setTodoList] = useState<Event[]>([]);
-  // const [filteredTodoList, setFilteredTodoList] = useState<Event[]>([]);
+  const [filteredTodoList, setFilteredTodoList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
 
   useEffect(() => {
@@ -45,19 +45,17 @@ const ActionCard: React.FC<ActionCardProps> = ({
     return `${year}-${month}-${day}`;
   };
 
-  // useEffect(() => {
-  //   console.log("currentDate: " + currentDate);
-  //   if (currentDate) {
-  //     const filteredList = todoList.filter((todo) => {
-  //       return (
-  //         formatDate(todo.start.dateTime) ===
-  //         formatDate(currentDate.toISOString())
-  //       );
-  //     });
-  //     console.log("filtered: ", filteredList);
-  //     setFilteredTodoList(filteredList);
-  //   }
-  // }, [todoList]);
+  useEffect(() => {
+    console.log("currentDate: " + currentDate);
+    if (currentDate) {
+      const formattedCurrentDate = formatDate(currentDate.toISOString());
+      const filteredList = todoList.filter((todo) => {
+        return todo.start.dateTime === formattedCurrentDate;
+      });
+      console.log("filtered: ", filteredList);
+      setFilteredTodoList(filteredList);
+    }
+  }, [todoList]);
 
   const handleCreateEvent = async () => {
     try {
@@ -113,7 +111,6 @@ const ActionCard: React.FC<ActionCardProps> = ({
         ) : ( */}
         <>
           <div className="w-full">
-            {/* {isListPreview === true ? ( */}
             <div className="w-full pl-4 h-full overflow-y-auto">
               <div className="flex flex-row justify-between items-center">
                 <h2 className="text-xl font-bold border-b pb-2 mb-4">
@@ -136,13 +133,13 @@ const ActionCard: React.FC<ActionCardProps> = ({
                       />
                       <p className="text-sm mr-2">
                         {item.start.dateTime.slice(0, 16).split("T")[0]}
-                        {/* - {item.end.dateTime.slice(0, 16)} */}
                       </p>
                       <p className="text-orange-600">
                         {new Date(item.start.dateTime).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
+                        -
                         {new Date(item.end.dateTime).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
@@ -168,61 +165,6 @@ const ActionCard: React.FC<ActionCardProps> = ({
                 ))}
               </div>
             </div>
-            {/* ) : (
-                <div className="flex flex-row">
-                  <div>
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      className="rounded-md border"
-                    />
-                  </div>
-                  <div className="w-full pl-4 h-full overflow-y-auto">
-                    <div className="flex flex-row border-b mb-4 pb-2 items-center">
-                      <h2 className="text-xl font-bold mr-2">List of Event</h2>
-                      <p>(based on video input)</p>
-                    </div>
-                    <div className="space-y-4">
-                      {todoList.map((item, index) => (
-                        <div key={index} className="border-b pb-4">
-                          <div className="flex flex-row items-center">
-                            <p className="text-sm font-bold mr-2">
-                              {item.start_dateTime.slice(0, 16).split("T")[0]}
-                            </p>
-                            <p className="text-orange-600 font-bold">
-                              {new Date(item.start_dateTime).toLocaleTimeString(
-                                [],
-                                {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                }
-                              )}{" "}
-                              -{" "}
-                              {new Date(item.end_dateTime).toLocaleTimeString(
-                                [],
-                                {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                }
-                              )}
-                            </p>
-                          </div>
-                          <div className="flex flex-row items-center">
-                            <p className="text-lg font-semibold mr-2">
-                              {item.summary}
-                            </p>
-                            <Link href={item.event_link}>
-                              <Calendericon className="h-5 w-5" />
-                            </Link>
-                          </div>
-                          <p className="text-sm">{item.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )} */}
           </div>
         </>
         {/* )} */}
