@@ -31,9 +31,14 @@ export async function GET(request: Request) {
       },
     );
 
-    const { error, data } = await supabase.auth.exchangeCodeForSession(code);
+    const { error: sessionError, data } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
+    if (sessionError) {
+      console.error('Error exchanging code for session:', sessionError.message);
+      return NextResponse.redirect(`${origin}/auth/error`);
+    }
+
+    if (!sessionError) {
       try {
         //check user exit or not
         const userRes = await supabaseClient
@@ -41,25 +46,38 @@ export async function GET(request: Request) {
           .select('*')
           .eq('user_uuid', data.user.id);
 
+        if (userRes.error) {
+          throw new Error(`Error fetching user: ${userRes.error.message}`);
+        }
+
+        const token = data.session;
+        console.log('this is token : ' + token);
+
         if (userRes.data?.length === 0) {
           // Insert new user
-          await supabaseClient.from('users').insert({
+          const insertUserRes = await supabaseClient.from('users').insert({
             user_uuid: data.user.id,
             user_email: data.user.email,
           });
 
+          if (insertUserRes.error) {
+            throw new Error(`Error inserting user: ${insertUserRes.error.message}`);
+          }
+
           // Insert new tokens
-          const token = data.session;
-          console.log('this is token : ' + token);
-          await supabaseClient.from('googleauthtokens').insert({
+          const insertTokenRes = await supabaseClient.from('googleauthtokens').insert({
             user_uuid: data.user.id,
             access_token: token.provider_token,
             refresh_token: token.provider_refresh_token,
             expires_at: new Date(Date.now() + token.expires_in! * 1000).toISOString(),
           });
+
+          if (insertTokenRes.error) {
+            throw new Error(`Error inserting token: ${insertTokenRes.error.message}`);
+          }
+
         } else {
-          const token = data.session;
-          await supabaseClient
+          const updateTokenRes = await supabaseClient
             .from('googleauthtokens')
             .update({
               access_token: token.provider_token,
@@ -67,9 +85,14 @@ export async function GET(request: Request) {
               expires_at: new Date(Date.now() + token.expires_in! * 1000).toISOString(),
             })
             .eq('user_uuid', data.user.id);
+
+          if (updateTokenRes.error) {
+            throw new Error(`Error updating token: ${updateTokenRes.error.message}`);
+          }
         }
       } catch (error) {
         console.log('Google Auth Toke not insert into database -> Token Table : ' + error);
+        return NextResponse.redirect(`${origin}/auth/error`);
       }
 
       return NextResponse.redirect(`${origin}${next}`);
