@@ -1,23 +1,76 @@
-.markdown-content ol {
-  display: grid;
-  gap: 1.5rem;
-  padding-left: 1.5rem; /* Adjust padding if needed */
+/* Styling for main headers */
+.markdown-content h1 {
+  font-weight: bold;
+  text-align: center;
+  margin: 2rem 0;
 }
 
 .markdown-content h2 {
   font-weight: bold;
-  text-align: center;
-  margin: 2rem 0; /* Adjust margins as needed */
+  text-align: left;
 }
 
-.markdown-content ol li {
+/* Styling for unordered lists */
+.markdown-content ul {
+  padding-left: 1.5rem;
+  list-style-type: disc; /* Standard bullet point symbol */
+}
+
+.markdown-content ul li {
   position: relative;
-  padding-left: 1.5rem; /* Adjust padding if needed */
+  margin-bottom: 1rem;
 }
 
-.markdown-content ol li::before {
+/* Styling for bold text within lists */
+.markdown-content ul li strong,
+.markdown-content ul li b {
+  font-weight: bold;
+}
+
+/* Styling for ordered lists */
+.markdown-content ol {
+  padding-left: 1.5rem;
+  counter-reset: list-item;
+}
+
+.markdown-content ol > li {
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.markdown-content ol > li::before {
   content: counter(list-item) ".";
+  counter-increment: list-item;
   position: absolute;
-  left: 0;
+  left: 1.5rem;
+  font-weight: bold;
+}
+
+/* Styling for paragraphs within ordered lists */
+.markdown-content ol li p {
+  margin: 1.2rem;
+}
+
+/* Styling for nested lists */
+.markdown-content ol li ul,
+.markdown-content ul ul {
+  padding-left: 1.5rem;
+  list-style-type: disc; /* Standard bullet point symbol for nested lists */
+}
+
+.markdown-content ol li ul li,
+.markdown-content ul ul li {
+  padding-left: 0;
+}
+
+/* Styling for bold text in nested lists */
+.markdown-content ul ul li strong,
+.markdown-content ul ul li b {
+  font-weight: bold;
+}
+
+/* General bold styling */
+.markdown-content strong,
+.markdown-content b {
   font-weight: bold;
 }
