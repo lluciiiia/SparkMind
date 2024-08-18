@@ -89,7 +89,7 @@ export const MyLearning = () => {
 
       if (!uuid) throw new Error('User ID not returned from superbase');
 
-      const res = await axios.get(`/api/v1/store-learnings?userId=${uuid}`);
+      const res = await axios.get(`/api/v1/learnings?userId=${uuid}`);
       if (res.status === 200) {
         const options = {
           day: 'numeric' as const,
@@ -144,7 +144,7 @@ export const MyLearning = () => {
     };
 
     try {
-      const res = await axios.post('/api/v1/store-learnings', data);
+      const res = await axios.post('/api/v1/learnings', data);
       if (res.status === 200) {
         const newLearningId = res.data.body[0].id;
         redirectToDashboard(newLearningId);
@@ -165,7 +165,7 @@ export const MyLearning = () => {
 
         if (!uuid) throw new Error('User ID not returned from superbase');
 
-        const response = await axios.delete('/api/v1/store-learnings', {
+        const response = await axios.delete('/api/v1/learnings', {
           data: { id, uuid },
         });
 
@@ -222,7 +222,7 @@ export const MyLearning = () => {
 
       if (!userId) throw new Error('User ID not returned from superbase');
 
-      const response = await axios.patch('/api/v1/store-learnings', {
+      const response = await axios.patch('/api/v1/learnings', {
         id: card.id,
         title: card.title,
         date: card.date,
