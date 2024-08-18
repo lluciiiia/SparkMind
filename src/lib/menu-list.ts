@@ -20,6 +20,7 @@ type Group = {
 };
 
 export function getMenuList(pathname: string, id: string | null): Group[] {
+
   return [
     {
       groupLabel: '',

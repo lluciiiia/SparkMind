@@ -6,7 +6,7 @@ import { genAI, generationConfig, model, safetySettings } from '../../gemini-set
 
 dotenv.config();
 
-async function fetchSummaryData(query: string): Promise<string> {
+export async function fetchSummaryData(query: string): Promise<string> {
   const genModel = genAI.getGenerativeModel({
     model,
     generationConfig,

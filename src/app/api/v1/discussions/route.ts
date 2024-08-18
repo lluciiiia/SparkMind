@@ -48,7 +48,7 @@ async function getTranscript(videoid: string) {
       const { data: summaryData, error: summaryError } = await supabase
         .from('outputs')
         .select('summary')
-        .eq('learning_id', videoid); // learning id and video id is same of no woory about that
+        .eq('learning_id', videoid); // learning id and video id is same of no worry about that
 
       if (summaryError) {
         console.log('Error fetching summary from DB: ' + summaryError.message);
@@ -82,8 +82,23 @@ async function getBasicQuestion(videoid: string) {
     if (data && data.length > 0) {
       return data[0].basic_questions;
     } else {
-      console.log('No transcript found for the provided UUID');
-      return null;
+      // Fetch summary using learning_id if transcript is not found
+      const { data: rec_queData, error: rec_queError } = await supabase
+        .from('outputs')
+        .select('rec_questions')
+        .eq('learning_id', videoid); // learning id and video id is same of no worry about that
+
+      if (rec_queError) {
+        console.log('Error fetching summary from DB: ' + rec_queError.message);
+        return null;
+      }
+
+      if (rec_queData && rec_queData.length > 0) {
+        return rec_queData[0].rec_questions;
+      } else {
+        console.log('No transcript or summary found for the provided videoid');
+        return null;
+      }
     }
   } catch (err) {
     console.log('Error when feach Transcript from DB : ' + err);
