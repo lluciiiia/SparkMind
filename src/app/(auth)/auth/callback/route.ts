@@ -70,6 +70,7 @@ export async function GET(request: Request) {
         }
       } catch (error) {
         console.log('Google Auth Toke not insert into database -> Token Table : ' + error);
+        throw new Error('Google Auth Toke not insert into database -> Token Table : ' + error);
       }
 
       return NextResponse.redirect(`${origin}${next}`);
