@@ -17,7 +17,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       return NextResponse.json({ status: 400, error: 'User not authenticated' });
 
     const selectedTask: Event[] = data.selectedTask;
-    const learningId: string = data.learningId;
 
     // Use type assertion to add uuid to the request object
     (req as any).uuid = uuid;
@@ -28,6 +27,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
     await rotateToken(req, res, async () => {
       accessToken = (req as any).accessToken;
     });
+
+    console.log(accessToken);
 
     if (accessToken !== undefined) {
       const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
