@@ -125,3 +125,9 @@ JSON Format Example:
     },
     ...
 ]`;
+
+export const DEFAULT_TITLE_SYSTEM_INSTRUCTION = `
+Based on the provided summary, generate a concise and impactful title within 10 words. 
+The title should be more than 0 words, no matter what.
+
+Here is the summary: `;
