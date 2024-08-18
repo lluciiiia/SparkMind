@@ -85,10 +85,37 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
               <div className="flex flex-row justify-between items-center">
                 <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
                 <button
+                  disabled={isLoading}
                   onClick={() => handleCreateEvent()}
-                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2"
+                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2 flex items-center justify-center"
                 >
-                  Create Selected Task
+                  {isLoading ? (
+                    <>
+                      <svg className="mr-3 h-6 w-6 animate-spin" viewBox="0 0 100 100">
+                        <circle
+                          fill="none"
+                          stroke-width="14"
+                          className="stroke-current opacity-40"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                        />
+                        <circle
+                          fill="none"
+                          stroke-width="14"
+                          className="stroke-current"
+                          stroke-dasharray="250"
+                          stroke-dashoffset="180"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                        />
+                      </svg>
+                      Creating Task...
+                    </>
+                  ) : (
+                    'Create Selected Task'
+                  )}
                 </button>
               </div>
               <div className="space-y-4">
@@ -143,11 +170,6 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
           </>
         )}
       </div>
-      {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-          <div className="Circleloader"></div>
-        </div>
-      )}
     </Card>
   );
 };
