@@ -23,6 +23,9 @@ export function Menu({ isOpen }: MenuProps) {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(true);
 
+  const supabase = createClient();
+  const router = useRouter();
+
   useEffect(() => {
     const myLearningId = searchParams.get('id');
     if (myLearningId) {
@@ -32,7 +35,15 @@ export function Menu({ isOpen }: MenuProps) {
   }, [searchParams, setId]);
 
   const pathname = usePathname();
-  const menuList = getMenuList(pathname, id);
+  let menuList = getMenuList(pathname, id);
+
+  const isMyLearningPage = pathname.includes('/my-learning');
+
+  if (isMyLearningPage) {
+    menuList = menuList.filter((group) => {
+      return !group.menus.some((menu) => menu.label === 'Upload');
+    });
+  }
 
   if (loading) {
     return <p>Loading...</p>;
