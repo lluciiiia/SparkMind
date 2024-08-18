@@ -3,7 +3,6 @@
 import type {
   ActionCardProps,
   Event,
-  TodoType,
 } from '@/app/(dashboard)/dashboard/_components/interfaces';
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
@@ -19,6 +18,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
 
   const [todoList, setTodoList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const ActionData = async () => {
@@ -35,6 +35,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
 
   const handleCreateEvent = async () => {
     try {
+      setIsLoading(true);
       if (!learningId) return;
 
       const selectedTask = selectedRowsidx.map((rowIndex) => ({
@@ -60,6 +61,9 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
       console.log('Error in creating Event ' + (err as Error).message);
       return;
     }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCheckboxChange = (index: number) => {
@@ -81,14 +85,41 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
               <div className="flex flex-row justify-between items-center">
                 <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
                 <button
+                  disabled={isLoading}
                   onClick={() => handleCreateEvent()}
-                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2"
+                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2 flex items-center justify-center"
                 >
-                  Create Selected Task
+                  {isLoading ? (
+                    <>
+                      <svg className="mr-3 h-6 w-6 animate-spin" viewBox="0 0 100 100">
+                        <circle
+                          fill="none"
+                          stroke-width="14"
+                          className="stroke-current opacity-40"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                        />
+                        <circle
+                          fill="none"
+                          stroke-width="14"
+                          className="stroke-current"
+                          stroke-dasharray="250"
+                          stroke-dashoffset="180"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                        />
+                      </svg>
+                      Creating Task...
+                    </>
+                  ) : (
+                    'Create Selected Task'
+                  )}
                 </button>
               </div>
               <div className="space-y-4">
-                {todoList.map((item, index) => (
+                {todoList && todoList.map((item, index) => (
                   <div key={index} className="border-b pb-4">
                     <div className="flex flex-row items-center">
                       <input
