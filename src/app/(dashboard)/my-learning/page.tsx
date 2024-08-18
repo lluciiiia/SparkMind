@@ -317,16 +317,16 @@ export const MyLearning = () => {
           />
         </div>
       </Breadcrumb>
-      <section className="bg-[#fef9f5] min-h-screen">
+      <section className="bg-[#fef9f5] dark:bg-[#18181b] min-h-screen">
         <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4`}>
           <div className="p-4">
             <div className="flex flex-row items-center">
-              <h1 className="text-4xl font-mediums text-black">My</h1>
+              <h1 className="text-4xl font-mediums text-black dark:text-white">My</h1>
               <div className="ml-10 w-4 h-4 rounded-full bg-black"></div>
               <div className="w-full h-1 bg-black"></div>
             </div>
             <div className="flex sm:flex-row flex-col sm:items-center">
-              <h1 className="text-4xl font-mediums text-black">Learnings</h1>
+              <h1 className="text-4xl font-mediums text-black dark:text-white">Learnings</h1>
               <div className="sm:ml-10 md:mt-0 mt-2 flex items-center mx-auto">
                 <Tabs defaultValue="recent" onValueChange={toggleSort}>
                   <TabsList>
@@ -341,11 +341,11 @@ export const MyLearning = () => {
             <article
               className={`h-[60vh] overflow-y-auto w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 pb-8 pr-3`}
             >
-              <div className={`w-full h-full flex items-center justify-center`}>
+              <div className={`w-[28vh] h-[20vh] flex items-center justify-center`}>
                 <Button
                   className={`
-                    bg-transparent border-dashed border-2 border-blue-500 w-full 
-                    h-full mx-auto hover:bg-transparent hover:border-blue-500 
+                    bg-transparent border-dashed border-2 border-blue-500 w-full h-full
+                    mx-auto hover:bg-transparent hover:border-blue-500 
                     hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl
                     flex flex-col justify-center items-center
                     p-8
@@ -456,13 +456,13 @@ const LearningCard = ({
   const [isHover, setIsHover] = useState(false);
   return (
     <div
-      className="relative w-full h-full"
+      className="relative w-[28vh] h-[20vh]"
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
       <Card
         className={`
-          w-full h-full flex flex-col justify-between
+         w-full h-full flex flex-col justify-between
           rounded-tl-none rounded-tr-3xl rounded-b-3xl shadow-xl border-none cursor-pointer
         `}
         style={{

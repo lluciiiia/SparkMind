@@ -3,7 +3,6 @@
 import type {
   ActionCardProps,
   Event,
-  TodoType,
 } from '@/app/(dashboard)/dashboard/_components/interfaces';
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
@@ -19,6 +18,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
 
   const [todoList, setTodoList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const ActionData = async () => {
@@ -35,6 +35,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
 
   const handleCreateEvent = async () => {
     try {
+      setIsLoading(true);
       if (!learningId) return;
 
       const selectedTask = selectedRowsidx.map((rowIndex) => ({
@@ -59,6 +60,9 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
     } catch (err) {
       console.log('Error in creating Event ' + (err as Error).message);
       return;
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -88,7 +92,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
                 </button>
               </div>
               <div className="space-y-4">
-                {todoList.map((item, index) => (
+                {todoList && todoList.map((item, index) => (
                   <div key={index} className="border-b pb-4">
                     <div className="flex flex-row items-center">
                       <input
@@ -139,6 +143,11 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
           </>
         )}
       </div>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+          <div className="Circleloader"></div>
+        </div>
+      )}
     </Card>
   );
 };
