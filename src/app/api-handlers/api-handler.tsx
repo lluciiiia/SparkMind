@@ -40,6 +40,10 @@ const processActionItems = async (myLearningId: string, outputId: string) => {
   );
 };
 
+export const processDefaultTitle = async (myLearningId: string) => {
+  return await axios.patch(`/api/v1/outputs/learning-title-processing?id=${myLearningId}`);
+};
+
 export const getOutput = async (myLearningId: string) => {
   const params: { id: string } = {
     id: myLearningId,
