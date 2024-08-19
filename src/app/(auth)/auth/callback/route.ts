@@ -42,19 +42,16 @@ export async function GET(request: Request) {
     if (!sessionError) {
       try {
         //check user exit or not
-        const userRes = await supabaseClient
+        const { data: userRes, error: userError } = await supabaseClient
           .from('users')
-          .select('*')
+          .select('user_uuid')
           .eq('user_uuid', data.user.id);
 
-        if (userRes.error) {
-          throw new Error(`Error fetching user: ${userRes.error.message}`);
+        if (userError) {
+          throw new Error(userError.message);
         }
 
-        const token = data.session;
-        console.log('this is token : ' + token);
-
-        if (userRes.data?.length === 0) {
+        if (!userRes || userRes.length === 0) {
           // Insert new user
 
           const { error: usersInterError } = await supabaseClient.from('users').insert({
