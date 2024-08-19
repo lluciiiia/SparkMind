@@ -32,9 +32,14 @@ export async function GET(request: Request) {
       },
     );
 
-    const { error, data } = await supabase.auth.exchangeCodeForSession(code);
+    const { error: sessionError, data } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
+    if (sessionError) {
+      console.error('Error exchanging code for session:', sessionError.message);
+      return NextResponse.redirect(`${origin}/auth/error`);
+    }
+
+    if (!sessionError) {
       try {
         //check user exit or not
         const { data: userRes, error: userError } = await supabaseClient
@@ -48,6 +53,7 @@ export async function GET(request: Request) {
 
         if (!userRes || userRes.length === 0) {
           // Insert new user
+
           const { error: usersInterError } = await supabaseClient.from('users').insert({
             user_uuid: data.user.id,
             user_email: data.user.email,
