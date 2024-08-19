@@ -37,12 +37,16 @@ export async function GET(request: Request) {
     if (!error) {
       try {
         //check user exit or not
-        const userRes = await supabaseClient
+        const { data: userRes, error: userError } = await supabaseClient
           .from('users')
-          .select('*')
+          .select('user_uuid')
           .eq('user_uuid', data.user.id);
 
-        if (userRes.data?.length === 0) {
+        if (userError) {
+          throw new Error(userError.message);
+        }
+
+        if (!userRes || userRes.length === 0) {
           // Insert new user
           const { error: usersInterError } = await supabaseClient.from('users').insert({
             user_uuid: data.user.id,
