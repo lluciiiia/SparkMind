@@ -76,7 +76,6 @@ export async function PATCH(req: NextRequest) {
     const { id, title, date, uuid } = (await req.json()) as UpdateLearningData;
     const supabase = createClient();
 
-
     const { data, error } = await supabase
       .from('mylearnings')
       .update({ title: title, date: date })

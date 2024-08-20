@@ -137,7 +137,7 @@ export const MyLearning = () => {
         setIsLoading(true);
         await fetchData();
       } catch (error) {
-        console.log('this is Error is Fatch the MyLearnings : ' + (error as Error).message);
+        console.log('this is Error is Fetch the MyLearnings : ' + (error as Error).message);
       } finally {
         setIsLoading(false);
       }

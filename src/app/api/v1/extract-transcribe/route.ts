@@ -227,6 +227,11 @@ export async function PATCH(req: NextRequest) {
     const questionsArr = relevantData.questions;
 
     //now time to insert the transcript and keyword into supabase
+    if (!uuid || !video_id) {
+      console.error('UUID or Video ID is undefined:', { uuid, video_id });
+      return NextResponse.json({ error: 'UUID or Video ID is undefined' }, { status: 400 });
+    }
+
     const { error } = await supabaseClient
       .from('transcriptdata')
       .update({

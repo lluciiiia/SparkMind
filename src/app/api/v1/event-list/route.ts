@@ -94,7 +94,6 @@ async function getTranscript(videoid: string, istextinput: boolean) {
     //this is only for declaretion
 
     if (istextinput === true) {
-
       const { data, error } = await supabase
         .from('outputs')
         .select('summary')
@@ -111,8 +110,7 @@ async function getTranscript(videoid: string, istextinput: boolean) {
         console.log('No summary found for the provided video id');
         return null;
       }
-    }
-    else {
+    } else {
       const { data, error } = await supabase
         .from('transcriptdata')
         .select('transcript')
