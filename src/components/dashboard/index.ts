@@ -7,3 +7,4 @@ export * from './navbar';
 export * from './sheet-menu';
 export * from './sidebar-toggle';
 export * from './user-nav';
+export * from './user-avatar';

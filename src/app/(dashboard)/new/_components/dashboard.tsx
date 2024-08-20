@@ -31,11 +31,11 @@ import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 import { processDefaultTitle, saveOutput } from '../../../api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
 import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
+import { useQueryState } from 'nuqs';
 
 export const NewDashboard = () => {
-  const searchParams = useSearchParams();
-  const myLearningId = searchParams.get('id');
+  const [myLearningId] = useQueryState('id', { defaultValue: '' });
+  console.log('this is my learning id : ' + myLearningId);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
