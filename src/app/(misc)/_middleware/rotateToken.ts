@@ -9,8 +9,10 @@ export default async function rotateToken(req: any, res: NextResponse, next: any
   try {
     const user_uuid = req.uuid;
 
-    if (user_uuid === undefined)
-      return NextResponse.json({ status: 400, error: 'User not authenticated' });
+    if (!user_uuid) {
+      console.error('User UUID is undefined:', user_uuid);
+      return NextResponse.json({ status: 400, error: 'User UUID is undefined' });
+    }
 
     const { data: tokens, error } = await supabaseClient
       .from('googleauthtokens')

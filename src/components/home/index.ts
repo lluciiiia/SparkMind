@@ -1,3 +1,3 @@
-export * from '.'
+export * from '.';
 
-import Head from 'next/head'
+import Head from 'next/head';

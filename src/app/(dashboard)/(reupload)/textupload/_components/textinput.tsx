@@ -33,11 +33,10 @@ import { getYoutubeResponse, saveOutput } from '@/app/api-handler';
 import '@/styles/css/Circle-loader.css';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { useSearchParams } from 'next/navigation';
+import { useQueryState } from 'nuqs';
 
 export const ReUploadText = () => {
-  const searchParams = useSearchParams();
-  const myLearningId = searchParams.get('id');
+  const [myLearningId] = useQueryState('id', { defaultValue: '' });
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);

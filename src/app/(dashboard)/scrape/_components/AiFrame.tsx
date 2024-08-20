@@ -9,7 +9,7 @@ import { createClient } from '@/utils/supabase/client';
 import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
 import { marked } from 'marked';
 import type React from 'react';
-import { memo, useCallback, useMemo, useRef, useState, useEffect } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const useDebounce = (func: Function, delay: number) => {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
@@ -21,7 +21,7 @@ const useDebounce = (func: Function, delay: number) => {
       }
       timeoutRef.current = setTimeout(() => func(...args), delay);
     },
-    [func, delay]
+    [func, delay],
   );
 
   const cancel = useCallback(() => {
@@ -55,7 +55,7 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
       [googleGenerativeAI],
     );
 
-    console.log("Model configuration:", model);
+    console.log('Model configuration:', model);
 
     const generateContent = useCallback(
       async (topic: string, websiteData: string) => {

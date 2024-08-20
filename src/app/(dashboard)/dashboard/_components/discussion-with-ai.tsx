@@ -63,16 +63,18 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
   }, [video_id]);
 
   useEffect(() => {
-    const Session = model.startChat({
-      generationConfig,
-      history: [
-        {
-          role: 'user',
-          parts: [{ text: transcript! }],
-        },
-      ],
-    });
-    setChatSession(Session);
+    if (transcript) {
+      const Session = model.startChat({
+        generationConfig,
+        history: [
+          {
+            role: 'user',
+            parts: [{ text: transcript }],
+          },
+        ],
+      });
+      setChatSession(Session);
+    }
   }, [transcript]);
 
   useEffect(() => {
@@ -108,11 +110,13 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
 
           const question = `Given the previous transcript or summary, Based on the transcript or summary, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
 
-          const chatResponse = await chatSession.sendMessage(question);
+          const chatResponse = await chatSession.sendMessage({
+            contents: [{ parts: [{ text: question }] }],
+          });
 
           const aiMessage: Message = {
             id: Date.now(),
-            text: chatResponse.response.text(),
+            text: await chatResponse.response.text(),
             sender: 'ai',
           };
           setResponses((prevResponses) => [...prevResponses, aiMessage]);

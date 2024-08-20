@@ -19,7 +19,7 @@ export const EmailSignIn = ({ allowPassword, redirectMethod, disableButton }: Em
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true); // Disable the button while the request is being handled
+    setIsSubmitting(true);
     await handleRequest(e, signInWithEmail, router);
     setIsSubmitting(false);
   };
