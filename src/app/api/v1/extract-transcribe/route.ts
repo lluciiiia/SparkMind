@@ -122,7 +122,7 @@ interface AIresponse {
 }
 
 // for Extract Keyword from Transcript
-const extractKeywordsAndQuestions = async (transcript: string) => {
+export const extractKeywordsAndQuestions = async (transcript: string) => {
   try {
     // Configuration based on different types of output
     const generationConfig = {

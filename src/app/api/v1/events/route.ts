@@ -1,4 +1,4 @@
-import type { Event, TodoType } from '@/app/(dashboard)/dashboard/_components/interfaces';
+import type { Event } from '@/app/(dashboard)/dashboard/_components/interfaces';
 import rotateToken from '@/app/(misc)/_middleware/rotateToken';
 import { createClient } from '@/utils/supabase/server';
 import { google } from 'googleapis';
@@ -13,14 +13,10 @@ export async function POST(req: NextRequest, res: NextResponse) {
     const supabaseClient = createClient();
     const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
-    if (uuid === undefined) {
+    if (uuid === undefined)
       return NextResponse.json({ status: 400, error: 'User not authenticated' });
-    }
 
     const selectedTask: Event[] = data.selectedTask;
-    const learningId: string = data.learningId;
-
-    console.log('selectedTask : ' + selectedTask);
 
     // Use type assertion to add uuid to the request object
     (req as any).uuid = uuid;
@@ -32,14 +28,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
       accessToken = (req as any).accessToken;
     });
 
+    console.log(accessToken);
+
     if (accessToken !== undefined) {
       const calendarEvents = await createCalendarEvent(selectedTask, accessToken);
-      const todolist = (await storeCalendarEvent(
-        selectedTask,
-        learningId,
-        calendarEvents,
-      )) as TodoType[];
-      return NextResponse.json({ status: 200, todolist });
+      if (calendarEvents.length !== selectedTask.length)
+        return NextResponse.json({
+          status: 500,
+          error: 'Failed to create one or more calendar events',
+        });
+
+      return NextResponse.json({ status: 200, messsge: 'Succeefully Event Created' });
     }
 
     return NextResponse.json({ status: 400, error: 'Access token might be error or undefined' });
@@ -86,59 +85,14 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
       });
 
       const data = response.data;
+      console.log('response: ', response);
 
-      if (response.status === 200 && data.htmlLink) {
-        responseArray.push(data.htmlLink);
-      }
+      if (response.status === 200 && data.htmlLink) responseArray.push(data.htmlLink);
     } catch (error) {
       console.log('Error while creating Calendar Event:', (error as Error).message);
     }
   }
 
-  console.log('this is Repose Array : ' + responseArray);
   return responseArray;
 };
 
-const storeCalendarEvent = async (
-  eventList: Event[],
-  learning_id: string,
-  calendarEvents: string[],
-) => {
-  try {
-    console.log('this is event list : ' + eventList);
-    const supabaseClient = createClient();
-
-    const TodoTasksList: TodoType[] = [];
-
-    let idx = 0;
-
-    eventList.forEach((event) => {
-      TodoTasksList.push({
-        summary: event.summary,
-        description: event.description,
-        start_dateTime: event.start.dateTime,
-        end_dateTime: event.end.dateTime,
-        timezone: event.start.timeZone,
-        event_link: calendarEvents[idx++],
-      });
-    });
-
-    const { error } = await supabaseClient
-      .from('outputs')
-      .update({
-        todo_task: TodoTasksList,
-        is_task_preview_done: true,
-      })
-      .eq('learning_id', learning_id);
-
-    if (error) {
-      console.log('Errror while Store TodoTask : ' + error.message);
-      return;
-    }
-
-    return TodoTasksList;
-  } catch (err) {
-    console.error('Error Store TodoTask:', (err as Error).message);
-    return;
-  }
-};

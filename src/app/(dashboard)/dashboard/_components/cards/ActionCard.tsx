@@ -1,142 +1,68 @@
 'use client';
 
+import type {
+  ActionCardProps,
+  Event,
+} from '@/app/(dashboard)/dashboard/_components/interfaces';
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
-import axios from 'axios';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import type { ActionCardProps, Event, TodoType } from '../interfaces';
 import '@/styles/css/custom-scroll.css';
+import { createEvents } from '@/app/api-handlers/api-handler';
 import { Calendar as Calendericon } from 'lucide-react';
 import Link from 'next/link';
 
-const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
-  if (!learningId) {
-    console.error('LearningId is Missing in ActionCard');
-  }
+const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
+  if (!learningId) console.error('LearningId is Missing in ActionCard');
 
-  const [date, setDate] = useState<Date | undefined>(new Date());
-
-  const [todoList, setTodoList] = useState<TodoType[]>([]);
-  const [eventList, setEventList] = useState<Event[]>([]);
+  const [todoList, setTodoList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
-  const [isListPreview, setListPreview] = useState<boolean>(false);
-  const [initTodoList, setinitTdoLisit] = useState<TodoType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [videoNotAvailable, setVideoNotAvailable] = useState<boolean>(false);
 
   useEffect(() => {
     const ActionData = async () => {
       try {
-        setIsLoading(true);
-        if (learningId) {
-          //fist check is video is uploaded on not
-          const checkid = await isVideoUploaded(learningId);
-
-          if (checkid === true) {
-            const check = await getIsActionPreviewDone(learningId);
-            if (check === false) {
-              await getListOfEvent(learningId, false);
-              setListPreview(true);
-            } else {
-              await getTodoTaskFormDB(learningId);
-            }
-          } else {
-            const check = await getIsActionPreviewDone(learningId);
-            if (check === false) {
-              await getListOfEvent(learningId, true);
-              setListPreview(true);
-            } else {
-              await getTodoTaskFormDB(learningId);
-            }
-            // setVideoNotAvailable(true);
-          }
-        }
+        console.log(actionItemsData);
+        setTodoList(actionItemsData);
       } catch (error) {
-        throw new Error('not enough permissions to access calander : ' + (error as Error).message);
-      } finally {
-        setIsLoading(false);
+        throw new Error('Not enough permissions to access calendar: ' + (error as Error).message);
       }
     };
+
     ActionData();
   }, []);
 
-  const isVideoUploaded = async (learningid: string) => {
-    const res = await axios.get('/api/v1/check-video', {
-      params: { learningid: learningid },
-    });
-
-    if (res.status === 200) return res.data.exists;
-
-    return false;
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  useEffect(() => {
-    if (date) {
-      const filteredList = initTodoList.filter((todo) => {
-        return formatDate(todo.start_dateTime) === formatDate(date.toISOString());
-      });
-      setTodoList(filteredList);
-    }
-  }, [date, initTodoList]);
-
-  const getListOfEvent = async (LearningId: any, getfromtext?: boolean) => {
-    try {
-      const eventlistRes = await axios.get('/api/v1/event-list', {
-        params: { LearningId: LearningId, getfromtext: getfromtext },
-      });
-
-      const eventList = JSON.stringify(eventlistRes.data);
-
-      const secnd = (await JSON.parse(eventList)) as any;
-      const VSlList: Event[] = secnd.body;
-
-      setEventList(VSlList);
-    } catch (error) {
-      console.error('Error creating event :', error);
-      alert('Error creating event : ' + (error as Error).message);
-    }
-  };
-
   const handleCreateEvent = async () => {
     try {
+      setIsLoading(true);
+      if (!learningId) return;
+
       const selectedTask = selectedRowsidx.map((rowIndex) => ({
-        summary: eventList[rowIndex].summary,
-        description: eventList[rowIndex].description,
+        summary: todoList[rowIndex].summary,
+        description: todoList[rowIndex].description,
         start: {
-          dateTime: eventList[rowIndex].start.dateTime,
-          timeZone: eventList[rowIndex].start.timeZone,
+          dateTime: todoList[rowIndex].start.dateTime,
+          timeZone: todoList[rowIndex].start.timeZone,
         },
         end: {
-          dateTime: eventList[rowIndex].end.dateTime,
-          timeZone: eventList[rowIndex].end.timeZone,
+          dateTime: todoList[rowIndex].end.dateTime,
+          timeZone: todoList[rowIndex].end.timeZone,
         },
       }));
 
-      const res = await axios.post('/api/v1/events', {
-        selectedTask: selectedTask,
-        learningId: learningId,
-      });
-
-      if (res.data.status === 200) {
-        setTodoList(res.data.todolist);
-        setinitTdoLisit(res.data.todolist);
+      const response = await createEvents(selectedTask, learningId);
+      if (response.data.status == 200) {
+        alert(`Successfully created a new event! Check your Google Calendar!`);
       } else {
-        alert(`Error create-event: ${res.data.message}`);
+        alert(`Error create-event: ${response.data.error}`);
       }
-
-      setListPreview(false);
     } catch (err) {
       console.log('Error in creating Event ' + (err as Error).message);
       return;
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -150,156 +76,97 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId }) => {
     });
   };
 
-  const getIsActionPreviewDone = async (learningid: string) => {
-    const res = await axios.get('/api/v1/action-previews', {
-      params: { learningid: learningid },
-    });
-
-    if (res.status === 200) return res.data.check;
-
-    return false;
-  };
-
-  const getTodoTaskFormDB = async (learningId: string) => {
-    try {
-      const eventlistRes = await axios.get('/api/v1/todo-tasks', {
-        params: { learning_id: learningId },
-      });
-
-      if (eventlistRes.status === 200) {
-        setTodoList(eventlistRes.data.todo_task);
-        setinitTdoLisit(eventlistRes.data.todo_task);
-      } else {
-        setTodoList([]);
-      }
-    } catch (err) {
-      console.log('getTodoTaskFormDB gives error:' + (err as Error).message);
-      setTodoList([]);
-    }
-  };
-
   return (
     <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
       <div className="flex flex-row h-full rounded-t-3xl w-full justify-between">
-        {videoNotAvailable === true ? (
-          <div className="flex h-full w-full justify-center items-center">
-            <p>
-              No videos or relevant data were found for creating the event. Please grant Calendar
-              access during sign-in and upload the video.
-            </p>
+        {todoList.length > 0 ? (
+          <div className="w-full">
+            <div className="w-full pl-4 h-full overflow-y-auto">
+              <div className="flex flex-row justify-between items-center">
+                <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
+                <button
+                  disabled={isLoading}
+                  onClick={() => handleCreateEvent()}
+                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2 flex items-center justify-center"
+                >
+                  {isLoading ? (
+                    <>
+                      <svg className="mr-3 h-6 w-6 animate-spin" viewBox="0 0 100 100">
+                        <circle
+                          fill="none"
+                          stroke-width="14"
+                          className="stroke-current opacity-40"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                        />
+                        <circle
+                          fill="none"
+                          stroke-width="14"
+                          className="stroke-current"
+                          stroke-dasharray="250"
+                          stroke-dashoffset="180"
+                          cx="50"
+                          cy="50"
+                          r="40"
+                        />
+                      </svg>
+                      Creating Task...
+                    </>
+                  ) : (
+                    'Create Selected Task'
+                  )}
+                </button>
+              </div>
+              <div className="space-y-4">
+                {todoList && todoList.map((item, index) => (
+                  <div key={index} className="border-b pb-4">
+                    <div className="flex flex-row items-center">
+                      <input
+                        type="checkbox"
+                        className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
+                        onChange={() => handleCheckboxChange(index)}
+                      />
+                      <p className="text-sm mr-2">
+                        {item.start.dateTime.slice(0, 16).split('T')[0]}
+                      </p>
+                      <p className="text-orange-600">
+                        {new Date(item.start.dateTime).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                        -
+                        {new Date(item.end.dateTime).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </p>
+                    </div>
+                    <input
+                      defaultValue={item.summary}
+                      className="text-lg font-semibold w-96 block"
+                    />
+                    <textarea defaultValue={item.description} className="text-sm block w-full" />
+                    <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
+                      <option value="Asia/Calcutta">Asia/Calcutta</option>
+                      <option value="PST">PST</option>
+                      <option value="CST">CST</option>
+                      <option value="EST">EST</option>
+                      <option value="GMT">GMT</option>
+                    </select>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <>
-            <div className="w-full">
-              {isListPreview === true ? (
-                <div className="w-full pl-4 h-full overflow-y-auto">
-                  <div className="flex flex-row justify-between items-center">
-                    <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
-                    <button
-                      onClick={() => handleCreateEvent()}
-                      className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2"
-                    >
-                      {' '}
-                      Create Selected Task
-                    </button>
-                  </div>
-                  <div className="space-y-4">
-                    {eventList.map((item, index) => (
-                      <div key={index} className="border-b pb-4">
-                        <div className="flex flex-row items-center">
-                          <input
-                            type="checkbox"
-                            className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
-                            onChange={() => handleCheckboxChange(index)}
-                          />
-                          <p className="text-sm mr-2">
-                            {item.start.dateTime.slice(0, 16).split('T')[0]}
-                            {/* - {item.end.dateTime.slice(0, 16)} */}
-                          </p>
-                          <p className="text-orange-600">
-                            {new Date(item.start.dateTime).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}{' '}
-                            -{' '}
-                            {new Date(item.end.dateTime).toLocaleTimeString([], {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </p>
-                        </div>
-                        <input
-                          defaultValue={item.summary}
-                          className="text-lg font-semibold w-96 block"
-                        />
-                        <textarea
-                          defaultValue={item.description}
-                          className="text-sm block w-full"
-                        />
-                        <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
-                          <option value="Asia/Calcutta">Asia/Calcutta</option>
-                          <option value="PST">PST</option>
-                          <option value="CST">CST</option>
-                          <option value="EST">EST</option>
-                          <option value="GMT">GMT</option>
-                        </select>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-row">
-                  <div>
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      className="rounded-md border"
-                    />
-                  </div>
-                  <div className="w-full pl-4 h-full overflow-y-auto">
-                    <div className="flex flex-row border-b mb-4 pb-2 items-center">
-                      <h2 className="text-xl font-bold mr-2">List of Event</h2>
-                      <p>(based on video input)</p>
-                    </div>
-                    <div className="space-y-4">
-                      {todoList.map((item, index) => (
-                        <div key={index} className="border-b pb-4">
-                          <div className="flex flex-row items-center">
-                            <p className="text-sm font-bold mr-2">
-                              {item.start_dateTime.slice(0, 16).split('T')[0]}
-                            </p>
-                            <p className="text-orange-600 font-bold">
-                              {new Date(item.start_dateTime).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}{' '}
-                              -{' '}
-                              {new Date(item.end_dateTime).toLocaleTimeString([], {
-                                hour: '2-digit',
-                                minute: '2-digit',
-                              })}
-                            </p>
-                          </div>
-                          <div className="flex flex-row items-center">
-                            <p className="text-lg font-semibold mr-2">{item.summary}</p>
-                            <Link href={item.event_link}>
-                              <Calendericon className="h-5 w-5" />
-                            </Link>
-                          </div>
-                          <p className="text-sm">{item.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+            <div className="flex h-full w-full justify-center items-center">
+              <p>
+                No videos or relevant data were found for creating the event. Please grant Calendar
+                access during sign-in and upload the video.
+              </p>
             </div>
-            {isLoading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                <div className="Circleloader"></div>
-              </div>
-            )}
           </>
         )}
       </div>

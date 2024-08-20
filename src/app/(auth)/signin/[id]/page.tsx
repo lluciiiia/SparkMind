@@ -53,7 +53,7 @@ export default async function SignIn({
   } = await supabase.auth.getUser();
 
   if (user && viewProp !== 'update_password') {
-    return redirect('/dashboard');
+    return redirect('/my-learning');
   } else if (!user && viewProp === 'update_password') {
     return redirect('/signin');
   }

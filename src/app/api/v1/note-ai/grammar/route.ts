@@ -1,5 +1,12 @@
+import { GRAMMAR_NOTE_SYSTEM_INSTRUCTION } from '@/app/api/gemini-system-instructions';
+import {
+  API_KEY,
+  genAI,
+  generationConfig,
+  model,
+  safetySettings,
+} from '@/app/api/v1/gemini-settings';
 import { type NextRequest, NextResponse } from 'next/server';
-import { API_KEY, genAI, generationConfig, model, safetySettings } from '../../gemini-settings';
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
@@ -13,7 +20,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
       safetySettings,
     });
 
-    const prompt = SYSTEM_INSTRUCTION + note;
+    const prompt = GRAMMAR_NOTE_SYSTEM_INSTRUCTION + note;
 
     const geminiRes = await genModel.generateContent(prompt);
 
@@ -26,6 +33,3 @@ export async function POST(req: NextRequest, res: NextResponse) {
     });
   }
 }
-
-const SYSTEM_INSTRUCTION = `Task: Correct the grammar of the given text.
-Text: `;

@@ -3,13 +3,14 @@ import { type CookieOptions, createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-const supabaseClient = createClient();
+
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
   // if "next" is in param, use it as the redirect URL
   const next = searchParams.get('next') ?? '/';
+  const supabaseClient = createClient();
 
   if (code) {
     const cookieStore = cookies();
@@ -31,9 +32,14 @@ export async function GET(request: Request) {
       },
     );
 
-    const { error, data } = await supabase.auth.exchangeCodeForSession(code);
+    const { error: sessionError, data } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
+    if (sessionError) {
+      console.error('Error exchanging code for session:', sessionError.message);
+      return NextResponse.redirect(`${origin}/auth/error`);
+    }
+
+    if (!sessionError) {
       try {
         const token = data.session;
         if (!data.user.id) {

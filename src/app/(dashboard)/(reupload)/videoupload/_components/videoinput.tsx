@@ -22,17 +22,17 @@ import {
 import { Label } from '@/components/ui/label';
 
 import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
-import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
+import { VideoIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
-import { getYoutubeResponse, saveOutput } from '@/app/api-handler';
-//Circle Loading Style
+import { saveOutput } from '../../../../api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
-import axios from 'axios';
+
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
+import { toast } from 'sonner'
 
 export const ReUploadVideo = () => {
   const [myLearningId] = useQueryState('id', { defaultValue: '' });
@@ -79,9 +79,14 @@ export const ReUploadVideo = () => {
   const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
       const file = event.target.files[0];
-      const pathURL = URL.createObjectURL(file);
-      setSelectedFile(file);
-      setObjectURL(pathURL);
+      if (file.size <= 5 * 1024 * 1024) {
+        const pathURL = URL.createObjectURL(file);
+        setSelectedFile(file);
+        setObjectURL(pathURL);
+        console.log(objectURL);
+      } else {
+        toast.error('File size must be less than 5MB because we are in the testing phase.');
+      }
     }
   };
 

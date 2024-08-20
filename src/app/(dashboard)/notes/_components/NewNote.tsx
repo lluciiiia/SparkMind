@@ -1,6 +1,5 @@
 'use client';
 
-import { getConciseNote, getGrammarNote } from '@/app/api-handler';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField } from '@/components/ui/form';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
@@ -9,7 +8,8 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa';
-import type { Note } from './interfaces';
+import { getConciseNote, getGrammarNote } from '../../../api-handlers/notes';
+import type { Note } from '../../dashboard/_components/interfaces';
 
 export const NewNoteSection: React.FC<{
   handleCreate: () => void;
