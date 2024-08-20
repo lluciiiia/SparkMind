@@ -23,15 +23,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
-import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
+import { TextIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
-import { getYoutubeResponse, saveOutput } from '@/app/api-handler';
-//Circle Loading Style
+import { saveOutput } from '../../../../api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
-import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 

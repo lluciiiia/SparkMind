@@ -22,16 +22,14 @@ import {
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-import { AudioLinesIcon, ImageIcon, TextIcon, VideoIcon } from 'lucide-react';
+import { TextIcon, VideoIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
-import { saveOutput } from '../../../api-handler';
-//Circle Loading Style
+import { processDefaultTitle, saveOutput } from '../../../api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
-import { Input } from '@/components/ui/input';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 
@@ -139,6 +137,7 @@ export const NewDashboard = () => {
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
       await saveOutput(input, myLearningId);
+      await processDefaultTitle(myLearningId);
 
       router.push(`/dashboard?id=${myLearningId}`);
     } catch (err: any) {

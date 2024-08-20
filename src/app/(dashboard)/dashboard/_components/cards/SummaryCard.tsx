@@ -1,5 +1,6 @@
 import React from 'react';
 type Paragraph = { title: string; data: string };
+import '../../../../../styles/css/markdown.css';
 
 import { Card } from '@/components/ui/card';
 import { marked } from 'marked';
