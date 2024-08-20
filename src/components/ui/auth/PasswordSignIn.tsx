@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
+import { memo } from 'react';
 import { toast } from 'sonner';
 
 // Define prop type with allowEmail boolean
@@ -15,7 +16,7 @@ interface PasswordSignInProps {
   redirectMethod: string;
 }
 
-export const PasswordSignIn = ({ allowEmail, redirectMethod }: PasswordSignInProps) => {
+export const PasswordSignIn = memo(({ allowEmail, redirectMethod }: PasswordSignInProps) => {
   const router = redirectMethod === 'client' ? useRouter() : null;
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -79,4 +80,4 @@ export const PasswordSignIn = ({ allowEmail, redirectMethod }: PasswordSignInPro
       </p>
     </div>
   );
-};
+});

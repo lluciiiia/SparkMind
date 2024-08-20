@@ -22,7 +22,10 @@ export async function POST(req: NextRequest) {
     }
 
     const { data: output, error: outputError } = await getOutputById(outputId);
-    if (outputError) return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
+    if (outputError) {
+      console.error('Error getting output:', outputError);
+      return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
+    }
 
     const quizResponse = await saveQuizOutput(input, myLearningId, output);
     if (quizResponse.status != 200) return NextResponse.json({ status: quizResponse.status });

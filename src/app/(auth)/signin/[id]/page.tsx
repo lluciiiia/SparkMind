@@ -10,7 +10,6 @@ import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import logo from '../../../../../public/assets/images/home/Logowithtext.png';
 
 import { BackgroundBeams } from '@/components';
 
@@ -64,7 +63,12 @@ export default async function SignIn({
       <div className="absolute top-0 left-0 flex justify-center h-screen w-screen z-50">
         <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80">
           <div className="flex justify-center pb-12">
-            <Image src={logo} alt="logo" width={250} height={250} />
+            <Image
+              src={`/assets/images/home/Logowithtext.png`}
+              alt="logo"
+              width={250}
+              height={250}
+            />
           </div>
           <Card
             className="bg-[#cde1fa] rounded-lg"
