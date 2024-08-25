@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     const { data: output, error: outputError } = await getAndSaveOutputByLearningId(myLearningId);
     if (outputError) return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
 
-    return NextResponse.json({ status: 200, outputId: output.id });
+    return NextResponse.json({ status: 200, output: output });
   } catch (error) {
     console.error('Error saving output in DB:', error);
     return NextResponse.json({ error: 'Failed to save output in DB' }, { status: 500 });
