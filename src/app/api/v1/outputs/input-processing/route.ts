@@ -1,7 +1,8 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { saveRecQueOutput } from '../helpers/rec-que';
 import { saveYoutubeOutput } from '../helpers/youtube';
-
+import { saveSummaryOutput } from '../helpers/summary';
+s
 import { getOutputById } from '../repository';
 
 export const dynamic = 'force-dynamic';
@@ -27,6 +28,11 @@ export async function POST(req: NextRequest) {
       console.error('Error getting output:', outputError);
       return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
     }
+
+    
+    const summaryResponse = await saveSummaryOutput(myLearningId, input, output);
+    if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
+
 
     const youtubeResponse = await saveYoutubeOutput(input, pageToken, myLearningId, output);
     if (youtubeResponse.status != 200) return NextResponse.json({ status: youtubeResponse.status });

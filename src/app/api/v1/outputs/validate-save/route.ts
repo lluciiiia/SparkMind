@@ -1,5 +1,4 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { saveSummaryOutput } from '../helpers/summary';
 
 import {
   getAndSaveOutputByLearningId,
@@ -37,9 +36,6 @@ export async function POST(req: NextRequest) {
 
     const { data: output, error: outputError } = await getAndSaveOutputByLearningId(myLearningId);
     if (outputError) return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
-
-    const summaryResponse = await saveSummaryOutput(myLearningId, input, output);
-    if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
 
     return NextResponse.json({ status: 200, outputId: output.id });
   } catch (error) {
