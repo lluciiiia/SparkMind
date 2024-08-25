@@ -2,11 +2,11 @@ import axios from 'axios';
 
 export const saveOutput = async (input: string, myLearningId: string) => {
   const processInputResponse = await handleRequest(() => validateSave(input, myLearningId));
-  const outputId = processInputResponse.data.outputId;
+  const output = processInputResponse.data.output;
 
-  await handleRequest(() => processInput(input, myLearningId, outputId));
-  await handleRequest(() => processFinalizing(input, myLearningId, outputId));
-  await handleRequest(() => processActionItems(myLearningId, outputId));
+  await handleRequest(() => processInput(input, myLearningId, output));
+  await handleRequest(() => processFinalizing(input, myLearningId, output));
+  await handleRequest(() => processActionItems(myLearningId, output.id));
 };
 
 const handleRequest = async (request: () => Promise<any>) => {
@@ -23,17 +23,18 @@ const validateSave = async (input: string, myLearningId: string) => {
   });
 };
 
-const processInput = async (input: string, myLearningId: string, outputId: string) => {
-  return axios.post(`/api/v1/outputs/input-processing?id=${myLearningId}&output-id=${outputId}`, {
+const processInput = async (input: string, myLearningId: string, output: string) => {
+  return axios.post(`/api/v1/outputs/input-processing?id=${myLearningId}`, {
     input: input,
+    output: output,
   });
 };
 
-const processFinalizing = async (input: string, myLearningId: string, outputId: string) => {
-  return axios.post(
-    `/api/v1/outputs/finalize-processing?id=${myLearningId}&output-id=${outputId}`,
-    { input: input },
-  );
+const processFinalizing = async (input: string, myLearningId: string, output: string) => {
+  return axios.post(`/api/v1/outputs/finalize-processing?id=${myLearningId}`, {
+    input: input,
+    output: output,
+  });
 };
 
 const processActionItems = async (myLearningId: string, outputId: string) => {
