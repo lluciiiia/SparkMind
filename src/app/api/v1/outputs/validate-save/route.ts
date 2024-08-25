@@ -7,7 +7,6 @@ import {
   saveMyLearningInput,
 } from '../repository';
 
-
 export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
