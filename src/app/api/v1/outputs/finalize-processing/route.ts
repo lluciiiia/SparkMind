@@ -10,21 +10,15 @@ export async function POST(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const myLearningId = url.searchParams.get('id');
-    const outputId = url.searchParams.get('output-id');
-    const body = (await req.json()) as { input: string };
+    const body = (await req.json()) as { input: string; output: any };
     const input = body.input;
+    const output = body.output;
 
-    if (!myLearningId || !input || !outputId) {
+    if (!myLearningId || !input) {
       return NextResponse.json(
-        { error: 'Error extracting myLearningId or input or outputId' },
+        { error: 'Error extracting myLearningId or input' },
         { status: 400 },
       );
-    }
-
-    const { data: output, error: outputError } = await getOutputById(outputId);
-    if (outputError) {
-      console.error('Error getting output:', outputError);
-      return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
     }
 
     const quizResponse = await saveQuizOutput(input, myLearningId, output);
