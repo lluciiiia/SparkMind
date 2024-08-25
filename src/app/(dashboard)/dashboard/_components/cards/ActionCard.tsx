@@ -1,9 +1,6 @@
 'use client';
 
-import type {
-  ActionCardProps,
-  Event,
-} from '@/app/(dashboard)/dashboard/_components/interfaces';
+import type { ActionCardProps, Event } from '@/app/(dashboard)/dashboard/_components/interfaces';
 import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
 import type React from 'react';
@@ -60,8 +57,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
     } catch (err) {
       console.log('Error in creating Event ' + (err as Error).message);
       return;
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };
@@ -119,43 +115,44 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
                 </button>
               </div>
               <div className="space-y-4">
-                {todoList && todoList.map((item, index) => (
-                  <div key={index} className="border-b pb-4">
-                    <div className="flex flex-row items-center">
+                {todoList &&
+                  todoList.map((item, index) => (
+                    <div key={index} className="border-b pb-4">
+                      <div className="flex flex-row items-center">
+                        <input
+                          type="checkbox"
+                          className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
+                          onChange={() => handleCheckboxChange(index)}
+                        />
+                        <p className="text-sm mr-2">
+                          {item.start.dateTime.slice(0, 16).split('T')[0]}
+                        </p>
+                        <p className="text-orange-600">
+                          {new Date(item.start.dateTime).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                          -
+                          {new Date(item.end.dateTime).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
                       <input
-                        type="checkbox"
-                        className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
-                        onChange={() => handleCheckboxChange(index)}
+                        defaultValue={item.summary}
+                        className="text-lg font-semibold w-96 block"
                       />
-                      <p className="text-sm mr-2">
-                        {item.start.dateTime.slice(0, 16).split('T')[0]}
-                      </p>
-                      <p className="text-orange-600">
-                        {new Date(item.start.dateTime).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                        -
-                        {new Date(item.end.dateTime).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        })}
-                      </p>
+                      <textarea defaultValue={item.description} className="text-sm block w-full" />
+                      <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
+                        <option value="Asia/Calcutta">Asia/Calcutta</option>
+                        <option value="PST">PST</option>
+                        <option value="CST">CST</option>
+                        <option value="EST">EST</option>
+                        <option value="GMT">GMT</option>
+                      </select>
                     </div>
-                    <input
-                      defaultValue={item.summary}
-                      className="text-lg font-semibold w-96 block"
-                    />
-                    <textarea defaultValue={item.description} className="text-sm block w-full" />
-                    <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
-                      <option value="Asia/Calcutta">Asia/Calcutta</option>
-                      <option value="PST">PST</option>
-                      <option value="CST">CST</option>
-                      <option value="EST">EST</option>
-                      <option value="GMT">GMT</option>
-                    </select>
-                  </div>
-                ))}
+                  ))}
               </div>
             </div>
           </div>

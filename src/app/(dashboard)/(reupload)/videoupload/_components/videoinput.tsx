@@ -32,7 +32,7 @@ import '@/styles/css/Circle-loader.css';
 
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
-import { toast } from 'sonner'
+import { toast } from 'sonner';
 
 export const ReUploadVideo = () => {
   const [myLearningId] = useQueryState('id', { defaultValue: '' });
