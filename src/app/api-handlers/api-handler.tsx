@@ -4,7 +4,8 @@ export const saveOutput = async (input: string, myLearningId: string) => {
   const processInputResponse = await handleRequest(() => validateSave(input, myLearningId));
   const output = processInputResponse.data.output;
 
-  await handleRequest(() => processInput(input, myLearningId, output));
+  await handleRequest(() => processInputStep1(input, myLearningId, output));
+  await handleRequest(() => processInputStep2(input, myLearningId, output));
   await handleRequest(() => processFinalizing(input, myLearningId, output));
   await handleRequest(() => processActionItems(myLearningId, output.id));
 };
@@ -23,8 +24,15 @@ const validateSave = async (input: string, myLearningId: string) => {
   });
 };
 
-const processInput = async (input: string, myLearningId: string, output: string) => {
-  return axios.post(`/api/v1/outputs/input-processing?id=${myLearningId}`, {
+const processInputStep1 = async (input: string, myLearningId: string, output: string) => {
+  return axios.post(`/api/v1/outputs/input-step1?id=${myLearningId}`, {
+    input: input,
+    output: output,
+  });
+};
+
+const processInputStep2 = async (input: string, myLearningId: string, output: string) => {
+  return axios.post(`/api/v1/outputs/input-step2?id=${myLearningId}`, {
     input: input,
     output: output,
   });
