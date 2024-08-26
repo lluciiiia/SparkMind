@@ -1,47 +1,58 @@
 import axios from 'axios';
 
 export const saveOutput = async (input: string, myLearningId: string) => {
-  const processInputResponse = await processInput(input, myLearningId);
+  const processInputResponse = await handleRequest(() => validateSave(input, myLearningId));
+  const output = processInputResponse.data.output;
 
-  if (processInputResponse.status === 200) {
-    const outputId = processInputResponse.data.outputId;
-    const processFinalizingResponse = await processFinalizing(input, myLearningId, outputId);
-
-    if (processFinalizingResponse.status === 200) {
-      const processActionItemsResponse = await processActionItems(myLearningId, outputId);
-      if (processActionItemsResponse.status != 200)
-        throw new Error('processActionItems failed : ' + processActionItemsResponse);
-    } else {
-      throw new Error('processFinalizing failed : ' + processFinalizingResponse);
-    }
-  } else {
-    throw new Error('processInput failed : ' + processInputResponse);
-  }
+  await handleRequest(() => processInputStep1(input, myLearningId, output));
+  await handleRequest(() => processInputStep2(input, myLearningId, output));
+  await handleRequest(() => processFinalizing(input, myLearningId, output));
+  await handleRequest(() => processActionItems(myLearningId, output.id));
 };
 
-const processInput = async (input: string, myLearningId: string) => {
-  return await axios.post(`/api/v1/outputs/input-processing?id=${myLearningId}`, {
+const handleRequest = async (request: () => Promise<any>) => {
+  const response = await request();
+  if (response.status !== 200) {
+    throw new Error(`${request.name} failed: ` + response);
+  }
+  return response;
+};
+
+const validateSave = async (input: string, myLearningId: string) => {
+  return axios.post(`/api/v1/outputs/validate-save?id=${myLearningId}`, {
     input: input,
   });
 };
 
-const processFinalizing = async (input: string, myLearningId: string, outputId: string) => {
-  return await axios.post(
-    `/api/v1/outputs/finalize-processing?id=${myLearningId}&output-id=${outputId}`,
-    {
-      input: input,
-    },
-  );
+const processInputStep1 = async (input: string, myLearningId: string, output: string) => {
+  return axios.post(`/api/v1/outputs/input-step1?id=${myLearningId}`, {
+    input: input,
+    output: output,
+  });
+};
+
+const processInputStep2 = async (input: string, myLearningId: string, output: string) => {
+  return axios.post(`/api/v1/outputs/input-step2?id=${myLearningId}`, {
+    input: input,
+    output: output,
+  });
+};
+
+const processFinalizing = async (input: string, myLearningId: string, output: string) => {
+  return axios.post(`/api/v1/outputs/finalize-processing?id=${myLearningId}`, {
+    input: input,
+    output: output,
+  });
 };
 
 const processActionItems = async (myLearningId: string, outputId: string) => {
-  return await axios.post(
+  return axios.post(
     `/api/v1/outputs/action-items-processing?id=${myLearningId}&output-id=${outputId}`,
   );
 };
 
 export const processDefaultTitle = async (myLearningId: string) => {
-  return await axios.patch(`/api/v1/outputs/learning-title-processing?id=${myLearningId}`);
+  return axios.patch(`/api/v1/outputs/learning-title-processing?id=${myLearningId}`);
 };
 
 export const getOutput = async (myLearningId: string) => {
