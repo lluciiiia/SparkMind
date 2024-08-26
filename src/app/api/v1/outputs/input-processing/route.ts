@@ -1,9 +1,9 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { saveFurtherInfoOutput } from '../helpers/further-info';
 import { saveQuizOutput } from '../helpers/qna';
+import { saveRecQueOutput } from '../helpers/rec-que';
 import { saveSummaryOutput } from '../helpers/summary';
 import { saveYoutubeOutput } from '../helpers/youtube';
-import { saveRecQueOutput } from '../helpers/rec-que';
 
 import {
   getAndSaveOutputByLearningId,
@@ -11,7 +11,6 @@ import {
   getOutputByLearningId,
   saveMyLearningInput,
 } from '../repository';
-
 
 export const dynamic = 'force-dynamic';
 
@@ -52,7 +51,8 @@ export async function POST(req: NextRequest) {
     if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
 
     const basicQuestionResponse = await saveRecQueOutput(myLearningId, input, output);
-    if (summaryResponse.status != 200) return NextResponse.json({ status: basicQuestionResponse.status });
+    if (summaryResponse.status != 200)
+      return NextResponse.json({ status: basicQuestionResponse.status });
 
     return NextResponse.json({ status: 200, outputId: output.id });
   } catch (error) {

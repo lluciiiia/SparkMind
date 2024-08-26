@@ -95,4 +95,3 @@ const createCalendarEvent = async (eventList: Event[], accessToken: any): Promis
 
   return responseArray;
 };
-
