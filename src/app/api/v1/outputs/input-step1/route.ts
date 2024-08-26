@@ -1,8 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
-import { saveFurtherInfoOutput } from '../helpers/further-info';
-import { saveQuizOutput } from '../helpers/qna';
-
-import { getOutputById } from '../repository';
+import { saveSummaryOutput } from '../helpers/summary';
+import { saveYoutubeOutput } from '../helpers/youtube';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,6 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const url = new URL(req.url);
     const myLearningId = url.searchParams.get('id');
+    const pageToken = url.searchParams.get('pageToken');
     const body = (await req.json()) as { input: string; output: any };
     const input = body.input;
     const output = body.output;
@@ -21,12 +20,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const quizResponse = await saveQuizOutput(input, myLearningId, output);
-    if (quizResponse.status != 200) return NextResponse.json({ status: quizResponse.status });
+    const summaryResponse = await saveSummaryOutput(myLearningId, input, output);
+    if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
 
-    const furtherInfoResponse = await saveFurtherInfoOutput(input, myLearningId, output);
-    if (furtherInfoResponse.status != 200)
-      return NextResponse.json({ status: furtherInfoResponse.status });
+    const youtubeResponse = await saveYoutubeOutput(input, pageToken, myLearningId, output);
+    if (youtubeResponse.status != 200) return NextResponse.json({ status: youtubeResponse.status });
 
     return NextResponse.json({ status: 200 });
   } catch (error) {
