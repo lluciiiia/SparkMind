@@ -110,9 +110,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
 
           const question = `Given the previous transcript or summary, Based on the transcript or summary, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
 
-          const chatResponse = await chatSession.sendMessage({
-            contents: [{ parts: [{ text: question }] }],
-          });
+          const chatResponse = await chatSession.sendMessage(question);
 
           const aiMessage: Message = {
             id: Date.now(),
