@@ -1,12 +1,20 @@
 'use client';
 
 import { Button } from '@/components/custom';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { handleRequest } from '@/utils/auth/client';
 import { requestPasswordUpdate } from '@/utils/auth/server';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Input } from '../input';
+import { Label } from '../label';
 
 // Define prop type with allowEmail boolean
 interface ForgotPasswordProps {
@@ -24,8 +32,7 @@ export const ForgotPassword = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true); // Disable the button while the request is being handled
-
+    setIsSubmitting(true);
     try {
       await handleRequest(e, requestPasswordUpdate, router);
     } catch (err) {
@@ -40,8 +47,15 @@ export const ForgotPassword = ({
       <form noValidate={true} className="mb-4" onSubmit={(e) => handleSubmit(e)}>
         <div className="grid gap-2">
           <div className="grid gap-1">
-            <label htmlFor="email">Email</label>
-            <input
+            <Label
+              className={`
+                font-semibold
+              `}
+              htmlFor="email"
+            >
+              Email
+            </Label>
+            <Input
               id="email"
               placeholder="name@example.com"
               type="email"
@@ -49,7 +63,7 @@ export const ForgotPassword = ({
               autoCapitalize="none"
               autoComplete="email"
               autoCorrect="off"
-              className="w-full p-3 rounded-md"
+              className="w-full p-3 rounded-md bg-[#fafafa] mb-2"
             />
           </div>
           <Button
@@ -63,23 +77,32 @@ export const ForgotPassword = ({
           </Button>
         </div>
       </form>
-      <p>
-        <Link href="/signin/password_signin" className="font-light text-sm">
-          Sign in with email and password
-        </Link>
-      </p>
-      {allowEmail && (
-        <p>
-          <Link href="/signin/email_signin" className="font-light text-sm">
-            Sign in via magic link
-          </Link>
-        </p>
-      )}
-      <p>
-        <Link href="/signin/signup" className="font-light text-sm">
-          Don't have an account? Sign up
-        </Link>
-      </p>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="slim" className="w-full">
+            Options
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-full">
+          <DropdownMenuItem asChild>
+            <Link href="/signin/password_signin" className="font-light text-sm">
+              Sign in with email and password
+            </Link>
+          </DropdownMenuItem>
+          {allowEmail && (
+            <DropdownMenuItem asChild>
+              <Link href="/signin/email_signin" className="font-light text-sm">
+                Sign in via magic link
+              </Link>
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem asChild>
+            <Link href="/signin/signup" className="font-light text-sm">
+              Don't have an account? Sign up
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

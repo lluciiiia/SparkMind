@@ -10,7 +10,6 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { Skeleton } from '@/components/ui/skeleton';
-import { fetchAllScrapes } from '@/lib/scrape';
 import type { OutputSchema } from '@/schema';
 import { memo, useState } from 'react';
 import { toast } from 'sonner';
@@ -25,28 +24,29 @@ const All = memo(
     }, [query, page]);
     return (
       <>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {isLoading
-            ? Array.from({ length: 20 }).map((_, index) => (
-                <Skeleton key={index} className="h-[200px] w-full rounded-lg" />
-              ))
-            : all.slice((page - 1) * 20, page * 20).map((scrape: OutputSchema, index: number) => {
-                return (
-                  <Slide delay={index * 0.1} key={scrape.output_id}>
-                    <ScrapeCard all={scrape} />
-                  </Slide>
-                );
-              })}
+        <div className="h-fit w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8 pr-3">
+          {all.slice((page - 1) * 20, page * 20).map((scrape: OutputSchema, index: number) => {
+            return (
+              <Slide delay={index * 0.1} key={scrape.output_id}>
+                <ScrapeCard all={scrape} />
+              </Slide>
+            );
+          })}
         </div>
         <Pagination className="mt-8">
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious href={`?query=${query}&page=${page - 1}`} isActive={page === 1} />
+              <PaginationPrevious
+                href={`?query=${query}&page=${page}`}
+                target={`_self`}
+                isActive={page === 1}
+              />
             </PaginationItem>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
               <PaginationItem key={pageNum}>
                 <PaginationLink
                   href={`?query=${query}&page=${pageNum}`}
+                  target={`_self`}
                   isActive={pageNum === page}
                 >
                   {pageNum}
@@ -56,6 +56,7 @@ const All = memo(
             <PaginationItem>
               <PaginationNext
                 href={`?query=${query}&page=${page + 1}`}
+                target={`_self`}
                 isActive={page === totalPages}
               />
             </PaginationItem>
@@ -70,10 +71,20 @@ export { All };
 
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
+import { marked } from 'marked';
 
 export const ScrapeCard = ({ all }: { all: OutputSchema }) => {
+  const [content, setContent] = useState('');
+  useIsomorphicLayoutEffect(() => {
+    const fetchContent = async () => {
+      const text = await marked(all.text_output);
+      setContent(text);
+    };
+    fetchContent();
+  }, [all.text_output]);
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -83,23 +94,22 @@ export const ScrapeCard = ({ all }: { all: OutputSchema }) => {
     >
       <Dialog>
         <DialogTrigger>
-          <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <Card className="max-w-[300px] max-h-[225px] overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader>
               <h3 className="text-lg font-semibold truncate">{all.prompt_name}</h3>
             </CardHeader>
-            <CardContent>
-              <p className="text-sm text-gray-600 line-clamp-3">{all.text_output}</p>
-            </CardContent>
-            <CardFooter className="flex justify-between items-center text-xs text-gray-500">
-              <span>Created: {format(new Date(all.created_at), 'PP')}</span>
-              <span>Updated: {format(new Date(all.updated_at), 'PP')}</span>
+            <CardFooter className="flex mx-auto justify-center items-center text-xs text-gray-500">
+              <span>Created: {format(new Date(all.created_at), 'PPpp')}</span>
             </CardFooter>
           </Card>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="max-w-2xl h-[80dvh]">
           <h2 className="text-xl font-semibold mb-4">{all.prompt_name}</h2>
-          <p className="text-gray-700">{all.text_output}</p>
-          <div className="mt-4 text-sm text-gray-500">
+          <ScrollArea className="h-full w-full rounded-md border p-4">
+            <div dangerouslySetInnerHTML={{ __html: content }} />
+            <ScrollBar orientation="vertical" />
+          </ScrollArea>
+          <div className="mt-4 text-sm text-gray-500 flex flex-row justify-between items-center">
             <p>Created: {format(new Date(all.created_at), 'PPP')}</p>
             <p>Updated: {format(new Date(all.updated_at), 'PPP')}</p>
           </div>

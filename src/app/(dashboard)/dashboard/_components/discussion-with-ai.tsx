@@ -89,7 +89,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
   };
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // Prevent default form submission on "Enter" key press
+      e.preventDefault();
     }
   };
 
@@ -132,7 +132,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
   );
 
   return (
-    <Card className="bottom-0 left-0 right-0 shadow-lg mx-auto w-[1000px] h-[600px] rounded-t-lg dark:border-1 dark:border-gray-200">
+    <Card className="bottom-0 left-0 right-0 shadow-lg mx-auto w-full max-w-4xl h-[600px] rounded-t-lg dark:border-1 dark:border-gray-200 relative">
       <menu className="flex justify-start border-b border-gray-200 ml-4">
         <li>
           <button className="px-4 py-2">Discussion with Gemini AI</button>

@@ -5,10 +5,11 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useUserInfo } from '@/hooks';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import { memo } from 'react';
 import { UserAvatar } from './user-avatar';
 import { UserDropdownContent } from './user-dropdown';
 
-export function UserNav() {
+export const UserNav = memo(() => {
   const { userName, userEmail, avatarUrl } = useUserInfo();
   const router = useRouter();
 
@@ -27,10 +28,15 @@ export function UserNav() {
               <UserAvatar avatarUrl={avatarUrl} userName={userName} />
             </DropdownMenuTrigger>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Profile</TooltipContent>
+          <TooltipContent>
+            <UserDropdownContent
+              userName={userName}
+              userEmail={userEmail}
+              onSignOut={handleSignOut}
+            />
+          </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <UserDropdownContent userName={userName} userEmail={userEmail} onSignOut={handleSignOut} />
     </DropdownMenu>
   );
-}
+});
