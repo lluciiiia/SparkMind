@@ -11,28 +11,6 @@ import { marked } from 'marked';
 import type React from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-const useDebounce = (func: Function, delay: number) => {
-  const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
-
-  const debouncedFunc = useCallback(
-    (...args: any[]) => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-      timeoutRef.current = setTimeout(() => func(...args), delay);
-    },
-    [func, delay],
-  );
-
-  const cancel = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-  }, []);
-
-  return [debouncedFunc, cancel] as const;
-};
-
 const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLoading: boolean }> =
   memo(({ topic, websiteData, uuid, isLoading: parentIsLoading }) => {
     const [htmlContent, setHtmlContent] = useState<string>('');
@@ -55,8 +33,6 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
       [googleGenerativeAI],
     );
 
-    console.log('Model configuration:', model);
-
     const generateContent = useCallback(
       async (topic: string, websiteData: string) => {
         if (!topic || !websiteData || isInserted) return;
@@ -71,7 +47,6 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
           await insertScraperOutput(text, topic, uuid);
           setIsInserted(true);
         } catch (error) {
-          console.error('Error generating content:', error);
           setHtmlContent(`<p>Error generating content. Please try again.</p>`);
         } finally {
           setIsLoading(false);
@@ -128,7 +103,9 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
         </CardHeader>
         <CardContent>
           {isLoading || parentIsLoading ? (
-            <div>Loading...</div>
+            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-9 backdrop-blur-sm">
+              <div className="Circleloader" />
+            </div>
           ) : (
             <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
           )}

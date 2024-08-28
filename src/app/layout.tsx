@@ -25,7 +25,7 @@ export default function RootLayout({
       data-a11y-link-underlines="false"
       data-turbo-loaded
     >
-      <body className={`bg-background overflow-hidden`}>
+      <body className={`bg-white overflow-x-hidden`}>
         <Providers>{children}</Providers>
       </body>
     </html>

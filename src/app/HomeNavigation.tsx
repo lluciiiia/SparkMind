@@ -16,6 +16,7 @@ export const HomeNavigation = () => {
   const supabase = createClient();
 
   useIsomorphicLayoutEffect(() => {
+    user && router.push('/my-learning');
     const getUser = async () => {
       const {
         data: { user },
@@ -23,14 +24,14 @@ export const HomeNavigation = () => {
       setUser(user);
     };
     getUser();
-  }, []);
+  }, [user]);
 
   return (
     <>
-      <div className="flex items-center justify-between flex-wrap p-4 md:justify-end gap-2">
-        <menu className="w-full md:w-auto flex flex-row items-center justify-center gap-2">
+      <div className="flex items-center justify-between flex-wrap p-4 md:justify-end gap-2 max-w-screen-2xl mx-auto">
+        <menu className="w-full md:w-auto flex flex-row items-center justify-center gap-4">
           <li className="flex flex-col md:flex-row gap-4 md:gap-8 items-center justify-center md:justify-end">
-            <Link href="/" className="w-full md:w-auto">
+            <Link href="/" className="w-full md:w-auto hover:underline">
               Home
             </Link>
           </li>
@@ -43,7 +44,9 @@ export const HomeNavigation = () => {
                   key={index}
                   className={`flex flex-col md:flex-row gap-4 md:gap-8 items-center justify-center md:justify-end`}
                 >
-                  <Link href={value}>{key}</Link>
+                  <Link href={value} className="hover:underline">
+                    {key}
+                  </Link>
                 </li>
               ))
             : null}

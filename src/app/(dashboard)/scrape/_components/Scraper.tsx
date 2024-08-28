@@ -4,14 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PING, PONG } from '@/constants';
-import { createAPIClient } from '@/lib';
-import {
-  type InputSchema,
-  type ScrapeSchema,
-  type ScraperQueueItemType,
-  inputSchema,
-  scrapeSchema,
-} from '@/schema/scrape';
+import type { InputSchema, ScrapeSchema, ScraperQueueItemType } from '@/schema/scrape';
 import { createClient } from '@/utils/supabase/client';
 import type React from 'react';
 import { memo, useState } from 'react';
@@ -37,7 +30,7 @@ export const Scraper: React.FC = memo(() => {
         const description = await fetchDescriptionFromURL(url);
         setTopic(description);
       } catch (error) {
-        console.error('Error fetching description:', error);
+        toast.error('Failed to fetch description');
         setTopic('No description available');
       }
     };
@@ -49,6 +42,7 @@ export const Scraper: React.FC = memo(() => {
       new URL(string);
       return true;
     } catch (_) {
+      toast.error('Invalid URL');
       return false;
     }
   };
@@ -61,7 +55,7 @@ export const Scraper: React.FC = memo(() => {
       error,
     } = await supabaseClient.auth.getUser();
     if (error) {
-      toast.error('Failed to get user');
+      toast.error('Failed to get user information');
       return null;
     }
     return user?.id;
@@ -74,11 +68,10 @@ export const Scraper: React.FC = memo(() => {
       toast.error('Please enter a URL before scraping');
       return;
     }
-    console.log('item', item);
-    console.log('url', url);
+
     setScraper(item);
     const user_id = await getUser();
-    console.log('user_id', user_id);
+
     if (!user_id) {
       toast.error('No user ID found. Please log in and try again.');
       return;
@@ -86,9 +79,9 @@ export const Scraper: React.FC = memo(() => {
 
     try {
       const response = await fetch(`${PING}${url}`, { method: 'GET' });
-      console.log('response', response);
+
       const data = (await response.json()) as ScrapeSchema;
-      console.log('data', data);
+
       if (data) {
         const updatedScraperItem: ScraperQueueItemType = {
           ...item,
@@ -98,8 +91,7 @@ export const Scraper: React.FC = memo(() => {
         };
         setScraper(updatedScraperItem);
         setWebsiteData(data.filteredTexts ? data.filteredTexts.join('\n') : '');
-        console.log(`filteredTexts`, data.filteredTexts);
-        console.log('websiteData', websiteData);
+
         const postResponse = await fetch(PONG, {
           method: 'POST',
           headers: {
@@ -114,7 +106,7 @@ export const Scraper: React.FC = memo(() => {
             updated_at: new Date(),
           }),
         });
-        console.log('postResponse', postResponse);
+
         if (postResponse.ok) {
           const postData = (await postResponse.json()) as Extract<
             InputSchema,

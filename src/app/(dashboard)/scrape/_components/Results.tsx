@@ -2,8 +2,7 @@
 
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { fetchRecentScrapes } from '@/lib/scrape';
-import { type OutputSchema, inputSchema, outputSchema, scrapeSchema } from '@/schema/scrape';
+import type { OutputSchema } from '@/schema/scrape';
 import { useQueryState } from 'nuqs';
 import React from 'react';
 import { All, Recent, Scraper } from '.';
