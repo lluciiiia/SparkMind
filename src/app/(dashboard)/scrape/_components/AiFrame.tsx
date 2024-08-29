@@ -107,7 +107,13 @@ const AiFrame: React.FC<{ topic: string; websiteData: string; uuid: string; isLo
               <div className="Circleloader" />
             </div>
           ) : (
-            <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
+            <div
+              dangerouslySetInnerHTML={{ __html: htmlContent }}
+              className={`
+                prose prose-sm max-w-none
+                ${htmlContent.includes('<img') ? 'prose-img:rounded-lg' : ''}
+              `}
+            />
           )}
         </CardContent>
       </Card>

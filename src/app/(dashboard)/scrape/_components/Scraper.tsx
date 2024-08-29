@@ -89,8 +89,18 @@ export const Scraper: React.FC = memo(() => {
           status: 'done',
           finishedAt: new Date(),
         };
+
         setScraper(updatedScraperItem);
-        setWebsiteData(data.filteredTexts ? data.filteredTexts.join('\n') : '');
+        if (data.filteredTexts) {
+          console.log(data.filteredTexts);
+          if (data.filteredTexts.length > 0) {
+            setWebsiteData(data.filteredTexts.join('\n'));
+          } else {
+            toast.error('Error scraping website, it is either not allowed or not accessible');
+          }
+        } else {
+          toast.error('Error scraping website, no data returned');
+        }
 
         const postResponse = await fetch(PONG, {
           method: 'POST',

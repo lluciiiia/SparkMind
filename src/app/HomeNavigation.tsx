@@ -28,7 +28,7 @@ export const HomeNavigation = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between flex-wrap p-4 md:justify-end gap-2 max-w-screen-2xl mx-auto">
+      <div className="flex flex-row items-center justify-between p-4 md:justify-end gap-2 max-w-screen-2xl">
         <menu className="w-full md:w-auto flex flex-row items-center justify-center gap-4">
           <li className="flex flex-col md:flex-row gap-4 md:gap-8 items-center justify-center md:justify-end">
             <Link href="/" className="w-full md:w-auto hover:underline">
