@@ -1,26 +1,24 @@
-import { useCallback, useState } from 'react'
-import copy from 'copy-to-clipboard'
+import copy from 'copy-to-clipboard';
+import { useCallback, useState } from 'react';
 
-const useCopyToClipBoard = async (): Promise<
-  { copied: boolean; copyToClipBoard: (text: string) => void }
-> => {
-  const [copied, setCopied] = useState<boolean>(false)
-  const copyToClipBoard = useCallback( async (text: string) => {
+const useCopyToClipBoard = () => {
+  const [copied, setCopied] = useState<boolean>(false);
+  const copyToClipBoard = useCallback(async (text: string): Promise<void> => {
     if ('clipboard' in navigator) {
       try {
-        const res = await navigator.clipboard.writeText(text)
-        setCopied(true)
-        return res
+        const res = await navigator.clipboard.writeText(text);
+        setCopied(true);
+        return res;
       } catch (error) {
-        throw new Error(`${error instanceof Error ? error.message : error}`)
+        throw new Error(`${error instanceof Error ? error.message : error}`);
       } finally {
-        setTimeout(() => setCopied(false), 3000)
+        setTimeout(() => setCopied(false), 3000);
       }
     } else {
-      copy(text)
+      copy(text);
     }
-  }, [])
-  return { copied, copyToClipBoard }
-}
+  }, []);
+  return { copied, copyToClipBoard };
+};
 
-export { useCopyToClipBoard }
+export { useCopyToClipBoard };
