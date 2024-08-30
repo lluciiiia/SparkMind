@@ -130,41 +130,35 @@ export const Dashboard = () => {
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
-  const isLaptop = useMediaQuery('(min-width: 1023px)');
+  const isLaptop = useMediaQuery('(min-width: 1024px)');
+  const isTablet = useMediaQuery('(min-width: 768px)');
 
   const handleDelete = async (id: string) => {
     const response = await deleteNote(id);
-
     setNotes(notes.filter((note) => note.id !== id));
   };
 
   const handleCreate = async () => {
     if (!myLearningId) return;
-
     const response = await createNote(myLearningId);
-
     const newNote = {
       id: response.data.body[0].id,
       title: response.data.body[0].title,
       content: response.data.body[0].content,
       createdAt: response.data.body[0].created_at,
     };
-
     setNotes([...notes, newNote]);
     setIsDrawerOpen(false);
   };
 
   const handleEdit = async (selectedNote: Note) => {
     const id = selectedNote.id;
-
     const updatedNote = {
       ...selectedNote,
       title: selectedNote.title ? selectedNote.title : 'Undefined',
       content: selectedNote.content,
     };
-
     const response = await editNote(updatedNote.id, updatedNote.title, updatedNote.content);
-
     setNotes(notes.map((note) => (note.id === id ? updatedNote : note)));
     setIsDrawerOpen(false);
   };
@@ -179,25 +173,21 @@ export const Dashboard = () => {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-items-start absolute top-[80px] right-0 rounded-l-md rounded-r-none z-[100] w-fit">
+      <div className="fixed top-20 right-0 z-50">
         <motion.details
           open={isOpen}
           onToggle={() => setIsOpen(!isOpen)}
           className="w-full"
           initial={{ width: 30 }}
-          animate={{ width: isOpen ? '100%' : 50 }}
+          animate={{ width: isOpen ? 'auto' : 50 }}
           transition={{ type: 'spring', stiffness: 100 }}
         >
           <summary
-            className={`left-0 relative p-2 ${
-              isOpen ? 'rounded-l-md' : 'rounded-md'
-            } bg-navy text-white rounded-r-none w-full flex items-center justify-start ${
-              isOpen ? 'justify-start' : 'justify-center'
-            }`}
+            className={`p-2 ${isOpen ? 'rounded-l-md' : 'rounded-l-md'
+              } bg-navy text-white flex items-center cursor-pointer`}
           >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
-            <PiNoteBlankFill size={24} />
-
+            <PiNoteBlankFill size={24} className="ml-2" />
             {showText && <span className="ml-4">New note</span>}
           </summary>
           <NewNoteSection
@@ -209,7 +199,7 @@ export const Dashboard = () => {
         </motion.details>
       </div>
       <ContentLayout title="Dashboard">
-        <Breadcrumb>
+        <Breadcrumb className="mb-4">
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
@@ -222,92 +212,76 @@ export const Dashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <section className="relative border-2 border-gray-400 min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] bg-gray-200 rounded-3xl mt-[56px]">
-          <menu className="flex justify-start border-b border-gray-200 min-h-40px">
+        <section className="relative border-2 border-gray-300 rounded-3xl bg-gray-100 overflow-hidden">
+          <nav className="flex flex-wrap justify-start border-b border-gray-300 bg-gray-200">
             {tabs.map((tab) => (
-              <li key={tab.name}>
-                <button
-                  type="button"
-                  className={`px-6 py-2 cursor-pointer ${
-                    activeTab === tab.name ? 'bg-navy text-white rounded-t-3xl' : 'text-gray'
+              <button
+                key={tab.name}
+                type="button"
+                className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${activeTab === tab.name
+                    ? 'bg-navy text-white'
+                    : 'text-gray-600 hover:bg-gray-300'
+                  } ${isLaptop
+                    ? 'flex-1'
+                    : isTablet
+                      ? 'w-1/3'
+                      : 'w-1/2'
+                  } ${activeTab === tab.name && 'rounded-t-xl'
                   }`}
-                  onClick={() => setActiveTab(tab.name)}
-                >
-                  {tab.label}
-                </button>
-              </li>
+                onClick={() => setActiveTab(tab.name)}
+              >
+                {tab.label}
+              </button>
             ))}
-          </menu>
-          {[
-            { tab: 'summary' },
-            { tab: 'video' },
-            { tab: 'qna' },
-            { tab: 'further-info' },
-            { tab: 'action-items' },
-          ].map(
-            ({ tab }) =>
-              activeTab === tab && (
-                <div className="rounded-b-3xl bg-white h-full" key={tab}>
-                  {activeTab === tab && tab === 'summary' && summaryData != null && (
-                    <SummaryCard summaryData={summaryData} />
-                  )}
-                  {activeTab === tab && tab === 'video' && <VideoCard videos={videos} />}
-                  {activeTab === tab && tab === 'qna' && questions.length > 0 && (
-                    <QuestionAndAnswer questions={questions} />
-                  )}
-                  {activeTab === tab && tab === 'further-info' && furtherInfoData != null && (
-                    <FurtherInfoCard furtherInfo={furtherInfoData} />
-                  )}
-                  {activeTab === tab && tab === 'action-items' && (
-                    <ActionCard
-                      learningId={myLearningId}
-                      actionItemsData={actionItemsData ? actionItemsData : []}
-                    />
-                  )}
-                  {activeTab != tab && (
-                    <Card
-                      className={`w-full min-h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] overflow-y-auto rounded-b-3xl`}
-                    />
-                  )}
-                </div>
-              ),
-          )}
+          </nav>
+          <div className="p-4 sm:p-6 bg-white rounded-b-3xl min-h-[calc(100vh-300px)]">
+            {activeTab === 'summary' && summaryData != null && (
+              <SummaryCard summaryData={summaryData} />
+            )}
+            {activeTab === 'video' && <VideoCard videos={videos} />}
+            {activeTab === 'qna' && questions.length > 0 && (
+              <QuestionAndAnswer questions={questions} />
+            )}
+            {activeTab === 'further-info' && furtherInfoData != null && (
+              <FurtherInfoCard furtherInfo={furtherInfoData} />
+            )}
+            {activeTab === 'action-items' && (
+              <ActionCard
+                learningId={myLearningId}
+                actionItemsData={actionItemsData ? actionItemsData : []}
+              />
+            )}
+          </div>
         </section>
-        <footer className=" w-fit flex-col bottom-0 left-0 right-0 mx-auto flex items-center justify-center">
+        <footer className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-3xl px-4">
           <motion.div
-            initial={{ y: '90%' }}
-            animate={{ y: isDrawerOpen ? 100 : '100%' }}
+            initial={{ y: '100%' }}
+            animate={{ y: isDrawerOpen ? 0 : '100%' }}
             transition={{ type: 'spring', stiffness: 50 }}
-            className={`
-                absolute flex flex-col items-center justify-center bottom-6
-              `}
+            className="flex flex-col items-center w-full"
             ref={drawerRef}
           >
             <TooltipProvider>
               <Tooltip>
-                <TooltipTrigger>
-                  <motion.div
+                <TooltipTrigger asChild>
+                  <motion.button
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 100 }}
-                    className={`w-5 h-5 bottom-0 cursor-pointer mb-2`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setIsDrawerOpen(!isDrawerOpen);
-                    }}
+                    className="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center mb-2 focus:outline-none"
+                    onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                   >
                     <Triangle
-                      className={`w-5 h-5 bottom-0 ${isDrawerOpen ? 'rotate-180' : ''}`}
-                      fill="black"
+                      className={`w-5 h-5 transform ${isDrawerOpen ? 'rotate-180' : ''}`}
                     />
-                  </motion.div>
+                  </motion.button>
                 </TooltipTrigger>
                 <TooltipContent>{isDrawerOpen ? 'Close' : 'Open'}</TooltipContent>
               </Tooltip>
             </TooltipProvider>
-
-            {/* Discuss with AI */}
-            <DiscussionWithAI learningid={myLearningId} />
+            <div className="w-full">
+              <DiscussionWithAI learningid={myLearningId} />
+            </div>
           </motion.div>
         </footer>
       </ContentLayout>

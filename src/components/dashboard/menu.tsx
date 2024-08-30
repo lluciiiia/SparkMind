@@ -35,15 +35,15 @@ export function Menu({ isOpen }: MenuProps) {
   }, [searchParams, setId]);
 
   const pathname = usePathname();
-  let menuList = getMenuList(pathname, id);
+  const menuList = getMenuList(pathname, id);
 
-  const isMyLearningPage = pathname.includes('/my-learning');
+  // const isMyLearningPage = pathname.includes('/my-learning');
 
-  if (isMyLearningPage) {
-    menuList = menuList.filter((group) => {
-      return !group.menus.some((menu) => menu.label === 'Upload');
-    });
-  }
+  // if (isMyLearningPage) {
+  //   menuList = menuList.filter((group) => {
+  //     return !group.menus.some((menu) => menu.label === 'Upload');
+  //   });
+  // }
 
   if (loading) {
     return <p>Loading...</p>;
