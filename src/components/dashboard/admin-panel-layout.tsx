@@ -5,7 +5,7 @@ import { useSidebarToggle } from '@/hooks/use-sidebar-toggle';
 import { useStore } from '@/hooks/use-store';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
-import { useMediaQuery, useIsomorphicLayoutEffect } from 'usehooks-ts';
+import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 export default function AdminPanelLayout({
   children,
@@ -36,12 +36,10 @@ export default function AdminPanelLayout({
             ? isLaptop
               ? 'w-[calc(100%-90px)]'
               : 'w-[calc(100%-288px)]'
-            : 'w-[calc(100%-90px)]'
+            : 'w-[calc(100%-90px)]',
         )}
       >
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {children}
-        </div>
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</div>
       </main>
     </div>
   );
