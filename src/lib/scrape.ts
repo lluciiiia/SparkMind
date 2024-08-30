@@ -78,7 +78,7 @@ const fetchAllScrapes = async (query: string): Promise<OutputSchema[]> => {
     const { data: queryData, error } = await supabaseServer
       .from('scraper_output')
       .select('*')
-      .eq('prompt_name', query);
+      .ilike('prompt_name', `%${query}%`);
     if (error) throw new Error(error.message);
     data = queryData || [];
   } else {
@@ -98,7 +98,7 @@ const fetchRecentScrapes = async (query: string): Promise<OutputSchema[]> => {
     const { data: queryData, error } = await supabaseServer
       .from('scraper_output')
       .select('*')
-      .eq('prompt_name', query)
+      .ilike('prompt_name', `%${query}%`)
       .order('created_at', { ascending: false })
       .limit(5);
     if (error) throw new Error(error.message);
@@ -116,10 +116,17 @@ const fetchRecentScrapes = async (query: string): Promise<OutputSchema[]> => {
   return data;
 };
 
+const deleteOutput = async (id: string) => {
+  const supabase = createClient();
+  const { error } = await supabase.from('scraper_output').delete().eq('output_id', id);
+  if (error) throw new Error(error.message);
+};
+
 export {
   fetchAllScrapes,
   fetchRecentScrapes,
   fetchDescriptionFromURL,
   insertScraperOutput,
   studyGuidePrompt,
+  deleteOutput,
 };

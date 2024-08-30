@@ -20,11 +20,23 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
-      setIsSubmitting(true); // Disable the button while the request is being handled
-      await handleRequest(e, updatePassword, router);
-      toast.success('Password updated successfully');
-    } catch {
-      toast.error('Password update failed, try again later.');
+      setIsSubmitting(true);
+      const result = await handleRequest(
+        e,
+        async (formData) => {
+          const result = await updatePassword(formData);
+          return {
+            redirectPath: result,
+            toastMessage: { type: 'success', message: 'Password updated successfully' },
+          };
+        },
+        router,
+      );
+      if (result && typeof result === 'object' && 'toastMessage' in result) {
+        toast.success(
+          (result as unknown as { toastMessage: { message: string } }).toastMessage.message,
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }

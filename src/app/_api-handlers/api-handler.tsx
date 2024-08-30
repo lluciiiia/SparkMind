@@ -8,6 +8,8 @@ export const saveOutput = async (input: string, myLearningId: string) => {
   await handleRequest(() => processInputStep2(input, myLearningId, output));
   await handleRequest(() => processFinalizing(input, myLearningId, output));
   await handleRequest(() => processActionItems(myLearningId, output.id));
+
+  return output;
 };
 
 const handleRequest = async (request: () => Promise<any>) => {

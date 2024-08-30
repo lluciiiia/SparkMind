@@ -97,27 +97,13 @@ export async function saveQuizOutput(query: string, myLearningId: string, output
     const quizData = await fetchQuizData(systemInstruction);
     const supabase = createClient();
 
-    const quiz = quizData.map((item, index) => ({
-      id: index + 1,
+    const questionsMap = quizData.map((item) => ({
+      id: item.id,
       question: item.question,
       options: item.options,
       answer: item.answer,
       multipleAnswers: item.multipleAnswers,
     }));
-    const halfLength = quiz.length / 2;
-    const questions = quiz.slice(0, halfLength);
-    const answers = quiz.slice(halfLength);
-
-    const questionsMap = questions.map((question, index) => {
-      if (answers[index]) {
-        const answerText = answers[index].question.split(') ')[1]; // Extract the answer text
-        const answerIndex = question.options.findIndex((option) => option === answerText);
-        if (answerIndex !== -1) {
-          question.answer.push(question.options[answerIndex]);
-        }
-      }
-      return question;
-    });
 
     if (!output) {
       const { data, error } = await supabase

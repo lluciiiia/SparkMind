@@ -28,10 +28,11 @@ import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
-import { saveOutput } from '../../../../api-handlers/api-handler';
+import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
+import { toast } from 'sonner';
 
 export const ReUploadText = () => {
   const [myLearningId] = useQueryState('id', { defaultValue: '' });
@@ -80,10 +81,14 @@ export const ReUploadText = () => {
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
       setIsLoading(true);
-      const response = await saveOutput(input, myLearningId);
-      router.push(`/dashboard?id=${myLearningId}`);
+      const output = await saveOutput(input, myLearningId);
+      if (!output || !output.id) {
+        throw new Error('Invalid response from saveOutput');
+      }
+      router.push(`/dashboard?id=${output.id}`);
     } catch (err: any) {
-      throw new Error('Error when handle upload : ' + (err as Error).message);
+      console.error('Error when handling upload:', err);
+      toast.error(err.message || 'An error occurred during upload');
     } finally {
       setIsLoading(false);
     }

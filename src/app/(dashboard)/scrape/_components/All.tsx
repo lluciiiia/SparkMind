@@ -1,8 +1,17 @@
 'use client';
 
 import { Slide } from '@/components/animation';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   Pagination,
   PaginationContent,
@@ -12,12 +21,16 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { deleteOutput } from '@/lib/scrape';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
+import { Check, Copy } from 'lucide-react';
 import { marked } from 'marked';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { memo, useState, useCallback } from 'react';
+import { toast } from 'sonner';
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
+import { useCopyToClipboard } from 'usehooks-ts';
 
 import type { OutputSchema } from '@/schema';
 const ITEMS_PER_PAGE = 20;
@@ -25,6 +38,7 @@ const ITEMS_PER_PAGE = 20;
 const All = memo(
   ({ query, page = 1, all }: { query: string; page: number; all: OutputSchema[] }) => {
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -62,11 +76,54 @@ const All = memo(
       currentPage * ITEMS_PER_PAGE,
     );
 
+    const handleSelectItem = (id: string) => {
+      setSelectedItems((prev) =>
+        prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+      );
+    };
+
+    const handleSelectAll = () => {
+      if (selectedItems.length === paginatedItems.length) {
+        setSelectedItems([]);
+      } else {
+        setSelectedItems(paginatedItems.map((item) => item.output_id));
+      }
+    };
+
+    const handleDelete = async () => {
+      try {
+        await Promise.all(selectedItems.map((id) => deleteOutput(id)));
+        toast.success('Selected items deleted successfully');
+        router.refresh();
+      } catch (error) {
+        console.error('Error deleting items:', error);
+        toast.error('Failed to delete selected items');
+      }
+    };
+
     return (
       <>
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            <Checkbox
+              checked={selectedItems.length === paginatedItems.length}
+              onCheckedChange={handleSelectAll}
+            />
+            <span className="text-sm text-gray-500">
+              {selectedItems.length} of {paginatedItems.length}
+            </span>
+          </div>
+          <Button
+            onClick={handleDelete}
+            disabled={selectedItems.length === 0}
+            variant="destructive"
+          >
+            Delete Selected
+          </Button>
+        </div>
         <section
           className={`
-            h-fit w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8 pr-3 max-w-full overflow-y-scroll
+            h-fit w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8 pr-3 max-w-full overflow-y-scroll pl-3 pt-4
             ${isLoading ? 'animate-pulse' : ''}
           `}
         >
@@ -76,7 +133,11 @@ const All = memo(
               ))
             : paginatedItems.map((scrape: OutputSchema, index: number) => (
                 <Slide delay={index * 0.1} key={scrape.output_id}>
-                  <ScrapeCard all={scrape} />
+                  <ScrapeCard
+                    all={scrape}
+                    isSelected={selectedItems.includes(scrape.output_id)}
+                    onSelect={() => handleSelectItem(scrape.output_id)}
+                  />
                 </Slide>
               ))}
         </section>
@@ -121,8 +182,15 @@ All.displayName = 'All';
 
 export { All };
 
-const ScrapeCard = ({ all }: { all: OutputSchema }) => {
+const ScrapeCard = ({
+  all,
+  isSelected,
+  onSelect,
+}: { all: OutputSchema; isSelected: boolean; onSelect: () => void }) => {
   const [content, setContent] = useState('');
+  const [isCopied, setIsCopied] = useState(false);
+  const [, copy] = useCopyToClipboard();
+
   useIsomorphicLayoutEffect(() => {
     const fetchContent = async () => {
       const text = await marked(all.text_output);
@@ -130,20 +198,47 @@ const ScrapeCard = ({ all }: { all: OutputSchema }) => {
     };
     fetchContent();
   }, [all.text_output]);
+
+  const handleCopy = useCallback(() => {
+    const textContent = stripHtmlTags(content);
+    copy(textContent)
+      .then(() => {
+        setIsCopied(true);
+        toast.success('Copied to clipboard');
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch((error) => {
+        toast.error(`Failed to copy! ${error instanceof Error ? error.message : String(error)}`);
+      });
+  }, [content, copy]);
+
+  const stripHtmlTags = (html: string) => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -50 }}
       transition={{ duration: 0.5 }}
+      className="relative group"
     >
+      <Checkbox
+        checked={isSelected}
+        onCheckedChange={onSelect}
+        className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+      />
       <Dialog>
         <DialogTrigger>
           <Card
             className={`
-							w-[250px] h-[150px] overflow-hidden
-							shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg
-						`}
+              w-[250px] h-[150px] overflow-hidden
+              shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg
+              ${isSelected ? 'ring-2 ring-primary' : ''}
+            `}
           >
             <CardHeader>
               <h3 className="text-lg font-semibold truncate">{all.prompt_name}</h3>
@@ -154,7 +249,12 @@ const ScrapeCard = ({ all }: { all: OutputSchema }) => {
           </Card>
         </DialogTrigger>
         <DialogContent className="max-w-2xl h-[80dvh]">
-          <h2 className="text-xl font-semibold mb-4">{all.prompt_name}</h2>
+          <DialogHeader>
+            <DialogTitle>{all.prompt_name}</DialogTitle>
+            <DialogDescription>
+              Created on {format(new Date(all.created_at), 'PPP')}
+            </DialogDescription>
+          </DialogHeader>
           <ScrollArea className="h-full w-full rounded-md border p-4">
             <div dangerouslySetInnerHTML={{ __html: content }} />
             <ScrollBar orientation="vertical" />
@@ -163,6 +263,19 @@ const ScrapeCard = ({ all }: { all: OutputSchema }) => {
             <p>Created: {format(new Date(all.created_at), 'PPP')}</p>
             <p>Updated: {format(new Date(all.updated_at), 'PPP')}</p>
           </div>
+          <Button variant="outline" size="sm" onClick={handleCopy}>
+            {isCopied ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="mr-2 h-4 w-4" />
+                Copy to Clipboard
+              </>
+            )}
+          </Button>
         </DialogContent>
       </Dialog>
     </motion.div>

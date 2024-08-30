@@ -30,8 +30,17 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       setIsSubmitting(true);
-      await handleRequest(e, signUp, router);
-      toast.success('Sign up successful');
+      await handleRequest(
+        e,
+        async (formData) => {
+          const result = await signUp(formData);
+          return {
+            redirectPath: result,
+            toastMessage: { type: 'success', message: 'Sign up successful' },
+          };
+        },
+        router,
+      );
     } catch {
       toast.error('Sign up failed, try again later');
     } finally {
