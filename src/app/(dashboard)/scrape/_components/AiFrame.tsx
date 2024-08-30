@@ -57,6 +57,7 @@ const AiFrame: React.FC<{
   const generateContent = useCallback(
     async (currentTopic: string, currentWebsiteData: string) => {
       if (!currentTopic || !currentWebsiteData || isInserted) {
+        setHtmlContent('<p>Missing topic or website data.</p>');
         return;
       }
       setIsLoading(true);
@@ -73,7 +74,9 @@ const AiFrame: React.FC<{
         return text;
       } catch (error) {
         console.error('Error generating content:', error);
-        setHtmlContent(`<p>Error generating content. Please try again.</p>`);
+        setHtmlContent(
+          `<p>Error generating content: ${error instanceof Error ? error.message : 'Unknown error'}</p>`,
+        );
         toast.error('Error generating content');
       } finally {
         setIsLoading(false);
@@ -96,6 +99,7 @@ const AiFrame: React.FC<{
 
     const checkExistingData = async () => {
       if (!topic || !websiteData || !uuid) {
+        setHtmlContent('<p>Missing required data.</p>');
         return;
       }
 
@@ -104,6 +108,10 @@ const AiFrame: React.FC<{
 
       try {
         const supabase = createClient();
+        if (!supabase) {
+          throw new Error('Failed to create Supabase client');
+        }
+
         const storedOutputId =
           sessionStorage.getItem('output_id') ||
           new URLSearchParams(window.location.search).get('output_id');
@@ -142,7 +150,9 @@ const AiFrame: React.FC<{
       } catch (error) {
         console.error('Error checking existing data:', error);
         if (isMounted.current) {
-          setHtmlContent(`<p>Error checking existing data. Please try again.</p>`);
+          setHtmlContent(
+            `<p>Error checking existing data: ${error instanceof Error ? error.message : 'Unknown error'}</p>`,
+          );
         }
       } finally {
         setShouldCheckExistingData(false);
@@ -181,25 +191,29 @@ const AiFrame: React.FC<{
   }, [uuid]);
 
   return (
-    <Card className="w-full max-w-3xl mx-auto">
+    <Card className="w-full max-w-3xl mx-auto my-10">
       <CardHeader>
-        <CardTitle>{topic}</CardTitle>
+        <CardTitle>{topic || 'No Topic'}</CardTitle>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[300px] w-full rounded-md border p-4">
           {isLoading ? (
             <p>Generating content...</p>
-          ) : (
+          ) : htmlContent ? (
             <pre
               className="whitespace-pre-wrap font-mono text-sm"
               dangerouslySetInnerHTML={{ __html: htmlContent }}
             />
+          ) : (
+            <p>No content available.</p>
           )}
         </ScrollArea>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <div className="text-sm text-muted-foreground">{htmlContent.length} characters</div>
-        <Button variant="outline" size="sm" onClick={handleCopy}>
+        <div className="text-sm text-muted-foreground">
+          {htmlContent ? `${htmlContent.length} characters` : 'No content'}
+        </div>
+        <Button variant="outline" size="sm" onClick={handleCopy} disabled={!htmlContent}>
           {isCopied ? (
             <>
               <Check className="mr-2 h-4 w-4" />

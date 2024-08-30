@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight, LogOut } from 'lucide-react';
+import { ChevronRight, LogOut, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useQueryState } from 'nuqs';
@@ -121,7 +121,29 @@ export function Menu({ isOpen }: MenuProps) {
               )}
             </li>
           ))}
-          <li className="flex items-end w-full grow">
+          <li className="flex flex-col items-end w-full grow">
+            <TooltipProvider disableHoverableContent>
+              <Tooltip delayDuration={100}>
+                <TooltipTrigger asChild>
+                  <Button variant="outline" className="justify-start w-full h-10 mb-2" asChild>
+                    <Link href="/account">
+                      <span className={cn(isOpen === false ? '' : 'mr-4')}>
+                        <User size={18} />
+                      </span>
+                      <p
+                        className={cn(
+                          'whitespace-nowrap',
+                          isOpen === false ? 'opacity-0 hidden' : 'opacity-100',
+                        )}
+                      >
+                        Account
+                      </p>
+                    </Link>
+                  </Button>
+                </TooltipTrigger>
+                {isOpen === false && <TooltipContent side="right">Account</TooltipContent>}
+              </Tooltip>
+            </TooltipProvider>
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
@@ -131,7 +153,7 @@ export function Menu({ isOpen }: MenuProps) {
                       router.push('/signin');
                     }}
                     variant="outline"
-                    className="justify-center w-full h-10 mt-5"
+                    className="justify-start w-full h-10"
                   >
                     <span className={cn(isOpen === false ? '' : 'mr-4')}>
                       <LogOut size={18} />

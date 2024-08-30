@@ -11,7 +11,7 @@ import Link from 'next/link';
 import React from 'react';
 import { Scraper } from '../_components';
 
-const ScrapeNewPage = () => {
+const ScrapeNewPage = async () => {
   return (
     <ContentLayout title="Scrape New">
       <Breadcrumb>

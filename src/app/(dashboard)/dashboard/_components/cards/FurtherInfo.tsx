@@ -1,37 +1,68 @@
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import Image from 'next/image';
 import React from 'react';
 
+type InfoItem = {
+  link: string;
+  title: string;
+  snippet: string;
+  thumbnail?: { src: string; width: string; height: string };
+};
+
 type Props = {
-  furtherInfo: {
-    link: string;
-    title: string;
-    snippet: string;
-    thumbnail: { src: string; width: string; height: string };
-  }[];
+  furtherInfo: InfoItem[];
 };
 
 export default function FurtherInfoCard({ furtherInfo }: Props) {
+  if (!Array.isArray(furtherInfo) || furtherInfo.length === 0) {
+    return (
+      <Card className="w-full h-[calc(100vh-200px)]">
+        <CardHeader>
+          <CardTitle>Further Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground">No further information available.</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl px-4 overflow-y-scroll pb-5 gap-5 grid">
-      {furtherInfo.map((info) => (
-        <div key={info.link} className="flex space-x-4 p-4 border rounded-lg shadow-sm">
-          {info.thumbnail && (
-            <img
-              src={info.thumbnail.src}
-              alt={info.title}
-              width={info.thumbnail.width}
-              height={info.thumbnail.height}
-              className="object-cover rounded"
-            />
-          )}
-          <div>
-            <a href={info.link} className="text-blue-600 hover:underline font-semibold text-lg">
-              {info.title}
-            </a>
-            <p className="text-gray-700 mt-2">{info.snippet}</p>
-          </div>
-        </div>
-      ))}
+    <Card className="w-full h-[calc(100vh-200px)]">
+      <CardHeader>
+        <CardTitle>Further Information</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ScrollArea className="h-[calc(100vh-300px)] pr-4">
+          {furtherInfo.map((info, index) => (
+            <div key={info.link || index} className="flex space-x-4 p-4 border-b last:border-b-0">
+              {info.thumbnail && (
+                <Image
+                  src={info.thumbnail.src}
+                  alt={info.title || 'Thumbnail'}
+                  width={Number.parseInt(info.thumbnail.width) || 100}
+                  height={Number.parseInt(info.thumbnail.height) || 100}
+                  className="object-cover rounded"
+                />
+              )}
+              <div>
+                <a
+                  href={info.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline font-semibold text-lg"
+                >
+                  {info.title || 'Untitled'}
+                </a>
+                <p className="text-sm text-muted-foreground mt-2">
+                  {info.snippet || 'No description available.'}
+                </p>
+              </div>
+            </div>
+          ))}
+        </ScrollArea>
+      </CardContent>
     </Card>
   );
 }

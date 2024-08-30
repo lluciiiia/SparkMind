@@ -1,28 +1,27 @@
 import { updateSession } from '@/utils/supabase/middleware';
 import type { User } from '@supabase/supabase-js';
-import { url } from 'inspector';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest): Promise<NextResponse> {
-  const { user } = await updateSession(request);
+  const { user, res } = await updateSession(request);
 
-  const { res, redirect } = handleRedirect({
+  const { res: newRes, redirect } = handleRedirect({
     req: request,
-    res: NextResponse.next({ request }),
+    res,
     user,
   });
 
   if (redirect) {
-    return res;
+    return newRes;
   }
 
-  return NextResponse.next({ request });
+  return res;
 }
 
 export const config = {
   matcher: [
-    '/((?!api|_next/static|_next/image|media|favicon.ico|favicon-16x16.png|favicon-32x32.png|apple-touch-icon.png|android-chrome-192x192.png|android-chrome-512x512.png|robots.txt|sitemap.xml|site.webmanifest|monitoring|auth|signin|public).*)',
+    '/((?!api|_next/static|_next/image|media|favicon.ico|favicon-16x16.png|favicon-32x32.png|apple-touch-icon.png|android-chrome-192x192.png|android-chrome-512x512.png|robots.txt|sitemap.xml|site.webmanifest|monitoring|auth|signin|public|scrape).*)',
   ],
 };
 
@@ -39,12 +38,13 @@ const handleRedirect = ({
   redirect: boolean;
 } => {
   if (user) {
-    return { res: NextResponse.next(), redirect: true };
-  }
+    const hasRedirected = req.cookies.get('hasRedirected');
 
-  if (req.nextUrl.pathname.includes('/signin') && user) {
-    const nextRes = NextResponse.redirect(req.nextUrl.href.replace('/signin', '/my-learning'));
-    return { res: nextRes, redirect: true };
+    if (req.nextUrl.pathname.includes('/signin') && !hasRedirected) {
+      const nextRes = NextResponse.redirect(new URL('/my-learning', req.url));
+      nextRes.cookies.set('hasRedirected', 'true', { maxAge: 60 * 60 * 24 }); // 24 hours
+      return { res: nextRes, redirect: true };
+    }
   }
 
   if (

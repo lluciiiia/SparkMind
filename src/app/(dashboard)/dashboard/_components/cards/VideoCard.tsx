@@ -1,38 +1,60 @@
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import type React from 'react';
-import { type VideoCardProps, VideoItem } from '../interfaces';
+import type { VideoCardProps, VideoItem } from '../interfaces';
 
 const VideoCard: React.FC<VideoCardProps> = ({ videos }) => {
+  const isValidVideo = (video: VideoItem): boolean => {
+    return (
+      video &&
+      video.id &&
+      typeof video.id.videoId === 'string' &&
+      video.snippet &&
+      typeof video.snippet.title === 'string' &&
+      typeof video.snippet.description === 'string'
+    );
+  };
+
+  const validVideos = videos?.filter(isValidVideo) || [];
+
   return (
-    <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
-      <div className="flex flex-col h-full overflow-y-auto rounded-t-3xl items-center">
-        {Array.isArray(videos) && videos.length > 0 ? (
-          videos.map((video) => (
-            <div
-              key={video.id.videoId}
-              className="w-full flex flex-row px-8 py-4 border-b border-gray-200"
-            >
-              <div className="flex flex-col mr-8 l-0">
-                <h3 className="break-words font-bold">{video.snippet.title}</h3>
-                <p className="break-words mt-2">Description: {video.snippet.description}</p>
+    <Card className="w-full h-[calc(100vh-200px)]">
+      <CardHeader>
+        <CardTitle>Video Recommendations</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ScrollArea className="h-[calc(100vh-300px)] pr-4">
+          {validVideos.length > 0 ? (
+            validVideos.map((video) => (
+              <div key={video.id.videoId} className="flex mb-4 pb-4 border-b last:border-b-0">
+                <div className="flex-grow pr-4">
+                  <h3 className="font-semibold mb-2 line-clamp-2">{video.snippet.title}</h3>
+                  <p className="text-sm text-muted-foreground line-clamp-3">
+                    {video.snippet.description}
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <iframe
+                    width="160"
+                    height="90"
+                    src={`https://www.youtube.com/embed/${video.id.videoId}`}
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title={video.snippet.title}
+                    loading="lazy"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  ></iframe>
+                </div>
               </div>
-              <iframe
-                className="flex-shrink-0 ml-auto"
-                width="120"
-                height="100"
-                src={`https://www.youtube.com/embed/${video.id.videoId}`}
-                frameBorder="0"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-          ))
-        ) : (
-          <div className="flex h-full justify-center items-center">
-            <p>No videos found</p>
-          </div>
-        )}
-      </div>
+            ))
+          ) : (
+            <p className="text-center text-muted-foreground">No valid videos found</p>
+          )}
+        </ScrollArea>
+      </CardContent>
     </Card>
   );
 };

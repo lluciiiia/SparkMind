@@ -1,168 +1,192 @@
 'use client';
 
 import type { ActionCardProps, Event } from '@/app/(dashboard)/dashboard/_components/interfaces';
-import { Card } from '@/components/ui/card';
+import { createEvents } from '@/app/_api-handlers/api-handler';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import type React from 'react';
 import { useEffect, useState } from 'react';
-import '@/styles/css/custom-scroll.css';
-import { createEvents } from '@/app/api-handlers/api-handler';
 import { toast } from 'sonner';
-const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
-  if (!learningId) console.error('LearningId is Missing in ActionCard');
 
+function isEvent(item: unknown): item is Event {
+  return (
+    typeof item === 'object' &&
+    item !== null &&
+    'summary' in item &&
+    'description' in item &&
+    'start' in item &&
+    'end' in item
+  );
+}
+
+const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
   const [todoList, setTodoList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const ActionData = async () => {
-      try {
-        setTodoList(actionItemsData);
-      } catch (error) {
-        toast.error('Not enough permissions to access calendar: ' + (error as Error).message);
-      }
-    };
+    if (actionItemsData === null || actionItemsData === undefined) {
+      setTodoList([]);
+      toast.error('No action items data available');
+      return;
+    }
 
-    ActionData();
-  }, []);
+    if (!Array.isArray(actionItemsData)) {
+      setTodoList([]);
+      toast.error('Invalid action items data format');
+      return;
+    }
+
+    const validEvents = actionItemsData.filter(isEvent);
+
+    if (validEvents.length === 0) {
+      setTodoList([]);
+      toast.warning('No valid action items found');
+      return;
+    }
+
+    if (validEvents.length !== actionItemsData.length) {
+      toast.warning('Some action items were invalid and have been filtered out');
+    }
+
+    setTodoList(validEvents);
+  }, [actionItemsData]);
 
   const handleCreateEvent = async () => {
-    try {
-      setIsLoading(true);
-      if (!learningId) return;
+    if (!learningId) {
+      toast.error('Learning ID is missing');
+      return;
+    }
 
-      const selectedTask = selectedRowsidx.map((rowIndex) => ({
-        summary: todoList[rowIndex].summary,
-        description: todoList[rowIndex].description,
-        start: {
-          dateTime: todoList[rowIndex].start.dateTime,
-          timeZone: todoList[rowIndex].start.timeZone,
-        },
-        end: {
-          dateTime: todoList[rowIndex].end.dateTime,
-          timeZone: todoList[rowIndex].end.timeZone,
-        },
-      }));
+    if (selectedRowsidx.length === 0) {
+      toast.error('No tasks selected');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const selectedTask = selectedRowsidx.map((rowIndex) => {
+        const item = todoList[rowIndex];
+        if (!item) throw new Error(`Invalid item at index ${rowIndex}`);
+        return {
+          summary: item.summary || 'Untitled Task',
+          description: item.description || '',
+          start: item.start,
+          end: item.end,
+        };
+      });
 
       const response = await createEvents(selectedTask, learningId);
-      if (response.data.status == 200) {
-        alert(`Successfully created a new event! Check your Google Calendar!`);
+      if (response?.data?.status === 200) {
+        toast.success('Events created successfully');
+        setSelectedRowsidx([]);
       } else {
-        alert(`Error create-event: ${response.data.error}`);
+        toast.error(`Error creating events: ${response?.data?.error || 'Unknown error'}`);
       }
     } catch (err) {
-      toast.error('Error in creating Event ' + (err as Error).message);
-      return;
+      console.error(err);
+      toast.error(`Error creating events: ${(err as Error).message || 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCheckboxChange = (index: number) => {
-    setSelectedRowsidx((prevSelectedRows) => {
-      if (prevSelectedRows.includes(index)) {
-        return prevSelectedRows.filter((row) => row !== index);
-      } else {
-        return [...prevSelectedRows, index];
-      }
-    });
+    setSelectedRowsidx((prevSelectedRows) =>
+      prevSelectedRows.includes(index)
+        ? prevSelectedRows.filter((row) => row !== index)
+        : [...prevSelectedRows, index],
+    );
   };
 
   return (
-    <Card className="w-full h-[calc(100vh-56px-64px-20px-24px-56px-48px-40px)] rounded-t-3xl">
-      <div className="flex flex-row h-full rounded-t-3xl w-full justify-between">
-        {todoList.length > 0 ? (
-          <div className="w-full">
-            <div className="w-full pl-4 h-full overflow-y-auto">
-              <div className="flex flex-row justify-between items-center">
-                <h2 className="text-xl font-bold border-b pb-2 mb-4">List of Event</h2>
-                <button
-                  disabled={isLoading}
-                  onClick={() => handleCreateEvent()}
-                  className="bg-navy text-white py-2 px-4 rounded mr-2 mb-2 flex items-center justify-center"
+    <Card className="w-full h-[calc(100vh-200px)]">
+      <CardHeader className="flex flex-row items-center justify-between">
+        <CardTitle>Action Items</CardTitle>
+        <Button onClick={handleCreateEvent} disabled={isLoading || selectedRowsidx.length === 0}>
+          {isLoading ? 'Creating...' : 'Create Selected Tasks'}
+        </Button>
+      </CardHeader>
+      <CardContent>
+        <ScrollArea className="h-[calc(100vh-300px)] pr-4">
+          {todoList.length > 0 ? (
+            todoList.map((item, index) => (
+              <div key={index} className="mb-4 pb-4 border-b last:border-b-0">
+                <div className="flex items-center mb-2">
+                  <Checkbox
+                    checked={selectedRowsidx.includes(index)}
+                    onCheckedChange={() => handleCheckboxChange(index)}
+                  />
+                  <span className="ml-2 text-sm">
+                    {new Date(item.start.dateTime).toLocaleString()} -{' '}
+                    {new Date(item.end.dateTime).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </span>
+                </div>
+                <Input
+                  value={item.summary || ''}
+                  onChange={(e) =>
+                    setTodoList((prev) =>
+                      prev.map((t, i) => (i === index ? { ...t, summary: e.target.value } : t)),
+                    )
+                  }
+                  className="mb-2"
+                  placeholder="Task summary"
+                />
+                <Textarea
+                  value={item.description || ''}
+                  onChange={(e) =>
+                    setTodoList((prev) =>
+                      prev.map((t, i) => (i === index ? { ...t, description: e.target.value } : t)),
+                    )
+                  }
+                  className="mb-2"
+                  placeholder="Task description"
+                />
+                <Select
+                  value={item.start?.timeZone || ''}
+                  onValueChange={(value) =>
+                    setTodoList((prev) =>
+                      prev.map((t, i) =>
+                        i === index ? { ...t, start: { ...t.start, timeZone: value } } : t,
+                      ),
+                    )
+                  }
                 >
-                  {isLoading ? (
-                    <>
-                      <svg className="mr-3 h-6 w-6 animate-spin" viewBox="0 0 100 100">
-                        <circle
-                          fill="none"
-                          stroke-width="14"
-                          className="stroke-current opacity-40"
-                          cx="50"
-                          cy="50"
-                          r="40"
-                        />
-                        <circle
-                          fill="none"
-                          stroke-width="14"
-                          className="stroke-current"
-                          stroke-dasharray="250"
-                          stroke-dashoffset="180"
-                          cx="50"
-                          cy="50"
-                          r="40"
-                        />
-                      </svg>
-                      Creating Task...
-                    </>
-                  ) : (
-                    'Create Selected Task'
-                  )}
-                </button>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select timezone" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Asia/Calcutta">Asia/Calcutta</SelectItem>
+                    <SelectItem value="America/Los_Angeles">PST</SelectItem>
+                    <SelectItem value="America/Chicago">CST</SelectItem>
+                    <SelectItem value="America/New_York">EST</SelectItem>
+                    <SelectItem value="GMT">GMT</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <div className="space-y-4">
-                {todoList &&
-                  todoList.map((item, index) => (
-                    <div key={index} className="border-b pb-4">
-                      <div className="flex flex-row items-center">
-                        <input
-                          type="checkbox"
-                          className="form-checkbox w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
-                          onChange={() => handleCheckboxChange(index)}
-                        />
-                        <p className="text-sm mr-2">
-                          {item.start.dateTime.slice(0, 16).split('T')[0]}
-                        </p>
-                        <p className="text-orange-600">
-                          {new Date(item.start.dateTime).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                          -
-                          {new Date(item.end.dateTime).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </p>
-                      </div>
-                      <input
-                        defaultValue={item.summary}
-                        className="text-lg font-semibold w-96 block"
-                      />
-                      <textarea defaultValue={item.description} className="text-sm block w-full" />
-                      <select className="w-32 focus:ring-0 mt-2 border border-[#003366] p-1 rounded-lg">
-                        <option value="Asia/Calcutta">Asia/Calcutta</option>
-                        <option value="PST">PST</option>
-                        <option value="CST">CST</option>
-                        <option value="EST">EST</option>
-                        <option value="GMT">GMT</option>
-                      </select>
-                    </div>
-                  ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="flex h-full w-full justify-center items-center">
-              <p>
-                No videos or relevant data were found for creating the event. Please grant Calendar
-                access during sign-in and upload the video.
-              </p>
-            </div>
-          </>
-        )}
-      </div>
+            ))
+          ) : (
+            <p className="text-center text-muted-foreground">
+              No action items found. Please ensure you have calendar access and have uploaded a
+              video.
+            </p>
+          )}
+        </ScrollArea>
+      </CardContent>
     </Card>
   );
 };

@@ -30,12 +30,12 @@ import DiscussionWithAI from './discussion-with-ai';
 
 import { API_KEY } from '@/app/api/v1/gemini-settings';
 
-import { createNote, deleteNote, editNote, getNotes } from '../../../api-handlers/notes';
+import { createNote, deleteNote, editNote, getNotes } from '../../../_api-handlers/notes';
 
-import { getOutput } from '../../../api-handlers/api-handler';
+import { toast } from 'sonner';
+import { getOutput } from '../../../_api-handlers/api-handler';
 import FurtherInfoCard from './cards/FurtherInfo';
 import QuestionAndAnswer from './cards/QuestionAndAnswer';
-import { toast } from 'sonner';
 
 export const Dashboard = () => {
   if (!API_KEY) console.error('Missing API key');
@@ -91,6 +91,7 @@ export const Dashboard = () => {
 
     if (output?.questions) {
       const parsedData = JSON.parse(output.questions) as Question[];
+      console.log(parsedData);
       setQuestions(parsedData);
     }
 

@@ -8,7 +8,7 @@ import type React from 'react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa';
-import { getConciseNote, getGrammarNote } from '../../../api-handlers/notes';
+import { getConciseNote, getGrammarNote } from '../../../_api-handlers/notes';
 import type { Note } from '../../dashboard/_components/interfaces';
 
 export const NewNoteSection: React.FC<{

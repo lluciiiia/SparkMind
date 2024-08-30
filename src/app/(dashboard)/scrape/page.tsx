@@ -15,7 +15,9 @@ import { Results } from './_components/Results';
 
 const ScrapePage = async ({
   searchParams,
-}: { searchParams?: { query?: string; page?: string } }) => {
+}: {
+  searchParams?: { query?: string; page?: string };
+}) => {
   const query = searchParams?.query || '';
   const page = searchParams?.page || '1';
 
@@ -23,22 +25,24 @@ const ScrapePage = async ({
   const recent = await fetchRecentScrapes(query);
 
   return (
-    <ContentLayout title={`Scrape`}>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink asChild>
-              <Link href="/dashboard">Home</Link>
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Scrape</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-      <section className={`flex flex-col gap-4`}>
+    <ContentLayout title="Scrape">
+      <div className="flex justify-between items-center mb-4">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <Link href="/dashboard">Home</Link>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Scrape</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
         <Search search={query} />
+      </div>
+      <section className="flex flex-col gap-4">
         <Results query={query} page={page} all={all} recent={recent} />
       </section>
     </ContentLayout>

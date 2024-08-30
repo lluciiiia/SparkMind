@@ -7,30 +7,37 @@ import type { OutputSchema } from '@/schema/scrape';
 import { Slugify } from '@/utils';
 import { format } from 'date-fns';
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
+import { Check, Copy } from 'lucide-react';
 import { marked } from 'marked';
 import { useQueryState } from 'nuqs';
 import { useEffect, useState } from 'react';
+import React from 'react';
 import { toast } from 'sonner';
+import { useCopyToClipboard } from 'usehooks-ts';
 
 const MAX_TITLE_LENGTH = 100; // Adjust this value as needed
 
 export function Recent({ recent }: { recent: OutputSchema[] }) {
   const [currentSlide, setCurrentSlide] = useQueryState('recent', {
     parse: Slugify,
-    defaultValue: Slugify(recent[0].output_id),
+    defaultValue: recent.length > 0 ? Slugify(recent[0].output_id) : '',
     clearOnDefault: false,
   });
   const [currIndex, setCurrIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [content, setContent] = useState('');
   const [showFullTitle, setShowFullTitle] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+  const [, copy] = useCopyToClipboard();
 
   useEffect(() => {
+    if (recent.length === 0) return;
     const index = recent.findIndex((item) => Slugify(item.output_id) === currentSlide);
     setCurrIndex(index !== -1 ? index : 0);
   }, [currentSlide, recent]);
 
   useEffect(() => {
+    if (recent.length === 0) return;
     const fetchContent = async () => {
       setLoading(true);
       try {
@@ -92,6 +99,29 @@ export function Recent({ recent }: { recent: OutputSchema[] }) {
     );
   };
 
+  const handleCopy = React.useCallback(() => {
+    const textContent = stripHtmlTags(content);
+    copy(textContent)
+      .then(() => {
+        setIsCopied(true);
+        toast.success('Copied to clipboard');
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch((error) => {
+        toast.error(`Failed to copy! ${error instanceof Error ? error.message : String(error)}`);
+      });
+  }, [content, copy]);
+
+  const stripHtmlTags = (html: string) => {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || div.innerText || '';
+  };
+
+  if (recent.length === 0) {
+    return <div>No results found</div>;
+  }
+
   return (
     <div className="relative w-full max-w-4xl mx-auto mt-8 px-4">
       {loading && (
@@ -128,9 +158,24 @@ export function Recent({ recent }: { recent: OutputSchema[] }) {
             />
           </ScrollArea>
         </CardContent>
-        <CardFooter className="flex justify-between text-sm text-muted-foreground">
-          <p>Created: {format(new Date(recent[currIndex].created_at), 'PPP')}</p>
-          <p>Updated: {format(new Date(recent[currIndex].updated_at), 'PPP')}</p>
+        <CardFooter className="flex justify-between items-center">
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <p>Created: {format(new Date(recent[currIndex].created_at), 'PPP')}</p>
+            <p className="ml-4">Updated: {format(new Date(recent[currIndex].updated_at), 'PPP')}</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={handleCopy}>
+            {isCopied ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Copied
+              </>
+            ) : (
+              <>
+                <Copy className="mr-2 h-4 w-4" />
+                Copy to Clipboard
+              </>
+            )}
+          </Button>
         </CardFooter>
       </Card>
     </div>

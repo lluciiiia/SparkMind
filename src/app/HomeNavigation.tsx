@@ -16,15 +16,17 @@ export const HomeNavigation = () => {
   const supabase = createClient();
 
   useIsomorphicLayoutEffect(() => {
-    user && router.push('/my-learning');
     const getUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      setUser(user);
+      if (user) {
+        setUser(user);
+        router.push('/my-learning');
+      }
     };
     getUser();
-  }, [user]);
+  }, []); // Empty dependency array
 
   return (
     <>
