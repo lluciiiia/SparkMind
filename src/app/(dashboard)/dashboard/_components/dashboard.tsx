@@ -183,8 +183,9 @@ export const Dashboard = () => {
           transition={{ type: 'spring', stiffness: 100 }}
         >
           <summary
-            className={`p-2 ${isOpen ? 'rounded-l-md' : 'rounded-l-md'
-              } bg-navy text-white flex items-center cursor-pointer`}
+            className={`p-2 ${
+              isOpen ? 'rounded-l-md' : 'rounded-l-md'
+            } bg-navy text-white flex items-center cursor-pointer`}
           >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} className="ml-2" />
@@ -218,16 +219,11 @@ export const Dashboard = () => {
               <button
                 key={tab.name}
                 type="button"
-                className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${activeTab === tab.name
-                    ? 'bg-navy text-white'
-                    : 'text-gray-600 hover:bg-gray-300'
-                  } ${isLaptop
-                    ? 'flex-1'
-                    : isTablet
-                      ? 'w-1/3'
-                      : 'w-1/2'
-                  } ${activeTab === tab.name && 'rounded-t-xl'
-                  }`}
+                className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                  activeTab === tab.name ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-300'
+                } ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'} ${
+                  activeTab === tab.name && 'rounded-t-xl'
+                }`}
                 onClick={() => setActiveTab(tab.name)}
               >
                 {tab.label}
@@ -271,9 +267,7 @@ export const Dashboard = () => {
                     className="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center mb-2 focus:outline-none"
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                   >
-                    <Triangle
-                      className={`w-5 h-5 transform ${isDrawerOpen ? 'rotate-180' : ''}`}
-                    />
+                    <Triangle className={`w-5 h-5 transform ${isDrawerOpen ? 'rotate-180' : ''}`} />
                   </motion.button>
                 </TooltipTrigger>
                 <TooltipContent>{isDrawerOpen ? 'Close' : 'Open'}</TooltipContent>

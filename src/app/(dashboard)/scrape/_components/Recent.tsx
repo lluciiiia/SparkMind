@@ -1,70 +1,70 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { useQueryState } from 'nuqs'
-import { format } from 'date-fns'
-import { marked } from 'marked'
-import { Slugify } from '@/utils'
-import type { OutputSchema } from '@/schema/scrape'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Button } from '@/components/ui/button'
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react'
-import { toast } from 'sonner'
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import type { OutputSchema } from '@/schema/scrape';
+import { Slugify } from '@/utils';
+import { format } from 'date-fns';
+import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp } from 'lucide-react';
+import { marked } from 'marked';
+import { useQueryState } from 'nuqs';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
-const MAX_TITLE_LENGTH = 100 // Adjust this value as needed
+const MAX_TITLE_LENGTH = 100; // Adjust this value as needed
 
 export function Recent({ recent }: { recent: OutputSchema[] }) {
   const [currentSlide, setCurrentSlide] = useQueryState('recent', {
     parse: Slugify,
     defaultValue: Slugify(recent[0].output_id),
     clearOnDefault: false,
-  })
-  const [currIndex, setCurrIndex] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [content, setContent] = useState('')
-  const [showFullTitle, setShowFullTitle] = useState(false)
+  });
+  const [currIndex, setCurrIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState('');
+  const [showFullTitle, setShowFullTitle] = useState(false);
 
   useEffect(() => {
-    const index = recent.findIndex(item => Slugify(item.output_id) === currentSlide)
-    setCurrIndex(index !== -1 ? index : 0)
-  }, [currentSlide, recent])
+    const index = recent.findIndex((item) => Slugify(item.output_id) === currentSlide);
+    setCurrIndex(index !== -1 ? index : 0);
+  }, [currentSlide, recent]);
 
   useEffect(() => {
     const fetchContent = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const text = await marked(recent[currIndex].text_output)
-        setContent(text)
+        const text = await marked(recent[currIndex].text_output);
+        setContent(text);
       } catch (error) {
-        toast.error('Failed to fetch content')
+        toast.error('Failed to fetch content');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    fetchContent()
-  }, [currIndex, recent])
+    };
+    fetchContent();
+  }, [currIndex, recent]);
 
   const handleNext = () => {
     if (currIndex < recent.length - 1) {
-      setCurrentSlide(Slugify(recent[currIndex + 1].output_id))
+      setCurrentSlide(Slugify(recent[currIndex + 1].output_id));
     }
-  }
+  };
 
   const handlePrev = () => {
     if (currIndex > 0) {
-      setCurrentSlide(Slugify(recent[currIndex - 1].output_id))
+      setCurrentSlide(Slugify(recent[currIndex - 1].output_id));
     }
-  }
+  };
 
   const toggleTitleDisplay = () => {
-    setShowFullTitle(!showFullTitle)
-  }
+    setShowFullTitle(!showFullTitle);
+  };
 
   const renderTitle = () => {
-    const title = recent[currIndex].prompt_name
+    const title = recent[currIndex].prompt_name;
     if (title.length <= MAX_TITLE_LENGTH) {
-      return <CardTitle className="text-2xl font-bold">{title}</CardTitle>
+      return <CardTitle className="text-2xl font-bold">{title}</CardTitle>;
     }
 
     return (
@@ -89,8 +89,8 @@ export function Recent({ recent }: { recent: OutputSchema[] }) {
           )}
         </Button>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="relative w-full max-w-4xl mx-auto mt-8 px-4">
@@ -104,12 +104,7 @@ export function Recent({ recent }: { recent: OutputSchema[] }) {
           <div className="flex flex-row items-center justify-between">
             {renderTitle()}
             <div className="flex space-x-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={handlePrev}
-                disabled={currIndex === 0}
-              >
+              <Button variant="outline" size="icon" onClick={handlePrev} disabled={currIndex === 0}>
                 <ChevronLeft className="h-4 w-4" />
                 <span className="sr-only">Previous</span>
               </Button>
@@ -139,5 +134,5 @@ export function Recent({ recent }: { recent: OutputSchema[] }) {
         </CardFooter>
       </Card>
     </div>
-  )
+  );
 }

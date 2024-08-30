@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import featureFrame from '../../public/assets/images/feature/feature_frame.png';
 import threeDots from '../../public/assets/images/home/feature-03.png';
@@ -28,7 +29,9 @@ export default function Home() {
             flex w-full justify-between px-4 md:px-16 lg:px-32 fixed top-0 left-0 right-0 bg-white z-10 shadow-md
           `}
         >
-          <Image width={150} src={homeLogoSvg} alt="Home Logo" />
+          <Link href="/" className="text-2xl font-bold">
+            <Image width={150} src={homeLogoSvg} alt="Home Logo" />
+          </Link>
           <HomeNavigation />
         </div>
         {/* Content below the navbar */}
@@ -135,6 +138,34 @@ export default function Home() {
           alt="Home Title"
         />
       </main>
+      <footer className="bg-gray-100 py-4 mt-8">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center">
+            <div className="text-gray-600">
+              © {new Date().getFullYear()} SparkMind. All rights reserved.
+            </div>
+            <nav>
+              <ul className="flex space-x-4">
+                <li>
+                  <Link href="/legal/privacy" className="text-navy hover:underline">
+                    Privacy Policy
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/terms" className="text-navy hover:underline">
+                    Terms of Service
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/cookies" className="text-navy hover:underline">
+                    Cookie Policy
+                  </Link>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </footer>
     </>
   );
 }

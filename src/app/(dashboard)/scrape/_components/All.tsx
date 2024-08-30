@@ -70,17 +70,15 @@ const All = memo(
             ${isLoading ? 'animate-pulse' : ''}
           `}
         >
-          {isLoading ? (
-            Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
-              <article key={index} className="h-[150px] bg-gray-200 animate-pulse rounded-lg" />
-            ))
-          ) : (
-            paginatedItems.map((scrape: OutputSchema, index: number) => (
-              <Slide delay={index * 0.1} key={scrape.output_id}>
-                <ScrapeCard all={scrape} />
-              </Slide>
-            ))
-          )}
+          {isLoading
+            ? Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+                <article key={index} className="h-[150px] bg-gray-200 animate-pulse rounded-lg" />
+              ))
+            : paginatedItems.map((scrape: OutputSchema, index: number) => (
+                <Slide delay={index * 0.1} key={scrape.output_id}>
+                  <ScrapeCard all={scrape} />
+                </Slide>
+              ))}
         </section>
         {totalPages > 1 && (
           <Pagination className="mt-8">
