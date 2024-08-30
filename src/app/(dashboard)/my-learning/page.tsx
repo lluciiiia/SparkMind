@@ -38,6 +38,7 @@ import { ScrollArea } from '@radix-ui/react-scroll-area';
 
 import axios from 'axios';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 type Cards = {
   id: string;
@@ -123,7 +124,7 @@ export const MyLearning = () => {
         setIsLoading(true);
         await fetchData();
       } catch (error) {
-        console.log('this is Error is Fetch the MyLearnings : ' + (error as Error).message);
+        toast.error('this is Error is Fetch the MyLearnings : ' + (error as Error).message);
       } finally {
         setIsLoading(false);
       }
@@ -150,7 +151,7 @@ export const MyLearning = () => {
         const newLearningId = res.data.body[0].id;
         redirectToDashboard(newLearningId);
       } else {
-        console.error('Error storing data:', res.data.error);
+        toast.error('Error storing data:', res.data.error);
       }
     } catch (error) {
       throw new Error('Error storing data : ' + (error as Error).message);
@@ -175,7 +176,7 @@ export const MyLearning = () => {
           setOriginalCards((cards) => cards.filter((card) => card.id !== id));
           setIsDialogOpen(false);
         } else {
-          console.error('Error deleting My leaning data:', response.data.body);
+          toast.error('Error deleting My leaning data:', response.data.body);
         }
       }
     } catch (error) {

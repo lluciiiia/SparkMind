@@ -29,13 +29,13 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 
 import { processDefaultTitle, saveOutput } from '../../../api-handlers/api-handler';
+import { toast } from 'sonner';
 import '@/styles/css/Circle-loader.css';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 
 export const NewDashboard = () => {
   const [myLearningId] = useQueryState('id', { defaultValue: '' });
-  console.log('this is my learning id : ' + myLearningId);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -113,7 +113,7 @@ export const NewDashboard = () => {
 
       // @ts-ignore trust me bro
       const data = (await res.json()) as any;
-      console.log(data);
+      // console.log(data);
 
       // right now not usefull to display the transcript
       // setFetchedTranscript(data.transcription);

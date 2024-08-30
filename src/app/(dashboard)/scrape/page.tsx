@@ -8,11 +8,8 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { fetchAllScrapes, fetchRecentScrapes } from '@/lib/scrape';
-import { createClient } from '@/utils/supabase/client';
-import type { AuthResponse } from '@supabase/supabase-js';
 import Link from 'next/link';
 import React from 'react';
-import { toast } from 'sonner';
 import { Search } from './_components';
 import { Results } from './_components/Results';
 

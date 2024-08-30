@@ -1,15 +1,12 @@
 'use client';
 
 import type { ActionCardProps, Event } from '@/app/(dashboard)/dashboard/_components/interfaces';
-import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import '@/styles/css/custom-scroll.css';
 import { createEvents } from '@/app/api-handlers/api-handler';
-import { Calendar as Calendericon } from 'lucide-react';
-import Link from 'next/link';
-
+import { toast } from 'sonner';
 const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
   if (!learningId) console.error('LearningId is Missing in ActionCard');
 
@@ -20,10 +17,9 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
   useEffect(() => {
     const ActionData = async () => {
       try {
-        console.log(actionItemsData);
         setTodoList(actionItemsData);
       } catch (error) {
-        throw new Error('Not enough permissions to access calendar: ' + (error as Error).message);
+        toast.error('Not enough permissions to access calendar: ' + (error as Error).message);
       }
     };
 
@@ -55,7 +51,7 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
         alert(`Error create-event: ${response.data.error}`);
       }
     } catch (err) {
-      console.log('Error in creating Event ' + (err as Error).message);
+      toast.error('Error in creating Event ' + (err as Error).message);
       return;
     } finally {
       setIsLoading(false);

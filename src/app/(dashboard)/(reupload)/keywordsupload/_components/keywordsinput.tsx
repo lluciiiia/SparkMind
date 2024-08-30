@@ -35,7 +35,7 @@ import { useQueryState } from 'nuqs';
 
 export const ReUploadKeyword = () => {
   const [myLearningId] = useQueryState('id', { defaultValue: '' });
-  console.log('this is my learning id : ' + myLearningId);
+  // console.log('this is my learning id : ' + myLearningId);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -91,7 +91,7 @@ export const ReUploadKeyword = () => {
       const pathURL = URL.createObjectURL(file);
       setSelectedFile(file);
       setObjectURL(pathURL);
-      console.log(objectURL);
+      // console.log(objectURL);
     }
   };
 

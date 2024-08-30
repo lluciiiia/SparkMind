@@ -4,13 +4,11 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import Link from 'next/link';
 import { UploadComponent } from './_components';
 
-const uploadscreen = () => {
+const UploadScreen = () => {
   return (
     <>
       <ContentLayout title="Upload Screen">
@@ -29,4 +27,4 @@ const uploadscreen = () => {
   );
 };
 
-export default uploadscreen;
+export default UploadScreen;

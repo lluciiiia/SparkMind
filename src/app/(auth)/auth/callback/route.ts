@@ -55,9 +55,9 @@ export async function GET(request: Request) {
           { onConflict: 'user_uuid' },
         );
 
-        console.log('Token insert or update response:', tokenInsertOrUpdateRes);
+        // console.log('Token insert or update response:', tokenInsertOrUpdateRes);
       } catch (error) {
-        console.log('Google Auth Token not inserted into database -> Token Table : ' + error);
+        throw new Error('Google Auth Token not inserted into database -> Token Table : ' + error);
       }
 
       return NextResponse.redirect(`${origin}${next}`);

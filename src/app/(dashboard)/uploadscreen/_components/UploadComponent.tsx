@@ -1,6 +1,7 @@
 'use client';
 import type React from 'react';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export const UploadComponent = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -29,11 +30,14 @@ export const UploadComponent = () => {
         body: formData,
       });
 
-      if (!res.ok) throw new Error(await res.text());
+      if (!res.ok) {
+        toast.error('Error when extract transcribe : ' + (await res.text()));
+        throw new Error(await res.text());
+      }
 
       // @ts-ignore trust me bro
       const data = (await res.json()) as any;
-      console.log(data);
+      toast.success('Transcript and Keywords extracted successfully');
 
       setFetchedTranscript(data.transcription);
       setKeywords(data.keywordsArr);
