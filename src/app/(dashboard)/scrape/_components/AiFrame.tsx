@@ -107,7 +107,6 @@ const AiFrame: React.FC<{
         const storedOutputId =
           sessionStorage.getItem('output_id') ||
           new URLSearchParams(window.location.search).get('output_id');
-        console.log('Stored output ID:', storedOutputId);
         if (!storedOutputId) {
           const generatedText = await generateContent(topic, websiteData);
           if (generatedText) {
@@ -129,12 +128,10 @@ const AiFrame: React.FC<{
         }
 
         if (data) {
-          console.log('Existing data found:', data);
           const content = await marked(data.text_output);
           setHtmlContent(content);
           setIsInserted(true);
         } else {
-          console.log('No existing data found, generating content');
           const generatedText = await generateContent(topic, websiteData);
           if (generatedText) {
             setIsInserted(true);
@@ -172,9 +169,7 @@ const AiFrame: React.FC<{
   }, [htmlContent, copy]);
 
   useEffect(() => {
-    console.log('useEffect for generateContent called', { topic, websiteData, uuid, isInserted });
     if (!topic || !websiteData || !uuid || isInserted) {
-      console.log('useEffect early return', { topic, websiteData, uuid, isInserted });
       return;
     }
 

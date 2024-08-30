@@ -2,6 +2,7 @@ import { google } from 'googleapis';
 
 import { createClient } from '@/utils/supabase/client';
 import { NextResponse } from 'next/server';
+import { toast } from 'sonner';
 
 const supabaseClient = createClient();
 
@@ -53,13 +54,13 @@ export default async function rotateToken(req: any, res: NextResponse, next: any
 
         req.accessToken = access_token;
       } catch (err) {
-        console.log('🔃 Google RefeshToken Error : ' + err);
+        toast.error('🔃 Google RefeshToken Error : ' + err);
       }
     } else {
       req.accessToken = await tokens.access_token;
     }
   } catch (err) {
-    console.log('Server Side error : ' + err);
+    toast.error('Server Side error : ' + err);
   }
   next();
 }

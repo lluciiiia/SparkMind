@@ -36,7 +36,7 @@ import { toast } from 'sonner';
 
 export const ReUploadVideo = () => {
   const [myLearningId] = useQueryState('id', { defaultValue: '' });
-  console.log('this is my learning id : ' + myLearningId);
+  // console.log('this is my learning id : ' + myLearningId);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -83,7 +83,7 @@ export const ReUploadVideo = () => {
         const pathURL = URL.createObjectURL(file);
         setSelectedFile(file);
         setObjectURL(pathURL);
-        console.log(objectURL);
+        // console.log(objectURL);
       } else {
         toast.error('File size must be less than 5MB because we are in the testing phase.');
       }
@@ -143,7 +143,7 @@ export const ReUploadVideo = () => {
       }
       await handleUpload(input, myLearningId);
     } catch (error) {
-      console.log('error in submitChanges' + (error as Error).message);
+      throw new Error('error in submitChanges' + (error as Error).message);
     } finally {
       setIsLoading(false);
     }

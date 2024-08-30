@@ -35,6 +35,7 @@ import { createNote, deleteNote, editNote, getNotes } from '../../../api-handler
 import { getOutput } from '../../../api-handlers/api-handler';
 import FurtherInfoCard from './cards/FurtherInfo';
 import QuestionAndAnswer from './cards/QuestionAndAnswer';
+import { toast } from 'sonner';
 
 export const Dashboard = () => {
   if (!API_KEY) console.error('Missing API key');
@@ -73,7 +74,7 @@ export const Dashboard = () => {
     if (myLearningId) fetchData(myLearningId);
 
     return () => {
-      console.log('Output retrieved');
+      toast.success('Output retrieved');
     };
   }, []);
 

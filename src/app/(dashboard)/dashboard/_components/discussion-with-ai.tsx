@@ -11,6 +11,7 @@ import remarkGfm from 'remark-gfm';
 import type { Message } from './interfaces';
 
 import { API_KEY, genAI, safetySettings } from '@/app/api/v1/gemini-settings';
+import { toast } from 'sonner';
 
 interface DiscussionWithAIProps {
   learningid: string | null;
@@ -56,7 +57,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
         setBasicQuestion(response.data.basicQue);
         setTranscript(response.data.transcript);
       } else {
-        console.log('Something goes Wrong in Discuss with ai feature');
+        toast.error('Something goes Wrong in Discuss with ai feature');
       }
     };
     fetchDiscussData();
@@ -123,7 +124,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
           setInput('');
         }
       } catch (error) {
-        console.log(error);
+        toast.error('Something goes Wrong in Discuss with ai feature');
       }
     },
     [input, chatSession],

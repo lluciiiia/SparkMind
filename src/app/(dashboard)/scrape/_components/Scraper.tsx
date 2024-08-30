@@ -26,7 +26,6 @@ export const Scraper: React.FC = memo(() => {
 
   const resetOutputId = useCallback(() => {
     sessionStorage.removeItem('output_id');
-    console.log('output_id cleared');
   }, []);
 
   useIsomorphicLayoutEffect(() => {
@@ -109,7 +108,6 @@ export const Scraper: React.FC = memo(() => {
             updated_at: new Date(),
           }),
         });
-        console.log('postResponse', postResponse);
         if (postResponse.ok) {
           const postData = (await postResponse.json()) as Extract<
             InputSchema,
