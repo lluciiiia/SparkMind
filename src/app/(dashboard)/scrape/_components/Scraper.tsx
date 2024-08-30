@@ -4,17 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PING, PONG } from '@/constants';
-import { createAPIClient } from '@/lib';
-import {
-  type InputSchema,
-  type ScrapeSchema,
-  type ScraperQueueItemType,
-  inputSchema,
-  scrapeSchema,
-} from '@/schema/scrape';
+import type { InputSchema, ScrapeSchema, ScraperQueueItemType } from '@/schema/scrape';
 import { createClient } from '@/utils/supabase/client';
 import type React from 'react';
-import { memo, useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { AiFrame } from './AiFrame';
@@ -29,6 +22,12 @@ export const Scraper: React.FC = memo(() => {
   const [websiteData, setWebsiteData] = useState<string>('');
   const [topic, setTopic] = useState<string>('');
   const [uuid, setUuid] = useState<string>('');
+  const [isInserted, setIsInserted] = useState<boolean>(false);
+
+  const resetOutputId = useCallback(() => {
+    sessionStorage.removeItem('output_id');
+    console.log('output_id cleared');
+  }, []);
 
   useIsomorphicLayoutEffect(() => {
     if (!url || !isValidURL(url)) return;
@@ -37,7 +36,7 @@ export const Scraper: React.FC = memo(() => {
         const description = await fetchDescriptionFromURL(url);
         setTopic(description);
       } catch (error) {
-        console.error('Error fetching description:', error);
+        toast.error('Failed to fetch description');
         setTopic('No description available');
       }
     };
@@ -49,22 +48,19 @@ export const Scraper: React.FC = memo(() => {
       new URL(string);
       return true;
     } catch (_) {
+      toast.error('Invalid URL');
       return false;
     }
   };
 
-  const supabaseClient = createClient();
-
   const getUser = async () => {
-    const {
-      data: { user },
-      error,
-    } = await supabaseClient.auth.getUser();
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.getUser();
     if (error) {
-      toast.error('Failed to get user');
+      toast.error('Failed to get user ID');
       return null;
     }
-    return user?.id;
+    return data.user.id;
   };
 
   const processItem = async (item: ScraperQueueItemType): Promise<void> => {
@@ -74,11 +70,10 @@ export const Scraper: React.FC = memo(() => {
       toast.error('Please enter a URL before scraping');
       return;
     }
-    console.log('item', item);
-    console.log('url', url);
+
     setScraper(item);
     const user_id = await getUser();
-    console.log('user_id', user_id);
+
     if (!user_id) {
       toast.error('No user ID found. Please log in and try again.');
       return;
@@ -86,9 +81,9 @@ export const Scraper: React.FC = memo(() => {
 
     try {
       const response = await fetch(`${PING}${url}`, { method: 'GET' });
-      console.log('response', response);
+
       const data = (await response.json()) as ScrapeSchema;
-      console.log('data', data);
+
       if (data) {
         const updatedScraperItem: ScraperQueueItemType = {
           ...item,
@@ -97,9 +92,9 @@ export const Scraper: React.FC = memo(() => {
           finishedAt: new Date(),
         };
         setScraper(updatedScraperItem);
-        setWebsiteData(data.filteredTexts ? data.filteredTexts.join('\n') : '');
-        console.log(`filteredTexts`, data.filteredTexts);
-        console.log('websiteData', websiteData);
+        const websiteDataText = data.filteredTexts ? data.filteredTexts.join('\n') : '';
+        setWebsiteData(websiteDataText);
+
         const postResponse = await fetch(PONG, {
           method: 'POST',
           headers: {
@@ -109,7 +104,7 @@ export const Scraper: React.FC = memo(() => {
             input_id: newUuid,
             user_id,
             url,
-            text: data.filteredTexts ? data.filteredTexts.join('\n') : '',
+            text: websiteDataText,
             created_at: new Date(),
             updated_at: new Date(),
           }),
@@ -123,6 +118,8 @@ export const Scraper: React.FC = memo(() => {
 
           if (postData) {
             toast.success('Scraping was successful');
+            sessionStorage.setItem('output_id', newUuid);
+            window.history.pushState({}, '', `?output_id=${newUuid}`);
           } else {
             toast.error('Failed to save scraping results');
           }
@@ -139,6 +136,8 @@ export const Scraper: React.FC = memo(() => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    resetOutputId();
+    setIsInserted(false);
     const item: ScraperQueueItemType = {
       id: uuidv4(),
       url,
@@ -148,35 +147,39 @@ export const Scraper: React.FC = memo(() => {
     };
     processItem(item);
   };
+
   const handleChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value);
   }, 500);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  };
+
   return (
     <>
-      <form className="flex flex-col gap-4">
-        <div>
-          <Label htmlFor="url">URL</Label>
-          <Input
-            id="url"
-            type="text"
-            onChange={(e) => handleChange(e)}
-            placeholder="Enter URL"
-            className={scraper?.status === 'pending' ? 'cursor-not-allowed' : ''}
-          />
-        </div>
+      <form className="flex w-full max-w-sm items-center space-x-2" onSubmit={handleSubmit}>
+        <Input
+          id="url"
+          type="url"
+          onChange={(e) => handleChange(e)}
+          onKeyDown={handleKeyDown}
+          placeholder="Enter URL"
+          className={`border rounded px-4 py-2 ${scraper?.status === 'pending' ? 'cursor-not-allowed' : ''}`}
+        />
         <Button
           type="submit"
           className={`${
             !url || scraper?.status === 'pending'
-              ? 'bg-gray-500 cursor-not-allowed opacity-50 pointer-events-none'
-              : 'bg-blue-500 cursor-pointer opacity-100 pointer-events-auto'
-          } text-white py-2 px-4 rounded text-lg font-bold border-none outline-none shadow-md transition-colors duration-300 flex items-center justify-center gap-2`}
+              ? 'bg-gray-500 cursor-not-allowed bg-opacity-50 pointer-events-none'
+              : 'bg-navy cursor-pointer opacity-100 pointer-events-auto'
+          } text-white transition-colors duration-300 flex items-center justify-center gap-2`}
           data-testid="scrape-all"
           disabled={!url || scraper?.status === 'pending'}
-          onClick={(e) => handleSubmit(e)}
         >
-          <span className="ml-2">Scrape website</span>
+          Scrape website
         </Button>
       </form>
       <AiFrame
@@ -184,6 +187,7 @@ export const Scraper: React.FC = memo(() => {
         websiteData={websiteData}
         uuid={uuid}
         isLoading={scraper?.status === 'pending'}
+        resetOutputId={resetOutputId}
       />
     </>
   );
