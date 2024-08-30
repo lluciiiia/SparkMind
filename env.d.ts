@@ -15,6 +15,8 @@ declare global {
       GEMINI_API_KEY: string;
       GOOGLE_OAUTH_CLIENT_ID: string;
       GOOGLE_OAUTH_SECRET: string;
+      GOOGLE_RECAPTCHA_SITE_KEY: string;
+      GOOGLE_RECAPTCHA_SECRET_KEY: string;
       STRIPE_PUBLISHABLE_KEY_LIVE: string;
       STRIPE_SECRET_KEY_LIVE: string;
       STRIPE_PUBLISHABLE_KEY_TEST: string;

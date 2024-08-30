@@ -2,11 +2,10 @@
 
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { fetchRecentScrapes } from '@/lib/scrape';
-import { type OutputSchema, inputSchema, outputSchema, scrapeSchema } from '@/schema/scrape';
-import { useQueryState } from 'nuqs';
+import type { OutputSchema } from '@/schema/scrape';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React from 'react';
-import { All, Recent, Scraper } from '.';
+import { All, Recent } from '.';
 
 export const Results = ({
   query,
@@ -19,18 +18,21 @@ export const Results = ({
   recent: OutputSchema[];
   all: OutputSchema[];
 }) => {
-  const [tab, setTab] = useQueryState('tab', {
-    parse: String,
-    defaultValue: 'new',
-    history: 'push',
-    shallow: true,
-  });
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab') || 'recent';
+
+  const setTab = (newTab: string) => {
+    const current = new URLSearchParams(Array.from(searchParams.entries()));
+    current.set('tab', newTab);
+    const search = current.toString();
+    const query = search ? `?${search}` : '';
+    router.push(`${window.location.pathname}${query}`);
+  };
+
   return (
     <Tabs value={tab}>
       <TabsList>
-        <TabsTrigger value="new" onClick={() => setTab('new')}>
-          New
-        </TabsTrigger>
         <TabsTrigger value="recent" onClick={() => setTab('recent')}>
           Recent
         </TabsTrigger>
@@ -38,9 +40,6 @@ export const Results = ({
           All
         </TabsTrigger>
       </TabsList>
-      <TabsContent value="new">
-        <Scraper />
-      </TabsContent>
       <TabsContent value="recent">
         <ScrollArea>
           <Recent recent={recent} />

@@ -22,7 +22,7 @@ import { FaEdit, FaEye, FaPlus, FaSearch } from 'react-icons/fa';
 
 import { assignColors } from '@/utils/assignColors';
 
-import { ContentLayout } from '@/components';
+import { ContentLayout, SearchBar } from '@/components';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,6 +35,7 @@ import { ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createClient } from '@/utils/supabase/client';
 import { ScrollArea } from '@radix-ui/react-scroll-area';
+
 import axios from 'axios';
 import Link from 'next/link';
 
@@ -57,7 +58,7 @@ export const MyLearning = () => {
   const [originalCards, setOriginalCards] = useState<Cards[]>([]);
   const [isDateSorted, setIsDateSorted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [colorMap, setColorMap] = useState<Map<number, string>>(new Map());
+  const [colorMap, setColorMap] = useState<Map<number, string>>(new Map<number, string>());
 
   //DB Storage date
   const dateFormatter = (date: Date) => {
@@ -306,15 +307,7 @@ export const MyLearning = () => {
           </BreadcrumbItem>
         </BreadcrumbList>
         <div className="flex flex-row items-center ml-6">
-          <div className="h-9 w-9 -mr-[2.30rem] bg-black text-white rounded-xl z-10 flex justify-center items-center">
-            <FaSearch size={18} />
-          </div>
-          <input
-            type="text"
-            className="border border-gray-300 rounded-lg px-4 py-2 h-9 pl-10 bg-[#e6e6e6]"
-            placeholder="Search"
-            onChange={(e) => handleSearch(e.target.value)}
-          />
+          <SearchBar onChange={(e) => handleSearch(e.target.value)} />
         </div>
       </Breadcrumb>
       <section className="bg-[#fef9f5] dark:bg-[#18181b] min-h-screen">
@@ -327,109 +320,106 @@ export const MyLearning = () => {
             </div>
             <div className="flex sm:flex-row flex-col sm:items-center">
               <h1 className="text-4xl font-mediums text-black dark:text-white">Learnings</h1>
-              <div className="sm:ml-10 md:mt-0 mt-2 flex items-center mx-auto">
-                <Tabs defaultValue="recent" onValueChange={toggleSort}>
-                  <TabsList>
-                    <TabsTrigger value="recent">Recent</TabsTrigger>
-                    <TabsTrigger value="date">Date</TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
+              <div className="sm:ml-10 md:mt-0 mt-2 flex items-center mx-auto"></div>
+              <Tabs defaultValue="recent" onValueChange={toggleSort}>
+                <TabsList>
+                  <TabsTrigger value="recent">Recent</TabsTrigger>
+                  <TabsTrigger value="date">Date</TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
           </div>
-          <ScrollArea className="h-full w-full">
-            <article
-              className={`h-[60vh] overflow-y-auto w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 xl:gap-12 pb-8 pr-3`}
-            >
-              <div className={`w-[28vh] h-[20vh] flex items-center justify-center`}>
-                <Button
-                  className={`
-                    bg-transparent border-dashed border-2 border-blue-500 w-full h-full
-                    mx-auto hover:bg-transparent hover:border-blue-500 
-                    hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl
-                    flex flex-col justify-center items-center
-                    p-8
-                  `}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleAddCard();
-                  }}
-                >
-                  <FaPlus size={24} color="#60a5fa" />
-                </Button>
-              </div>
-              {cards.map((card) => (
-                <LearningCard
-                  id={card.id}
-                  key={card.id}
-                  title={card.title}
-                  date={card.date}
-                  onEdit={handleEdit}
-                  bgColor={colorMap.get(card.index) || '#ffffff'}
-                  handleDashboardScreen={redirectToMyLearningPage}
-                />
-              ))}
-            </article>
-            <ScrollBar orientation={`vertical`} />
-          </ScrollArea>
-          <Dialog open={isDialogOpen}>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Edit Details</DialogTitle>
-                <DialogDescription>
-                  Make changes to your Learning here. Click save when you're done.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="titleinput" className="text-right">
-                    Title
-                  </Label>
-                  <Input
-                    type="text"
-                    id="titleinput"
-                    value={currTitle}
-                    className="col-span-3"
-                    onChange={(e) => setCurrTitle(e.target.value)}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="dateinput" className="text-right">
-                    Date
-                  </Label>
-                  <Input
-                    type="date"
-                    id="dateinput"
-                    value={currDate.toISOString().substring(0, 10)}
-                    className="col-span-3"
-                    onChange={handleDateChange}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <div className="w-full flex justify-between">
-                  <Button
-                    type="submit"
-                    className="bg-red-500 hover:bg-red-900 text-white"
-                    onClick={() => handleDelete(editingCardId)}
-                  >
-                    Delete
-                  </Button>
-                  <div>
-                    <Button type="submit" className="mr-2" onClick={cancelChanges}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" onClick={() => saveChanges(editingCardId)}>
-                      Save changes
-                    </Button>
-                  </div>
-                </div>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
         </div>
+        <ScrollArea className="h-full w-full">
+          <article className="h-fit w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8 pr-3 ">
+            <div className="max-w-[300px] max-h-[225px] flex items-center justify-center">
+              <Button
+                className="
+                      bg-transparent border-dashed border-2 border-blue-500 w-full h-full
+                      mx-auto hover:bg-transparent hover:border-blue-500 
+                      hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl
+                      flex flex-col justify-center items-center
+                      p-8
+                    "
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAddCard();
+                }}
+              >
+                <FaPlus size={24} color="#60a5fa" />
+              </Button>
+            </div>
+            {cards.map((card) => (
+              <LearningCard
+                id={card.id}
+                key={card.id}
+                title={card.title}
+                date={card.date}
+                onEdit={handleEdit}
+                bgColor={colorMap.get(card.index) || '#ffffff'}
+                handleDashboardScreen={redirectToMyLearningPage}
+              />
+            ))}
+          </article>
+          <ScrollBar orientation="vertical" />
+        </ScrollArea>
+        <Dialog open={isDialogOpen}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Details</DialogTitle>
+              <DialogDescription>
+                Make changes to your Learning here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="titleinput" className="text-right">
+                  Title
+                </Label>
+                <Input
+                  type="text"
+                  id="titleinput"
+                  value={currTitle}
+                  className="col-span-3"
+                  onChange={(e) => setCurrTitle(e.target.value)}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="dateinput" className="text-right">
+                  Date
+                </Label>
+                <Input
+                  type="date"
+                  id="dateinput"
+                  value={currDate.toISOString().substring(0, 10)}
+                  className="col-span-3"
+                  onChange={handleDateChange}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <div className="w-full flex justify-between">
+                <Button
+                  type="submit"
+                  className="bg-red-500 hover:bg-red-900 text-white"
+                  onClick={() => handleDelete(editingCardId)}
+                >
+                  Delete
+                </Button>
+                <div>
+                  <Button type="submit" className="mr-2" onClick={cancelChanges}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" onClick={() => saveChanges(editingCardId)}>
+                    Save changes
+                  </Button>
+                </div>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-9 backdrop-blur-sm">
             <div className="Circleloader" />
           </div>
         )}
@@ -456,7 +446,7 @@ const LearningCard = ({
   const [isHover, setIsHover] = useState(false);
   return (
     <div
-      className="relative w-[28vh] h-[20vh]"
+      className="relative max-w-[300px] max-h-[225px] sm:mx-0 mx-auto"
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >

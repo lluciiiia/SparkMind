@@ -11,8 +11,6 @@ import { cookies } from 'next/headers';
 import Image from 'next/image';
 import { redirect } from 'next/navigation';
 
-import { BackgroundBeams } from '@/components';
-
 import {
   EmailSignIn,
   ForgotPassword,
@@ -21,6 +19,8 @@ import {
   SignUp,
   UpdatePassword,
 } from '@/components/ui/auth';
+import authBackground from '../../../../../public/assets/images/auth.png';
+import logo from '../../../../../public/assets/images/home/Logowithtext.png';
 
 export default async function SignIn({
   params,
@@ -60,18 +60,13 @@ export default async function SignIn({
 
   return (
     <>
-      <div className="absolute top-0 left-0 flex justify-center h-screen w-screen z-50">
-        <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80">
+      <div className="mx-auto my-auto flex justify-center h-screen w-screen z-50">
+        <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-full mx-auto">
           <div className="flex justify-center pb-12">
-            <Image
-              src={`/assets/images/home/Logowithtext.png`}
-              alt="logo"
-              width={250}
-              height={250}
-            />
+            <Image src={logo} alt="logo" width={250} height={250} />
           </div>
           <Card
-            className="bg-[#cde1fa] rounded-lg"
+            className="rounded-2xl p-3 shadow-lg bg-[#cde1fa] mx-auto w-[80%]"
             title={
               viewProp === 'forgot_password'
                 ? 'Reset Password'
@@ -105,15 +100,19 @@ export default async function SignIn({
             )}
             {viewProp !== 'update_password' && viewProp !== 'signup' && allowOauth && (
               <>
-                <span className="text-center">Third-party sign-in</span>
-                <Separator />
+                <span className="sr-only">Third-party sign-in</span>
+                <Separator className={`bg-white h-[0.125rem] w-full`} />
                 <OauthSignIn />
               </>
             )}
           </Card>
         </div>
       </div>
-      <BackgroundBeams />
+      <Image
+        src={authBackground}
+        alt="authentication screen BackgroundBeams"
+        className="object-contain absolute inset-0 w-full h-full z-[-10] mx-auto my-auto max-w-[1440px] max-h-[900px] min-w-[1024px] min-h-[768px]"
+      />
     </>
   );
 }

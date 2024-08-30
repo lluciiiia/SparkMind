@@ -2,11 +2,78 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 @import "./Circle-loader.css";
-@import "./custom-scroll.css";
+
+/* @import "./custom-scroll.css"; */
 @import "./custom-styles.css";
 @import "./fonts.css";
 @import "./LoadingIndicator.css";
 @import "./toggle-switch.css";
+
+@layer base {
+    *,
+    *::before,
+    *::after{
+        @apply tabular-nums box-border;
+
+        box-sizing: border-box;
+    }
+
+    img {
+        @apply select-none;
+    }
+    
+    :host,html {
+        @apply leading-7 text-base antialiased font-sans tabular-nums transition-all duration-300 list-none scroll-smooth;
+
+        text-size-adjust: 100%;
+        font-feature-settings: normal;
+        font-variation-settings: normal;
+        tab-size: 4;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    ::-webkit-scrollbar {
+        width: 0;
+        background: transparent;
+    }
+
+    body {
+        @apply bg-[#fff] transition-colors duration-200 ease-in text-[#003366];
+    }
+
+    body.scav {
+        @apply bg-[#fff];
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        @apply font-sans font-bold leading-5 text-[#003366];
+    }
+
+    p {
+        @apply font-sans font-normal leading-7 text-[#003366];
+    }
+
+    a {
+        @apply text-[#003366] no-underline transition-colors duration-200 ease-in;
+    }
+
+    /* a:hover {
+        @apply font-bold;
+    } */
+
+    span {
+        @apply font-sans font-normal leading-7 text-[#003366];
+    }
+
+    /* ul {
+        @apply list-disc list-inside;
+    }
+
+    ol {
+        @apply list-decimal list-inside;
+    } */
+}
+
 
 @layer base {
   :root {

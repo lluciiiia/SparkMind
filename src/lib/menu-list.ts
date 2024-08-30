@@ -38,18 +38,29 @@ export function getMenuList(pathname: string, id: string | null): Group[] {
           icon: Folder,
           submenus: [],
         },
-        {
-          href: `/scrape`,
-          label: 'Scrape',
-          active: pathname.includes(`/scrape`),
-          icon: Filter,
-          submenus: [],
-        },
       ],
     },
     {
       groupLabel: '',
       menus: [
+        {
+          href: ``,
+          label: 'Scrape',
+          active: pathname.includes(`/scrape`),
+          icon: Filter,
+          submenus: [
+            {
+              href: `/scrape/new`,
+              label: 'New',
+              active: pathname.includes(`/scrape/new`),
+            },
+            {
+              href: `/scrape`,
+              label: 'Results',
+              active: pathname === `/scrape`,
+            },
+          ],
+        },
         {
           href: `/upload?id=${id}`,
           label: 'Upload',
