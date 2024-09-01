@@ -1,9 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type React from 'react';
+import { memo } from 'react';
 import type { VideoCardProps, VideoItem } from '../interfaces';
 
-const VideoCard: React.FC<VideoCardProps> = ({ videos }) => {
+const VideoCard: React.FC<VideoCardProps> = memo(({ videos }) => {
   const isValidVideo = (video: VideoItem): boolean => {
     return (
       video &&
@@ -57,6 +58,8 @@ const VideoCard: React.FC<VideoCardProps> = ({ videos }) => {
       </CardContent>
     </Card>
   );
-};
+});
+
+VideoCard.displayName = 'VideoCard';
 
 export default VideoCard;

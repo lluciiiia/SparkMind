@@ -30,13 +30,12 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
 
+import { usePersistedId } from '@/hooks';
 import { useRouter } from 'next/navigation';
-import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 
 export const ReUploadVideo = () => {
-  const [myLearningId] = useQueryState('id', { defaultValue: '' });
-  // console.log('this is my learning id : ' + myLearningId);
+  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -96,8 +95,8 @@ export const ReUploadVideo = () => {
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
-      if (myLearningId !== null) {
-        formData.append('learningid', myLearningId);
+      if (mylearning_id !== null) {
+        formData.append('learningid', mylearning_id);
       }
 
       const res = await fetch('/api/v1/extract-transcribe', {
@@ -124,14 +123,14 @@ export const ReUploadVideo = () => {
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
       const response = await saveOutput(input, myLearningId);
-      router.push(`/dashboard?id=${myLearningId}`);
+      router.push(`/dashboard?mylearning_id=${myLearningId}`);
     } catch (err: any) {
       throw new Error('Error when save output : ' + (err as Error).message);
     }
   };
 
   const submitChanges = async () => {
-    if (!myLearningId) return;
+    if (!mylearning_id) return;
 
     try {
       setIsLoading(true);
@@ -141,7 +140,7 @@ export const ReUploadVideo = () => {
         const keyWordsArray = await handleVideoUpload();
         input = keyWordsArray.toString();
       }
-      await handleUpload(input, myLearningId);
+      await handleUpload(input, mylearning_id);
     } catch (error) {
       throw new Error('error in submitChanges' + (error as Error).message);
     } finally {
@@ -252,8 +251,8 @@ export const ReUploadVideo = () => {
                 )}
 
                 {isLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                    <div className="Circleloader"></div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
                   </div>
                 )}
               </DialogContent>

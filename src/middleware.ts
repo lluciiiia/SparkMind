@@ -42,7 +42,7 @@ const handleRedirect = ({
 
     if (req.nextUrl.pathname.includes('/signin') && !hasRedirected) {
       const nextRes = NextResponse.redirect(new URL('/my-learning', req.url));
-      nextRes.cookies.set('hasRedirected', 'true', { maxAge: 60 * 60 * 24 }); // 24 hours
+      nextRes.cookies.set('hasRedirected', 'true', { maxAge: 60 * 60 * 24 * 30 });
       return { res: nextRes, redirect: true };
     }
   }

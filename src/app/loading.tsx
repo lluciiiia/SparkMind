@@ -1,6 +1,5 @@
 'use client';
-import { CenterLayout, CustomPicture as Picture } from '@/components';
-import Image from 'next/image';
+import { CenterLayout } from '@/components';
 import React from 'react';
 
 const Loading = React.memo(() => {
@@ -15,14 +14,9 @@ const Loading = React.memo(() => {
 					left-0 bottom-0 right-0 z-50
         `}
       >
-        <Picture
-          className={`
-              relative w-[100px] h-[100px]
-              animate-spin
-            `}
-        >
-          <Image src={`/assets/svgs/loading.svg`} alt={`Loading`} fill className="object-contain" />
-        </Picture>
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
+        </div>
       </CenterLayout>
     </>
   );

@@ -17,6 +17,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { DropdownMenuArrow } from '@radix-ui/react-dropdown-menu';
+import { toast } from 'sonner';
 
 type Submenu = {
   href: string;
@@ -78,6 +79,9 @@ export function CollapseMenuButton({
             variant={active ? 'secondary' : 'ghost'}
             className="w-full justify-start h-10 mb-1"
             asChild
+            onClick={() => {
+              toast.info('Redirecting to account page');
+            }}
           >
             <Link href={href}>
               <span className="mr-4 ml-2">
@@ -134,7 +138,13 @@ export function CollapseMenuButton({
         <DropdownMenuSeparator />
         {submenus.map(({ href, label }, index) => (
           <DropdownMenuItem key={index} asChild>
-            <Link className="cursor-pointer" href={href}>
+            <Link
+              className="cursor-pointer"
+              href={href}
+              onClick={() => {
+                toast.info(`Redirecting to ${label} page`);
+              }}
+            >
               <p className="max-w-[180px] truncate">{label}</p>
             </Link>
           </DropdownMenuItem>

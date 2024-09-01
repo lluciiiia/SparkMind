@@ -206,6 +206,7 @@ export const Scraper: React.FC = memo(() => {
           `}
           data-testid="scrape-all"
           disabled={isLoading || !url}
+          onClick={() => console.log('clicked')}
         >
           {isLoading ? 'Scraping...' : 'Scrape website'}
         </Button>

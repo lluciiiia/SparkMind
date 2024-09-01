@@ -30,11 +30,15 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
+import { usePersistedId } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
+import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 export const ReUploadResource = () => {
-  const [myLearningId] = useQueryState('id', { defaultValue: '' });
+  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
+
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -99,8 +103,8 @@ export const ReUploadResource = () => {
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
-      if (myLearningId !== null) {
-        formData.append('learningid', myLearningId);
+      if (mylearning_id !== null) {
+        formData.append('learningid', mylearning_id);
       }
 
       const res = await fetch('/api/v1/extract-transcribe', {
@@ -127,30 +131,39 @@ export const ReUploadResource = () => {
   const handleUpload = async (input: any, myLearningId: string) => {
     try {
       const response = await saveOutput(input, myLearningId);
-      router.push(`/dashboard?id=${myLearningId}`);
+      if (response) {
+        toast.success('Resource updated successfully');
+        router.push(`/dashboard?mylearning_id=${mylearning_id}`);
+      } else {
+        toast.error('Failed to update resource');
+      }
     } catch (err: any) {
       throw new Error('Error when save output : ' + (err as Error).message);
     }
   };
 
   const submitChanges = async () => {
-    if (!myLearningId) return;
+    if (!mylearning_id) return;
 
     try {
       setIsLoading(true);
       let input;
+      let title;
       if (fileType === 'video') {
         const keyWordsArray = await handleVideoUpload();
         input = keyWordsArray.toString();
+        title = `Video: ${input.slice(0, 30)}...`;
       } else if (fileType == 'text') {
         input = content;
+        title = `Text: ${content.slice(0, 30)}...`;
       } else if (fileType == 'keywords') {
         input = keywords;
+        title = `Keywords: ${keywords.slice(0, 30)}...`;
       }
 
-      await handleUpload(input, myLearningId);
+      await handleUpload(input, mylearning_id);
     } catch (err: any) {
-      throw new Error('Error when submit changes : ' + (err as Error).message);
+      throw new Error('Error when update resource : ' + (err as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -300,8 +313,8 @@ export const ReUploadResource = () => {
                 )}
 
                 {isLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                    <div className="Circleloader"></div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
                   </div>
                 )}
               </DialogContent>

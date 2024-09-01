@@ -1,6 +1,7 @@
 'use client';
+import { Button } from '@/components/ui/button';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -13,27 +14,29 @@ interface Props {
 
 const QnaCards: React.FC<Props> = ({ question, options, answer, multipleAnswers, number }) => {
   const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
-  const [isOpen, setIsOpen] = useState(true);
   const [isAnswered, setIsAnswered] = useState(false);
-  const [allWrong, setAllWrong] = useState(false);
+  const allWrongRef = useRef(false);
 
   useEffect(() => {
-    setAllWrong(options.every((option) => !answer.includes(option)));
+    allWrongRef.current = options.every((option) => !answer.includes(option));
   }, [options, answer]);
 
-  const handleOptionClick = (index: number) => {
-    if (isAnswered) return;
+  const handleOptionClick = useCallback(
+    (index: number) => {
+      if (isAnswered) return;
 
-    if (multipleAnswers) {
-      setSelectedOptions((prev) =>
-        prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index],
-      );
-    } else {
-      setSelectedOptions((prev) => (prev.includes(index) ? [] : [index]));
-    }
-  };
+      setSelectedOptions((prev) => {
+        if (multipleAnswers) {
+          return prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index];
+        } else {
+          return prev.includes(index) ? [] : [index];
+        }
+      });
+    },
+    [isAnswered, multipleAnswers],
+  );
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     if (selectedOptions.length === 0) {
       toast.error('Please select an option before submitting.');
       return;
@@ -46,88 +49,60 @@ const QnaCards: React.FC<Props> = ({ question, options, answer, multipleAnswers,
 
     if (isCorrect) {
       toast.success('Correct!');
-    } else if (allWrong && selectedOptions.length === options.length) {
+    } else if (allWrongRef.current && selectedOptions.length === options.length) {
       toast.success('Correct! All options were wrong.');
     } else {
       toast.error('Incorrect. Try again or check the correct answer.');
     }
 
     setIsAnswered(true);
-  };
+  }, [selectedOptions, options, answer]);
 
-  const resetQuestion = () => {
+  const resetQuestion = useCallback(() => {
     setSelectedOptions([]);
     setIsAnswered(false);
-  };
+  }, []);
+
+  const memoizedOptions = useMemo(
+    () =>
+      options.map((item, index) => {
+        const isCorrectOption = answer.includes(item);
+        const isSelected = selectedOptions.includes(index);
+        const isOptionCorrect = isAnswered && isCorrectOption && isSelected;
+        const isOptionIncorrect = isAnswered && !isCorrectOption && isSelected;
+
+        return (
+          <Button
+            key={index}
+            onClick={() => handleOptionClick(index)}
+            variant={isSelected ? 'default' : 'outline'}
+            className={`mb-2 ${isOptionCorrect ? 'bg-green-500' : ''} ${isOptionIncorrect ? 'bg-red-500' : ''}`}
+          >
+            {item}
+          </Button>
+        );
+      }),
+    [options, answer, selectedOptions, isAnswered, handleOptionClick],
+  );
 
   return (
-    <div className="my-7 transition-all duration-300 ease-in-out w-full">
-      <div
-        className={`flex items-center font-semibold bg-white w-full rounded-t-xl p-2 border border-black ${
-          isOpen ? 'border-b-0' : ''
-        }`}
-      >
-        <div>Q{number + 1}: </div>
-        <div className="ml-2">{question}</div>
+    <div className="mb-4 p-4 border rounded-lg">
+      <h3 className="text-lg font-semibold mb-2">
+        Question {number}: {question}
+      </h3>
+      <div className="space-y-2">{memoizedOptions}</div>
+      <div className="mt-4 space-x-2">
+        <Button onClick={handleSubmit} disabled={isAnswered}>
+          Submit
+        </Button>
+        <Button onClick={resetQuestion} variant="outline">
+          Reset
+        </Button>
       </div>
-
-      {isOpen && (
-        <div className="bg-white w-full rounded-b-xl border border-black border-t-0 overflow-y-auto max-h-[60vh]">
-          <div className="p-2">
-            {options.map((item, index) => {
-              const isCorrectOption = answer.includes(item);
-              const isSelected = selectedOptions.includes(index);
-              const isOptionCorrect = isAnswered && isCorrectOption && isSelected;
-              const isOptionIncorrect = isAnswered && !isCorrectOption && isSelected;
-
-              return (
-                <div
-                  key={index}
-                  onClick={() => handleOptionClick(index)}
-                  className={`flex font-medium cursor-pointer p-2 rounded-md transition-colors duration-300 ${
-                    isOptionCorrect
-                      ? 'bg-green-500 text-white'
-                      : isOptionIncorrect
-                        ? 'bg-red-500 text-white'
-                        : isSelected
-                          ? 'bg-navy text-white'
-                          : 'hover:bg-gray-300'
-                  }`}
-                >
-                  <div>{String.fromCharCode(index + 65)}: </div>
-                  <div className="ml-2">{item}</div>
-                </div>
-              );
-            })}
-          </div>
-          <div className="w-full flex justify-center items-center p-2 space-x-2">
-            {!isAnswered && (
-              <button
-                onClick={handleSubmit}
-                className="p-2 bg-navy text-white rounded-md hover:bg-blue-950 transition-colors duration-300"
-                disabled={selectedOptions.length === 0}
-              >
-                Submit
-              </button>
-            )}
-            {isAnswered && (
-              <button
-                onClick={resetQuestion}
-                className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors duration-300"
-              >
-                Try Again
-              </button>
-            )}
-          </div>
-          {isAnswered && allWrong && (
-            <div className="p-2 text-center text-red-500">
-              Note: All given options were incorrect for this question.
-            </div>
-          )}
-        </div>
-      )}
     </div>
   );
 };
 
-export default QnaCards;
+QnaCards.displayName = 'QnaCards';
+
+export { QnaCards };

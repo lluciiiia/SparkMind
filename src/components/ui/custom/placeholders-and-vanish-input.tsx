@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -15,7 +16,7 @@ export function PlaceholdersAndVanishInput({
 }) {
   const [currentPlaceholder, setCurrentPlaceholder] = useState(0);
 
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startAnimation = () => {
     intervalRef.current = setInterval(() => {
       setCurrentPlaceholder((prev) => (prev + 1) % placeholders.length);
@@ -23,10 +24,10 @@ export function PlaceholdersAndVanishInput({
   };
   const handleVisibilityChange = () => {
     if (document.visibilityState !== 'visible' && intervalRef.current) {
-      clearInterval(intervalRef.current); // Clear the interval when the tab is not visible
+      clearInterval(intervalRef.current);
       intervalRef.current = null;
     } else if (document.visibilityState === 'visible') {
-      startAnimation(); // Restart the interval when the tab becomes visible
+      startAnimation();
     }
   };
 
@@ -134,14 +135,18 @@ export function PlaceholdersAndVanishInput({
         } else {
           setValue('');
           setAnimating(false);
+          setCurrentPlaceholder(0);
         }
       });
     };
     animateFrame(start);
   };
 
-  const handleKeyDown = (e: any) => {
-    if (e.key === 'Enter' && !animating) {
+  // TODO: fix this if breaks
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement> | React.FormEvent<HTMLFormElement>,
+  ) => {
+    if ((e as React.KeyboardEvent<HTMLInputElement>).key === 'Enter' && !animating) {
       e.preventDefault();
       vanishAndSubmit();
       onSubmit && onSubmit(e as React.FormEvent<HTMLFormElement>);
@@ -159,6 +164,7 @@ export function PlaceholdersAndVanishInput({
         0,
       );
       animate(maxX);
+      setValue('');
     }
   };
 
@@ -167,6 +173,14 @@ export function PlaceholdersAndVanishInput({
     vanishAndSubmit();
     onSubmit && onSubmit(e);
   };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!animating) {
+      setValue(e.target.value);
+      onChange && onChange(e);
+    }
+  };
+
   return (
     <form
       className={cn(
@@ -183,12 +197,7 @@ export function PlaceholdersAndVanishInput({
         ref={canvasRef}
       />
       <input
-        onChange={(e) => {
-          if (!animating) {
-            setValue(e.target.value);
-            onChange && onChange(e);
-          }
-        }}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
         ref={inputRef}
         value={value}
@@ -199,7 +208,7 @@ export function PlaceholdersAndVanishInput({
         )}
       />
 
-      <button
+      <Button
         disabled={!value}
         type="submit"
         className="absolute right-2 top-1/2 z-50 -translate-y-1/2 h-8 w-8 rounded-full bg-black bg-navy disabled:bg-navy-200 transition duration-200 flex items-center justify-center"
@@ -234,7 +243,7 @@ export function PlaceholdersAndVanishInput({
           <path d="M13 18l6 -6" />
           <path d="M13 6l6 6" />
         </motion.svg>
-      </button>
+      </Button>
 
       <div className="absolute inset-0 flex items-center rounded-full pointer-events-none">
         <AnimatePresence mode="wait">

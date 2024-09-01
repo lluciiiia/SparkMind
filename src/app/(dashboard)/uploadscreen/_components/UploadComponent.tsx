@@ -1,4 +1,6 @@
 'use client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import type React from 'react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -48,10 +50,10 @@ export const UploadComponent = () => {
 
   return (
     <div>
-      <input type="file" name="file" accept=".mp4" onChange={handleFileChange} />
-      <button onClick={handleUpload} disabled={!selectedFile} className="bg-red-400 p-4">
+      <Input type="file" name="file" accept=".mp4" onChange={handleFileChange} />
+      <Button onClick={handleUpload} disabled={!selectedFile} className="bg-red-400 p-4">
         Upload File
-      </button>
+      </Button>
       {objectURL && (
         <div>
           <p>Preview:</p>

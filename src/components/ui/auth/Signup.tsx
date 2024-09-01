@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import type React from 'react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Options } from '.';
 import { Input } from '../input';
 import { Label } from '../label';
 
@@ -88,32 +89,12 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
               className="w-full p-3 rounded-md bg-[#fafafa] mb-2"
             />
           </div>
-          <Button variant="slim" type="submit" className="mt-1" loading={isSubmitting}>
+          <Button variant="default" type="submit" className="mt-1" loading={isSubmitting}>
             Sign up
           </Button>
         </div>
       </form>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="slim" className="w-full">
-            Options
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-full">
-          <DropdownMenuItem asChild>
-            <Link href="/signin/password_signin" className="font-light text-sm">
-              Sign in with email and password
-            </Link>
-          </DropdownMenuItem>
-          {allowEmail && (
-            <DropdownMenuItem asChild>
-              <Link href="/signin/email_signin" className="font-light text-sm">
-                Sign in via magic link
-              </Link>
-            </DropdownMenuItem>
-          )}
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Options allowPassword={true} allowEmail={allowEmail} allowMagicLink={true} />
     </div>
   );
 };

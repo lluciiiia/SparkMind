@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 function isEvent(item: unknown): item is Event {
@@ -30,7 +30,7 @@ function isEvent(item: unknown): item is Event {
   );
 }
 
-const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) => {
+const ActionCard: React.FC<ActionCardProps> = memo(({ learningId, actionItemsData }) => {
   const [todoList, setTodoList] = useState<Event[]>([]);
   const [selectedRowsidx, setSelectedRowsidx] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -189,6 +189,8 @@ const ActionCard: React.FC<ActionCardProps> = ({ learningId, actionItemsData }) 
       </CardContent>
     </Card>
   );
-};
+});
+
+ActionCard.displayName = 'ActionCard';
 
 export default ActionCard;

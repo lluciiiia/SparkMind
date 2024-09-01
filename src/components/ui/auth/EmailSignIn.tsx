@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Options } from '.';
 import { Input } from '../input';
 import { Label } from '../label';
 
@@ -30,7 +31,17 @@ export const EmailSignIn = ({ allowPassword, redirectMethod, disableButton }: Em
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       setIsSubmitting(true); // Disable the button while the request is being handled
-      await handleRequest(e, signInWithEmail, router);
+      await handleRequest(
+        e,
+        async (formData) => {
+          const result = await signInWithEmail(formData);
+          return {
+            redirectPath: result,
+            toastMessage: { type: 'success', message: 'Sign in successful' },
+          };
+        },
+        router,
+      );
       toast.success('Sign in successful');
     } catch (err) {
       toast.error("Sign in with your Google account, or if you don't have one, try again later.");
@@ -64,7 +75,7 @@ export const EmailSignIn = ({ allowPassword, redirectMethod, disableButton }: Em
             />
           </div>
           <Button
-            variant="slim"
+            variant="default"
             type="submit"
             className="mt-1"
             loading={isSubmitting}
@@ -75,27 +86,7 @@ export const EmailSignIn = ({ allowPassword, redirectMethod, disableButton }: Em
         </div>
       </form>
       {allowPassword && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="slim" className="w-full">
-              Options
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-full">
-            <>
-              <DropdownMenuItem asChild>
-                <Link href="/signin/password_signin" className="font-light text-sm">
-                  Sign in with email and password
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/signin/signup" className="font-light text-sm">
-                  Don't have an account? Sign up
-                </Link>
-              </DropdownMenuItem>
-            </>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Options allowPassword={allowPassword} allowEmail={true} allowSignup={true} />
       )}
     </div>
   );

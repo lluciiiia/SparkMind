@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -78,7 +79,7 @@ export default function Home() {
               flex justify-center w-full
             `}
           >
-            <button
+            <Button
               onClick={() => {
                 router.push('/my-learning');
               }}
@@ -87,7 +88,7 @@ export default function Home() {
               `}
             >
               Get Started
-            </button>
+            </Button>
           </div>
           <div
             className={`

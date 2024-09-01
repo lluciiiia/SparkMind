@@ -1,27 +1,35 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Form, FormControl, FormField } from '@/components/ui/form';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Skeleton } from '@/components/ui/skeleton';
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa';
+import { toast } from 'sonner';
 import { getConciseNote, getGrammarNote } from '../../../_api-handlers/notes';
 import type { Note } from '../../dashboard/_components/interfaces';
 
 export const NewNoteSection: React.FC<{
-  handleCreate: () => void;
-  handleEdit: (values: Note) => void;
-  handleDelete: (id: string) => void;
+  handleCreate: () => Promise<void>;
+  handleEdit: (values: Note) => Promise<void>;
+  handleDelete: (id: string) => Promise<void>;
   notes: Note[];
 }> = ({ handleCreate, handleEdit, handleDelete, notes }) => {
-  const form = useForm<Note>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedNote, setSelectedNote] = useState<Note>();
+  const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [originalContent, setOriginalContent] = useState<string | null>(null);
   const [isRevertEnabled, setIsRevertEnabled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
+
+  const form = useForm<Note>();
 
   useEffect(() => {
     if (selectedNote) {
@@ -34,189 +42,235 @@ export const NewNoteSection: React.FC<{
     }
   }, [selectedNote, form]);
 
-  const onSubmit = (values: Note) => {
+  const onSubmit = async (values: Note) => {
     if (!selectedNote) return;
-
-    const updatedNote = { ...selectedNote, ...values };
-    handleEdit(updatedNote);
-    setIsModalOpen(false);
+    setIsLoading(true);
+    try {
+      const updatedNote = { ...selectedNote, ...values };
+      await handleEdit(updatedNote);
+      setIsModalOpen(false);
+      toast.success('Note updated successfully');
+    } catch (error) {
+      toast.error('Failed to update note');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGrammar = async (content: string) => {
-    const response = await getGrammarNote(content);
-    setOriginalContent(form.getValues('content'));
-    form.setValue('content', response.data.correctedNote);
-    setIsRevertEnabled(true); // Enable revert after grammar change
+    setIsLoading(true);
+    try {
+      const response = await getGrammarNote(content);
+      setOriginalContent(form.getValues('content'));
+      form.setValue('content', response.data.correctedNote);
+      setIsRevertEnabled(true);
+    } catch (error) {
+      toast.error('Failed to correct grammar');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleConcise = async (content: string) => {
-    const response = await getConciseNote(content);
-    setOriginalContent(form.getValues('content'));
-    form.setValue('content', response.data.concisedNote);
-    setIsRevertEnabled(true); // Enable revert after concise change
+    setIsLoading(true);
+    try {
+      const response = await getConciseNote(content);
+      setOriginalContent(form.getValues('content'));
+      form.setValue('content', response.data.concisedNote);
+      setIsRevertEnabled(true);
+    } catch (error) {
+      toast.error('Failed to make note concise');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRevert = () => {
     if (originalContent !== null) {
       form.setValue('content', originalContent);
-      setIsRevertEnabled(false); // Disable revert after reverting
+      setIsRevertEnabled(false);
     }
   };
 
-  return (
-    <div className="flex flex-col items-center justify-items-start rounded-bl-md rounded-r-none w-[calc(100vw-100px)] sm:w-[50vw] md:w-[40vw] lg:w-[30vw] xl:w-[25vw] pt-5">
-      {/* Button to trigger the modal */}
-      <Button
-        className="bg-transparent border-dashed border-2 rounded-r-2xl rounded-bl-2xl border-navy w-[75px] h-[75px]"
-        onClick={() => {
-          handleCreate();
-        }}
-      >
-        <FaPlus size={24} color="#003366" />
-      </Button>
+  const handleCreateNote = async () => {
+    setIsCreating(true);
+    try {
+      const result = (await handleCreate()) as any;
+      if (result && result.success) {
+        toast.success('New note created');
+      } else {
+        console.warn('Note creation response unclear:', result);
+        toast.info('Note may have been created. Please refresh to check.');
+      }
+    } catch (error) {
+      console.error('Error in note creation:', error);
+      toast.error('An error occurred while creating the note');
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="flex flex-col bg-navy rounded-lg p-8 w-[700px] h-[400px]">
-            {/* Header with title and close button */}
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-white text-xl font-bold">Note</span>
-              <button className="text-white" onClick={() => setIsModalOpen(false)}>
-                Close
-              </button>
-            </div>
-            {/* Form content */}
-            <div className="flex flex-col flex-grow">
-              <Form {...form}>
-                <form
-                  onSubmit={form.handleSubmit(onSubmit)}
-                  className="flex flex-col gap-4 h-full text-white"
-                >
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormControl>
-                        <textarea
-                          {...field}
-                          placeholder="Title"
-                          rows={1}
-                          className="w-full p-2 bg-transparent text-white rounded"
-                        />
-                      </FormControl>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="content"
-                    render={({ field }) => (
-                      <FormControl>
-                        <textarea
-                          {...field}
-                          placeholder="Content"
-                          rows={7}
-                          className="w-full p-2 bg-transparent text-white rounded overflow-y-auto resize-none"
-                        />
-                      </FormControl>
-                    )}
-                  />
-                  {/* Action buttons at the bottom */}
-                  <div className="flex gap-2 mt-auto">
-                    <button
-                      type="button"
-                      className="bg-white text-navy text-sm py-1 px-2 rounded"
-                      onClick={() => {
-                        const content = form.watch('content');
-                        handleGrammar(content);
-                      }}
-                    >
-                      Grammar
-                    </button>
-                    <button
-                      type="button"
-                      className="bg-white text-navy text-sm py-1 px-2 rounded"
-                      onClick={() => {
-                        const content = form.watch('content');
-                        handleConcise(content);
-                      }}
-                    >
-                      Concise
-                    </button>
-                    <button
-                      type="button"
-                      className={`bg-white text-navy text-sm py-1 px-2 rounded ${
-                        !isRevertEnabled ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
-                      onClick={() => {
-                        handleRevert();
-                      }}
-                      disabled={!isRevertEnabled}
-                    >
-                      Revert
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-white text-navy text-sm py-1 px-2 rounded ml-auto"
-                    >
-                      Save
-                    </button>
-                  </div>
-                </form>
-              </Form>
-            </div>
+  const handleDeleteNote = async (id: string) => {
+    setIsDeleting(id);
+    try {
+      await handleDelete(id);
+      toast.success('Note deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete note');
+    } finally {
+      setIsDeleting(null);
+    }
+  };
+
+  const renderNoteCard = useCallback(
+    (note: Note) => (
+      <motion.div
+        key={note.id}
+        layout
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.8 }}
+        transition={{ duration: 0.3 }}
+        className="w-full bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+      >
+        <div className="p-4 h-full flex flex-col">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-semibold truncate flex-1 mr-2">
+              {note.title || 'New Note'}
+            </h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleDeleteNote(note.id)}
+              disabled={isDeleting === note.id}
+            >
+              {isDeleting === note.id ? (
+                <Skeleton className="h-5 w-5 rounded-full" />
+              ) : (
+                <Image src="/assets/svgs/x_icon.svg" alt="Delete" width={20} height={20} />
+              )}
+            </Button>
+          </div>
+          <div
+            className="flex-1 overflow-hidden cursor-pointer"
+            onClick={() => {
+              setSelectedNote(note);
+              setIsModalOpen(true);
+            }}
+          >
+            <p className="text-sm text-gray-600 break-words line-clamp-4">
+              {note.content || 'Start typing...'}
+            </p>
           </div>
         </div>
-      )}
+      </motion.div>
+    ),
+    [isDeleting, handleDeleteNote],
+  );
 
-      <ScrollArea className="w-full h-[calc(100vh-199px)] pt-5">
-        <section className="flex flex-col items-start justify-start gap-10">
-          {notes.map((note, i) => (
-            <div
-              key={i}
-              className="w-[250px] h-[250px] sm:w-[200px] sm:h-[200px] md:w-[250px] md:h-[250px] border-2 border-gray-200 lg:w-[300px] lg:h-[300px] bg-white rounded-r-3xl rounded-bl-3xl overflow-hidden"
-            >
-              {/* Content of the note */}
-              <div className="p-4 overflow-hidden">
-                <div className="flex">
-                  <p className="text-xl font-bold truncate">{note.title}</p>
-                  <div
-                    className="ml-auto cursor-pointer"
-                    style={{
-                      position: 'relative',
-                      width: '30px',
-                      height: '30px',
-                    }}
-                    onClick={() => {
-                      handleDelete(note.id);
-                    }}
-                  >
-                    <Image
-                      src={`/assets/svgs/x_icon.svg`}
-                      alt={`Cancel Icon`}
-                      fill
-                      objectFit={`contain`}
-                    />
-                  </div>
-                </div>
-                <div
-                  className="h-[230px] cursor-pointer"
-                  onClick={() => {
-                    setSelectedNote(note);
-                    setIsModalOpen(true);
-                  }}
-                >
-                  <p className="text-lg text-gray-700 overflow-hidden break-words ">
-                    {note.content}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </section>
+  return (
+    <div className="flex flex-col items-center w-full max-w-4xl mx-auto pt-5 px-4">
+      <Button
+        className="mb-5 bg-navy hover:bg-navy-dark text-white rounded-full w-12 h-12 flex items-center justify-center shadow-md hover:shadow-lg transition-all"
+        onClick={handleCreateNote}
+        disabled={isCreating}
+      >
+        {isCreating ? <Skeleton className="h-6 w-6 rounded-full" /> : <FaPlus size={20} />}
+      </Button>
 
-        <ScrollBar orientation="vertical" />
+      <ScrollArea className="w-full h-[calc(100vh-200px)] pr-4">
+        <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <AnimatePresence>{notes.map(renderNoteCard)}</AnimatePresence>
+        </motion.div>
+        {notes.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="text-center text-gray-500 py-8"
+          >
+            No notes yet. Click the "+" button to create one!
+          </motion.div>
+        )}
       </ScrollArea>
+
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle>Edit Note</DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormControl>
+                    <input
+                      {...field}
+                      placeholder="Title"
+                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-navy focus:border-transparent"
+                    />
+                  </FormControl>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormControl>
+                    <textarea
+                      {...field}
+                      placeholder="Content"
+                      rows={7}
+                      className="w-full p-2 border rounded-md resize-none focus:ring-2 focus:ring-navy focus:border-transparent"
+                    />
+                  </FormControl>
+                )}
+              />
+              <div className="flex flex-wrap justify-between gap-2">
+                <div className="space-x-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleGrammar(form.getValues('content'))}
+                    disabled={isLoading}
+                    className="text-sm"
+                  >
+                    Grammar
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => handleConcise(form.getValues('content'))}
+                    disabled={isLoading}
+                    className="text-sm"
+                  >
+                    Concise
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleRevert}
+                    disabled={!isRevertEnabled || isLoading}
+                    className="text-sm"
+                  >
+                    Revert
+                  </Button>
+                </div>
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-navy hover:bg-navy-dark text-white"
+                >
+                  {isLoading ? 'Saving...' : 'Save'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
