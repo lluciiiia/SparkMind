@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePersistedId } from '@/hooks';
+import { format } from 'date-fns'; // Make sure to install date-fns if not already
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
@@ -188,7 +189,7 @@ export const Dashboard = () => {
     try {
       const response = await NotesMethods.createNote(mylearning_id);
       if (response.error) {
-        toast.error(response.data);
+        toast.error(response.error);
       } else if (response && response.data && response.data.body) {
         const newNote = {
           id: response.data.body.id,
@@ -302,7 +303,12 @@ export const Dashboard = () => {
                   <button
                     key={tab.name}
                     type="button"
-                    className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${activeTab === tab.name ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-300'} ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'} ${activeTab === tab.name ? 'rounded-t-xl' : ''}`}
+                    className={`
+                      px-4 py-2 text-sm font-medium transition-colors duration-200
+                      ${activeTab === tab.name ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-300'}
+                      ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'}
+                      ${activeTab === tab.name ? 'rounded-t-xl' : ''}
+                    `.trim()}
                     onClick={() => setActiveTab(tab.name)}
                   >
                     {tab.label}
