@@ -9,7 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { motion } from 'framer-motion';
 import { Triangle } from 'lucide-react';
@@ -23,17 +23,18 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { NewNoteSection } from '../../notes/_components';
 import type { FurtherInfo, Note, Output, ParsedVideoData, Question, VideoItem } from './interfaces';
 
+import { API_KEY } from '@/app/api/v1/gemini-settings';
+import { usePersistedId } from '@/hooks';
 import ActionCard from './cards/ActionCard';
 import SummaryCard from './cards/SummaryCard';
 import VideoCard from './cards/VideoCard';
 import DiscussionWithAI from './discussion-with-ai';
 
-import { API_KEY } from '@/app/api/v1/gemini-settings';
-
 import { createNote, deleteNote, editNote, getNotes } from '../../../_api-handlers/notes';
 
+import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
-import { getOutput } from '../../../_api-handlers/api-handler';
+import { getOutput } from '../../../_api-handlers';
 import FurtherInfoCard from './cards/FurtherInfo';
 import QuestionAndAnswer from './cards/QuestionAndAnswer';
 
@@ -47,36 +48,79 @@ export const Dashboard = () => {
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
 
-  const searchParams = useSearchParams();
   const [videos, setVideos] = useState<VideoItem[] | null>(null);
   const [questions, setQuestions] = useState<any[]>([]);
   const [summaryData, setSummaryData] = useState(null);
   const [furtherInfoData, setFurtherInfoData] = useState<any[]>([]);
   const [actionItemsData, setActionItemsData] = useState<{} | null>(null);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [output, setOutput] = useState<Output | null>(null);
-  const myLearningId = searchParams.get('id');
+  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
+
+  const [fetchAttempts, setFetchAttempts] = useState(0);
+  const [fetchTimeout, setFetchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [dataFetched, setDataFetched] = useState(false);
+
+  const MAX_FETCH_ATTEMPTS = 3;
+  const FETCH_RETRY_DELAY = 10000;
 
   useEffect(() => {
     const fetchData = async (myLearningId: string) => {
+      if (dataFetched || fetchAttempts >= MAX_FETCH_ATTEMPTS) return;
+
       try {
+        setIsLoading(true);
         const outputResponse = await getOutput(myLearningId);
-        setOutput(outputResponse.data.body[0]);
+        if (
+          outputResponse.data &&
+          outputResponse.data.body &&
+          outputResponse.data.body.length > 0
+        ) {
+          setOutput(outputResponse.data.body[0]);
+          setDataFetched(true);
+        } else if (fetchAttempts < MAX_FETCH_ATTEMPTS - 1) {
+          const newTimeout = setTimeout(() => {
+            setFetchAttempts((prev) => prev + 1);
+          }, FETCH_RETRY_DELAY);
+          setFetchTimeout(newTimeout as NodeJS.Timeout);
+        } else {
+          toast.error('No output data available after multiple attempts');
+        }
 
         const noteResponse = await getNotes(myLearningId);
+        setNotes(noteResponse.data || []);
 
-        setNotes(noteResponse.data.body);
+        if (noteResponse.data.length === 0 && !dataFetched) {
+          toast.info('No notes found for this learning ID, creating a new one');
+          handleCreate();
+        }
       } catch (error) {
-        throw new Error('Error fetching data : ' + (error as Error).message);
+        console.error('Error fetching data:', error);
+        if (fetchAttempts < MAX_FETCH_ATTEMPTS - 1) {
+          const newTimeout = setTimeout(() => {
+            setFetchAttempts((prev) => prev + 1);
+          }, FETCH_RETRY_DELAY);
+          setFetchTimeout(newTimeout as NodeJS.Timeout);
+        } else {
+          toast.error('Failed to fetch data after multiple attempts. Please try again later.');
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (myLearningId) fetchData(myLearningId);
+    if (mylearning_id && !dataFetched) {
+      fetchData(mylearning_id);
+    } else if (!mylearning_id) {
+      toast.error('No learning ID available. Please select a learning resource.');
+    }
 
     return () => {
-      toast.success('Output retrieved');
+      if (fetchTimeout) {
+        clearTimeout(fetchTimeout);
+      }
     };
-  }, []);
+  }, [mylearning_id, fetchAttempts, dataFetched]);
 
   useEffect(() => {
     if (output?.youtube) {
@@ -115,7 +159,6 @@ export const Dashboard = () => {
     } else {
       setShowText(false);
     }
-
     const handleClickOutside = (e: MouseEvent) => {
       const rect = drawerRef.current?.getBoundingClientRect();
       if (
@@ -136,33 +179,63 @@ export const Dashboard = () => {
   const isTablet = useMediaQuery('(min-width: 768px)');
 
   const handleDelete = async (id: string) => {
-    const response = await deleteNote(id);
-    setNotes(notes.filter((note) => note.id !== id));
+    setIsLoading(true);
+    const { success } = await deleteNote(id);
+    if (success) {
+      setNotes(notes.filter((note) => note.id !== id));
+    } else {
+      toast.error('Failed to delete note. Please try again.');
+    }
+    setIsLoading(false);
   };
 
   const handleCreate = async () => {
-    if (!myLearningId) return;
-    const response = await createNote(myLearningId);
-    const newNote = {
-      id: response.data.body[0].id,
-      title: response.data.body[0].title,
-      content: response.data.body[0].content,
-      createdAt: response.data.body[0].created_at,
-    };
-    setNotes([...notes, newNote]);
-    setIsDrawerOpen(false);
+    setIsLoading(true);
+    if (!mylearning_id) {
+      toast.error('No learning ID available');
+      return;
+    }
+    try {
+      const response = await createNote(mylearning_id);
+      if (response && response.data && response.data.body) {
+        const newNote = {
+          id: response.data.body.id,
+          title: response.data.body.title,
+          content: response.data.body.content,
+          createdAt: response.data.body.created_at,
+        };
+        setNotes((prevNotes) => [...prevNotes, newNote]);
+        toast.success('Note created successfully');
+      } else {
+        toast.error('Unexpected response structure');
+      }
+    } catch (error) {
+      console.error('Error creating note:', error);
+      toast.error('Failed to create note');
+    }
+    setIsLoading(false);
   };
 
   const handleEdit = async (selectedNote: Note) => {
+    setIsLoading(true);
     const id = selectedNote.id;
     const updatedNote = {
       ...selectedNote,
-      title: selectedNote.title ? selectedNote.title : 'Undefined',
-      content: selectedNote.content,
+      title: selectedNote.title ? selectedNote.title : 'New Note',
+      content: selectedNote.content ? selectedNote.content : 'Start typing here...',
     };
-    const response = await editNote(updatedNote.id, updatedNote.title, updatedNote.content);
-    setNotes(notes.map((note) => (note.id === id ? updatedNote : note)));
-    setIsDrawerOpen(false);
+    try {
+      const response = await editNote(updatedNote.id, updatedNote.title, updatedNote.content);
+      if (response.success) {
+        setNotes(notes.map((note) => (note.id === id ? updatedNote : note)));
+        setIsDrawerOpen(false);
+      } else {
+        toast.error('Failed to edit note. Please try again.');
+      }
+    } catch (error) {
+      toast.error('Failed to edit note. Please try again.');
+    }
+    setIsLoading(false);
   };
 
   const tabs = [
@@ -216,40 +289,56 @@ export const Dashboard = () => {
           </BreadcrumbList>
         </Breadcrumb>
         <section className="relative border-2 border-gray-300 rounded-3xl bg-gray-100 overflow-hidden">
-          <nav className="flex flex-wrap justify-start border-b border-gray-300 bg-gray-200">
-            {tabs.map((tab) => (
-              <button
-                key={tab.name}
-                type="button"
-                className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-                  activeTab === tab.name ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-300'
-                } ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'} ${
-                  activeTab === tab.name && 'rounded-t-xl'
-                }`}
-                onClick={() => setActiveTab(tab.name)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-          <div className="p-4 sm:p-6 bg-white rounded-b-3xl min-h-[calc(100vh-300px)]">
-            {activeTab === 'summary' && summaryData != null && (
-              <SummaryCard summaryData={summaryData} />
-            )}
-            {activeTab === 'video' && <VideoCard videos={videos} />}
-            {activeTab === 'qna' && questions.length > 0 && (
-              <QuestionAndAnswer questions={questions} />
-            )}
-            {activeTab === 'further-info' && furtherInfoData != null && (
-              <FurtherInfoCard furtherInfo={furtherInfoData} />
-            )}
-            {activeTab === 'action-items' && (
-              <ActionCard
-                learningId={myLearningId}
-                actionItemsData={actionItemsData ? actionItemsData : []}
-              />
-            )}
-          </div>
+          {isLoading ? (
+            <div className="relative inset-0 flex items-center justify-center bg-white bg-opacity-20 z-10 backdrop-blur-sm w-full h-full py-16">
+              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
+            </div>
+          ) : !dataFetched ? (
+            <div className="p-4 text-center">
+              {fetchAttempts >= MAX_FETCH_ATTEMPTS
+                ? 'Failed to load data. Please try again later.'
+                : 'Attempting to fetch data...'}
+            </div>
+          ) : (
+            <>
+              <nav className="flex flex-wrap justify-start border-b border-gray-300 bg-gray-200">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.name}
+                    type="button"
+                    className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
+                      activeTab === tab.name
+                        ? 'bg-navy text-white'
+                        : 'text-gray-600 hover:bg-gray-300'
+                    } ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'} ${
+                      activeTab === tab.name && 'rounded-t-xl'
+                    }`}
+                    onClick={() => setActiveTab(tab.name)}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </nav>
+              <div className="p-4 sm:p-6 bg-white rounded-b-3xl min-h-[calc(100vh-300px)]">
+                {activeTab === 'summary' && summaryData != null && (
+                  <SummaryCard summaryData={summaryData} />
+                )}
+                {activeTab === 'video' && <VideoCard videos={videos} />}
+                {activeTab === 'qna' && questions.length > 0 && (
+                  <QuestionAndAnswer questions={questions} />
+                )}
+                {activeTab === 'further-info' && furtherInfoData != null && (
+                  <FurtherInfoCard furtherInfo={furtherInfoData} />
+                )}
+                {activeTab === 'action-items' && (
+                  <ActionCard
+                    learningId={mylearning_id}
+                    actionItemsData={actionItemsData ? actionItemsData : []}
+                  />
+                )}
+              </div>
+            </>
+          )}
         </section>
         <footer className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-3xl px-4">
           <motion.div
@@ -276,7 +365,7 @@ export const Dashboard = () => {
               </Tooltip>
             </TooltipProvider>
             <div className="w-full">
-              <DiscussionWithAI learningid={myLearningId} />
+              <DiscussionWithAI learningid={mylearning_id} />
             </div>
           </motion.div>
         </footer>

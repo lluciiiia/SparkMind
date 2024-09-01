@@ -2,12 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 
 type Props = { summaryData?: string };
 
-export default function SummaryCard({ summaryData }: Props) {
+const SummaryCard = memo(function SummaryCard({ summaryData }: Props) {
   const [htmlContent, setHtmlContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,4 +63,8 @@ export default function SummaryCard({ summaryData }: Props) {
       </CardContent>
     </Card>
   );
-}
+});
+
+SummaryCard.displayName = 'SummaryCard';
+
+export default SummaryCard;

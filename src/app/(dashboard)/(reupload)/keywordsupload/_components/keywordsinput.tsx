@@ -30,12 +30,15 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
+import { usePersistedId } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
+import { toast } from 'sonner';
+import { v4 as uuidv4 } from 'uuid';
 
 export const ReUploadKeyword = () => {
-  const [myLearningId] = useQueryState('id', { defaultValue: '' });
-  // console.log('this is my learning id : ' + myLearningId);
+  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
+
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -95,28 +98,38 @@ export const ReUploadKeyword = () => {
     }
   };
 
-  const handleUpload = async (input: any, myLearningId: string) => {
+  const handleUpload = async (input: any, mylearning_id: string) => {
     try {
       setIsLoading(true);
-      const response = await saveOutput(input, myLearningId);
+      const response = await saveOutput(input, mylearning_id);
 
-      router.push(`/dashboard?id=${myLearningId}`);
+      if (response && response.id) {
+        toast.success('Keywords uploaded successfully');
+        router.push(`/dashboard?mylearning_id=${response.id}`);
+      } else {
+        console.error('Unexpected response structure:', response);
+        toast.error('Failed to upload keywords: Invalid response structure');
+      }
     } catch (err: any) {
-      throw new Error('Error when handle upload : ' + (err as Error).message);
+      console.error('Error when handling upload:', err);
+      toast.error(`Failed to upload keywords: ${err.message || 'Unknown error'}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const submitChanges = async () => {
-    if (!myLearningId) return;
+    if (!mylearning_id) {
+      toast.error('Learning ID is missing');
+      return;
+    }
 
     let input;
     if (fileType == 'keywords') {
       input = keywords;
     }
 
-    await handleUpload(input, myLearningId);
+    await handleUpload(input, mylearning_id);
   };
 
   return (
@@ -196,8 +209,8 @@ export const ReUploadKeyword = () => {
                 )}
 
                 {isLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                    <div className="Circleloader"></div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
                   </div>
                 )}
               </DialogContent>

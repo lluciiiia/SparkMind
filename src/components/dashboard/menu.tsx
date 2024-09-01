@@ -10,29 +10,22 @@ import { CollapseMenuButton } from '@/components/dashboard/collapse-menu-button'
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { usePersistedId } from '@/hooks';
 import { getMenuList } from '@/lib/menu-list';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+
 interface MenuProps {
   isOpen: boolean | undefined;
 }
 
 export function Menu({ isOpen }: MenuProps) {
-  const [id, setId] = useQueryState('id');
-  const searchParams = useSearchParams();
-  const [loading, setLoading] = useState(true);
+  const { id } = usePersistedId('mylearning_id');
 
   const supabase = createClient();
   const router = useRouter();
-
-  useEffect(() => {
-    const myLearningId = searchParams.get('id');
-    if (myLearningId) {
-      setId(myLearningId);
-    }
-    setLoading(false);
-  }, [searchParams, setId]);
 
   const pathname = usePathname();
   const menuList = getMenuList(pathname, id);
@@ -44,10 +37,6 @@ export function Menu({ isOpen }: MenuProps) {
   //     return !group.menus.some((menu) => menu.label === 'Upload');
   //   });
   // }
-
-  if (loading) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <ScrollArea className="[&>div>div[style]]:!block">
@@ -85,6 +74,9 @@ export function Menu({ isOpen }: MenuProps) {
                             variant={active ? 'secondary' : 'ghost'}
                             className="justify-start w-full h-10 mb-1"
                             asChild
+                            onClick={() => {
+                              toast.info(`Redirecting to ${label} page`);
+                            }}
                           >
                             <Link href={href}>
                               <span className={cn(isOpen === false ? '' : 'mr-4')}>
@@ -125,7 +117,14 @@ export function Menu({ isOpen }: MenuProps) {
             <TooltipProvider disableHoverableContent>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" className="justify-start w-full h-10 mb-2" asChild>
+                  <Button
+                    variant="outline"
+                    className="justify-start w-full h-10 mb-2"
+                    asChild
+                    onClick={() => {
+                      toast.info('Redirecting to account page');
+                    }}
+                  >
                     <Link href="/account">
                       <span className={cn(isOpen === false ? '' : 'mr-4')}>
                         <User size={18} />
@@ -150,6 +149,7 @@ export function Menu({ isOpen }: MenuProps) {
                   <Button
                     onClick={() => {
                       supabase.auth.signOut();
+                      toast.info('Signed out successfully');
                       router.push('/signin');
                     }}
                     variant="outline"

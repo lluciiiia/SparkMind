@@ -20,28 +20,29 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 
 import NewInputIcon from '@/../public/assets/svgs/new-input-icon';
-import { TextIcon } from 'lucide-react';
+import { FileIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
+import { usePersistedId } from '@/hooks';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 
 export const ReUploadText = () => {
-  const [myLearningId] = useQueryState('id', { defaultValue: '' });
+  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
+
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
-  const [content, setContent] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useIsomorphicLayoutEffect(() => {
@@ -70,22 +71,37 @@ export const ReUploadText = () => {
     };
   }, [drawerRef, isDrawerOpen, isOpen]);
 
-  const handleContentChange = (event: any) => {
-    setContent(event.target.value);
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
   };
 
   const isLaptop = useMediaQuery('(min-width: 1023px)');
 
-  const [fileType, setFileType] = useState<'text'>();
-
-  const handleUpload = async (input: any, myLearningId: string) => {
+  const handleUpload = async (file: File, myLearningId: string) => {
     try {
       setIsLoading(true);
-      const output = await saveOutput(input, myLearningId);
-      if (!output || !output.id) {
-        throw new Error('Invalid response from saveOutput');
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('myLearningId', myLearningId);
+
+      const response = await fetch('/api/v1/upload-text', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload failed');
       }
-      router.push(`/dashboard?id=${output.id}`);
+
+      const data = (await response.json()) as any;
+      if (data.id) {
+        router.push(`/dashboard?mylearning_id=${data.id}`);
+        toast.success('File uploaded successfully');
+      } else {
+        toast.error('Invalid response from server, or file upload is temporarily unavailable');
+      }
     } catch (err: any) {
       console.error('Error when handling upload:', err);
       toast.error(err.message || 'An error occurred during upload');
@@ -95,14 +111,12 @@ export const ReUploadText = () => {
   };
 
   const submitChanges = async () => {
-    if (!myLearningId) return;
-
-    let input;
-    if (fileType == 'text') {
-      input = content;
+    if (!mylearning_id || !selectedFile) {
+      toast.error('Please select a file to upload');
+      return;
     }
 
-    await handleUpload(input, myLearningId);
+    await handleUpload(selectedFile, mylearning_id);
   };
 
   return (
@@ -123,11 +137,7 @@ export const ReUploadText = () => {
         </Breadcrumb>
         <section className="relative flex items-center justify-center min-h-[calc(100vh-56px-64px-20px-24px-56px-48px)] rounded-md mt-[56px]">
           <div className="flex items-center justify-center w-full h-full">
-            <Dialog
-              onOpenChange={() => {
-                setFileType(undefined);
-              }}
-            >
+            <Dialog>
               <DialogTrigger asChild>
                 <div className="flex flex-col items-center justify-center">
                   <div className="cursor-pointer">
@@ -137,53 +147,40 @@ export const ReUploadText = () => {
                 </div>
               </DialogTrigger>
               <DialogContent className="rounded-2xl sm:rounded-2xl">
-                {!fileType && (
-                  <>
-                    <DialogHeader>
-                      <DialogTitle>Upload files</DialogTitle>
-                      <DialogDescription>
-                        Choose which type of content you want to upload.
-                      </DialogDescription>
-                    </DialogHeader>
+                <DialogHeader>
+                  <DialogTitle>Upload Text File</DialogTitle>
+                  <DialogDescription>
+                    Choose a text file (.txt, .doc, .docx, etc.) to upload.
+                  </DialogDescription>
+                </DialogHeader>
 
-                    <div className="grid gap-2">
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType('text')}
-                      >
-                        <TextIcon className="w-4 h-4 mr-1" />
-                        Text
-                      </Button>
-                    </div>
-                  </>
-                )}
+                <div className="grid gap-4">
+                  <Label htmlFor="file-upload">Select File</Label>
+                  <input
+                    id="file-upload"
+                    type="file"
+                    accept=".txt,.doc,.docx,.pdf"
+                    onChange={handleFileChange}
+                    className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100"
+                  />
+                  {selectedFile && (
+                    <p className="text-sm text-gray-500">Selected file: {selectedFile.name}</p>
+                  )}
+                </div>
 
-                {fileType === 'text' && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="content">Content</Label>
-                    <Textarea
-                      id="content"
-                      placeholder="Write your content here"
-                      value={content}
-                      onChange={handleContentChange}
-                    />
-                  </div>
-                )}
-
-                {fileType && (
-                  <div className="flex justify-end">
-                    <DialogFooter>
-                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
-                        {isLoading ? 'Uploading ...' : 'Upload'}
-                      </Button>
-                    </DialogFooter>
-                  </div>
-                )}
+                <DialogFooter>
+                  <Button
+                    type="submit"
+                    onClick={submitChanges}
+                    disabled={isLoading || !selectedFile}
+                  >
+                    {isLoading ? 'Uploading ...' : 'Upload'}
+                  </Button>
+                </DialogFooter>
 
                 {isLoading && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-20 backdrop-blur-sm">
-                    <div className="Circleloader"></div>
+                  <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
+                    <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
                   </div>
                 )}
               </DialogContent>

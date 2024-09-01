@@ -19,9 +19,8 @@ export const OauthSignIn = () => {
     {
       name: 'google',
       displayName: 'Google',
-      icon: <FaGoogle className="h-5 w-5" />,
+      icon: <FaGoogle className="h-5 w-5 text-white" />,
     },
-    /* Add desired OAuth providers here */
   ];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -39,13 +38,24 @@ export const OauthSignIn = () => {
   };
 
   return (
-    <div className="mt-4">
+    <div
+      className={`
+        mt-4
+        ${oAuthProviders.length > 3 ? 'grid grid-cols-2 gap-2' : ''}
+      `}
+    >
       {oAuthProviders.map((provider) => (
         <form key={provider.name} className="pb-2" onSubmit={(e) => handleSubmit(e)}>
           <Input type="hidden" name="provider" value={provider.name} />
-          <Button variant="slim" type="submit" className="w-full" loading={isSubmitting}>
+          <Button
+            variant="default"
+            type="submit"
+            className="w-full bg-navy"
+            loading={isSubmitting}
+            disabled={isSubmitting}
+          >
             <span className="mr-2">{provider.icon}</span>
-            <span>{provider.displayName}</span>
+            <span className="text-white">{provider.displayName}</span>
           </Button>
         </form>
       ))}

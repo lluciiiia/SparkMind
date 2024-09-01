@@ -25,14 +25,14 @@ export function getMenuList(pathname: string, id: string | null): Group[] {
       groupLabel: '',
       menus: [
         {
-          href: `/dashboard?id=${id}`,
+          href: `/dashboard?mylearning_id=${id}`,
           label: 'Home',
           active: pathname.includes(`/dashboard`),
           icon: House,
           submenus: [],
         },
         {
-          href: `/my-learning`,
+          href: `/my-learning?mylearning_id=${id}`,
           label: 'My Learning',
           active: pathname.includes(`/my-learning`),
           icon: Folder,
@@ -62,13 +62,13 @@ export function getMenuList(pathname: string, id: string | null): Group[] {
           ],
         },
         {
-          href: `/upload?id=${id}`,
+          href: `/upload?mylearning_id=${id}`,
           label: 'Upload',
           active: pathname.includes(`/upload`),
           icon: SquarePlus,
           submenus: [
             {
-              href: `/allresources?id=${id}`,
+              href: `/allresources?mylearning_id=${id}`,
               label: 'All Resources',
               active: pathname.includes(`/allresources`),
             },
@@ -78,12 +78,12 @@ export function getMenuList(pathname: string, id: string | null): Group[] {
             //   active: pathname.includes(`/videoupload`),
             // },
             {
-              href: `/textupload?id=${id}`,
+              href: `/textupload?mylearning_id=${id}`,
               label: 'Text',
               active: pathname.includes(`/textupload`),
             },
             {
-              href: `/keywordsupload?id=${id}`,
+              href: `/keywordsupload?mylearning_id=${id}`,
               label: 'Keywords',
               active: pathname.includes(`/keywordsupload`),
             },

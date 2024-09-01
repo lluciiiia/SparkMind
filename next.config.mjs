@@ -31,7 +31,9 @@ const config = {
     unoptimized: true,
   },
   experimental: {
-    optimizeCss: true,
+    optimizeCss: {
+      preload: true,
+    },
     turbo: {
       rules: {
         '*.svg': {

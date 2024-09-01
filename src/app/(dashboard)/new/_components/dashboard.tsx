@@ -31,11 +31,12 @@ import NewInputIcon from '../../../../../public/assets/svgs/new-input-icon';
 import { toast } from 'sonner';
 import { processDefaultTitle, saveOutput } from '../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
+import { usePersistedId } from '@/hooks';
 import { useRouter } from 'next/navigation';
-import { useQueryState } from 'nuqs';
 
 export const NewDashboard = () => {
-  const [myLearningId] = useQueryState('id', { defaultValue: '' });
+  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
+
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -100,8 +101,8 @@ export const NewDashboard = () => {
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
-      if (myLearningId !== null) {
-        formData.append('learningid', myLearningId);
+      if (mylearning_id !== null) {
+        formData.append('learningid', mylearning_id);
       }
 
       const res = await fetch('/api/v1/extract-transcribe', {
@@ -139,7 +140,7 @@ export const NewDashboard = () => {
       await saveOutput(input, myLearningId);
       await processDefaultTitle(myLearningId);
 
-      router.push(`/dashboard?id=${myLearningId}`);
+      router.push(`/dashboard?mylearning_id=${myLearningId}`);
     } catch (err: any) {
       console.error(err);
     }
@@ -149,7 +150,7 @@ export const NewDashboard = () => {
     try {
       setIsLoading(true);
 
-      if (!myLearningId) return;
+      if (!mylearning_id) return;
 
       let input;
       if (fileType === 'video') {
@@ -161,7 +162,7 @@ export const NewDashboard = () => {
         input = keywords;
       }
 
-      await handleUpload(input, myLearningId);
+      await handleUpload(input, mylearning_id);
     } catch (err) {
       throw new Error((err as Error).message);
     } finally {
@@ -300,8 +301,8 @@ export const NewDashboard = () => {
                       <video controls src={objectURL}></video>
                     </div>
                     {isLoading && (
-                      <div className="absolute inset-0 z-20 flex items-center justify-center bg-white bg-opacity-20 backdrop-blur-sm">
-                        <div className="loader"></div>
+                      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
+                        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
                       </div>
                     )}
                   </div>

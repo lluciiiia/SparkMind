@@ -1,15 +1,29 @@
 import axios from 'axios';
 
 export const saveOutput = async (input: string, myLearningId: string) => {
-  const processInputResponse = await handleRequest(() => validateSave(input, myLearningId));
-  const output = processInputResponse.data.output;
+  try {
+    const processInputResponse = await handleRequest(() => validateSave(input, myLearningId));
 
-  await handleRequest(() => processInputStep1(input, myLearningId, output));
-  await handleRequest(() => processInputStep2(input, myLearningId, output));
-  await handleRequest(() => processFinalizing(input, myLearningId, output));
-  await handleRequest(() => processActionItems(myLearningId, output.id));
+    if (!processInputResponse || !processInputResponse.data || !processInputResponse.data.output) {
+      throw new Error('Invalid response from validateSave');
+    }
 
-  return output;
+    const output = processInputResponse.data.output;
+
+    if (!output.id) {
+      throw new Error('Output is missing id');
+    }
+
+    await handleRequest(() => processInputStep1(input, myLearningId, output));
+    await handleRequest(() => processInputStep2(input, myLearningId, output));
+    await handleRequest(() => processFinalizing(input, myLearningId, output));
+    await handleRequest(() => processActionItems(myLearningId, output.id));
+
+    return output;
+  } catch (error) {
+    console.error('Error in saveOutput:', error);
+    throw error;
+  }
 };
 
 const handleRequest = async (request: () => Promise<any>) => {

@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import LoadingIndicator from '@/components/ui/custom/LoadingIndicator';
 import { PlaceholdersAndVanishInput } from '@/components/ui/custom/placeholders-and-vanish-input';
@@ -134,7 +135,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
     <Card className="bottom-0 left-0 right-0 shadow-lg mx-auto w-full max-w-4xl h-[600px] rounded-t-lg dark:border-1 dark:border-gray-200 relative">
       <menu className="flex justify-start border-b border-gray-200 ml-4">
         <li>
-          <button className="px-4 py-2">Discussion with Gemini AI</button>
+          <p className="px-4 py-2">Discussion with Gemini AI</p>
         </li>
       </menu>
       <div className="h-full w-full flex flex-col items-center">
@@ -166,7 +167,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
           <div className="flex flex-row overflow-x-auto no-scrollbar">
             {basicQuestion !== undefined &&
               basicQuestion.map((que, index) => (
-                <button
+                <Button
                   key={index}
                   onClick={() => {
                     setInput(que);
@@ -175,12 +176,16 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
                   className="bg-gray-200 mx-4 rounded-lg p-2 flex-shrink-0 dark:text-black"
                 >
                   {que}
-                </button>
+                </Button>
               ))}
           </div>
           <div className="mt-4 w-3/5 ">
             <PlaceholdersAndVanishInput
-              placeholders={[]}
+              placeholders={[
+                'Ask a question about the video',
+                'Ask a question about the transcript',
+                'Ask a question about the summary',
+              ]}
               onChange={handleDiscussInputChange}
               //onKeyDown={handleKeyDown}
               onSubmit={(event: React.FormEvent<HTMLFormElement>) => {

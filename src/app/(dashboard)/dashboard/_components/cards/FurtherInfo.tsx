@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Image from 'next/image';
-import React from 'react';
+import Link from 'next/link';
+import React, { memo } from 'react';
 
 type InfoItem = {
   link: string;
@@ -14,7 +15,7 @@ type Props = {
   furtherInfo: InfoItem[];
 };
 
-export default function FurtherInfoCard({ furtherInfo }: Props) {
+const FurtherInfoCard = memo(function FurtherInfoCard({ furtherInfo }: Props) {
   if (!Array.isArray(furtherInfo) || furtherInfo.length === 0) {
     return (
       <Card className="w-full h-[calc(100vh-200px)]">
@@ -47,14 +48,14 @@ export default function FurtherInfoCard({ furtherInfo }: Props) {
                 />
               )}
               <div>
-                <a
+                <Link
                   href={info.link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-primary hover:underline font-semibold text-lg"
                 >
                   {info.title || 'Untitled'}
-                </a>
+                </Link>
                 <p className="text-sm text-muted-foreground mt-2">
                   {info.snippet || 'No description available.'}
                 </p>
@@ -65,4 +66,8 @@ export default function FurtherInfoCard({ furtherInfo }: Props) {
       </CardContent>
     </Card>
   );
-}
+});
+
+FurtherInfoCard.displayName = 'FurtherInfoCard';
+
+export default FurtherInfoCard;

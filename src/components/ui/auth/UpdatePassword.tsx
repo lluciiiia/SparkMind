@@ -37,6 +37,8 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
           (result as unknown as { toastMessage: { message: string } }).toastMessage.message,
         );
       }
+    } catch (err) {
+      toast.error('Failed to update password');
     } finally {
       setIsSubmitting(false);
     }
@@ -80,7 +82,7 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
               className="w-full p-3 rounded-md bg-[#fafafa] mb-2"
             />
           </div>
-          <Button variant="slim" type="submit" className="mt-1" loading={isSubmitting}>
+          <Button variant="default" type="submit" className="mt-1" loading={isSubmitting}>
             Update Password
           </Button>
         </div>

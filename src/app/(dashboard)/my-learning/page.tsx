@@ -1,28 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import type React from 'react';
-import { useEffect, useState } from 'react';
-
-import { Button } from '@/components/ui/button';
-import { Card, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { FaEdit, FaEye, FaPlus, FaSearch } from 'react-icons/fa';
-
-import { assignColors } from '@/utils/assignColors';
-
-import { ContentLayout, SearchBar } from '@/components';
+import { ContentLayout } from '@/components';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -31,13 +9,27 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
-import { ScrollBar } from '@/components/ui/scroll-area';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { usePersistedId } from '@/hooks';
 import { createClient } from '@/utils/supabase/client';
-import { ScrollArea } from '@radix-ui/react-scroll-area';
-
 import axios from 'axios';
+import { Edit, Eye, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 type Cards = {
@@ -49,17 +41,24 @@ type Cards = {
 
 export const MyLearning = () => {
   const router = useRouter();
+  const {
+    id: mylearning_id,
+    clearId: clearMyLearningId,
+    setPersistedId,
+    generateNewId,
+  } = usePersistedId('mylearning_id');
 
   const [cards, setCards] = useState<Cards[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [currTitle, setCurrTitle] = useState<string>('');
   const [currDate, setCurrDate] = useState<Date>(new Date());
-  const [editingCardId, setEditingCardId] = useState<string | null>(null);
-
   const [originalCards, setOriginalCards] = useState<Cards[]>([]);
   const [isDateSorted, setIsDateSorted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const [colorMap, setColorMap] = useState<Map<number, string>>(new Map<number, string>());
+
+  const supabaseClient = createClient();
 
   //DB Storage date
   const dateFormatter = (date: Date) => {
@@ -79,44 +78,69 @@ export const MyLearning = () => {
     return formattedDateTime;
   };
 
+  function assignColors(cards: any[], colorMap: Map<number, string>): Map<number, string> {
+    const colors = ['bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-pink-100', 'bg-purple-100'];
+    cards.forEach((card, index) => {
+      if (!colorMap.has(index)) {
+        colorMap.set(index, colors[index % colors.length]);
+      }
+    });
+    return colorMap;
+  }
+
   useEffect(() => {
     setColorMap(assignColors(cards, colorMap));
   }, [cards]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      const supabaseClient = createClient();
+      const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
 
-      const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
-
-      if (!uuid) throw new Error('User ID not returned from superbase');
+      if (!uuid) {
+        clearMyLearningId();
+        throw new Error('User ID not returned from Supabase');
+      }
 
       const res = await axios.get(`/api/v1/learnings?userId=${uuid}`);
-      if (res.status === 200) {
-        const options = {
-          day: 'numeric' as const,
-          month: 'short' as const,
-          year: 'numeric' as const,
+      if (res.status === 200 && Array.isArray(res.data.body) && res.data.body.length > 0) {
+        const options: Intl.DateTimeFormatOptions = {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
         };
-        const fetchedCards: Cards[] = res.data.body.map((item: any, index: number) => {
-          const date = new Date(item.date);
-          return {
-            id: item.id,
-            index: index,
-            title: item.title,
-            date: date.toLocaleDateString('en-GB', options),
-          };
-        });
+
+        const lastItem = res.data.body[res.data.body.length - 1];
+        if (lastItem && lastItem.id) {
+          setPersistedId(lastItem.id);
+        } else {
+          console.warn('Last item or its ID is undefined');
+        }
+
+        const fetchedCards: Cards[] = res.data.body
+          .filter((item: any) => item && item.id && item.title && item.date)
+          .map((item: any, index: number) => {
+            const date = new Date(item.date);
+            return {
+              id: item.id,
+              index: index,
+              title: item.title,
+              date: date.toLocaleDateString('en-GB', options),
+            };
+          });
 
         setCards(fetchedCards);
         setOriginalCards(fetchedCards);
       } else {
-        console.error('Error fetching data:', res.data.body);
+        console.error('Error fetching data or empty response:', res.data);
+        toast.error('Failed to fetch learning data. Please try again.');
       }
     } catch (error) {
-      throw new Error('Error fetching data : ' + (error as Error).message);
+      console.error('Error fetching data:', error);
+      toast.error(`Failed to fetch learning data: ${(error as Error).message}`);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [supabaseClient, clearMyLearningId, setPersistedId]);
 
   useEffect(() => {
     const init = async () => {
@@ -124,48 +148,56 @@ export const MyLearning = () => {
         setIsLoading(true);
         await fetchData();
       } catch (error) {
-        toast.error('this is Error is Fetch the MyLearnings : ' + (error as Error).message);
+        toast.error('Error fetching MyLearnings: ' + (error as Error).message);
       } finally {
         setIsLoading(false);
       }
     };
     init();
-  }, []);
+  }, [fetchData]);
 
   const handleAddCard = async () => {
-    const supabaseClient = createClient();
-
-    const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
-
-    if (!uuid) throw new Error('User ID not returned from superbase');
-
-    const data = {
-      uuid: uuid,
-      title: 'New Note',
-      date: dateFormatter(new Date()),
-    };
-
     try {
+      const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
+
+      if (!uuid) {
+        clearMyLearningId();
+        throw new Error('User ID not returned from Supabase');
+      }
+
+      const currentDate = new Date();
+      const formattedDate = dateFormatter(currentDate);
+      const defaultTitle = `New Note ${formattedDate}`;
+
+      const newLearningId = generateNewId();
+
+      const data = {
+        uuid: uuid,
+        title: defaultTitle,
+        date: formattedDate,
+        id: newLearningId,
+      };
+
       const res = await axios.post('/api/v1/learnings', data);
       if (res.status === 200) {
-        const newLearningId = res.data.body[0].id;
         redirectToDashboard(newLearningId);
       } else {
-        toast.error('Error storing data:', res.data.error);
+        toast.error(`Error storing data: ${res.data.error}`);
       }
     } catch (error) {
-      throw new Error('Error storing data : ' + (error as Error).message);
+      toast.error(`Error storing data: ${(error as Error).message}`);
     }
   };
 
   const handleDelete = async (id: string | null) => {
     try {
       if (id !== null) {
-        const supabaseClient = createClient();
-
         const uuid = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-        if (!uuid) throw new Error('User ID not returned from superbase');
+        if (!uuid) {
+          clearMyLearningId();
+          throw new Error('User ID not returned from superbase');
+        }
 
         const response = await axios.delete('/api/v1/learnings', {
           data: { id, uuid },
@@ -207,7 +239,6 @@ export const MyLearning = () => {
       const parsedDate = parseDateUTC(filteredCard.date);
       setCurrTitle(filteredCard.title);
       setCurrDate(parsedDate);
-      setEditingCardId(id);
       setIsDialogOpen(true);
     }
   }
@@ -286,16 +317,26 @@ export const MyLearning = () => {
   };
 
   const redirectToDashboard = (id: string) => {
-    router.push(`/new?id=${id}`);
+    router.push(`/new?mylearning_id=${id}`);
   };
 
   const redirectToMyLearningPage = (id: string) => {
-    router.push(`/dashboard?id=${id}`);
+    console.log('redirectToMyLearningPage', id);
+    setPersistedId(id);
+    window.open(`/dashboard?mylearning_id=${id}`, '_self');
   };
+
+  const filteredCards = cards.filter((card) =>
+    card.title.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  const sortedCards = isDateSorted
+    ? [...filteredCards].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    : filteredCards;
 
   return (
     <ContentLayout title="My Learning">
-      <Breadcrumb className={`flex flex-row items-center justify-between`}>
+      <Breadcrumb className="flex flex-row items-center justify-between mb-6">
         <BreadcrumbList>
           <BreadcrumbItem>
             <BreadcrumbLink asChild>
@@ -307,124 +348,116 @@ export const MyLearning = () => {
             <BreadcrumbPage>My Learning</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
-        <div className="flex flex-row items-center ml-6">
-          <SearchBar onChange={(e) => handleSearch(e.target.value)} />
-        </div>
       </Breadcrumb>
-      <section className="bg-[#fef9f5] dark:bg-[#18181b] min-h-screen">
-        <div className={`flex flex-col gap-4 sm:px-14 px-2 py-4`}>
-          <div className="p-4">
-            <div className="flex flex-row items-center">
-              <h1 className="text-4xl font-mediums text-black dark:text-white">My</h1>
-              <div className="ml-10 w-4 h-4 rounded-full bg-black"></div>
-              <div className="w-full h-1 bg-black"></div>
-            </div>
-            <div className="flex sm:flex-row flex-col sm:items-center">
-              <h1 className="text-4xl font-mediums text-black dark:text-white">Learnings</h1>
-              <div className="sm:ml-10 md:mt-0 mt-2 flex items-center mx-auto"></div>
-              <Tabs defaultValue="recent" onValueChange={toggleSort}>
-                <TabsList>
-                  <TabsTrigger value="recent">Recent</TabsTrigger>
-                  <TabsTrigger value="date">Date</TabsTrigger>
-                </TabsList>
-              </Tabs>
-            </div>
+      <div className="container mx-auto">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">My Learning</h1>
+          <div className="relative">
+            <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input
+              type="search"
+              placeholder="Search"
+              className="pl-8"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
         </div>
-        <ScrollArea className="h-full w-full">
-          <article className="h-fit w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8 pr-3 ">
-            <div className="max-w-[300px] max-h-[225px] flex items-center justify-center">
-              <Button
-                className="
-                      bg-transparent border-dashed border-2 border-blue-500 w-full h-full
-                      mx-auto hover:bg-transparent hover:border-blue-500 
-                      hover:text-blue-500 rounded-tl-none rounded-tr-3xl rounded-b-3xl
-                      flex flex-col justify-center items-center
-                      p-8
-                    "
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleAddCard();
-                }}
-              >
-                <FaPlus size={24} color="#60a5fa" />
+        <div className="flex items-center space-x-2 mb-6">
+          <div className="w-4 h-4 bg-black rounded-full" />
+          <div className="flex-grow h-0.5 bg-black" />
+        </div>
+        <Tabs
+          defaultValue={isDateSorted ? 'date' : 'recent'}
+          onValueChange={(value) => setIsDateSorted(value === 'date')}
+          className="mb-6"
+        >
+          <TabsList>
+            <TabsTrigger value="recent">Recent</TabsTrigger>
+            <TabsTrigger value="date">Date</TabsTrigger>
+          </TabsList>
+        </Tabs>
+        <ScrollArea className="h-[calc(100vh-200px)]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8 pr-4">
+            <Card className="flex items-center justify-center h-48 border-2 border-dashed border-blue-300 bg-blue-50">
+              <Button variant="ghost" className="h-full w-full" onClick={handleAddCard}>
+                <Plus className="h-6 w-6 text-blue-500" />
               </Button>
-            </div>
-            {cards.map((card) => (
+            </Card>
+            {sortedCards.map((card) => (
               <LearningCard
-                id={card.id}
                 key={card.id}
+                id={card.id}
                 title={card.title}
                 date={card.date}
-                onEdit={handleEdit}
-                bgColor={colorMap.get(card.index) || '#ffffff'}
-                handleDashboardScreen={redirectToMyLearningPage}
+                onEdit={() => handleEdit(card.id)}
+                handleDashboardScreen={() => redirectToMyLearningPage(card.id)}
               />
             ))}
-          </article>
+          </div>
           <ScrollBar orientation="vertical" />
         </ScrollArea>
-        <Dialog open={isDialogOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit Details</DialogTitle>
-              <DialogDescription>
-                Make changes to your Learning here. Click save when you're done.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="titleinput" className="text-right">
-                  Title
-                </Label>
-                <Input
-                  type="text"
-                  id="titleinput"
-                  value={currTitle}
-                  className="col-span-3"
-                  onChange={(e) => setCurrTitle(e.target.value)}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="dateinput" className="text-right">
-                  Date
-                </Label>
-                <Input
-                  type="date"
-                  id="dateinput"
-                  value={currDate.toISOString().substring(0, 10)}
-                  className="col-span-3"
-                  onChange={handleDateChange}
-                />
+      </div>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Details</DialogTitle>
+            <DialogDescription>
+              Make changes to your Learning here. Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="titleinput" className="text-right">
+                Title
+              </Label>
+              <Input
+                type="text"
+                id="titleinput"
+                value={currTitle}
+                className="col-span-3"
+                onChange={(e) => setCurrTitle(e.target.value)}
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="dateinput" className="text-right">
+                Date
+              </Label>
+              <Input
+                type="date"
+                id="dateinput"
+                value={currDate.toISOString().substring(0, 10)}
+                className="col-span-3"
+                onChange={(e) => setCurrDate(new Date(e.target.value))}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <div className="w-full flex justify-between">
+              <Button
+                type="submit"
+                className="bg-red-500 hover:bg-red-900 text-white"
+                onClick={() => handleDelete(mylearning_id)}
+              >
+                Delete
+              </Button>
+              <div>
+                <Button type="button" className="mr-2" onClick={cancelChanges}>
+                  Cancel
+                </Button>
+                <Button type="submit" onClick={() => saveChanges(mylearning_id)}>
+                  Save changes
+                </Button>
               </div>
             </div>
-            <DialogFooter>
-              <div className="w-full flex justify-between">
-                <Button
-                  type="submit"
-                  className="bg-red-500 hover:bg-red-900 text-white"
-                  onClick={() => handleDelete(editingCardId)}
-                >
-                  Delete
-                </Button>
-                <div>
-                  <Button type="submit" className="mr-2" onClick={cancelChanges}>
-                    Cancel
-                  </Button>
-                  <Button type="submit" onClick={() => saveChanges(editingCardId)}>
-                    Save changes
-                  </Button>
-                </div>
-              </div>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-9 backdrop-blur-sm">
-            <div className="Circleloader" />
-          </div>
-        )}
-      </section>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
+        </div>
+      )}
     </ContentLayout>
   );
 };
@@ -433,60 +466,42 @@ const LearningCard = ({
   id,
   title,
   date,
-  bgColor,
   onEdit,
   handleDashboardScreen,
 }: {
   id: string;
   title: string;
   date: string;
-  onEdit: (id: string) => void;
-  bgColor: string;
-  handleDashboardScreen: (id: string) => void;
+  onEdit: () => void;
+  handleDashboardScreen: () => void;
 }) => {
   const [isHover, setIsHover] = useState(false);
+  const bgColors = ['bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-pink-100', 'bg-purple-100'];
+  const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
+
   return (
-    <div
-      className="relative max-w-[300px] max-h-[225px] sm:mx-0 mx-auto"
+    <Card
+      className={`relative h-48 ${bgColor} hover:shadow-lg transition-shadow duration-300 ease-in-out`}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
     >
-      <Card
-        className={`
-         w-full h-full flex flex-col justify-between
-          rounded-tl-none rounded-tr-3xl rounded-b-3xl shadow-xl border-none cursor-pointer
-        `}
-        style={{
-          backgroundColor: bgColor,
-          filter: isHover ? 'brightness(0.5)' : 'brightness(1)',
-        }}
-      >
-        <CardHeader className="flex items-center">
-          <CardTitle className="w-full text-left text-black">{title}</CardTitle>
-        </CardHeader>
-        <CardFooter className="flex justify-between items-center ">
-          <div className="text-left text-black">{date}</div>
-        </CardFooter>
-      </Card>
+      <CardContent className="flex flex-col justify-between h-full p-4">
+        <h2 className="font-semibold">{title}</h2>
+        <p className="text-sm text-gray-600">{date}</p>
+      </CardContent>
       {isHover && (
-        <div
-          className="absolute inset-0 bg-opacity-50 flex items-center justify-center transition-opacity"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div className="flex space-x-4">
-            <div
-              className="bg-white p-2 rounded-full cursor-pointer"
-              onClick={() => handleDashboardScreen(id)}
-            >
-              <FaEye size={24} className="text-black" title="View" />
-            </div>
-            <div className="bg-white p-2 rounded-full cursor-pointer" onClick={() => onEdit(id)}>
-              <FaEdit size={24} className="text-black" title="Edit" />
-            </div>
-          </div>
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center rounded-b-xl">
+          <Button variant="secondary" className="mr-2" onClick={handleDashboardScreen}>
+            <Eye className="h-4 w-4 mr-2" />
+            View
+          </Button>
+          <Button variant="secondary" onClick={onEdit}>
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 
