@@ -150,7 +150,7 @@ export function Menu({ isOpen }: MenuProps) {
                     onClick={() => {
                       supabase.auth.signOut();
                       toast.info('Signed out successfully');
-                      router.push('/signin');
+                      router.push('/signin/password_signin');
                     }}
                     variant="outline"
                     className="justify-start w-full h-10"

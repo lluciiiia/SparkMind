@@ -1,5 +1,6 @@
 'use client';
 
+import { notes as NotesMethods, getOutput } from '@/app/_api-handlers';
 import { ContentLayout } from '@/components/dashboard/content-layout';
 import {
   Breadcrumb,
@@ -11,48 +12,39 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { motion } from 'framer-motion';
-import { Triangle } from 'lucide-react';
+import { usePersistedId } from '@/hooks';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import React, { useEffect } from 'react';
-import { useRef, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
-import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
+import { toast } from 'sonner';
+import { useMediaQuery } from 'usehooks-ts';
 import { NewNoteSection } from '../../notes/_components';
-import type { FurtherInfo, Note, Output, ParsedVideoData, Question, VideoItem } from './interfaces';
-
-import { API_KEY } from '@/app/api/v1/gemini-settings';
-import { usePersistedId } from '@/hooks';
 import ActionCard from './cards/ActionCard';
+import FurtherInfoCard from './cards/FurtherInfo';
+import QuestionAndAnswer from './cards/QuestionAndAnswer';
 import SummaryCard from './cards/SummaryCard';
 import VideoCard from './cards/VideoCard';
 import DiscussionWithAI from './discussion-with-ai';
 
-import { createNote, deleteNote, editNote, getNotes } from '../../../_api-handlers/notes';
-
-import { useQueryState } from 'nuqs';
-import { toast } from 'sonner';
-import { getOutput } from '../../../_api-handlers';
-import FurtherInfoCard from './cards/FurtherInfo';
-import QuestionAndAnswer from './cards/QuestionAndAnswer';
+import type { FurtherInfo, Note, Output, ParsedVideoData, Question, VideoItem } from './interfaces';
 
 export const Dashboard = () => {
-  if (!API_KEY) console.error('Missing API key');
-
   const [isOpen, setIsOpen] = useState(false);
   const [notes, setNotes] = useState<Note[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('summary');
   const drawerRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
   const [showText, setShowText] = useState(false);
 
   const [videos, setVideos] = useState<VideoItem[] | null>(null);
-  const [questions, setQuestions] = useState<any[]>([]);
-  const [summaryData, setSummaryData] = useState(null);
-  const [furtherInfoData, setFurtherInfoData] = useState<any[]>([]);
-  const [actionItemsData, setActionItemsData] = useState<{} | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [summaryData, setSummaryData] = useState<any>(null);
+  const [furtherInfoData, setFurtherInfoData] = useState<FurtherInfo[]>([]);
+  const [actionItemsData, setActionItemsData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [output, setOutput] = useState<Output | null>(null);
   const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
@@ -87,7 +79,7 @@ export const Dashboard = () => {
           toast.error('No output data available after multiple attempts');
         }
 
-        const noteResponse = await getNotes(myLearningId);
+        const noteResponse = await NotesMethods.getNotes(myLearningId);
         setNotes(noteResponse.data || []);
 
         if (noteResponse.data.length === 0 && !dataFetched) {
@@ -125,8 +117,7 @@ export const Dashboard = () => {
   useEffect(() => {
     if (output?.youtube) {
       const parsedData = JSON.parse(output.youtube) as ParsedVideoData;
-      const videoItems = parsedData.items as VideoItem[];
-      setVideos(videoItems);
+      setVideos(parsedData.items);
     }
 
     if (output?.summary) {
@@ -134,23 +125,22 @@ export const Dashboard = () => {
     }
 
     if (output?.questions) {
-      const parsedData = JSON.parse(output.questions) as Question[];
-      console.log(parsedData);
-      setQuestions(parsedData);
+      const parsedQuestions = JSON.parse(output.questions) as Question[];
+      setQuestions(parsedQuestions);
     }
 
     if (output?.further_info) {
-      const parsedData = JSON.parse(output.further_info) as FurtherInfo[];
-      setFurtherInfoData(parsedData);
+      const parsedFurtherInfo = JSON.parse(output.further_info) as FurtherInfo[];
+      setFurtherInfoData(parsedFurtherInfo);
     }
 
     if (output?.todo_task) {
-      const parsedData = output.todo_task;
-      setActionItemsData(parsedData ? parsedData : null);
+      const parsedActionItems = output.todo_task;
+      setActionItemsData(parsedActionItems);
     }
   }, [output]);
 
-  useIsomorphicLayoutEffect(() => {
+  useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
         setShowText(true);
@@ -159,28 +149,27 @@ export const Dashboard = () => {
     } else {
       setShowText(false);
     }
+  }, [isOpen]);
+
+  useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      const rect = drawerRef.current?.getBoundingClientRect();
-      if (
-        rect &&
-        (e.clientX < rect.left || e.clientX > rect.right) &&
-        (e.clientY < rect.top || e.clientY > rect.bottom)
-      ) {
+      if (drawerRef.current && !drawerRef.current.contains(e.target as Node)) {
         setIsDrawerOpen(false);
       }
     };
-    window.addEventListener('click', handleClickOutside);
+
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
-      window.removeEventListener('click', handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [drawerRef, isDrawerOpen, isOpen]);
+  }, []);
 
   const isLaptop = useMediaQuery('(min-width: 1024px)');
   const isTablet = useMediaQuery('(min-width: 768px)');
 
   const handleDelete = async (id: string) => {
     setIsLoading(true);
-    const { success } = await deleteNote(id);
+    const { success } = await NotesMethods.deleteNote(id);
     if (success) {
       setNotes(notes.filter((note) => note.id !== id));
     } else {
@@ -193,11 +182,14 @@ export const Dashboard = () => {
     setIsLoading(true);
     if (!mylearning_id) {
       toast.error('No learning ID available');
+      setIsLoading(false);
       return;
     }
     try {
-      const response = await createNote(mylearning_id);
-      if (response && response.data && response.data.body) {
+      const response = await NotesMethods.createNote(mylearning_id);
+      if (response.error) {
+        toast.error(response.data);
+      } else if (response && response.data && response.data.body) {
         const newNote = {
           id: response.data.body.id,
           title: response.data.body.title,
@@ -210,24 +202,27 @@ export const Dashboard = () => {
         toast.error('Unexpected response structure');
       }
     } catch (error) {
-      console.error('Error creating note:', error);
-      toast.error('Failed to create note');
+      console.error('Unexpected error:', error);
+      toast.error('An unexpected error occurred');
     }
     setIsLoading(false);
   };
 
   const handleEdit = async (selectedNote: Note) => {
     setIsLoading(true);
-    const id = selectedNote.id;
     const updatedNote = {
       ...selectedNote,
-      title: selectedNote.title ? selectedNote.title : 'New Note',
-      content: selectedNote.content ? selectedNote.content : 'Start typing here...',
+      title: selectedNote.title || 'New Note',
+      content: selectedNote.content || 'Start typing here...',
     };
     try {
-      const response = await editNote(updatedNote.id, updatedNote.title, updatedNote.content);
+      const response = await NotesMethods.editNote(
+        updatedNote.id,
+        updatedNote.title,
+        updatedNote.content,
+      );
       if (response.success) {
-        setNotes(notes.map((note) => (note.id === id ? updatedNote : note)));
+        setNotes(notes.map((note) => (note.id === selectedNote.id ? updatedNote : note)));
         setIsDrawerOpen(false);
       } else {
         toast.error('Failed to edit note. Please try again.');
@@ -258,9 +253,7 @@ export const Dashboard = () => {
           transition={{ type: 'spring', stiffness: 100 }}
         >
           <summary
-            className={`p-2 ${
-              isOpen ? 'rounded-l-md' : 'rounded-l-md'
-            } bg-navy text-white flex items-center cursor-pointer`}
+            className={`p-2 ${isOpen ? 'rounded-l-md' : 'rounded-l-md'} bg-navy text-white flex items-center cursor-pointer`}
           >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} className="ml-2" />
@@ -288,13 +281,16 @@ export const Dashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <section className="relative border-2 border-gray-300 rounded-3xl bg-gray-100 overflow-hidden">
+        <section
+          ref={contentRef}
+          className="relative border-2 border-gray-300 rounded-3xl bg-gray-100 overflow-hidden mb-24"
+        >
           {isLoading ? (
             <div className="relative inset-0 flex items-center justify-center bg-white bg-opacity-20 z-10 backdrop-blur-sm w-full h-full py-16">
               <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
             </div>
           ) : !dataFetched ? (
-            <div className="p-4 text-center">
+            <div className="p-4 text-center text-navy">
               {fetchAttempts >= MAX_FETCH_ATTEMPTS
                 ? 'Failed to load data. Please try again later.'
                 : 'Attempting to fetch data...'}
@@ -306,13 +302,7 @@ export const Dashboard = () => {
                   <button
                     key={tab.name}
                     type="button"
-                    className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-                      activeTab === tab.name
-                        ? 'bg-navy text-white'
-                        : 'text-gray-600 hover:bg-gray-300'
-                    } ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'} ${
-                      activeTab === tab.name && 'rounded-t-xl'
-                    }`}
+                    className={`px-4 py-2 text-sm font-medium transition-colors duration-200 ${activeTab === tab.name ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-300'} ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'} ${activeTab === tab.name ? 'rounded-t-xl' : ''}`}
                     onClick={() => setActiveTab(tab.name)}
                   >
                     {tab.label}
@@ -320,56 +310,73 @@ export const Dashboard = () => {
                 ))}
               </nav>
               <div className="p-4 sm:p-6 bg-white rounded-b-3xl min-h-[calc(100vh-300px)]">
-                {activeTab === 'summary' && summaryData != null && (
+                {activeTab === 'summary' && summaryData && (
                   <SummaryCard summaryData={summaryData} />
                 )}
                 {activeTab === 'video' && <VideoCard videos={videos} />}
-                {activeTab === 'qna' && questions.length > 0 && (
+                {activeTab === 'qna' && Array.isArray(questions) && questions.length > 0 && (
                   <QuestionAndAnswer questions={questions} />
                 )}
-                {activeTab === 'further-info' && furtherInfoData != null && (
+                {activeTab === 'further-info' && furtherInfoData.length > 0 && (
                   <FurtherInfoCard furtherInfo={furtherInfoData} />
                 )}
                 {activeTab === 'action-items' && (
-                  <ActionCard
-                    learningId={mylearning_id}
-                    actionItemsData={actionItemsData ? actionItemsData : []}
-                  />
+                  <ActionCard learningId={mylearning_id} actionItemsData={actionItemsData || []} />
                 )}
               </div>
             </>
           )}
         </section>
-        <footer className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-3xl px-4">
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: isDrawerOpen ? 0 : '100%' }}
-            transition={{ type: 'spring', stiffness: 50 }}
-            className="flex flex-col items-center w-full"
-            ref={drawerRef}
-          >
+        <footer className="fixed bottom-0 left-0 right-0 z-50 bg-none mx-auto">
+          <AnimatePresence>
+            {isDrawerOpen && (
+              <motion.div
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="bg-none shadow-lg rounded-t-xl overflow-hidden mx-auto"
+                style={{
+                  width: contentRef.current ? contentRef.current.offsetWidth : '100%',
+                  left: contentRef.current ? contentRef.current.offsetLeft : 0,
+                  maxHeight: 'calc(100vh - 100px)',
+                }}
+                ref={drawerRef}
+              >
+                <div className="bg-none">
+                  <DiscussionWithAI learningid={mylearning_id} />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div className="flex justify-center pb-2 pt-2 bg-none rounded-t-xl shadow-lg">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <motion.button
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ type: 'spring', stiffness: 100 }}
-                    className="w-10 h-10 bg-navy text-white rounded-full flex items-center justify-center mb-2 focus:outline-none"
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-full bg-navy text-white hover:bg-navy/90"
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                   >
-                    <Triangle className={`w-5 h-5 transform ${isDrawerOpen ? 'rotate-180' : ''}`} />
-                  </motion.button>
+                    {isDrawerOpen ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronUp className="w-4 h-4" />
+                    )}
+                    <span className="sr-only">{isDrawerOpen ? 'Close drawer' : 'Open drawer'}</span>
+                  </Button>
                 </TooltipTrigger>
-                <TooltipContent>{isDrawerOpen ? 'Close' : 'Open'}</TooltipContent>
+                <TooltipContent>
+                  {isDrawerOpen ? 'Close' : 'Open'} Discussion with Gemini AI
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
-            <div className="w-full">
-              <DiscussionWithAI learningid={mylearning_id} />
-            </div>
-          </motion.div>
+          </div>
         </footer>
       </ContentLayout>
     </>
   );
 };
+
+export default Dashboard;

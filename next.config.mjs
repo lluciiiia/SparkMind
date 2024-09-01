@@ -67,7 +67,7 @@ const config = {
   webpack: (config, { isServer }) => {
     config.module.rules.push({
       test: /node_modules\/fluent-ffmpeg/,
-      use: 'null-loader'
+      use: 'null-loader',
     });
     return config;
   },

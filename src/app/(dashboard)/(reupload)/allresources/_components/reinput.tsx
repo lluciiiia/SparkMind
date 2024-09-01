@@ -31,15 +31,19 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
 import { usePersistedId } from '@/hooks';
+import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
 
 export const ReUploadResource = () => {
-  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
-
+  const {
+    id: mylearning_id,
+    clearId: clearMyLearningId,
+    generateNewId,
+  } = usePersistedId('mylearning_id');
+  const supabase = createClient();
   const router = useRouter();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
@@ -124,21 +128,61 @@ export const ReUploadResource = () => {
 
       return data.keywordsArr;
     } catch (err: any) {
-      throw new Error('Error when extract transcribe : ' + (err as Error).message);
+      toast.error('Error when extract transcribe : ' + (err as Error).message);
+      return [];
     }
   };
 
-  const handleUpload = async (input: any, myLearningId: string) => {
+  const handleUpload = async (input: any) => {
     try {
-      const response = await saveOutput(input, myLearningId);
+      setIsLoading(true);
+
+      // Check for active session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError) {
+        throw new Error(`Session error: ${sessionError.message}`);
+      }
+
+      if (!sessionData.session) {
+        throw new Error('No active session found');
+      }
+
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+
+      if (userError) {
+        throw new Error(`Error getting user: ${userError.message}`);
+      }
+
+      if (!userData.user) {
+        throw new Error('User not found');
+      }
+
+      // Generate a new ID for the learning
+      const newLearningId = generateNewId();
+
+      // Save the new learning with the generated ID and UUID
+      const response = await saveOutput(input, newLearningId, userData.user.id);
       if (response) {
-        toast.success('Resource updated successfully');
-        router.push(`/dashboard?mylearning_id=${mylearning_id}`);
+        toast.success('Resource created successfully');
+        router.push(`/dashboard?mylearning_id=${newLearningId}`);
       } else {
-        toast.error('Failed to update resource');
+        toast.error('Failed to create resource');
       }
     } catch (err: any) {
-      throw new Error('Error when save output : ' + (err as Error).message);
+      console.error('Error in handleUpload:', err);
+      toast.error(`Error when saving output: ${err.message}`);
+
+      // If there's an authentication error, redirect to sign in
+      if (
+        err.message.includes('Auth session missing') ||
+        err.message.includes('No active session found')
+      ) {
+        toast.error('Your session has expired. Please sign in again.');
+        router.push('/signin/password_signin');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -161,7 +205,7 @@ export const ReUploadResource = () => {
         title = `Keywords: ${keywords.slice(0, 30)}...`;
       }
 
-      await handleUpload(input, mylearning_id);
+      await handleUpload(input);
     } catch (err: any) {
       throw new Error('Error when update resource : ' + (err as Error).message);
     } finally {

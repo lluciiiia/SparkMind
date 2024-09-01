@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 
+import { createClient } from '@/utils/supabase/server';
 import {
   getAndSaveOutputByLearningId,
   getMyLearningById,
@@ -14,8 +15,18 @@ export async function POST(req: NextRequest) {
     const myLearningId = url.searchParams.get('id');
     const body = (await req.json()) as { input: string };
     const input = body.input;
+    const supabase = createClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
+    const uuid = user?.id;
 
-    if (!myLearningId || !input) {
+    if (error) {
+      return NextResponse.json({ error: 'Error extracting user' }, { status: 400 });
+    }
+
+    if (!myLearningId || !input || !uuid) {
       return NextResponse.json(
         { error: 'Error extracting myLearningId or input' },
         { status: 400 },
@@ -34,7 +45,10 @@ export async function POST(req: NextRequest) {
 
     await saveMyLearningInput(myLearningId, input);
 
-    const { data: output, error: outputError } = await getAndSaveOutputByLearningId(myLearningId);
+    const { data: output, error: outputError } = await getAndSaveOutputByLearningId(
+      myLearningId,
+      uuid,
+    );
     if (outputError) return NextResponse.json({ error: 'Error getting output' }, { status: 500 });
 
     return NextResponse.json({ status: 200, output: output });

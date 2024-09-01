@@ -5,18 +5,19 @@ interface MyLearningData {
   uuid: string;
   title: string;
   date: string;
+  input: string;
 }
 
 export async function POST(req: NextRequest, res: NextResponse) {
   try {
-    const { uuid, title, date } = (await req.json()) as MyLearningData;
+    const { uuid, title, date, input } = (await req.json()) as MyLearningData;
     const supabase = createClient();
 
     console.log(date);
 
     const { data, error } = await supabase
       .from('mylearnings')
-      .insert([{ title: title, date: date, uuid: uuid }])
+      .insert([{ title: title, date: date, uuid: uuid, input: input }])
       .select();
 
     if (error) {
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
 const cachedData: any = null;
 
 export async function GET(req: NextRequest, res: NextResponse) {
+  console.log('GET /api/v1/learnings called');
   try {
     if (cachedData) {
       return NextResponse.json({ status: 200, body: cachedData });
@@ -46,7 +48,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     const { data, error } = await supabase
       .from('mylearnings')
-      .select('id, uuid, title, date')
+      .select('id, uuid, title, input, date')
       .eq('uuid', uuid);
 
     if (error) {
@@ -68,17 +70,18 @@ interface UpdateLearningData {
   id: string;
   uuid: string;
   title: string;
+  input: string;
   date: string;
 }
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { id, title, date, uuid } = (await req.json()) as UpdateLearningData;
+    const { id, title, input, date, uuid } = (await req.json()) as UpdateLearningData;
     const supabase = createClient();
 
     const { data, error } = await supabase
       .from('mylearnings')
-      .update({ title: title, date: date })
+      .update({ title: title, input: input, date: date })
       .eq('id', id)
       .eq('uuid', uuid);
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { ContentLayout } from '@/components';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -26,9 +27,10 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { usePersistedId } from '@/hooks';
 import { createClient } from '@/utils/supabase/client';
 import axios from 'axios';
-import { Edit, Eye, Plus, Search } from 'lucide-react';
+import { AlertCircle, Edit, Eye, Plus, Search } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -36,6 +38,7 @@ type Cards = {
   id: string;
   index: number;
   title: string;
+  input: string;
   date: string;
 };
 
@@ -51,12 +54,14 @@ export const MyLearning = () => {
   const [cards, setCards] = useState<Cards[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [currTitle, setCurrTitle] = useState<string>('');
+  const [currInput, setCurrInput] = useState<string>('');
   const [currDate, setCurrDate] = useState<Date>(new Date());
   const [originalCards, setOriginalCards] = useState<Cards[]>([]);
   const [isDateSorted, setIsDateSorted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [colorMap, setColorMap] = useState<Map<number, string>>(new Map<number, string>());
+  const [showAlert, setShowAlert] = useState(true);
 
   const supabaseClient = createClient();
 
@@ -93,67 +98,72 @@ export const MyLearning = () => {
   }, [cards]);
 
   const fetchData = useCallback(async () => {
+    setIsLoading(true);
     try {
-      const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
+      const supabaseClient = createClient();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabaseClient.auth.getUser();
 
-      if (!uuid) {
+      if (userError) {
+        console.error('Error fetching user:', userError);
+        throw new Error('Failed to authenticate user');
+      }
+
+      if (!user || !user.id) {
+        console.error('User ID not found');
         clearMyLearningId();
         throw new Error('User ID not returned from Supabase');
       }
 
-      const res = await axios.get(`/api/v1/learnings?userId=${uuid}`);
-      if (res.status === 200 && Array.isArray(res.data.body) && res.data.body.length > 0) {
-        const options: Intl.DateTimeFormatOptions = {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-        };
+      const res = await axios.get(`/api/v1/learnings?userId=${user.id}`);
 
-        const lastItem = res.data.body[res.data.body.length - 1];
-        if (lastItem && lastItem.id) {
-          setPersistedId(lastItem.id);
-        } else {
-          console.warn('Last item or its ID is undefined');
-        }
-
-        const fetchedCards: Cards[] = res.data.body
-          .filter((item: any) => item && item.id && item.title && item.date)
-          .map((item: any, index: number) => {
-            const date = new Date(item.date);
-            return {
-              id: item.id,
-              index: index,
-              title: item.title,
-              date: date.toLocaleDateString('en-GB', options),
-            };
-          });
-
-        setCards(fetchedCards);
-        setOriginalCards(fetchedCards);
-      } else {
-        console.error('Error fetching data or empty response:', res.data);
-        toast.error('Failed to fetch learning data. Please try again.');
+      if (res.status !== 200) {
+        console.error('API response error:', res.status, res.statusText);
+        throw new Error(`API returned status ${res.status}`);
       }
+
+      if (!Array.isArray(res.data.body)) {
+        console.error('Unexpected API response format:', res.data);
+        throw new Error('Unexpected API response format');
+      }
+
+      if (res.data.body.length === 0) {
+        console.log('No learning data found for user');
+        setCards([]);
+        setOriginalCards([]);
+        return;
+      }
+
+      const options: Intl.DateTimeFormatOptions = {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      };
+
+      const formattedCards = res.data.body.map((card: any, index: number) => ({
+        ...card,
+        date: new Date(card.date).toLocaleDateString('en-GB', options),
+        index: index,
+      }));
+
+      setCards(formattedCards);
+      setOriginalCards(formattedCards);
     } catch (error) {
       console.error('Error fetching data:', error);
-      toast.error(`Failed to fetch learning data: ${(error as Error).message}`);
+      if (error instanceof Error) {
+        toast.error(`Failed to load data: ${error.message}`);
+      } else {
+        toast.error('An unexpected error occurred while fetching data');
+      }
     } finally {
       setIsLoading(false);
     }
-  }, [supabaseClient, clearMyLearningId, setPersistedId]);
+  }, [clearMyLearningId]);
 
   useEffect(() => {
-    const init = async () => {
-      try {
-        setIsLoading(true);
-        await fetchData();
-      } catch (error) {
-        toast.error('Error fetching MyLearnings: ' + (error as Error).message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    init();
+    fetchData();
   }, [fetchData]);
 
   const handleAddCard = async () => {
@@ -167,19 +177,21 @@ export const MyLearning = () => {
 
       const currentDate = new Date();
       const formattedDate = dateFormatter(currentDate);
-      const defaultTitle = `New Note ${formattedDate}`;
-
+      const defaultTitle = `New Learning`;
+      const defaultInput = 'New topic';
       const newLearningId = generateNewId();
 
       const data = {
         uuid: uuid,
         title: defaultTitle,
+        input: defaultInput,
         date: formattedDate,
         id: newLearningId,
       };
 
       const res = await axios.post('/api/v1/learnings', data);
       if (res.status === 200) {
+        setPersistedId(newLearningId); // Set the new ID as the persisted ID
         redirectToDashboard(newLearningId);
       } else {
         toast.error(`Error storing data: ${res.data.error}`);
@@ -236,8 +248,9 @@ export const MyLearning = () => {
   function handleEdit(id: string): void {
     const filteredCard = cards.find((card) => card.id === id);
     if (filteredCard) {
-      const parsedDate = parseDateUTC(filteredCard.date);
-      setCurrTitle(filteredCard.title);
+      const parsedDate = parseDateUTC(filteredCard?.date);
+      setCurrTitle(filteredCard?.title || '');
+      setCurrInput(filteredCard?.input || '');
       setCurrDate(parsedDate);
       setIsDialogOpen(true);
     }
@@ -253,11 +266,12 @@ export const MyLearning = () => {
 
       const userId = (await supabaseClient.auth.getUser()).data.user?.id as string;
 
-      if (!userId) throw new Error('User ID not returned from superbase');
+      if (!userId) throw new Error('User ID not returned from Supabase');
 
       const response = await axios.patch('/api/v1/learnings', {
         id: card.id,
         title: card.title,
+        input: card.input,
         date: card.date,
         uuid: userId,
       });
@@ -267,23 +281,24 @@ export const MyLearning = () => {
         month: 'short' as const,
         year: 'numeric' as const,
       };
-      const DateDiplay = new Date(card.date).toLocaleDateString('en-GB', options);
+      const DateDisplay = new Date(card.date).toLocaleDateString('en-GB', options);
 
-      const updatedCard = { ...card, date: DateDiplay };
+      const updatedCard = { ...card, date: DateDisplay };
 
       if (response.status === 200) {
         setCards(cards.map((c) => (c.id === card.id ? updatedCard : c)));
         setOriginalCards(cards.map((c) => (c.id === card.id ? updatedCard : c)));
-        setIsDialogOpen(false);
+        fetchData(); // Refresh the data after updating
       } else {
-        console.error('Error updating data:', response.data.body);
+        throw new Error('Error updating data: ' + response.data.body);
       }
     } catch (error) {
-      throw new Error('Error Update my learning : ' + (error as Error).message);
+      console.error('Error updating my learning:', error);
+      throw error;
     }
   };
 
-  const saveChanges = (id: string | null) => {
+  const saveChanges = async (id: string | null) => {
     if (id !== null) {
       const cardToUpdate = cards.find((c) => c.id === id) as Cards;
 
@@ -291,16 +306,25 @@ export const MyLearning = () => {
         id: id,
         index: cardToUpdate?.index,
         title: currTitle,
+        input: currInput,
         date: dateFormatter(currDate).toString(),
       };
 
-      handleSaveCard(updatedCard);
+      try {
+        await handleSaveCard(updatedCard);
+        toast.success('Changes saved successfully');
+        setIsDialogOpen(false);
+      } catch (error) {
+        console.error('Error saving changes:', error);
+        toast.error('Failed to save changes. Please try again.');
+      }
     }
   };
 
   const cancelChanges = () => {
     setCurrDate(new Date());
-    setCurrTitle('');
+    setCurrTitle(cards.find((c) => c.id === mylearning_id)?.title || '');
+    setCurrInput(cards.find((c) => c.id === mylearning_id)?.input || '');
     setIsDialogOpen(false);
   };
 
@@ -326,6 +350,13 @@ export const MyLearning = () => {
     window.open(`/dashboard?mylearning_id=${id}`, '_self');
   };
 
+  const helpfulNotes: string[] = [
+    'Changing the title does not change the context generated in the outputs section.',
+    'Your learning cards are automatically color-coded for easy identification.',
+    'You can sort your cards by date or keep them in the order you created them.',
+    'You can delete a card by clicking the delete button, after pressing the edit button.',
+  ];
+
   const filteredCards = cards.filter((card) =>
     card.title.toLowerCase().includes(searchTerm.toLowerCase()),
   );
@@ -350,6 +381,28 @@ export const MyLearning = () => {
         </BreadcrumbList>
       </Breadcrumb>
       <div className="container mx-auto">
+        {showAlert && (
+          <Alert variant="default" className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Helpful Notes</AlertTitle>
+            <AlertDescription>
+              <ul className="list-disc list-inside">
+                {helpfulNotes.map((note, index) => (
+                  <li key={index}>{note}</li>
+                ))}
+              </ul>
+            </AlertDescription>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAlert(false)}
+              className="mt-2"
+            >
+              Dismiss
+            </Button>
+          </Alert>
+        )}
+
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">My Learning</h1>
           <div className="relative">
@@ -387,9 +440,9 @@ export const MyLearning = () => {
             {sortedCards.map((card) => (
               <LearningCard
                 key={card.id}
-                id={card.id}
                 title={card.title}
                 date={card.date}
+                input={card.input}
                 onEdit={() => handleEdit(card.id)}
                 handleDashboardScreen={() => redirectToMyLearningPage(card.id)}
               />
@@ -414,9 +467,19 @@ export const MyLearning = () => {
               <Input
                 type="text"
                 id="titleinput"
-                value={currTitle}
+                value={currTitle || ''}
                 className="col-span-3"
                 onChange={(e) => setCurrTitle(e.target.value)}
+              />
+              <Label htmlFor="input" className="text-right">
+                Input
+              </Label>
+              <Input
+                type="text"
+                id="input"
+                value={currInput || ''}
+                className="col-span-3"
+                onChange={(e) => setCurrInput(e.target.value)}
               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
@@ -426,7 +489,7 @@ export const MyLearning = () => {
               <Input
                 type="date"
                 id="dateinput"
-                value={currDate.toISOString().substring(0, 10)}
+                value={currDate ? currDate.toISOString().substring(0, 10) : ''}
                 className="col-span-3"
                 onChange={(e) => setCurrDate(new Date(e.target.value))}
               />
@@ -463,20 +526,26 @@ export const MyLearning = () => {
 };
 
 const LearningCard = ({
-  id,
   title,
   date,
+  input,
   onEdit,
   handleDashboardScreen,
 }: {
-  id: string;
   title: string;
   date: string;
+  input: string;
   onEdit: () => void;
   handleDashboardScreen: () => void;
 }) => {
-  const [isHover, setIsHover] = useState(false);
-  const bgColors = ['bg-yellow-100', 'bg-blue-100', 'bg-green-100', 'bg-pink-100', 'bg-purple-100'];
+  const [isHover, setIsHover] = useState<boolean>(false);
+  const bgColors: string[] = [
+    'bg-yellow-100',
+    'bg-blue-100',
+    'bg-green-100',
+    'bg-pink-100',
+    'bg-purple-100',
+  ];
   const bgColor = bgColors[Math.floor(Math.random() * bgColors.length)];
 
   return (
@@ -487,6 +556,7 @@ const LearningCard = ({
     >
       <CardContent className="flex flex-col justify-between h-full p-4">
         <h2 className="font-semibold">{title}</h2>
+        <p className="text-sm text-gray-600">{input}</p>
         <p className="text-sm text-gray-600">{date}</p>
       </CardContent>
       {isHover && (

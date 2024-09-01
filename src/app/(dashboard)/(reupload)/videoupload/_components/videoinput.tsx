@@ -31,6 +31,7 @@ import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
 
 import { usePersistedId } from '@/hooks';
+import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -120,9 +121,9 @@ export const ReUploadVideo = () => {
     }
   };
 
-  const handleUpload = async (input: any, myLearningId: string) => {
+  const handleUpload = async (input: any, myLearningId: string, uuid: string) => {
     try {
-      const response = await saveOutput(input, myLearningId);
+      const response = await saveOutput(input, myLearningId, uuid);
       router.push(`/dashboard?mylearning_id=${myLearningId}`);
     } catch (err: any) {
       throw new Error('Error when save output : ' + (err as Error).message);
@@ -131,6 +132,16 @@ export const ReUploadVideo = () => {
 
   const submitChanges = async () => {
     if (!mylearning_id) return;
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const uuid = user?.id;
+
+    if (!uuid) {
+      toast.error('Please login to continue');
+      return;
+    }
 
     try {
       setIsLoading(true);
@@ -140,7 +151,7 @@ export const ReUploadVideo = () => {
         const keyWordsArray = await handleVideoUpload();
         input = keyWordsArray.toString();
       }
-      await handleUpload(input, mylearning_id);
+      await handleUpload(input, mylearning_id, uuid);
     } catch (error) {
       throw new Error('error in submitChanges' + (error as Error).message);
     } finally {

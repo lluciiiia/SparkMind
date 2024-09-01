@@ -1,22 +1,6 @@
-import { createClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
 import { ReUploadResource } from './_components';
 
-interface Props {
-  id: number | string | undefined;
-}
-
-export default async function ReuplaodResources() {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return redirect('/signin');
-  }
-
+export default function ReuplaodResources() {
   return (
     <>
       <ReUploadResource />

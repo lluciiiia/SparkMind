@@ -1,8 +1,8 @@
 import axios from 'axios';
 
-export const saveOutput = async (input: string, myLearningId: string) => {
+export const saveOutput = async (input: string, myLearningId: string, uuid: string) => {
   try {
-    const processInputResponse = await handleRequest(() => validateSave(input, myLearningId));
+    const processInputResponse = await handleRequest(() => validateSave(input, myLearningId, uuid));
 
     if (!processInputResponse || !processInputResponse.data || !processInputResponse.data.output) {
       throw new Error('Invalid response from validateSave');
@@ -34,9 +34,10 @@ const handleRequest = async (request: () => Promise<any>) => {
   return response;
 };
 
-const validateSave = async (input: string, myLearningId: string) => {
+const validateSave = async (input: string, myLearningId: string, uuid: string) => {
   return axios.post(`/api/v1/outputs/validate-save?id=${myLearningId}`, {
     input: input,
+    uuid: uuid,
   });
 };
 
@@ -85,4 +86,14 @@ export const createEvents = async (selectedTask: any, myLearningId: string) => {
     selectedTask: selectedTask,
     learningId: myLearningId,
   });
+};
+
+export const createNote = async (myLearningId: string) => {
+  try {
+    const response = await axios.post(`/api/v1/notes?id=${myLearningId}`);
+    return response.data;
+  } catch (error) {
+    // Instead of throwing, return an object indicating the error
+    return { error: true, message: 'Failed to create note' };
+  }
 };

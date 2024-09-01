@@ -32,6 +32,7 @@ import { toast } from 'sonner';
 import { processDefaultTitle, saveOutput } from '../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
 import { usePersistedId } from '@/hooks';
+import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 
 export const NewDashboard = () => {
@@ -135,9 +136,9 @@ export const NewDashboard = () => {
     }
   };
 
-  const handleUpload = async (input: any, myLearningId: string) => {
+  const handleUpload = async (input: any, myLearningId: string, uuid: string) => {
     try {
-      await saveOutput(input, myLearningId);
+      await saveOutput(input, myLearningId, uuid);
       await processDefaultTitle(myLearningId);
 
       router.push(`/dashboard?mylearning_id=${myLearningId}`);
@@ -147,6 +148,17 @@ export const NewDashboard = () => {
   };
 
   const submitChanges = async () => {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    const uuid = user?.id;
+
+    if (!uuid) {
+      toast.error('Error extracting uuid');
+      return;
+    }
+
     try {
       setIsLoading(true);
 
@@ -162,7 +174,7 @@ export const NewDashboard = () => {
         input = keywords;
       }
 
-      await handleUpload(input, mylearning_id);
+      await handleUpload(input, mylearning_id, uuid);
     } catch (err) {
       throw new Error((err as Error).message);
     } finally {

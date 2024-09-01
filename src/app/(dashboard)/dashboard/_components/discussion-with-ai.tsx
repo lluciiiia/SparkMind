@@ -1,73 +1,81 @@
 'use client';
 
+import { API_KEY, genAI, safetySettings } from '@/app/api/v1/gemini-settings';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import LoadingIndicator from '@/components/ui/custom/LoadingIndicator';
-import { PlaceholdersAndVanishInput } from '@/components/ui/custom/placeholders-and-vanish-input';
+import { Input } from '@/components/ui/input';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import axios from 'axios';
+import { Bot, Send, User } from 'lucide-react';
 import type React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import type { Message } from './interfaces';
-
-import { API_KEY, genAI, safetySettings } from '@/app/api/v1/gemini-settings';
 import { toast } from 'sonner';
+
+interface Message {
+  id: number;
+  text: string;
+  sender: 'user' | 'ai';
+}
 
 interface DiscussionWithAIProps {
   learningid: string | null;
 }
 
 const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
-  if (!API_KEY) {
-    console.error('Missing Google API key');
-  }
-
-  if (!learningid) {
-    console.error('Missing Learning Key' + learningid);
-  }
-
   const [input, setInput] = useState<string>('');
   const [responses, setResponses] = useState<Message[]>([]);
   const [chatSession, setChatSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [frequentQue, setFrequentQue] = useState<boolean>(false);
-
-  const [basicQuestion, setBasicQuestion] = useState<[]>([]);
+  const [basicQuestions, setBasicQuestions] = useState<string[]>([]);
   const [transcript, setTranscript] = useState<string | undefined>();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-1.5-pro',
-    safetySettings,
-  });
+  useEffect(() => {
+    if (!API_KEY) {
+      console.error('Missing Google API key');
+      toast.error('API key is missing. Please check your configuration.');
+    }
 
-  const generationConfig = {
-    temperature: 1,
-    topP: 0.95,
-    topK: 64,
-    maxOutputTokens: 8192,
-    responseMimeType: 'text/plain',
-  };
-
-  const video_id = learningid;
+    if (!learningid) {
+      console.error('Missing Learning ID');
+      toast.error('Learning ID is missing. Please select a learning resource.');
+    }
+  }, []);
 
   useEffect(() => {
     const fetchDiscussData = async () => {
-      const response = await axios.get(`/api/v1/discussions?videoid=${video_id}`);
-      if (response.status === 200) {
-        setBasicQuestion(response.data.basicQue);
-        setTranscript(response.data.transcript);
-      } else {
-        toast.error('Something goes Wrong in Discuss with ai feature');
+      try {
+        const response = await axios.get(`/api/v1/discussions?videoid=${learningid}`);
+        if (response.status === 200) {
+          setBasicQuestions(response.data.basicQue);
+          setTranscript(response.data.transcript);
+        } else {
+          throw new Error('Failed to fetch discussion data');
+        }
+      } catch (error) {
+        console.error('Error fetching discussion data:', error);
+        toast.error('Failed to load discussion data. Please try again later.');
       }
     };
-    fetchDiscussData();
-  }, [video_id]);
+    if (learningid) {
+      fetchDiscussData();
+    }
+  }, [learningid]);
 
   useEffect(() => {
     if (transcript) {
-      const Session = model.startChat({
-        generationConfig,
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-1.5-pro',
+        safetySettings,
+      });
+      const session = model.startChat({
+        generationConfig: {
+          temperature: 1,
+          topP: 0.95,
+          topK: 64,
+          maxOutputTokens: 8192,
+        },
         history: [
           {
             role: 'user',
@@ -75,128 +83,108 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
           },
         ],
       });
-      setChatSession(Session);
+      setChatSession(session);
     }
   }, [transcript]);
 
-  useEffect(() => {
-    if (frequentQue === true) {
-      onSubmit();
-      setFrequentQue(false);
-    }
-  }, [frequentQue]);
-
-  const handleDiscussInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-    }
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const onSubmit = useCallback(
+  useEffect(scrollToBottom, [responses]);
+
+  const handleSubmit = useCallback(
     async (event?: React.FormEvent<HTMLFormElement>) => {
+      event?.preventDefault();
+      if (!input.trim() || !chatSession) return;
+
+      setLoading(true);
+      const newMessage: Message = { id: Date.now(), text: input, sender: 'user' };
+      setResponses((prev) => [...prev, newMessage]);
+      setInput('');
+
       try {
-        event?.preventDefault();
-        if (input.trim()) {
-          setLoading(true);
-
-          const newMessage: Message = {
-            id: Date.now(),
-            text: input,
-            sender: 'user',
-          };
-
-          setResponses((prevResponses) => [...prevResponses, newMessage]);
-
-          const question = `Given the previous transcript or summary, Based on the transcript or summary, answer the user's question if related. If not, provide a general response. And here is the user's question: "${input}"`;
-
-          const chatResponse = await chatSession.sendMessage(question);
-
-          const aiMessage: Message = {
-            id: Date.now(),
-            text: await chatResponse.response.text(),
-            sender: 'ai',
-          };
-          setResponses((prevResponses) => [...prevResponses, aiMessage]);
-
-          setLoading(false);
-          setInput('');
-        }
+        const question = `Based on the transcript or summary, answer the user's question if related. If not, provide a general response: "${input}"`;
+        const chatResponse = await chatSession.sendMessage(question);
+        const aiMessage: Message = {
+          id: Date.now(),
+          text: await chatResponse.response.text(),
+          sender: 'ai',
+        };
+        setResponses((prev) => [...prev, aiMessage]);
       } catch (error) {
-        toast.error('Something goes Wrong in Discuss with ai feature');
+        console.error('Error in AI response:', error);
+        toast.error('Failed to get AI response. Please try again.');
+      } finally {
+        setLoading(false);
       }
     },
     [input, chatSession],
   );
 
   return (
-    <Card className="bottom-0 left-0 right-0 shadow-lg mx-auto w-full max-w-4xl h-[600px] rounded-t-lg dark:border-1 dark:border-gray-200 relative">
-      <menu className="flex justify-start border-b border-gray-200 ml-4">
-        <li>
-          <p className="px-4 py-2">Discussion with Gemini AI</p>
-        </li>
-      </menu>
-      <div className="h-full w-full flex flex-col items-center">
-        <div className="flex flex-col mt-3 mb-4 w-full max-w-4xl px-4 h-4/5 overflow-y-scroll no-scrollbar">
-          {responses.map((response, index) =>
-            response.sender === 'user' ? (
-              <div className="mb-4 flex justify-end" key={index}>
-                <div className="p-2 rounded bg-gray-200 inline-block dark:text-black">
-                  {response.text}
-                </div>
-              </div>
-            ) : (
-              <div className="mb-4 flex justify-start" key={index}>
-                <div className="p-2 text-black dark:text-white rounded bg-gray-400 inline-block">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{response.text}</ReactMarkdown>
-                </div>
-              </div>
-            ),
-          )}
-          {loading && (
-            <div className="mb-4 flex justify-start">
-              <div className="p-4 rounded bg-navy inline-block">
-                <LoadingIndicator />
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="sticky bottom-0 h-2/5 w-full max-w-4xl p-4 flex flex-col items-center rounded-t-lg mb-8">
-          <div className="flex flex-row overflow-x-auto no-scrollbar">
-            {basicQuestion !== undefined &&
-              basicQuestion.map((que, index) => (
-                <Button
-                  key={index}
-                  onClick={() => {
-                    setInput(que);
-                    setFrequentQue(true);
-                  }}
-                  className="bg-gray-200 mx-4 rounded-lg p-2 flex-shrink-0 dark:text-black"
-                >
-                  {que}
-                </Button>
-              ))}
-          </div>
-          <div className="mt-4 w-3/5 ">
-            <PlaceholdersAndVanishInput
-              placeholders={[
-                'Ask a question about the video',
-                'Ask a question about the transcript',
-                'Ask a question about the summary',
-              ]}
-              onChange={handleDiscussInputChange}
-              //onKeyDown={handleKeyDown}
-              onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-                event.preventDefault();
-                onSubmit();
-              }}
-            />
-          </div>
-        </div>
+    <div className="flex flex-col h-full bg-gray-100 rounded-lg shadow-md">
+      <div className="bg-navy text-white p-4 rounded-t-lg">
+        <h2 className="text-xl font-semibold">Discussion with Gemini AI</h2>
       </div>
-    </Card>
+      <ScrollArea className="flex-grow mb-4 p-4">
+        {responses.map((response) => (
+          <div
+            key={response.id}
+            className={`mb-4 flex ${response.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`p-3 rounded-lg max-w-[80%] ${
+                response.sender === 'user'
+                  ? 'bg-navy text-white'
+                  : 'bg-white text-gray-800 border border-gray-300'
+              }`}
+            >
+              {response.sender === 'user' ? (
+                <User className="inline-block mr-2 h-4 w-4" />
+              ) : (
+                <Bot className="inline-block mr-2 h-4 w-4" />
+              )}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{response.text}</ReactMarkdown>
+            </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </ScrollArea>
+      <div className="p-4 bg-white border-t border-gray-200">
+        <ScrollArea className="whitespace-nowrap mb-4">
+          <div className="flex space-x-2">
+            {basicQuestions.map((question, index) => (
+              <Button
+                key={index}
+                variant="outline"
+                size="sm"
+                onClick={() => setInput(question)}
+                className="text-xs flex-shrink-0 bg-gray-100 text-navy hover:bg-navy hover:text-white"
+              >
+                {question}
+              </Button>
+            ))}
+          </div>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
+        <form onSubmit={handleSubmit} className="flex items-center">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask a question..."
+            className="flex-grow mr-2 border-gray-300 focus:border-navy focus:ring-navy"
+          />
+          <Button
+            type="submit"
+            disabled={loading || !input.trim()}
+            className="bg-navy text-white hover:bg-navy/90"
+          >
+            {loading ? 'Sending...' : <Send className="h-4 w-4" />}
+          </Button>
+        </form>
+      </div>
+    </div>
   );
 };
 

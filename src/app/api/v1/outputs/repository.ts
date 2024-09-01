@@ -11,7 +11,32 @@ export async function saveMyLearningInput(id: string, input: string) {
   return await supabase.from('mylearnings').update({ input }).eq('id', id);
 }
 
-export async function getAndSaveOutputByLearningId(learningId: string) {
+export async function getAndSaveOutputByLearningId(learningId: string, uuid: string) {
+  // First, check if the learning exists
+  const { data: learningData, error: learningError } = await supabase
+    .from('mylearnings')
+    .select('id')
+    .eq('id', learningId)
+    .maybeSingle();
+
+  if (learningError && learningError.code !== 'PGRST116') {
+    console.error('Error checking learning:', learningError);
+    throw new Error('Error checking learning');
+  }
+
+  // If learning doesn't exist, create it
+  if (!learningData) {
+    const { error: insertLearningError } = await supabase
+      .from('mylearnings')
+      .insert([{ id: learningId, uuid: uuid }]);
+
+    if (insertLearningError) {
+      console.error('Error creating learning:', insertLearningError);
+      throw new Error('Error creating learning');
+    }
+  }
+
+  // Now proceed with getting or creating the output
   const { data, error } = await supabase
     .from('outputs')
     .select('*')
@@ -31,7 +56,7 @@ export async function getAndSaveOutputByLearningId(learningId: string) {
     .from('outputs')
     .insert([{ learning_id: learningId }])
     .select()
-    .single(); // Insert and return the new record
+    .single();
 
   if (insertError) {
     console.error('Error creating output:', insertError);

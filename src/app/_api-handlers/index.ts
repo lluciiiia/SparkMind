@@ -1,2 +1,2 @@
 export * from './api-handler';
-export * from './notes';
+export * as notes from './notes';
