@@ -133,37 +133,34 @@ export const ReUploadResource = () => {
     }
   };
 
-  const handleUpload = async (input: any) => {
+  const handleUpload = async (input: any, title: string) => {
+    if (!input || input.trim() === '') {
+      toast.error('Input cannot be empty');
+      return;
+    }
+
     try {
       setIsLoading(true);
 
-      // Check for active session
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
-      if (sessionError) {
-        throw new Error(`Session error: ${sessionError.message}`);
-      }
-
-      if (!sessionData.session) {
-        throw new Error('No active session found');
+      if (sessionError || !sessionData.session) {
+        toast.error('Your session has expired. Please sign in again.');
+        router.push('/signin/password_signin');
+        return;
       }
 
       const { data: userData, error: userError } = await supabase.auth.getUser();
 
-      if (userError) {
-        throw new Error(`Error getting user: ${userError.message}`);
+      if (userError || !userData.user) {
+        toast.error('Failed to get user information. Please try again.');
+        return;
       }
 
-      if (!userData.user) {
-        throw new Error('User not found');
-      }
-
-      // Generate a new ID for the learning
       const newLearningId = generateNewId();
 
-      // Save the new learning with the generated ID and UUID
-      const response = await saveOutput(input, newLearningId, userData.user.id);
-      if (response) {
+      const response = await saveOutput(input, newLearningId, userData.user.id, title);
+      if (response && response.id) {
         toast.success('Resource created successfully');
         router.push(`/dashboard?mylearning_id=${newLearningId}`);
       } else {
@@ -172,42 +169,50 @@ export const ReUploadResource = () => {
     } catch (err: any) {
       console.error('Error in handleUpload:', err);
       toast.error(`Error when saving output: ${err.message}`);
-
-      // If there's an authentication error, redirect to sign in
-      if (
-        err.message.includes('Auth session missing') ||
-        err.message.includes('No active session found')
-      ) {
-        toast.error('Your session has expired. Please sign in again.');
-        router.push('/signin/password_signin');
-      }
     } finally {
       setIsLoading(false);
     }
   };
 
   const submitChanges = async () => {
-    if (!mylearning_id) return;
+    if (isLoading) return; // Prevent multiple submissions
 
     try {
       setIsLoading(true);
       let input;
       let title;
+
       if (fileType === 'video') {
         const keyWordsArray = await handleVideoUpload();
-        input = keyWordsArray.toString();
+        if (!keyWordsArray || keyWordsArray.length === 0) {
+          toast.error('Failed to extract keywords from video');
+          return;
+        }
+        input = keyWordsArray.join(', ');
         title = `Video: ${input.slice(0, 30)}...`;
-      } else if (fileType == 'text') {
+      } else if (fileType === 'text') {
+        if (!content.trim()) {
+          toast.error('Content cannot be empty');
+          return;
+        }
         input = content;
         title = `Text: ${content.slice(0, 30)}...`;
-      } else if (fileType == 'keywords') {
+      } else if (fileType === 'keywords') {
+        if (!keywords.trim()) {
+          toast.error('Keywords cannot be empty');
+          return;
+        }
         input = keywords;
         title = `Keywords: ${keywords.slice(0, 30)}...`;
+      } else {
+        toast.error('Please select a file type');
+        return;
       }
 
-      await handleUpload(input);
+      await handleUpload(input, title);
     } catch (err: any) {
-      throw new Error('Error when update resource : ' + (err as Error).message);
+      console.error('Error when updating resource:', err);
+      toast.error(`Error when updating resource: ${err.message}`);
     } finally {
       setIsLoading(false);
     }

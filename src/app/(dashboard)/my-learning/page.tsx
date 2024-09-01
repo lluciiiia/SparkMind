@@ -210,7 +210,8 @@ export const MyLearning = () => {
           clearMyLearningId();
           throw new Error('User ID not returned from superbase');
         }
-
+        console.log('id', id);
+        console.log('uuid', uuid);
         const response = await axios.delete('/api/v1/learnings', {
           data: { id, uuid },
         });
@@ -247,6 +248,7 @@ export const MyLearning = () => {
 
   function handleEdit(id: string): void {
     const filteredCard = cards.find((card) => card.id === id);
+    console.log('filteredCard', filteredCard?.id);
     if (filteredCard) {
       const parsedDate = parseDateUTC(filteredCard?.date);
       setCurrTitle(filteredCard?.title || '');
@@ -433,7 +435,14 @@ export const MyLearning = () => {
         <ScrollArea className="h-[calc(100vh-200px)]">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-8 pr-4">
             <Card className="flex items-center justify-center h-48 border-2 border-dashed border-blue-300 bg-blue-50">
-              <Button variant="ghost" className="h-full w-full" onClick={handleAddCard}>
+              <Button
+                variant="ghost"
+                className="h-full w-full"
+                onClick={() => {
+                  const newId = generateNewId();
+                  window.open(`/new?mylearning_id=${newId}`, '_self');
+                }}
+              >
                 <Plus className="h-6 w-6 text-blue-500" />
               </Button>
             </Card>

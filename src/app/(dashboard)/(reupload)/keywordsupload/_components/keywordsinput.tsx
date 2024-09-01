@@ -30,6 +30,7 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 
 import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
+import { createMyLearning } from '@/app/api/v1/outputs/repository';
 import { usePersistedId } from '@/hooks';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
@@ -102,11 +103,11 @@ export const ReUploadKeyword = () => {
   const handleUpload = async (input: any, mylearning_id: string, userId: string) => {
     try {
       setIsLoading(true);
-      const response = await saveOutput(input, mylearning_id, userId);
+      const response = await createMyLearning(input, mylearning_id, userId);
 
-      if (response && response.id) {
+      if (response && response.data) {
         toast.success('Keywords uploaded successfully');
-        router.push(`/dashboard?mylearning_id=${response.id}`);
+        router.push(`/dashboard?mylearning_id=${response.data.id}`);
       } else {
         console.error('Unexpected response structure:', response);
         toast.error('Failed to upload keywords: Invalid response structure');

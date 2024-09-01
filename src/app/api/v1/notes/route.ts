@@ -29,26 +29,36 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const supabase = createClient();
+  const url = new URL(req.url);
+  const myLearningId = url.searchParams.get('id');
+
+  if (!myLearningId) {
+    return NextResponse.json({ error: 'Missing learning ID' }, { status: 400 });
+  }
+
   try {
-    const url = new URL(req.url);
-    const myLearningId = url.searchParams.get('id');
-
-    if (!myLearningId) return NextResponse.json({ error: 'Missing learning ID' }, { status: 400 });
-
+    const currentDate = new Date().toISOString(); // Use ISO string format
     const { data, error } = await supabase
       .from('notes')
-      .insert([{ learning_id: myLearningId, title: 'New Note', content: 'Start typing...' }])
+      .insert([
+        {
+          learning_id: myLearningId,
+          title: 'New Note',
+          content: 'Start typing...',
+          created_at: currentDate,
+        },
+      ])
       .select();
 
     if (error) {
       console.error('Supabase error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to create note' }, { status: 500 });
     }
 
     return NextResponse.json({ status: 200, body: data });
   } catch (error) {
-    console.error('Error inserting note into DB:', error);
-    return NextResponse.json({ error: 'Failed to insert note into DB' }, { status: 500 });
+    console.error('Unexpected error:', error);
+    return NextResponse.json({ error: 'An unexpected error occurred' }, { status: 500 });
   }
 }
 

@@ -1,8 +1,15 @@
 import axios from 'axios';
 
-export const saveOutput = async (input: string, myLearningId: string, uuid: string) => {
+export const saveOutput = async (
+  input: string,
+  myLearningId: string,
+  userId: string,
+  title: string,
+) => {
   try {
-    const processInputResponse = await handleRequest(() => validateSave(input, myLearningId, uuid));
+    const processInputResponse = await handleRequest(() =>
+      validateSave(input, myLearningId, userId, title),
+    );
 
     if (!processInputResponse || !processInputResponse.data || !processInputResponse.data.output) {
       throw new Error('Invalid response from validateSave');
@@ -34,10 +41,11 @@ const handleRequest = async (request: () => Promise<any>) => {
   return response;
 };
 
-const validateSave = async (input: string, myLearningId: string, uuid: string) => {
+const validateSave = async (input: string, myLearningId: string, userId: string, title: string) => {
   return axios.post(`/api/v1/outputs/validate-save?id=${myLearningId}`, {
-    input: input,
-    uuid: uuid,
+    input,
+    userId,
+    title,
   });
 };
 

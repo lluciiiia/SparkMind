@@ -7,8 +7,8 @@ export async function getMyLearningById(id: string) {
   return await supabase.from('mylearnings').select('id, input').eq('id', id);
 }
 
-export async function saveMyLearningInput(id: string, input: string) {
-  return await supabase.from('mylearnings').update({ input }).eq('id', id);
+export async function saveMyLearningInput(id: string, input: string, title: string) {
+  return await supabase.from('mylearnings').update({ input, title }).eq('id', id);
 }
 
 export async function getAndSaveOutputByLearningId(learningId: string, uuid: string) {
@@ -80,4 +80,19 @@ export async function getOutputById(id: string) {
     .from('outputs')
     .select('id, youtube, summary, questions, further_info')
     .eq('id', id);
+}
+
+export async function createMyLearning(myLearningId: string, userId: string, title: string) {
+  const supabase = createClient();
+
+  return await supabase
+    .from('mylearnings')
+    .insert({
+      id: myLearningId,
+      uuid: userId,
+      title: title,
+      date: new Date().toISOString(),
+    })
+    .select()
+    .single();
 }
