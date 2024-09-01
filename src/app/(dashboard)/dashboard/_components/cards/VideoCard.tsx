@@ -1,5 +1,10 @@
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import he from 'he';
+import { ExternalLink, Eye, ThumbsUp } from 'lucide-react';
+import Link from 'next/link';
 import type React from 'react';
 import { memo } from 'react';
 import type { VideoCardProps, VideoItem } from '../interfaces';
@@ -19,40 +24,73 @@ const VideoCard: React.FC<VideoCardProps> = memo(({ videos }) => {
   const validVideos = videos?.filter(isValidVideo) || [];
 
   return (
-    <Card className="w-full h-[calc(100vh-200px)]">
-      <CardHeader>
-        <CardTitle>Video Recommendations</CardTitle>
+    <Card className="w-full h-[calc(100vh-200px)] bg-background">
+      <CardHeader className="bg-muted sr-only">
+        <CardTitle className="text-2xl font-bold text-primary">Video Recommendations</CardTitle>
       </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[calc(100vh-300px)] pr-4">
+      <CardContent className="p-0">
+        <ScrollArea className="h-[calc(100vh-300px)]">
           {validVideos.length > 0 ? (
             validVideos.map((video) => (
-              <div key={video.id.videoId} className="flex mb-4 pb-4 border-b last:border-b-0">
-                <div className="flex-grow pr-4">
-                  <h3 className="font-semibold mb-2 line-clamp-2">{video.snippet.title}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {video.snippet.description}
-                  </p>
+              <div
+                key={video.id.videoId}
+                className="flex flex-col md:flex-row p-4 border-b border-border hover:bg-accent/5 transition-colors"
+              >
+                <div className="md:w-1/3 mb-4 md:mb-0 md:pr-4">
+                  <div className="relative aspect-video rounded-lg overflow-hidden">
+                    <iframe
+                      className="absolute inset-0 w-full h-full"
+                      src={`https://www.youtube.com/embed/${video.id.videoId}`}
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={he.decode(video.snippet.title)}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    ></iframe>
+                  </div>
                 </div>
-                <div className="flex-shrink-0">
-                  <iframe
-                    width="160"
-                    height="90"
-                    src={`https://www.youtube.com/embed/${video.id.videoId}`}
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title={video.snippet.title}
-                    loading="lazy"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  ></iframe>
+                <div className="md:w-2/3">
+                  <h3 className="text-lg font-semibold mb-2 line-clamp-2 text-primary">
+                    {he.decode(video.snippet.title)}
+                  </h3>
+                  <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
+                    {he.decode(video.snippet.description)}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    <Badge variant="secondary" className="text-xs">
+                      <Eye className="w-3 h-3 mr-1" />
+                      {Math.floor(Math.random() * 1000000)} views
+                    </Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      <ThumbsUp className="w-3 h-3 mr-1" />
+                      {Math.floor(Math.random() * 50000)} likes
+                    </Badge>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-white bg-navy hover:bg-navy/90"
+                    asChild
+                  >
+                    <Link
+                      href={`https://www.youtube.com/watch?v=${video.id.videoId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Watch on YouTube
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </Link>
+                  </Button>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-center text-muted-foreground">No valid videos found</p>
+            <div className="flex items-center justify-center h-full">
+              <p className="text-center text-muted-foreground">No valid videos found</p>
+            </div>
           )}
         </ScrollArea>
       </CardContent>

@@ -59,7 +59,7 @@ export interface NoteCardProps {
 }
 
 export interface Question {
-  id: number;
+  id: string;
   question: string;
   options: string[];
   answer: string[];

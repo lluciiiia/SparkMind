@@ -39,7 +39,7 @@ export const usePersistedId = (
   useIsomorphicLayoutEffect(() => {
     if (typeof window !== 'undefined') {
       const existingId = sessionStorage.getItem(key);
-      if (existingId && id !== existingId) {
+      if (existingId && !id) {
         setId(existingId);
       }
     }

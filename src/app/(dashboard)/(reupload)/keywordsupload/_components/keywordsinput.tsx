@@ -31,6 +31,7 @@ import { useIsomorphicLayoutEffect, useMediaQuery } from 'usehooks-ts';
 import { saveOutput } from '../../../../_api-handlers/api-handler';
 import '@/styles/css/Circle-loader.css';
 import { usePersistedId } from '@/hooks';
+import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
 import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
@@ -98,10 +99,10 @@ export const ReUploadKeyword = () => {
     }
   };
 
-  const handleUpload = async (input: any, mylearning_id: string) => {
+  const handleUpload = async (input: any, mylearning_id: string, userId: string) => {
     try {
       setIsLoading(true);
-      const response = await saveOutput(input, mylearning_id);
+      const response = await saveOutput(input, mylearning_id, userId);
 
       if (response && response.id) {
         toast.success('Keywords uploaded successfully');
@@ -119,6 +120,17 @@ export const ReUploadKeyword = () => {
   };
 
   const submitChanges = async () => {
+    const supabase = createClient();
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      toast.error('User authentication failed. Please log in and try again.');
+      return;
+    }
+
     if (!mylearning_id) {
       toast.error('Learning ID is missing');
       return;
@@ -129,7 +141,7 @@ export const ReUploadKeyword = () => {
       input = keywords;
     }
 
-    await handleUpload(input, mylearning_id);
+    await handleUpload(input, mylearning_id, user.id);
   };
 
   return (
