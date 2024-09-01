@@ -31,6 +31,7 @@ const config = {
     unoptimized: true,
   },
   experimental: {
+    esmExternals: 'loose',
     optimizeCss: {
       preload: true,
     },
@@ -62,6 +63,13 @@ const config = {
         ],
       },
     ];
+  },
+  webpack: (config, { isServer }) => {
+    config.module.rules.push({
+      test: /node_modules\/fluent-ffmpeg/,
+      use: 'null-loader'
+    });
+    return config;
   },
 };
 

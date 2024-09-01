@@ -3,6 +3,8 @@ import { type NextRequest, NextResponse } from 'next/server';
 
 const supabase = createClient();
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     const video_id = req.nextUrl.searchParams.get('videoid');
