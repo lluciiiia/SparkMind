@@ -52,7 +52,7 @@ export const Scraper = memo(() => {
         const timeoutId = setTimeout(() => {
           controller.abort();
           throw new Error('Request timed out');
-        }, 30000);
+        }, 120000);
 
         try {
           const response = await fetch(`${PING}${encodeURIComponent(url)}`, {
