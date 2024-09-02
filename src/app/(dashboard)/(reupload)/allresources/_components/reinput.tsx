@@ -209,7 +209,7 @@ export const ReUploadResource = () => {
       }
 
       await handleUpload(input, title, newLearningId);
-      
+
       window.open(`/dashboard?mylearning_id=${newLearningId}`, '_self');
     } catch (err: any) {
       console.error('Error in submitChanges:', err);
@@ -288,11 +288,7 @@ export const ReUploadResource = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button
-                        type="submit"
-                        onClick={submitChanges}
-                        disabled={isLoading}
-                      >
+                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
                         {isLoading ? 'Uploading ...' : 'Upload'}
                       </Button>
                     </DialogFooter>
