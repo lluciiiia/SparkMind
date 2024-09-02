@@ -34,13 +34,16 @@ import { createMyLearning } from '@/app/api/v1/outputs/repository';
 import { usePersistedId } from '@/hooks';
 import { createClient } from '@/utils/supabase/client';
 import { useRouter } from 'next/navigation';
-import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
-import { v4 as uuidv4 } from 'uuid';
 
 export const ReUploadKeyword = () => {
-  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
-
+  const {
+    id: mylearning_id,
+    clearId: clearMyLearningId,
+    generateNewId,
+    setPersistedId,
+  } = usePersistedId('mylearning_id');
+  const supabase = createClient();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -90,59 +93,84 @@ export const ReUploadKeyword = () => {
 
   const [fileType, setFileType] = useState<'keywords'>();
 
-  const handleVideoFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0];
-      const pathURL = URL.createObjectURL(file);
-      setSelectedFile(file);
-      setObjectURL(pathURL);
-      // console.log(objectURL);
+  const handleUpload = async (input: any, title: string, newLearningId: string) => {
+    if (!input || input.trim() === '') {
+      toast.error('Input cannot be empty');
+      return;
     }
-  };
 
-  const handleUpload = async (input: any, mylearning_id: string, userId: string) => {
     try {
       setIsLoading(true);
-      const response = await createMyLearning(input, mylearning_id, userId);
 
-      if (response && response.data) {
-        toast.success('Keywords uploaded successfully');
-        router.push(`/dashboard?mylearning_id=${response.data.id}`);
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        toast.error('Your session has expired. Please sign in again.');
+        router.push('/signin/password_signin');
+        return;
+      }
+
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !userData.user) {
+        toast.error('Failed to get user information. Please try again.');
+        return;
+      }
+
+      const response = await saveOutput(input, newLearningId, userData.user.id, title);
+      if (response && response.id) {
+        toast.success('Resource created successfully');
+        setPersistedId(newLearningId); // Update the persisted ID
       } else {
-        console.error('Unexpected response structure:', response);
-        toast.error('Failed to upload keywords: Invalid response structure');
+        toast.error('Failed to create resource');
       }
     } catch (err: any) {
-      console.error('Error when handling upload:', err);
-      toast.error(`Failed to upload keywords: ${err.message || 'Unknown error'}`);
+      console.error('Error in handleUpload:', err);
+      toast.error(`Error when saving output: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const submitChanges = async () => {
-    const supabase = createClient();
-    const {
-      data: { user },
-      error: userError,
-    } = await supabase.auth.getUser();
+    if (isLoading) return;
 
-    if (userError || !user) {
-      toast.error('User authentication failed. Please log in and try again.');
-      return;
+    try {
+      setIsLoading(true);
+      const supabase = createClient();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        toast.error('User authentication failed. Please log in and try again.');
+        return;
+      }
+
+      const newLearningId = generateNewId(); // Generate a new ID
+
+      if (fileType == 'keywords') {
+        if (!keywords.trim()) {
+          toast.error('Keywords cannot be empty');
+          return;
+        }
+        const input = keywords;
+        const title = `Keywords: ${keywords.slice(0, 30)}...`;
+        await handleUpload(input, title, newLearningId);
+      } else {
+        toast.error('Please select a file type');
+        return;
+      }
+
+      // Redirect to the dashboard with the new ID
+      router.push(`/dashboard?mylearning_id=${newLearningId}`);
+    } catch (err: any) {
+      console.error('Error in submitChanges:', err);
+      toast.error(`Error when submitting changes: ${err.message}`);
+    } finally {
+      setIsLoading(false);
     }
-
-    if (!mylearning_id) {
-      toast.error('Learning ID is missing');
-      return;
-    }
-
-    let input;
-    if (fileType == 'keywords') {
-      input = keywords;
-    }
-
-    await handleUpload(input, mylearning_id, user.id);
   };
 
   return (
@@ -214,7 +242,11 @@ export const ReUploadKeyword = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
+                      <Button
+                        type="submit"
+                        onClick={submitChanges}
+                        disabled={isLoading}
+                      >
                         {isLoading ? 'Uploading ...' : 'Upload'}
                       </Button>
                     </DialogFooter>

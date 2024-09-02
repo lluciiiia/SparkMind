@@ -40,6 +40,7 @@ export const ReUploadResource = () => {
     id: mylearning_id,
     clearId: clearMyLearningId,
     generateNewId,
+    setPersistedId,
   } = usePersistedId('mylearning_id');
   const supabase = createClient();
   const router = useRouter();
@@ -133,7 +134,7 @@ export const ReUploadResource = () => {
     }
   };
 
-  const handleUpload = async (input: any, title: string) => {
+  const handleUpload = async (input: any, title: string, newLearningId: string) => {
     if (!input || input.trim() === '') {
       toast.error('Input cannot be empty');
       return;
@@ -157,12 +158,10 @@ export const ReUploadResource = () => {
         return;
       }
 
-      const newLearningId = generateNewId();
-
       const response = await saveOutput(input, newLearningId, userData.user.id, title);
       if (response && response.id) {
         toast.success('Resource created successfully');
-        router.push(`/dashboard?mylearning_id=${newLearningId}`);
+        setPersistedId(newLearningId);
       } else {
         toast.error('Failed to create resource');
       }
@@ -175,33 +174,33 @@ export const ReUploadResource = () => {
   };
 
   const submitChanges = async () => {
-    if (isLoading) return; // Prevent multiple submissions
+    if (isLoading) return;
 
     try {
       setIsLoading(true);
+      const supabase = createClient();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError || !user) {
+        toast.error('User authentication failed. Please log in and try again.');
+        return;
+      }
+
+      const newLearningId = generateNewId();
+
       let input;
       let title;
-
       if (fileType === 'video') {
         const keyWordsArray = await handleVideoUpload();
-        if (!keyWordsArray || keyWordsArray.length === 0) {
-          toast.error('Failed to extract keywords from video');
-          return;
-        }
-        input = keyWordsArray.join(', ');
-        title = `Video: ${input.slice(0, 30)}...`;
+        input = keyWordsArray.toString();
+        title = `Video: ${selectedFile?.name}`;
       } else if (fileType === 'text') {
-        if (!content.trim()) {
-          toast.error('Content cannot be empty');
-          return;
-        }
         input = content;
         title = `Text: ${content.slice(0, 30)}...`;
       } else if (fileType === 'keywords') {
-        if (!keywords.trim()) {
-          toast.error('Keywords cannot be empty');
-          return;
-        }
         input = keywords;
         title = `Keywords: ${keywords.slice(0, 30)}...`;
       } else {
@@ -209,10 +208,12 @@ export const ReUploadResource = () => {
         return;
       }
 
-      await handleUpload(input, title);
+      await handleUpload(input, title, newLearningId);
+      
+      window.open(`/dashboard?mylearning_id=${newLearningId}`, '_self');
     } catch (err: any) {
-      console.error('Error when updating resource:', err);
-      toast.error(`Error when updating resource: ${err.message}`);
+      console.error('Error in submitChanges:', err);
+      toast.error(`Error when submitting changes: ${err.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -260,31 +261,6 @@ export const ReUploadResource = () => {
                     </DialogHeader>
 
                     <div className="grid gap-2">
-                      {/* <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType("image")}
-                        disabled>
-                        <ImageIcon className="w-4 h-4 mr-1" />
-                        Image
-                      </Button> */}
-                      <Button
-                        variant="outline"
-                        disabled={true}
-                        className="w-full"
-                        onClick={() => setFileType('video')}
-                      >
-                        <VideoIcon className="w-4 h-4 mr-1" />
-                        Video
-                      </Button>
-                      {/* <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType("audio")}
-                        disabled>
-                        <AudioLinesIcon className="w-4 h-4 mr-1" />
-                        Audio
-                      </Button> */}
                       <Button
                         variant="outline"
                         className="w-full"
@@ -293,28 +269,8 @@ export const ReUploadResource = () => {
                         <TextIcon className="w-4 h-4 mr-1" />
                         Keywords / Topic
                       </Button>
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType('text')}
-                      >
-                        <TextIcon className="w-4 h-4 mr-1" />
-                        Text
-                      </Button>
                     </div>
                   </>
-                )}
-
-                {fileType === 'text' && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="content">Content</Label>
-                    <Textarea
-                      id="content"
-                      placeholder="Write your content here"
-                      value={content}
-                      onChange={handleContentChange}
-                    />
-                  </div>
                 )}
 
                 {fileType === 'keywords' && (
@@ -329,32 +285,14 @@ export const ReUploadResource = () => {
                   </div>
                 )}
 
-                {/* {fileType === 'video' && (
-                  <>
-                    <DialogTitle>Choose Video File</DialogTitle>
-                    <input
-                      type="file"
-                      name="file"
-                      accept=".mp4"
-                      onChange={handleVideoFileChange}
-                      className="rounded-md"
-                    />
-                  </>
-                )} */}
-
-                {fileType === 'video' && objectURL && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="name">Preview</Label>
-                    <div>
-                      <video controls src={objectURL}></video>
-                    </div>
-                  </div>
-                )}
-
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
+                      <Button
+                        type="submit"
+                        onClick={submitChanges}
+                        disabled={isLoading}
+                      >
                         {isLoading ? 'Uploading ...' : 'Upload'}
                       </Button>
                     </DialogFooter>
