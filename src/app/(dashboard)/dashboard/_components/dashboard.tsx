@@ -126,7 +126,6 @@ export const Dashboard = () => {
     }
 
     if (output?.questions) {
-      console.log('questions', output.questions);
       const parsedQuestions = JSON.parse(output.questions) as Question[];
       setQuestions(parsedQuestions);
     }
@@ -322,7 +321,7 @@ export const Dashboard = () => {
                 )}
                 {activeTab === 'video' && <VideoCard videos={videos} />}
                 {activeTab === 'qna' && Array.isArray(questions) && questions.length > 0 && (
-                  <QuestionAndAnswer questions={questions} />
+                  <QuestionAndAnswer questions={questions as any[]} />
                 )}
                 {activeTab === 'further-info' && furtherInfoData.length > 0 && (
                   <FurtherInfoCard furtherInfo={furtherInfoData} />
