@@ -1,6 +1,5 @@
 <a href="https://sparkmind.vercel.app/">
-  
-  <h1 align="center">SparkMind</h1> 
+  <h1 align="center">SparkMind</h1>
   <img alt="SparkMind - AI-driven learning hub platform." src="./public/assets/images/SparkMind_homepage.png">
 </a>
 
@@ -12,8 +11,8 @@
   <a href="#team"><strong>Team</strong></a> ·
   <a href="#features"><strong>Features</strong></a> ·
   <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
+  <a href="#getting-started"><strong>Getting Started</strong></a> ·
+  <a href="#feedback-and-issues"><strong>Feedback and Issues</strong></a>
 </p>
 
 ## Team
@@ -26,67 +25,78 @@
 
 ## Features
 
+- **Web Scraper**
+  - Extract content from any URL for learning purposes.
+  - AI-powered content analysis and study guide generation.
+
 - **Diverse Learning Material Input Support**
+  - Accepts various types of input: Video, Text, Keywords, and Topics.
 
-  - Accepts various types of input: Video, Text, Keywords and Topics.
+- **AI-Generated Study Materials**
+  - **Summary**: Concise summaries of learning materials.
+  - **Video Recommendations**: Relevant videos for deeper understanding.
+  - **Q&A**: Exercise questions to reinforce concepts.
+  - **Further Information**: Additional resources for comprehensive learning.
+  - **Action Items**: Task identification and integration with Google Calendar and Gmail.
 
-- **Generated Study Materials**
-
-  - **Summary**: Provides concise summaries of learning materials.
-  - **Video Recommendations**: Suggests relevant videos for further understanding.
-  - **Q&A**: Generates exercise questions to help master the concepts.
-  - **Further Information**: Offers additional resources for deeper learning.
-  - **Action Items**: Identifies tasks from videos or other input types, adds them to Google Calendar, and sends reminder emails through Gmail.
-
-- **Note Taking**
-
-  - **Grammar Refinement**: Corrects grammatical errors in notes.
-  - **Concise Version**: Summarizes and simplifies lengthy or disorganized notes.
+- **Smart Note Taking**
+  - **Grammar Refinement**: Automatic correction of grammatical errors.
+  - **Concise Version**: Summarization of lengthy or disorganized notes.
 
 - **AI-Powered Discussion**
-
-  - Engage in further discussions with AI about the learning materials to enhance comprehension with AI-generated recommended questions based on user input.
+  - Engage in interactive discussions with AI to enhance comprehension.
+  - AI-generated recommended questions based on user input.
 
 - **Extended Learning Materials**
-
-  - Allows adding extra learning materials, integrating new inputs with existing ones for comprehensive study support.
+  - Seamless integration of new inputs with existing materials for comprehensive study support.
 
 - **Learning History**
-  - Tracks and maintains a history of all learning activities and materials.
+  - Track and review all learning activities and materials.
 
 ## Demo
 
-You can view a fully working demo on [Youtube](https://youtu.be/MJtmCqJjejw?si=j9s7jFL7Lc4eXv8B).
+Watch our fully working demo on [YouTube](https://youtu.be/MJtmCqJjejw?si=j9s7jFL7Lc4eXv8B).
 
-## Clone and run locally
+## Getting Started
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+1. Create a Supabase project via the [Supabase dashboard](https://database.new).
 
-2. Create a Next.js app using the Supabase Starter template npx command
-
-   ```bash
-   npx create-next-app -e with-supabase
-   ```
-
-3. Use `cd` to change into the app's directory
+2. Clone the repository:
 
    ```bash
-   cd name-of-new-app
+   git clone https://github.com/your-username/sparkmind.git
+   cd sparkmind
    ```
 
-4. Rename `.env.local.example` to `.env.local` and update the following:
+3. Install dependencies:
 
+   ```bash
+   npm install
    ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+4. Set up environment variables:
+   - Copy `.env.local.example` to `.env.local`
+   - Update the following in `.env.local`:
 
-5. You can now run the Next.js local development server:
+     ```
+     NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
+     NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
+     ```
+
+   - Find these values in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+
+5. Run the development server:
 
    ```bash
    npm run dev
    ```
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+   Visit [http://localhost:3000](http://localhost:3000) to see the application.
+
+## Feedback and Issues
+
+We welcome your feedback and contributions! Please open an issue or submit a pull request on our [GitHub repository](https://github.com/your-username/sparkmind).
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
