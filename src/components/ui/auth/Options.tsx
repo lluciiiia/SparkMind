@@ -27,12 +27,12 @@ const Options = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="w-full justify-between">
+        <Button variant="outline" className="w-full justify-between text-navy bg-white">
           Options
           <ChevronDown className="h-4 w-4 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-full">
+      <DropdownMenuContent className="w-full bg-white text-navy">
         {allowForgotPassword && (
           <DropdownMenuItem asChild>
             <Link href="/signin/forgot_password" className="w-full">

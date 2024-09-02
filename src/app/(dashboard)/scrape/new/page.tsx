@@ -1,3 +1,5 @@
+'use client';
+
 import { ContentLayout } from '@/components';
 import {
   Breadcrumb,
@@ -11,7 +13,7 @@ import Link from 'next/link';
 import React from 'react';
 import { Scraper } from '../_components';
 
-const ScrapeNewPage = async () => {
+const ScrapeNewPage = () => {
   return (
     <ContentLayout title="Scrape New">
       <Breadcrumb>

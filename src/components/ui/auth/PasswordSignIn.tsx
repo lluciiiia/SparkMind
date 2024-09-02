@@ -57,7 +57,7 @@ export const PasswordSignIn = memo(({ allowEmail, redirectMethod }: PasswordSign
           <div className="grid gap-1">
             <Label
               className={`
-                font-semibold
+                font-semibold text-navy
               `}
               htmlFor="email"
             >
@@ -75,7 +75,7 @@ export const PasswordSignIn = memo(({ allowEmail, redirectMethod }: PasswordSign
             />
             <Label
               className={`
-                font-semibold
+                font-semibold text-navy
               `}
               htmlFor="password"
             >

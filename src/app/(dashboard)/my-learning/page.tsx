@@ -130,9 +130,9 @@ export const MyLearning = () => {
       }
 
       if (res.data.body.length === 0) {
-        console.log('No learning data found for user');
         setCards([]);
         setOriginalCards([]);
+        toast.info('No learning data found for user');
         return;
       }
 
@@ -210,8 +210,6 @@ export const MyLearning = () => {
           clearMyLearningId();
           throw new Error('User ID not returned from superbase');
         }
-        console.log('id', id);
-        console.log('uuid', uuid);
         const response = await axios.delete('/api/v1/learnings', {
           data: { id, uuid },
         });
@@ -248,7 +246,6 @@ export const MyLearning = () => {
 
   function handleEdit(id: string): void {
     const filteredCard = cards.find((card) => card.id === id);
-    console.log('filteredCard', filteredCard?.id);
     if (filteredCard) {
       const parsedDate = parseDateUTC(filteredCard?.date);
       setCurrTitle(filteredCard?.title || '');
@@ -347,7 +344,6 @@ export const MyLearning = () => {
   };
 
   const redirectToMyLearningPage = (id: string) => {
-    console.log('redirectToMyLearningPage', id);
     setPersistedId(id);
     window.open(`/dashboard?mylearning_id=${id}`, '_self');
   };
@@ -440,6 +436,7 @@ export const MyLearning = () => {
                 className="h-full w-full"
                 onClick={() => {
                   const newId = generateNewId();
+                  toast.info('Redirecting to new learning card');
                   window.open(`/new?mylearning_id=${newId}`, '_self');
                 }}
               >

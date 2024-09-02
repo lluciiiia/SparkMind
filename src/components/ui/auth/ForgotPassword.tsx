@@ -58,7 +58,7 @@ export const ForgotPassword = ({
           <div className="grid gap-1">
             <Label
               className={`
-                font-semibold
+                font-semibold text-navy
               `}
               htmlFor="email"
             >
@@ -78,7 +78,7 @@ export const ForgotPassword = ({
           <Button
             variant="default"
             type="submit"
-            className="mt-1"
+            className="mt-1 bg-navy"
             loading={isSubmitting}
             disabled={disableButton}
           >
