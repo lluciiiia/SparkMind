@@ -62,6 +62,7 @@ export const MyLearning = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [colorMap, setColorMap] = useState<Map<number, string>>(new Map<number, string>());
   const [showAlert, setShowAlert] = useState(true);
+  const [editingCardId, setEditingCardId] = useState<string | null>(null);
 
   const supabaseClient = createClient();
 
@@ -166,41 +167,6 @@ export const MyLearning = () => {
     fetchData();
   }, [fetchData]);
 
-  const handleAddCard = async () => {
-    try {
-      const uuid = (await supabaseClient.auth.getUser()).data.user?.id;
-
-      if (!uuid) {
-        clearMyLearningId();
-        throw new Error('User ID not returned from Supabase');
-      }
-
-      const currentDate = new Date();
-      const formattedDate = dateFormatter(currentDate);
-      const defaultTitle = `New Learning`;
-      const defaultInput = 'New topic';
-      const newLearningId = generateNewId();
-
-      const data = {
-        uuid: uuid,
-        title: defaultTitle,
-        input: defaultInput,
-        date: formattedDate,
-        id: newLearningId,
-      };
-
-      const res = await axios.post('/api/v1/learnings', data);
-      if (res.status === 200) {
-        setPersistedId(newLearningId); // Set the new ID as the persisted ID
-        redirectToDashboard(newLearningId);
-      } else {
-        toast.error(`Error storing data: ${res.data.error}`);
-      }
-    } catch (error) {
-      toast.error(`Error storing data: ${(error as Error).message}`);
-    }
-  };
-
   const handleDelete = async (id: string | null) => {
     try {
       if (id !== null) {
@@ -227,20 +193,9 @@ export const MyLearning = () => {
     }
   };
 
-  const handleSearch = (search: string) => {
-    if (search.length > 0) {
-      const filteredCards = cards.filter((card) =>
-        card.title.toLowerCase().includes(search.toLowerCase()),
-      );
-      setCards(filteredCards);
-    } else {
-      setCards(originalCards);
-    }
-  };
-
   function parseDateUTC(dateString: string): Date {
     const [day, month, year] = dateString.split(' ');
-    const monthIndex = new Date(Date.parse(month + ' 1, 2012')).getMonth(); // Get month index
+    const monthIndex = new Date(Date.parse(month + ' 1, 2012')).getMonth();
     return new Date(Date.UTC(Number(year), monthIndex, Number(day)));
   }
 
@@ -251,13 +206,10 @@ export const MyLearning = () => {
       setCurrTitle(filteredCard?.title || '');
       setCurrInput(filteredCard?.input || '');
       setCurrDate(parsedDate);
+      setEditingCardId(id);
       setIsDialogOpen(true);
     }
   }
-
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrDate(new Date(e.target.value));
-  };
 
   const handleSaveCard = async (card: Cards) => {
     try {
@@ -287,7 +239,7 @@ export const MyLearning = () => {
       if (response.status === 200) {
         setCards(cards.map((c) => (c.id === card.id ? updatedCard : c)));
         setOriginalCards(cards.map((c) => (c.id === card.id ? updatedCard : c)));
-        fetchData(); // Refresh the data after updating
+        fetchData();
       } else {
         throw new Error('Error updating data: ' + response.data.body);
       }
@@ -297,12 +249,12 @@ export const MyLearning = () => {
     }
   };
 
-  const saveChanges = async (id: string | null) => {
-    if (id !== null) {
-      const cardToUpdate = cards.find((c) => c.id === id) as Cards;
+  const saveChanges = async () => {
+    if (editingCardId !== null) {
+      const cardToUpdate = cards.find((c) => c.id === editingCardId) as Cards;
 
       const updatedCard = {
-        id: id,
+        id: editingCardId,
         index: cardToUpdate?.index,
         title: currTitle,
         input: currInput,
@@ -322,25 +274,9 @@ export const MyLearning = () => {
 
   const cancelChanges = () => {
     setCurrDate(new Date());
-    setCurrTitle(cards.find((c) => c.id === mylearning_id)?.title || '');
-    setCurrInput(cards.find((c) => c.id === mylearning_id)?.input || '');
+    setCurrTitle(cards.find((c) => c.id === editingCardId)?.title || '');
+    setCurrInput(cards.find((c) => c.id === editingCardId)?.input || '');
     setIsDialogOpen(false);
-  };
-
-  const toggleSort = () => {
-    if (isDateSorted === false) {
-      const sortedCards = [...cards].sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
-      );
-      setCards(sortedCards);
-    } else {
-      setCards(originalCards);
-    }
-    setIsDateSorted(!isDateSorted);
-  };
-
-  const redirectToDashboard = (id: string) => {
-    router.push(`/new?mylearning_id=${id}`);
   };
 
   const redirectToMyLearningPage = (id: string) => {
@@ -506,7 +442,7 @@ export const MyLearning = () => {
               <Button
                 type="submit"
                 className="bg-red-500 hover:bg-red-900 text-white"
-                onClick={() => handleDelete(mylearning_id)}
+                onClick={() => handleDelete(editingCardId)}
               >
                 Delete
               </Button>
@@ -514,7 +450,7 @@ export const MyLearning = () => {
                 <Button type="button" className="mr-2" onClick={cancelChanges}>
                   Cancel
                 </Button>
-                <Button type="submit" onClick={() => saveChanges(mylearning_id)}>
+                <Button type="submit" onClick={saveChanges}>
                   Save changes
                 </Button>
               </div>

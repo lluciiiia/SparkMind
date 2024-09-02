@@ -47,7 +47,7 @@ const QuestionAndAnswer = memo(function QuestionAndAnswer({ questions }: Props) 
       });
 
       Object.entries(answerMap).forEach(([questionId, answers]) => {
-        const id = parseInt(questionId, 10);
+        const id = Number.parseInt(questionId, 10);
         if (questionMap[id]) {
           questionMap[id].answer = answers;
         }
@@ -154,8 +154,9 @@ const QuestionAndAnswer = memo(function QuestionAndAnswer({ questions }: Props) 
                       key={optionIndex}
                       onClick={() => handleOptionClick(question.id, optionIndex)}
                       variant={buttonVariant}
-                      className={`w-full justify-between ${isRevealed && isCorrect ? 'bg-green-100 hover:bg-green-200' : ''
-                        }`}
+                      className={`w-full justify-between ${
+                        isRevealed && isCorrect ? 'bg-green-100 hover:bg-green-200' : ''
+                      }`}
                     >
                       <span>{option}</span>
                       {icon}

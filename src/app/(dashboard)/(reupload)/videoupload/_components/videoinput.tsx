@@ -36,7 +36,12 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export const ReUploadVideo = () => {
-  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
+  const {
+    id: mylearning_id,
+    clearId: clearMyLearningId,
+    generateNewId,
+    setPersistedId,
+  } = usePersistedId('mylearning_id');
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -83,22 +88,19 @@ export const ReUploadVideo = () => {
         const pathURL = URL.createObjectURL(file);
         setSelectedFile(file);
         setObjectURL(pathURL);
-        // console.log(objectURL);
       } else {
         toast.error('File size must be less than 5MB because we are in the testing phase.');
       }
     }
   };
 
-  const handleVideoUpload = async () => {
+  const handleVideoUpload = async (newLearningId: string) => {
     if (!selectedFile) return;
 
     try {
       const formData = new FormData();
       formData.append('file', selectedFile);
-      if (mylearning_id !== null) {
-        formData.append('learningid', mylearning_id);
-      }
+      formData.append('learningid', newLearningId);
 
       const res = await fetch('/api/v1/extract-transcribe', {
         method: 'PATCH',
@@ -107,10 +109,8 @@ export const ReUploadVideo = () => {
 
       if (!res.ok) throw new Error(await res.text());
 
-      // @ts-ignore trust me bro
       const data = (await res.json()) as any;
 
-      //clean up old setState
       setSelectedFile(null);
       setObjectURL(null);
       setFileType(undefined);
@@ -121,17 +121,17 @@ export const ReUploadVideo = () => {
     }
   };
 
-  const handleUpload = async (input: any, myLearningId: string, uuid: string) => {
+  const handleUpload = async (input: any, newLearningId: string, uuid: string) => {
     try {
-      const response = await saveOutput(input, myLearningId, uuid);
-      router.push(`/dashboard?mylearning_id=${myLearningId}`);
+      const response = await saveOutput(input, newLearningId, uuid);
+      setPersistedId(newLearningId); // Update the persisted ID
+      router.push(`/dashboard?mylearning_id=${newLearningId}`);
     } catch (err: any) {
       throw new Error('Error when save output : ' + (err as Error).message);
     }
   };
 
   const submitChanges = async () => {
-    if (!mylearning_id) return;
     const supabase = createClient();
     const {
       data: { user },
@@ -146,14 +146,17 @@ export const ReUploadVideo = () => {
     try {
       setIsLoading(true);
 
+      const newLearningId = generateNewId(); // Generate a new ID
+
       let input;
       if (fileType === 'video') {
-        const keyWordsArray = await handleVideoUpload();
+        const keyWordsArray = await handleVideoUpload(newLearningId);
         input = keyWordsArray.toString();
       }
-      await handleUpload(input, mylearning_id, uuid);
+      await handleUpload(input, newLearningId, uuid);
     } catch (error) {
-      throw new Error('error in submitChanges' + (error as Error).message);
+      console.error('Error in submitChanges:', error);
+      toast.error('Error in submitting changes: ' + (error as Error).message);
     } finally {
       setIsLoading(false);
     }
@@ -201,14 +204,6 @@ export const ReUploadVideo = () => {
                     </DialogHeader>
 
                     <div className="grid gap-2">
-                      {/* <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType("image")}
-                        disabled>
-                        <ImageIcon className="w-4 h-4 mr-1" />
-                        Image
-                      </Button> */}
                       <Button
                         variant="outline"
                         className="w-full"
@@ -217,14 +212,6 @@ export const ReUploadVideo = () => {
                         <VideoIcon className="w-4 h-4 mr-1" />
                         Video
                       </Button>
-                      {/* <Button
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => setFileType("audio")}
-                        disabled>
-                        <AudioLinesIcon className="w-4 h-4 mr-1" />
-                        Audio
-                      </Button> */}
                     </div>
                   </>
                 )}

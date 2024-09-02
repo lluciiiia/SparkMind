@@ -35,7 +35,13 @@ import { useQueryState } from 'nuqs';
 import { toast } from 'sonner';
 
 export const ReUploadText = () => {
-  const { id: mylearning_id, clearId: clearMyLearningId } = usePersistedId('mylearning_id');
+  toast.info('Support for files is temporarily unavailable');
+  const {
+    id: mylearning_id,
+    clearId: clearMyLearningId,
+    generateNewId,
+    setPersistedId,
+  } = usePersistedId('mylearning_id');
 
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -79,12 +85,12 @@ export const ReUploadText = () => {
 
   const isLaptop = useMediaQuery('(min-width: 1023px)');
 
-  const handleUpload = async (file: File, myLearningId: string) => {
+  const handleUpload = async (file: File, newLearningId: string) => {
     try {
       setIsLoading(true);
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('myLearningId', myLearningId);
+      formData.append('myLearningId', newLearningId);
 
       const response = await fetch('/api/v1/upload-text', {
         method: 'POST',
@@ -97,7 +103,8 @@ export const ReUploadText = () => {
 
       const data = (await response.json()) as any;
       if (data.id) {
-        router.push(`/dashboard?mylearning_id=${data.id}`);
+        setPersistedId(newLearningId); // Update the persisted ID
+        router.push(`/dashboard?mylearning_id=${newLearningId}`);
         toast.success('File uploaded successfully');
       } else {
         toast.error('Invalid response from server, or file upload is temporarily unavailable');
@@ -111,12 +118,13 @@ export const ReUploadText = () => {
   };
 
   const submitChanges = async () => {
-    if (!mylearning_id || !selectedFile) {
+    if (!selectedFile) {
       toast.error('Please select a file to upload');
       return;
     }
 
-    await handleUpload(selectedFile, mylearning_id);
+    const newLearningId = generateNewId(); // Generate a new ID
+    await handleUpload(selectedFile, newLearningId);
   };
 
   return (
