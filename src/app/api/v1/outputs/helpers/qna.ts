@@ -1,16 +1,15 @@
 import { QNA_SYSTEM_INSTRUCTION } from '@/app/api/gemini-system-instructions';
 import { createClient } from '@/utils/supabase/client';
 import dotenv from 'dotenv';
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { genAI, generationConfig, model, safetySettings } from '../../gemini-settings';
 
 dotenv.config();
 
-// Define the Zod schema
 const quizSchema = z.array(
   z.object({
-    id: z.number(),
+    id: z.number().optional(),
     question: z.string(),
     options: z.array(z.string()),
     answer: z.array(z.string()),
@@ -18,63 +17,85 @@ const quizSchema = z.array(
   }),
 );
 
-// Function to convert plain text quiz data into an array of objects
-function parseQuizText(text: string) {
+type QuizItem = z.infer<typeof quizSchema>;
+
+function parseQuizText(text: string): QuizItem[] {
   const lines = text
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line);
-  const questions: any[] = [];
+  const questions: QuizItem[] = [];
+  let currentQuestion: CurrentQuestion | null = null;
   const answers: string[] = [];
-  let currentQuestion: { question: string; options: string[] } | null = null as {
-    question: string;
-    options: string[];
-  } | null;
 
   lines.forEach((line) => {
     const questionMatch = line.match(/^\d+\. \*\*(.+?)\*\*/);
     if (questionMatch) {
       if (currentQuestion) {
         questions.push({
-          id: questions.length + 1,
-          question: currentQuestion.question,
+          id: currentQuestion.id || questions.length + 1,
           options: currentQuestion.options,
-          answer: [],
-          multipleAnswers: false,
+          question: currentQuestion.question,
+          answer: currentQuestion.answer,
+          multipleAnswers: currentQuestion.answer.length > 1,
         });
       }
-      currentQuestion = { question: questionMatch[1], options: [] };
+      currentQuestion = {
+        id: questions.length + 1,
+        question: questionMatch[1],
+        options: [],
+        answer: [],
+      };
     } else if (currentQuestion) {
-      const optionMatch = line.match(/^[a-d]\) (.+)/);
+      const optionMatch = line.match(/^([a-d])\) (.+)/);
       if (optionMatch) {
-        currentQuestion.options.push(optionMatch[1]);
+        currentQuestion.options.push(optionMatch[2]);
+      } else {
+        const answerMatch = line.match(/^\d+\. ([a-d])\)/);
+        if (answerMatch) {
+          answers.push(line);
+        }
       }
-    }
-
-    const answerMatch = line.match(/^\d+\. (\w)\)/);
-    if (answerMatch) {
-      answers.push(answerMatch[1]);
     }
   });
 
   if (currentQuestion) {
     questions.push({
-      id: questions.length + 1,
+      id: currentQuestion.id || questions.length + 1,
       question: currentQuestion.question,
       options: currentQuestion.options,
-      answer: [],
-      multipleAnswers: false,
+      answer: currentQuestion.answer,
+      multipleAnswers: currentQuestion.answer.length > 1,
     });
   }
 
-  questions.forEach((question, index) => {
-    const answerIndex = 'abcd'.indexOf(answers[index]);
-    if (answerIndex !== -1) {
-      question.answer = [question.options[answerIndex]];
+  // Associate answers with questions
+  answers.forEach((answerLine, index) => {
+    const answerMatch = answerLine.match(/^\d+\. ([a-d])\)/);
+    if (answerMatch) {
+      const answerIndex = 'abcd'.indexOf(answerMatch[1]);
+      if (answerIndex !== -1 && questions[index].options[answerIndex]) {
+        questions[index].answer.push(questions[index].options[answerIndex]);
+      }
     }
   });
 
   return questions;
+}
+
+interface QuizQuestion {
+  question: string;
+  options: string[];
+  answer: string[];
+  id: number;
+}
+
+interface CurrentQuestion {
+  id?: number;
+  question: string;
+  options: string[];
+  answer: string[];
+  multipleAnswers?: boolean;
 }
 
 async function fetchQuizData(query: string) {
@@ -112,8 +133,9 @@ export async function saveQuizOutput(query: string, myLearningId: string, output
         .select();
 
       if (error) {
-        return NextResponse.json({ error: 'Error inserting questions output' }, { status: 500 });
+        throw new Error('Error inserting questions output');
       }
+      return { status: 200, data };
     } else {
       const { data, error } = await supabase
         .from('outputs')
@@ -121,16 +143,27 @@ export async function saveQuizOutput(query: string, myLearningId: string, output
         .eq('learning_id', myLearningId);
 
       if (error) {
-        return NextResponse.json({ error: 'Error updating questions output' }, { status: 500 });
+        throw new Error('Error updating questions output');
       }
+      return { status: 200, data };
     }
-
-    return NextResponse.json({ status: 200, body: 'success' });
   } catch (error) {
     console.error('Error fetching or generating questions data:', error);
-    return NextResponse.json(
-      { error: 'Error fetching or generating questions data' },
-      { status: 500 },
-    );
+    return { status: 500, error: 'Error fetching or generating questions data' };
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const { query, myLearningId, output } = (await req.json()) as {
+      query: string;
+      myLearningId: string;
+      output: any;
+    };
+    const result = await saveQuizOutput(query, myLearningId, output);
+    return NextResponse.json({ status: 200, body: result });
+  } catch (error) {
+    console.error('Error in API route:', error);
+    return NextResponse.json({ error: 'Error processing request' }, { status: 500 });
   }
 }

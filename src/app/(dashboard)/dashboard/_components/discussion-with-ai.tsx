@@ -145,7 +145,14 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
               ) : (
                 <Bot className="inline-block mr-2 h-4 w-4" />
               )}
-              <ReactMarkdown remarkPlugins={[remarkGfm]}>{response.text}</ReactMarkdown>
+              <ReactMarkdown
+                className={`${
+                  response.sender === 'user' ? 'text-white bg-navy' : 'text-gray-800 bg-white'
+                }`}
+                remarkPlugins={[remarkGfm]}
+              >
+                {response.text}
+              </ReactMarkdown>
             </div>
           </div>
         ))}
