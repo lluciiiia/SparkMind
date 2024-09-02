@@ -75,7 +75,7 @@ export function Menu({ isOpen }: MenuProps) {
                             className="justify-start w-full h-10 mb-1"
                             asChild
                             onClick={() => {
-                              toast.info(`Redirecting to ${label} page`);
+                              toast.info(`Navigating to ${label}`);
                             }}
                           >
                             <Link href={href}>
@@ -122,7 +122,7 @@ export function Menu({ isOpen }: MenuProps) {
                     className="justify-start w-full h-10 mb-2"
                     asChild
                     onClick={() => {
-                      toast.info('Redirecting to account page');
+                      toast.info('Navigating to Account page');
                     }}
                   >
                     <Link href="/account">
@@ -147,8 +147,8 @@ export function Menu({ isOpen }: MenuProps) {
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
                   <Button
-                    onClick={() => {
-                      supabase.auth.signOut();
+                    onClick={async () => {
+                      await supabase.auth.signOut();
                       toast.info('Signed out successfully');
                       router.push('/signin/password_signin');
                     }}

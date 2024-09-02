@@ -1,30 +1,27 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { PING, PONG } from '@/constants';
+import { usePersistedId } from '@/hooks';
 import { fetchDescriptionFromURL } from '@/lib/scrape';
 import type { InputSchema, ScrapeSchema, ScraperQueueItemType } from '@/schema/scrape';
-import { debounce } from '@/utils';
 import { createClient } from '@/utils/supabase/client';
-import type React from 'react';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { Check, Copy, Globe, Loader2 } from 'lucide-react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 import { AiFrame } from './AiFrame';
 
-export const Scraper: React.FC = memo(() => {
-  const [scraper, setScraper] = useState<ScraperQueueItemType | null>(null);
-  const [url, setUrl] = useState<string>('');
-  const [websiteData, setWebsiteData] = useState<string>('');
-  const [topic, setTopic] = useState<string>('');
-  const [uuid, setUuid] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const resetOutputId = useCallback(() => {
-    sessionStorage.removeItem('output_id');
-  }, []);
+export const Scraper = memo(() => {
+  const [url, setUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [websiteData, setWebsiteData] = useState('');
+  const [topic, setTopic] = useState('No Topic');
+  const [isCopied, setIsCopied] = useState(false);
+  const { id: outputId, setPersistedId, clearId } = usePersistedId('output_id');
 
   useEffect(() => {
     const fetchDescription = async () => {
@@ -40,6 +37,102 @@ export const Scraper: React.FC = memo(() => {
     fetchDescription();
   }, [url]);
 
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!isValidURL(url)) {
+        toast.error('Please enter a valid URL');
+        return;
+      }
+      setIsLoading(true);
+      clearId();
+      try {
+        const newInputId = uuidv4();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+          controller.abort();
+          throw new Error('Request timed out');
+        }, 30000);
+
+        try {
+          const response = await fetch(`${PING}${encodeURIComponent(url)}`, {
+            method: 'GET',
+            signal: controller.signal,
+          });
+
+          if (!response.ok) {
+            throw new Error(
+              `HTTP error! status: ${response.status}, statusText: ${response.statusText}`,
+            );
+          }
+
+          const data = (await response.json()) as ScrapeSchema;
+
+          if (data && data.filteredTexts) {
+            const websiteDataText = data.filteredTexts.join('\n');
+            setWebsiteData(websiteDataText);
+
+            const supabase = createClient();
+            const { data: userData, error: userError } = await supabase.auth.getUser();
+
+            if (userError) {
+              throw new Error('Failed to get user data');
+            }
+
+            const userId = userData.user?.id;
+
+            if (!userId) {
+              throw new Error('User ID is missing');
+            }
+
+            const postResponse = await fetch(PONG, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                input_id: newInputId,
+                user_id: userId,
+                url,
+                text: websiteDataText,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              }),
+            });
+
+            if (postResponse.ok) {
+              const postData = (await postResponse.json()) as InputSchema;
+              if (postData) {
+                toast.success('Scraping was successful');
+                setPersistedId(newInputId);
+              } else {
+                throw new Error('Failed to save scraping results');
+              }
+            } else {
+              throw new Error('Failed to save scraping results');
+            }
+          } else {
+            throw new Error('Scraping was not successful or response is invalid');
+          }
+        } finally {
+          clearTimeout(timeoutId);
+        }
+      } catch (error) {
+        console.error('Scraping error:', error);
+        if (error instanceof Error && error.name === 'AbortError') {
+          toast.error('Request timed out. Please try again.');
+        } else {
+          toast.error(
+            `Error: ${error instanceof Error ? error.message : 'An unknown error occurred'}`,
+          );
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [url, clearId, setPersistedId],
+  );
+
   const isValidURL = (string: string): boolean => {
     try {
       new URL(string);
@@ -49,176 +142,87 @@ export const Scraper: React.FC = memo(() => {
     }
   };
 
-  const getUser = async () => {
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.getUser();
-    if (error) {
-      console.error('Failed to get user ID:', error);
-      return null;
-    }
-    return data.user?.id;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUrl(e.target.value.trim());
   };
 
-  const checkApiHealth = async () => {
-    try {
-      const removedQueryString = PING.split('?')[0].split('/scrape')[0];
-      const response = await fetch(`${removedQueryString}/health`, { method: 'GET' });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  };
-
-  const processItem = async (item: ScraperQueueItemType): Promise<void> => {
-    if (!(await checkApiHealth())) {
-      toast.error('Scraper API is currently unavailable. Please try again later.');
-      return;
-    }
-    const newUuid = uuidv4();
-    setUuid(newUuid);
-    if (!url) {
-      toast.error('Please enter a URL before scraping');
-      return;
-    }
-
-    setScraper(item);
-    setIsLoading(true);
-    const user_id = await getUser();
-
-    if (!user_id) {
-      toast.error('No user ID found. Please log in and try again.');
-      setIsLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-
-    try {
-      const response = await fetch(`${PING}${encodeURIComponent(url)}`, {
-        method: 'GET',
-        signal: controller.signal,
+  const handleCopy = useCallback(() => {
+    navigator.clipboard
+      .writeText(websiteData)
+      .then(() => {
+        setIsCopied(true);
+        toast.success('Copied to clipboard');
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch((error) => {
+        toast.error(`Failed to copy: ${error instanceof Error ? error.message : 'Unknown error'}`);
       });
-      clearTimeout(timeoutId);
-      if (!response.ok) {
-        throw new Error(
-          `HTTP error! status: ${response.status}, statusText: ${response.statusText}`,
-        );
-      }
-      const data = (await response.json()) as ScrapeSchema;
-
-      if (data && data.filteredTexts) {
-        const updatedScraperItem: ScraperQueueItemType = {
-          ...item,
-          url,
-          status: 'done',
-          finishedAt: new Date(),
-        };
-        setScraper(updatedScraperItem);
-        const websiteDataText = data.filteredTexts.join('\n');
-        setWebsiteData(websiteDataText);
-
-        const postResponse = await fetch(PONG, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            input_id: newUuid,
-            user_id,
-            url,
-            text: websiteDataText,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          }),
-        });
-        if (postResponse.ok) {
-          const postData = (await postResponse.json()) as InputSchema;
-          if (postData) {
-            toast.success('Scraping was successful');
-            sessionStorage.setItem('output_id', newUuid);
-            window.history.pushState({}, '', `?output_id=${newUuid}`);
-          } else {
-            throw new Error('Failed to save scraping results');
-          }
-        } else {
-          throw new Error('Failed to save scraping results');
-        }
-      } else {
-        throw new Error('Scraping was not successful or response is invalid');
-      }
-    } catch (error) {
-      clearTimeout(timeoutId);
-      console.error('Scraping error:', error);
-      let errorMessage = 'An unknown error occurred';
-      if (error instanceof Error) {
-        errorMessage = error.message;
-        if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
-          errorMessage =
-            'Network error: Unable to connect to the scraper API. Please check your internet connection and try again.';
-        }
-      }
-      toast.error(`Error: ${errorMessage}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isValidURL(url)) {
-      toast.error('Please enter a valid URL');
-      return;
-    }
-    resetOutputId();
-    const item: ScraperQueueItemType = {
-      id: uuidv4(),
-      url,
-      startedAt: new Date(),
-      finishedAt: new Date(),
-      status: 'pending',
-    };
-    processItem(item);
-  };
-
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    debounce(() => setUrl(e.target.value.trim()), 300)();
-  }, []);
+  }, [websiteData]);
 
   return (
-    <>
-      <form className="flex w-full max-w-sm items-center space-x-2" onSubmit={handleSubmit}>
-        <Input
-          ref={inputRef}
-          id="url"
-          type="url"
-          onChange={handleChange}
-          placeholder="Enter URL"
-          className={`border rounded px-4 py-2 ${isLoading ? 'cursor-not-allowed' : ''}`}
-          disabled={isLoading}
-          required
-        />
-        <Button
-          type="submit"
-          className={`
-            text-white transition-colors duration-300 flex items-center justify-center gap-2
-            ${isLoading || !url ? 'bg-gray-500 cursor-not-allowed opacity-50' : 'bg-navy hover:bg-navy-dark'}
-          `}
-          data-testid="scrape-all"
-          disabled={isLoading || !url}
-          onClick={() => console.log('clicked')}
-        >
-          {isLoading ? 'Scraping...' : 'Scrape website'}
+    <Card className="w-full max-w-3xl mx-auto my-10">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold">Web Scraper</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Globe className="text-gray-400" />
+            <Input
+              type="url"
+              placeholder="Enter URL to scrape"
+              value={url}
+              onChange={handleChange}
+              className="flex-grow"
+              disabled={isLoading}
+              autoComplete={`on`}
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={!url || isLoading}>
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Scraping...
+              </>
+            ) : (
+              'Scrape Website'
+            )}
+          </Button>
+        </form>
+
+        <div className="mt-8">
+          <h3 className="text-lg font-semibold mb-2">{topic}</h3>
+          <Card>
+            <ScrollArea className="h-[200px] w-full rounded-md border p-4">
+              {websiteData ? (
+                <AiFrame topic={topic} websiteData={websiteData} isLoading={isLoading} />
+              ) : (
+                <p className="text-gray-500 italic">No content available.</p>
+              )}
+            </ScrollArea>
+          </Card>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-between items-center">
+        <div className="text-sm text-muted-foreground">
+          {websiteData ? `${websiteData.length} characters` : 'No content'}
+        </div>
+        <Button variant="outline" size="sm" onClick={handleCopy} disabled={!websiteData}>
+          {isCopied ? (
+            <>
+              <Check className="mr-2 h-4 w-4" />
+              Copied
+            </>
+          ) : (
+            <>
+              <Copy className="mr-2 h-4 w-4" />
+              Copy to Clipboard
+            </>
+          )}
         </Button>
-      </form>
-      <AiFrame
-        topic={topic}
-        websiteData={websiteData}
-        uuid={uuid}
-        isLoading={isLoading}
-        resetOutputId={resetOutputId}
-      />
-    </>
+      </CardFooter>
+    </Card>
   );
 });
 

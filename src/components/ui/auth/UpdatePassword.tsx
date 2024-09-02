@@ -51,7 +51,7 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
           <div className="grid gap-1">
             <Label
               className={`
-                font-semibold
+                font-semibold text-navy
               `}
               htmlFor="password"
             >
@@ -67,7 +67,7 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
             />
             <Label
               className={`
-                font-semibold
+                font-semibold text-navy
               `}
               htmlFor="passwordConfirm"
             >
@@ -82,7 +82,7 @@ export const UpdatePassword = ({ redirectMethod }: UpdatePasswordProps) => {
               className="w-full p-3 rounded-md bg-[#fafafa] mb-2"
             />
           </div>
-          <Button variant="default" type="submit" className="mt-1" loading={isSubmitting}>
+          <Button variant="default" type="submit" className="mt-1 bg-navy" loading={isSubmitting}>
             Update Password
           </Button>
         </div>

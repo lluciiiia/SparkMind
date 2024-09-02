@@ -56,7 +56,7 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
           <div className="grid gap-1">
             <Label
               className={`
-                font-semibold
+                font-semibold text-navy
               `}
               htmlFor="email"
             >
@@ -74,7 +74,7 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
             />
             <Label
               className={`
-                font-semibold
+                font-semibold text-navy
               `}
               htmlFor="password"
             >
@@ -89,7 +89,7 @@ export const SignUp = ({ allowEmail, redirectMethod }: SignUpProps) => {
               className="w-full p-3 rounded-md bg-[#fafafa] mb-2"
             />
           </div>
-          <Button variant="default" type="submit" className="mt-1" loading={isSubmitting}>
+          <Button variant="default" type="submit" className="mt-1 bg-navy" loading={isSubmitting}>
             Sign up
           </Button>
         </div>

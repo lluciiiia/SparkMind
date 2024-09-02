@@ -58,7 +58,7 @@ export const EmailSignIn = ({ allowPassword, redirectMethod, disableButton }: Em
             <Label
               htmlFor="email"
               className={`
-                font-semibold
+                font-semibold text-navy
               `}
             >
               Email
@@ -77,7 +77,7 @@ export const EmailSignIn = ({ allowPassword, redirectMethod, disableButton }: Em
           <Button
             variant="default"
             type="submit"
-            className="mt-1"
+            className="mt-1 bg-navy"
             loading={isSubmitting}
             disabled={disableButton}
           >

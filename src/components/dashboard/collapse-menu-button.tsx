@@ -80,7 +80,7 @@ export function CollapseMenuButton({
             className="w-full justify-start h-10 mb-1"
             asChild
             onClick={() => {
-              toast.info('Redirecting to account page');
+              toast.info(`Redirecting to ${label} page`);
             }}
           >
             <Link href={href}>

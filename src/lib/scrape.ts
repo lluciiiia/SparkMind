@@ -4,7 +4,6 @@ import { userAgent } from '@/constants';
 import type { InputSchema, OutputSchema } from '@/schema/scrape';
 import { createClient } from '@/utils/supabase/server';
 import ogs from 'open-graph-scraper';
-import { v4 as uuidv4 } from 'uuid';
 
 const studyGuidePrompt = (topic: string, websiteData: string): string => `
 You are a helpful AI assistant creating a 
@@ -50,24 +49,29 @@ const fetchDescriptionFromURL = async (url: string) => {
   }
 };
 
-const insertScraperOutput = async (textOutput: string, promptName: string, uuid: string) => {
+const insertScraperOutput = async (
+  uuid: string,
+  topic: string,
+  websiteData: string,
+): Promise<OutputSchema> => {
   const supabase = createClient();
 
   const newOutput = {
     output_id: uuid,
-    text_output: textOutput,
-    created_at: new Date(),
-    updated_at: new Date(),
-    prompt_name: promptName,
+    text_output: websiteData,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    prompt_name: topic,
   };
 
   const { data, error } = await supabase.from('scraper_output').insert(newOutput).select();
 
   if (error) {
-    throw new Error('Error inserting scraper output : ' + error.message);
+    console.error('Error inserting scraper output:', error);
+    throw new Error('Error inserting scraper output: ' + error.message);
   }
-
-  return data;
+  console.log('insertScraperOutput', data);
+  return data[0] as OutputSchema;
 };
 
 const fetchAllScrapes = async (query: string): Promise<OutputSchema[]> => {
@@ -121,8 +125,25 @@ const deleteOutput = async (id: string) => {
   const { error } = await supabase.from('scraper_output').delete().eq('output_id', id);
   if (error) throw new Error(error.message);
 };
+const fetchScraperOutput = async (outputId: string): Promise<OutputSchema | null> => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('scraper_output')
+    .select('*')
+    .eq('output_id', outputId)
+    .single();
+
+  if (error) {
+    console.error('Error fetching scraper output:', error);
+    return null;
+  }
+
+  return data as OutputSchema;
+};
 
 export {
+  fetchScraperOutput,
   fetchAllScrapes,
   fetchRecentScrapes,
   fetchDescriptionFromURL,

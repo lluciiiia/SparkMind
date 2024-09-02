@@ -1,42 +1,23 @@
 'use client';
 
 import { genAI } from '@/app/api/v1/gemini-settings';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { PONG } from '@/constants';
-import { insertScraperOutput, studyGuidePrompt } from '@/lib/scrape';
-import { createClient } from '@/utils/supabase/client';
+import { usePersistedId } from '@/hooks';
+import { fetchScraperOutput, insertScraperOutput, studyGuidePrompt } from '@/lib/scrape';
 import { HarmBlockThreshold, HarmCategory } from '@google/generative-ai';
-import { Check, Copy } from 'lucide-react';
 import { marked } from 'marked';
 import type React from 'react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { useCopyToClipboard, useIsomorphicLayoutEffect } from 'usehooks-ts';
-
-const stripHtmlTags = (html: string) => {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-  return div.textContent || div.innerText || '';
-};
 
 const AiFrame: React.FC<{
   topic: string;
   websiteData: string;
-  uuid: string;
   isLoading: boolean;
-  resetOutputId: () => void;
-}> = memo(({ topic, websiteData, uuid, isLoading: parentIsLoading, resetOutputId }) => {
-  const isMounted = useRef(true);
-  const prevProps = useRef({ topic, websiteData, uuid });
-
+}> = memo(({ topic, websiteData, isLoading: parentIsLoading }) => {
   const [htmlContent, setHtmlContent] = useState<string>('');
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isInserted, setIsInserted] = useState<boolean>(false);
-  const [isCopied, setIsCopied] = useState(false);
-  const [shouldCheckExistingData, setShouldCheckExistingData] = useState(false);
-  const [copiedText, copy] = useCopyToClipboard();
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
+  const { id: outputId, generateNewId, clearId, setPersistedId } = usePersistedId('output_id');
 
   const googleGenerativeAI = useMemo(() => genAI, []);
 
@@ -58,19 +39,16 @@ const AiFrame: React.FC<{
     async (currentTopic: string, currentWebsiteData: string) => {
       if (!currentTopic || !currentWebsiteData || isInserted) {
         setHtmlContent('<p>Missing topic or website data.</p>');
-        return;
+        return null;
       }
-      setIsLoading(true);
 
       try {
-        sessionStorage.removeItem('output_id');
+        clearId();
         const prompt = await studyGuidePrompt(currentTopic, currentWebsiteData);
         const result = await model.generateContent(prompt);
         const text = await result.response.text();
         const content = await marked(text);
         setHtmlContent(content);
-
-        // Return the generated text for Scraper.tsx to handle
         return text;
       } catch (error) {
         console.error('Error generating content:', error);
@@ -78,156 +56,62 @@ const AiFrame: React.FC<{
           `<p>Error generating content: ${error instanceof Error ? error.message : 'Unknown error'}</p>`,
         );
         toast.error('Error generating content');
-      } finally {
-        setIsLoading(false);
+        return null;
       }
     },
-    [model, isInserted],
+    [model, isInserted, clearId],
   );
 
-  useIsomorphicLayoutEffect(() => {
-    if (!isMounted.current) return;
-
-    const hasChanged =
-      prevProps.current.topic !== topic ||
-      prevProps.current.websiteData !== websiteData ||
-      prevProps.current.uuid !== uuid;
-
-    if (!hasChanged) return;
-
-    prevProps.current = { topic, websiteData, uuid };
+  useEffect(() => {
+    if (!topic || !websiteData || isInserted || isGenerating || parentIsLoading) return;
 
     const checkExistingData = async () => {
-      if (!topic || !websiteData || !uuid) {
-        setHtmlContent('<p>Missing required data.</p>');
-        return;
-      }
-
-      resetOutputId();
-      setIsInserted(false);
-
+      setIsGenerating(true);
       try {
-        const supabase = createClient();
-        if (!supabase) {
-          throw new Error('Failed to create Supabase client');
-        }
-
-        const storedOutputId =
-          sessionStorage.getItem('output_id') ||
-          new URLSearchParams(window.location.search).get('output_id');
-        if (!storedOutputId) {
-          const generatedText = await generateContent(topic, websiteData);
-          if (generatedText) {
-            setIsInserted(true);
-            sessionStorage.setItem('output_id', uuid);
-            window.history.pushState({}, '', `?output_id=${uuid}`);
-          }
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from('scraper_output')
-          .select('*')
-          .eq('output_id', storedOutputId)
-          .maybeSingle();
-
-        if (error && error.code !== 'PGRST116') {
-          throw error;
-        }
-
-        if (data) {
-          const content = await marked(data.text_output);
-          setHtmlContent(content);
+        const generatedText = await generateContent(topic, websiteData);
+        if (generatedText && outputId) {
+          await insertScraperOutput(outputId, topic, generatedText);
           setIsInserted(true);
-        } else {
-          const generatedText = await generateContent(topic, websiteData);
-          if (generatedText) {
-            setIsInserted(true);
-            sessionStorage.setItem('output_id', uuid);
-            window.history.pushState({}, '', `?output_id=${uuid}`);
-          }
+          const content = await marked(generatedText);
+          setHtmlContent(content);
         }
       } catch (error) {
         console.error('Error checking existing data:', error);
-        if (isMounted.current) {
-          setHtmlContent(
-            `<p>Error checking existing data: ${error instanceof Error ? error.message : 'Unknown error'}</p>`,
-          );
-        }
+        setHtmlContent(
+          `<p>Error checking existing data: ${error instanceof Error ? error.message : 'Unknown error'}</p>`,
+        );
+        toast.error('Error checking existing data');
       } finally {
-        setShouldCheckExistingData(false);
+        setIsGenerating(false);
       }
     };
 
     checkExistingData();
-
-    return () => {
-      isMounted.current = false;
-    };
-  }, [topic, websiteData, uuid, generateContent, resetOutputId]);
-
-  const handleCopy = useCallback(() => {
-    copy(stripHtmlTags(htmlContent))
-      .then(() => {
-        setIsCopied(true);
-        toast.success('Copied to clipboard');
-        setTimeout(() => setIsCopied(false), 2000);
-      })
-      .catch((error) => {
-        toast.error(`Failed to copy! ${error instanceof Error ? error.message : error}`);
-      });
-  }, [htmlContent, copy]);
-
-  useEffect(() => {
-    if (!topic || !websiteData || !uuid || isInserted) {
-      return;
-    }
-
-    generateContent(topic, websiteData);
-  }, [topic, websiteData, uuid, isInserted, generateContent]);
-
-  useEffect(() => {
-    setShouldCheckExistingData(true);
-  }, [uuid]);
+  }, [
+    topic,
+    websiteData,
+    outputId,
+    generateContent,
+    generateNewId,
+    isInserted,
+    isGenerating,
+    parentIsLoading,
+    clearId,
+  ]);
 
   return (
-    <Card className="w-full max-w-3xl mx-auto my-10">
-      <CardHeader>
-        <CardTitle>{topic || 'No Topic'}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ScrollArea className="h-[300px] w-full rounded-md border p-4">
-          {isLoading ? (
-            <p>Generating content...</p>
-          ) : htmlContent ? (
-            <pre
-              className="whitespace-pre-wrap font-mono text-sm"
-              dangerouslySetInnerHTML={{ __html: htmlContent }}
-            />
-          ) : (
-            <p>No content available.</p>
-          )}
-        </ScrollArea>
-      </CardContent>
-      <CardFooter className="flex justify-between">
-        <div className="text-sm text-muted-foreground">
-          {htmlContent ? `${htmlContent.length} characters` : 'No content'}
-        </div>
-        <Button variant="outline" size="sm" onClick={handleCopy} disabled={!htmlContent}>
-          {isCopied ? (
-            <>
-              <Check className="mr-2 h-4 w-4" />
-              Copied
-            </>
-          ) : (
-            <>
-              <Copy className="mr-2 h-4 w-4" />
-              Copy to Clipboard
-            </>
-          )}
-        </Button>
-      </CardFooter>
-    </Card>
+    <>
+      {parentIsLoading || isGenerating ? (
+        <p>Generating content...</p>
+      ) : htmlContent ? (
+        <pre
+          className="whitespace-pre-wrap font-mono text-sm"
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+        />
+      ) : (
+        <p>No content available.</p>
+      )}
+    </>
   );
 });
 

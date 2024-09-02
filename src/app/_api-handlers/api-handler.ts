@@ -4,11 +4,11 @@ export const saveOutput = async (
   input: string,
   myLearningId: string,
   userId: string,
-  title: string,
+  title?: string,
 ) => {
   try {
     const processInputResponse = await handleRequest(() =>
-      validateSave(input, myLearningId, userId, title),
+      validateSave(input, myLearningId, userId, title ?? ''),
     );
 
     if (!processInputResponse || !processInputResponse.data || !processInputResponse.data.output) {
