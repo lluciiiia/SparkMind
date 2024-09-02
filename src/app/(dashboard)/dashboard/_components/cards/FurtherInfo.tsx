@@ -36,6 +36,57 @@ const FurtherInfoCard = memo(function FurtherInfoCard({ furtherInfo }: Props) {
     );
   }
 
+  const stopWords = [
+    'the',
+    'and',
+    'of',
+    'to',
+    'a',
+    'in',
+    'that',
+    'is',
+    'with',
+    'as',
+    'for',
+    'on',
+    'by',
+    'an',
+    'be',
+    'this',
+    'which',
+    'or',
+    'at',
+    'from',
+    'it',
+    'are',
+    'was',
+    'were',
+    'who',
+    'what',
+    'when',
+    'where',
+    'why',
+    'how',
+  ];
+
+  function extractMainPoint(title: string): string {
+    return title
+      .split(' ')
+      .filter((word) => !stopWords.includes(word.toLowerCase()))
+      .join(' ');
+  }
+
+  const uniqueTitles = [...new Set(furtherInfo.map((info) => info.title))];
+  const mostCommonTitles = uniqueTitles.reduce((acc: Record<string, number>, title) => {
+    acc[title] = (acc[title] || 0) + 1;
+    return acc;
+  }, {});
+  const mostCommonTitle = Object.keys(mostCommonTitles).reduce((a, b) =>
+    mostCommonTitles[a] > mostCommonTitles[b] ? a : b,
+  );
+
+  const mainPoint = extractMainPoint(mostCommonTitle);
+
   return (
     <Card className="w-full h-[calc(100vh-200px)] bg-background">
       <CardHeader className="bg-muted sr-only">
@@ -80,7 +131,7 @@ const FurtherInfoCard = memo(function FurtherInfoCard({ furtherInfo }: Props) {
                     Resource {index + 1}
                   </Badge>
                   <Badge variant="outline" className="text-xs">
-                    Civic Engagement
+                    {mainPoint}
                   </Badge>
                 </div>
                 <Button

@@ -27,7 +27,7 @@ export default function Home() {
       >
         <div
           className={`
-            flex w-full justify-between px-4 md:px-16 lg:px-32 fixed top-0 left-0 right-0 bg-white z-10 shadow-md
+            flex w-full justify-between px-4 md:px-16 lg:px-32 fixed top-0 left-0 right-0 bg-white z-10 shadow-md items-center
           `}
         >
           <Link href="/" className="text-2xl font-bold">

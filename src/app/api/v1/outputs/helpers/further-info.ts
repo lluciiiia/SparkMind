@@ -24,7 +24,7 @@ export const search = async (query: string) => {
       items: data.items?.map((d) => ({
         link: d.link,
         title: d.title,
-        snippet: d.snippet,
+        snippet: d.snippet || 'No snippet available',
         thumbnail:
           d.pagemap && d.pagemap.cse_thumbnail && d.pagemap.cse_thumbnail.length > 0
             ? {

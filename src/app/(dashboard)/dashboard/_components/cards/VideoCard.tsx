@@ -6,7 +6,7 @@ import he from 'he';
 import { ExternalLink, Eye, ThumbsUp } from 'lucide-react';
 import Link from 'next/link';
 import type React from 'react';
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import type { VideoCardProps, VideoItem } from '../interfaces';
 
 const VideoCard: React.FC<VideoCardProps> = memo(({ videos }) => {
@@ -23,6 +23,17 @@ const VideoCard: React.FC<VideoCardProps> = memo(({ videos }) => {
 
   const validVideos = videos?.filter(isValidVideo) || [];
 
+  const [likedVideos, setLikedVideos] = useState<{ [key: string]: boolean }>({});
+  const [viewedVideos, setViewedVideos] = useState<{ [key: string]: boolean }>({});
+
+  const handleLike = (videoId: string) => {
+    setLikedVideos((prev) => ({ ...prev, [videoId]: !prev[videoId] }));
+  };
+
+  const handleView = (videoId: string) => {
+    setViewedVideos((prev) => ({ ...prev, [videoId]: true }));
+  };
+
   return (
     <Card className="w-full h-[calc(100vh-200px)] bg-background">
       <CardHeader className="bg-muted sr-only">
@@ -35,6 +46,7 @@ const VideoCard: React.FC<VideoCardProps> = memo(({ videos }) => {
               <div
                 key={video.id.videoId}
                 className="flex flex-col md:flex-row p-4 border-b border-border hover:bg-accent/5 transition-colors"
+                onMouseEnter={() => handleView(video.id.videoId)}
               >
                 <div className="md:w-1/3 mb-4 md:mb-0 md:pr-4">
                   <div className="relative aspect-video rounded-lg overflow-hidden">
@@ -60,19 +72,26 @@ const VideoCard: React.FC<VideoCardProps> = memo(({ videos }) => {
                     {he.decode(video.snippet.description)}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge
+                      variant="secondary"
+                      className={`text-xs text-white ${viewedVideos[video.id.videoId] ? 'bg-navy' : ''}`}
+                    >
                       <Eye className="w-3 h-3 mr-1" />
-                      {Math.floor(Math.random() * 1000000)} views
+                      {viewedVideos[video.id.videoId] ? 'Not viewed' : 'Viewed'}
                     </Badge>
-                    <Badge variant="secondary" className="text-xs">
+                    <Badge
+                      variant="secondary"
+                      className={`text-xs cursor-pointer text-navy ${likedVideos[video.id.videoId] ? 'bg-navy' : ''}`}
+                      onClick={() => handleLike(video.id.videoId)}
+                    >
                       <ThumbsUp className="w-3 h-3 mr-1" />
-                      {Math.floor(Math.random() * 50000)} likes
+                      {likedVideos[video.id.videoId] ? 'Liked' : 'Not liked'}
                     </Badge>
                   </div>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="text-white bg-navy hover:bg-navy/90"
+                    className="text-white bg-navy hover:bg-navy/90 hover:text-white"
                     asChild
                   >
                     <Link

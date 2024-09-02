@@ -126,6 +126,7 @@ export const Dashboard = () => {
     }
 
     if (output?.questions) {
+      console.log('questions', output.questions);
       const parsedQuestions = JSON.parse(output.questions) as Question[];
       setQuestions(parsedQuestions);
     }
@@ -284,7 +285,7 @@ export const Dashboard = () => {
         </Breadcrumb>
         <section
           ref={contentRef}
-          className="relative border-2 border-gray-300 rounded-3xl bg-gray-100 overflow-hidden mb-24"
+          className="relative border-2 border-gray-300 rounded-3xl bg-white overflow-hidden mb-24"
         >
           {isLoading ? (
             <div className="relative inset-0 flex items-center justify-center bg-white bg-opacity-20 z-10 backdrop-blur-sm w-full h-full py-16">
@@ -298,14 +299,14 @@ export const Dashboard = () => {
             </div>
           ) : (
             <>
-              <nav className="flex flex-wrap justify-start border-b border-gray-300 bg-gray-200">
+              <nav className="flex flex-wrap justify-start border-b border-gray-300 bg-gray-100">
                 {tabs.map((tab) => (
                   <button
                     key={tab.name}
                     type="button"
                     className={`
                       px-4 py-2 text-sm font-medium transition-colors duration-200
-                      ${activeTab === tab.name ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-300'}
+                      ${activeTab === tab.name ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-200'}
                       ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'}
                       ${activeTab === tab.name ? 'rounded-t-xl' : ''}
                     `.trim()}
@@ -333,7 +334,7 @@ export const Dashboard = () => {
             </>
           )}
         </section>
-        <footer className="fixed bottom-0 left-0 right-0 z-50 bg-none mx-auto">
+        <footer className="fixed bottom-0 left-0 right-0 z-50 bg-transparent mx-auto">
           <AnimatePresence>
             {isDrawerOpen && (
               <motion.div
@@ -341,7 +342,7 @@ export const Dashboard = () => {
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="bg-none shadow-lg rounded-t-xl overflow-hidden mx-auto"
+                className="bg-white shadow-lg rounded-t-xl overflow-hidden mx-auto"
                 style={{
                   width: contentRef.current ? contentRef.current.offsetWidth : '100%',
                   left: contentRef.current ? contentRef.current.offsetLeft : 0,
@@ -349,13 +350,13 @@ export const Dashboard = () => {
                 }}
                 ref={drawerRef}
               >
-                <div className="bg-none">
+                <div className="bg-white">
                   <DiscussionWithAI learningid={mylearning_id} />
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
-          <div className="flex justify-center pb-2 pt-2 bg-none rounded-t-xl shadow-lg">
+          <div className="flex justify-center pb-2 pt-2 bg-transparent rounded-t-xl shadow-lg">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
