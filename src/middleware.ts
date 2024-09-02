@@ -53,7 +53,10 @@ const handleRedirect = ({
     req.nextUrl.pathname !== '/auth/error' &&
     req.nextUrl.pathname !== '/auth/callback' &&
     req.nextUrl.pathname !== '/auth/reset_password' &&
-    req.nextUrl.pathname !== '/'
+    req.nextUrl.pathname !== '/' &&
+    req.nextUrl.pathname !== '/legal/privacy' &&
+    req.nextUrl.pathname !== '/legal/terms' &&
+    req.nextUrl.pathname !== '/legal/cookies'
   ) {
     const nextRes = NextResponse.redirect(new URL('/signin/password_signin', req.url));
     return { res: nextRes, redirect: true };

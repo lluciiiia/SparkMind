@@ -242,11 +242,7 @@ export const ReUploadKeyword = () => {
                 {fileType && (
                   <div className="flex justify-end">
                     <DialogFooter>
-                      <Button
-                        type="submit"
-                        onClick={submitChanges}
-                        disabled={isLoading}
-                      >
+                      <Button type="submit" onClick={submitChanges} disabled={isLoading}>
                         {isLoading ? 'Uploading ...' : 'Upload'}
                       </Button>
                     </DialogFooter>
