@@ -3,15 +3,12 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
 
 const withPwa = pwa({
-  cacheOnFrontEndNav: true,
-  aggressiveFrontEndNavCaching: true,
-  reloadOnOnline: true,
   dest: 'public',
+  disable: process.env.NODE_ENV === 'development',
   register: true,
-  sw: 'service-worker.js',
-  workboxOptions: {
-    disableDevLogs: true,
-  },
+  skipWaiting: true,
+  sw: '/sw.js',
+  publicExcludes: ['!**/*'],
 });
 
 /**
@@ -28,7 +25,7 @@ const config = {
     },
   },
   images: {
-    unoptimized: true,
+    domains: ['localhost', 'sparkmind.vercel.app', 'lh3.googleusercontent.com'],
   },
   experimental: {
     esmExternals: 'loose',
@@ -62,6 +59,15 @@ const config = {
           },
         ],
       },
+      {
+        source: '/(.*).png',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'image/png',
+          },
+        ],
+      },
     ];
   },
   webpack: (config, { isServer }) => {
@@ -69,7 +75,23 @@ const config = {
       test: /node_modules\/fluent-ffmpeg/,
       use: 'null-loader',
     });
+    config.module.rules.push({
+      test: /\.png$/,
+      use: [
+        {
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]',
+            publicPath: '/_next/static/images/',
+            outputPath: 'static/images/',
+          },
+        },
+      ],
+    });
     return config;
+  },
+  publicRuntimeConfig: {
+    basePath: '',
   },
 };
 
