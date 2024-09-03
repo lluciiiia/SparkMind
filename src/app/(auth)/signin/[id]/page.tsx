@@ -22,8 +22,6 @@ import { AlertCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import authBackground from '../../../../../public/assets/images/auth.png';
-import logo from '../../../../../public/assets/svgs/logo.svg';
 
 export default function SignIn({
   params,
@@ -109,11 +107,12 @@ export default function SignIn({
             <CardHeader className="p-6">
               <div className="flex justify-center mb-4">
                 <Image
-                  src={logo}
+                  src={'/assets/images/logo.png'}
                   alt="SparkMind Logo"
                   width={100}
                   height={100}
                   className="rounded-full bg-white p-2"
+                  priority
                 />
               </div>
               <CardTitle className="text-2xl font-bold text-center text-white sr-only">
@@ -159,11 +158,13 @@ export default function SignIn({
         </div>
       </div>
       <Image
-        src={authBackground}
+        src={'/assets/images/auth.png'}
         alt="authentication screen BackgroundBeams"
         className="object-contain absolute inset-0 w-full h-full z-[-10] mx-auto my-auto max-w-[1440px] max-h-[900px] min-w-[1024px] min-h-[768px]"
         width={1440}
         height={900}
+        priority
+        style={{ width: 'auto', height: 'auto' }} 
       />
     </div>
   );
