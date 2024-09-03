@@ -112,6 +112,7 @@ export default function SignIn({
                   width={100}
                   height={100}
                   className="rounded-full bg-white p-2"
+                  priority
                 />
               </div>
               <CardTitle className="text-2xl font-bold text-center text-white sr-only">
@@ -162,6 +163,8 @@ export default function SignIn({
         className="object-contain absolute inset-0 w-full h-full z-[-10] mx-auto my-auto max-w-[1440px] max-h-[900px] min-w-[1024px] min-h-[768px]"
         width={1440}
         height={900}
+        priority
+        style={{ width: 'auto', height: 'auto' }} 
       />
     </div>
   );

@@ -153,7 +153,7 @@ const ActionCard: React.FC<ActionCardProps> = memo(({ learningId, actionItemsDat
                       prev.map((t, i) => (i === index ? { ...t, description: e.target.value } : t)),
                     )
                   }
-                  className="mb-2"
+                  className="max-h-[200px] min-h-[100px] h-auto overflow-y-auto resize-y"
                   placeholder="Task description"
                 />
                 <Select

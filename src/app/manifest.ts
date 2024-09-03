@@ -1,14 +1,24 @@
 import type { MetadataRoute } from 'next';
 
-export default function manifest(): MetadataRoute.Manifest {
+// @ts-ignore
+type ExtendedScreenshot = MetadataRoute.Manifest['screenshots'][number] & {
+  form_factor?: 'narrow' | 'wide';
+};
+
+type ExtendedManifest = Omit<MetadataRoute.Manifest, 'screenshots'> & {
+  screenshots?: ExtendedScreenshot[];
+};
+
+export default function manifest(): ExtendedManifest {
   return {
     name: 'SparkMind',
     short_name: 'SM',
     description:
-      'SparkMind is a platform designed to help you learn and excel in your field. With our interactive platform, you can learn new concepts, improve your skills, and compete against other users.',
-    categories: ['education', 'learning'],
+      'SparkMind is an AI-driven learning hub that personalizes your educational journey. Upload content, get AI-generated study materials, and enhance your learning experience with smart tools and insights.',
+    categories: ['education', 'AI learning', 'personalized study'],
     lang: 'en-US',
     dir: 'ltr',
+    id: '/',
     start_url: '/',
     scope: '/',
     theme_color: '#0257AC',
@@ -702,10 +712,10 @@ export default function manifest(): MetadataRoute.Manifest {
         short_name: 'Terms',
         url: '/terms',
         description:
-          "The fine print of our digital handshake. Understand BlogMaven's Terms of Service.",
+          "The fine print of our digital handshake. Understand SparkMind's Terms of Service.",
         icons: [
           {
-            src: '/assets/svgs/logo.svg',
+            src: '/assets/svgs/logo-small.svg',
             type: 'image/svg+xml',
             purpose: 'any',
             sizes: '96x96',
@@ -720,7 +730,7 @@ export default function manifest(): MetadataRoute.Manifest {
           'Your privacy matters to us. Learn how SparkMind protects your personal information.',
         icons: [
           {
-            src: '/assets/svgs/logo.svg',
+            src: '/assets/svgs/logo-small.svg',
             type: 'image/svg+xml',
             purpose: 'any',
             sizes: '96x96',
@@ -735,7 +745,7 @@ export default function manifest(): MetadataRoute.Manifest {
           'Understand how we use cookies and similar technologies to enhance your experience.',
         icons: [
           {
-            src: '/assets/svgs/logo.svg',
+            src: '/assets/svgs/logo-small.svg',
             type: 'image/svg+xml',
             purpose: 'any',
             sizes: '96x96',
@@ -745,16 +755,18 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     screenshots: [
       {
-        src: '/images/Screen-shot-wide.png',
+        src: '/assets/images/screen-shot-narrow.png',
         sizes: '640x1136',
         type: 'image/png',
+        form_factor: 'narrow',
       },
       {
-        src: '/images/Screen-shot-narrow.png',
+        src: '/assets/images/screen-shot-wide.png',
         sizes: '1280x800',
         type: 'image/png',
+        form_factor: 'wide',
       },
     ],
     prefer_related_applications: false,
-  };
+  } as ExtendedManifest;
 }

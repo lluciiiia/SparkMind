@@ -125,8 +125,8 @@ export function Recent({ recent }: { recent: OutputSchema[] }) {
   return (
     <div className="relative w-full max-w-4xl mx-auto mt-8 px-4">
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
-          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
+        <div className="absolute inset-0 flex items-center justify-center  bg-opacity-20 z-50 backdrop-blur-sm">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 " />
         </div>
       )}
       <Card className="w-full">

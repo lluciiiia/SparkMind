@@ -11,9 +11,10 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { usePersistedId } from '@/hooks';
-import { format } from 'date-fns'; // Make sure to install date-fns if not already
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
@@ -21,7 +22,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { toast } from 'sonner';
-import { useMediaQuery } from 'usehooks-ts';
 import { NewNoteSection } from '../../notes/_components';
 import ActionCard from './cards/ActionCard';
 import FurtherInfoCard from './cards/FurtherInfo';
@@ -165,9 +165,6 @@ export const Dashboard = () => {
     };
   }, []);
 
-  const isLaptop = useMediaQuery('(min-width: 1024px)');
-  const isTablet = useMediaQuery('(min-width: 768px)');
-
   const handleDelete = async (id: string) => {
     setIsLoading(true);
     const { success } = await NotesMethods.deleteNote(id);
@@ -234,14 +231,6 @@ export const Dashboard = () => {
     setIsLoading(false);
   };
 
-  const tabs = [
-    { name: 'summary', label: 'Summary' },
-    { name: 'video', label: 'Video recommendation' },
-    { name: 'qna', label: 'Q&A' },
-    { name: 'further-info', label: 'Further Information' },
-    { name: 'action-items', label: 'Action Items' },
-  ];
-
   return (
     <>
       <div className="fixed top-20 right-0 z-50">
@@ -254,11 +243,12 @@ export const Dashboard = () => {
           transition={{ type: 'spring', stiffness: 100 }}
         >
           <summary
-            className={`p-2 ${isOpen ? 'rounded-l-md' : 'rounded-l-md'} bg-navy text-white flex items-center cursor-pointer`}
+            className={`p-2 ${isOpen ? 'rounded-l-md' : 'rounded-l-md'
+              } bg-primary text-primary-foreground flex items-center cursor-pointer`}
           >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} className="ml-2" />
-            {showText && <span className="ml-4">New note</span>}
+            {showText && <span className="ml-4 dark:text-navy text-white">New note</span>}
           </summary>
           <NewNoteSection
             handleCreate={handleCreate}
@@ -282,57 +272,51 @@ export const Dashboard = () => {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <section
-          ref={contentRef}
-          className="relative border-2 border-gray-300 rounded-3xl bg-white overflow-hidden mb-24"
-        >
-          {isLoading ? (
-            <div className="relative inset-0 flex items-center justify-center bg-white bg-opacity-20 z-10 backdrop-blur-sm w-full h-full py-16">
-              <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
-            </div>
-          ) : !dataFetched ? (
-            <div className="p-4 text-center text-navy">
-              {fetchAttempts >= MAX_FETCH_ATTEMPTS
-                ? 'Failed to load data. Please try again later.'
-                : 'Attempting to fetch data...'}
-            </div>
-          ) : (
-            <>
-              <nav className="flex flex-wrap justify-start border-b border-gray-300 bg-gray-100">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.name}
-                    type="button"
-                    className={`
-                      px-4 py-2 text-sm font-medium transition-colors duration-200
-                      ${activeTab === tab.name ? 'bg-navy text-white' : 'text-gray-600 hover:bg-gray-200'}
-                      ${isLaptop ? 'flex-1' : isTablet ? 'w-1/3' : 'w-1/2'}
-                      ${activeTab === tab.name ? 'rounded-t-xl' : ''}
-                    `.trim()}
-                    onClick={() => setActiveTab(tab.name)}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </nav>
-              <div className="p-4 sm:p-6 bg-white rounded-b-3xl min-h-[calc(100vh-300px)]">
-                {activeTab === 'summary' && summaryData && (
-                  <SummaryCard summaryData={summaryData} />
-                )}
-                {activeTab === 'video' && <VideoCard videos={videos} />}
-                {activeTab === 'qna' && Array.isArray(questions) && questions.length > 0 && (
-                  <QuestionAndAnswer questions={questions as any[]} />
-                )}
-                {activeTab === 'further-info' && furtherInfoData.length > 0 && (
-                  <FurtherInfoCard furtherInfo={furtherInfoData} />
-                )}
-                {activeTab === 'action-items' && (
-                  <ActionCard learningId={mylearning_id} actionItemsData={actionItemsData || []} />
-                )}
+        <Card ref={contentRef} className="mb-24">
+          <CardHeader className={`sr-only`}>
+            <CardTitle>Learning Dashboard</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-primary" />
               </div>
-            </>
-          )}
-        </section>
+            ) : !dataFetched ? (
+              <div className="p-4 text-center text-primary">
+                {fetchAttempts >= MAX_FETCH_ATTEMPTS
+                  ? 'Failed to load data. Please try again later.'
+                  : 'Attempting to fetch data...'}
+              </div>
+            ) : (
+              <Tabs defaultValue="summary" className="w-full">
+                <TabsList className="grid w-full grid-cols-5">
+                  <TabsTrigger value="summary">Summary</TabsTrigger>
+                  <TabsTrigger value="video">Video recommendation</TabsTrigger>
+                  <TabsTrigger value="qna">Q&A</TabsTrigger>
+                  <TabsTrigger value="further-info">Further Information</TabsTrigger>
+                  <TabsTrigger value="action-items">Action Items</TabsTrigger>
+                </TabsList>
+                <TabsContent value="summary">
+                  {summaryData && <SummaryCard summaryData={summaryData} />}
+                </TabsContent>
+                <TabsContent value="video">
+                  <VideoCard videos={videos} />
+                </TabsContent>
+                <TabsContent value="qna">
+                  {Array.isArray(questions) && questions.length > 0 && (
+                    <QuestionAndAnswer questions={questions as any[]} />
+                  )}
+                </TabsContent>
+                <TabsContent value="further-info">
+                  {furtherInfoData.length > 0 && <FurtherInfoCard furtherInfo={furtherInfoData} />}
+                </TabsContent>
+                <TabsContent value="action-items">
+                  <ActionCard learningId={mylearning_id} actionItemsData={actionItemsData || []} />
+                </TabsContent>
+              </Tabs>
+            )}
+          </CardContent>
+        </Card>
         <footer className="fixed bottom-0 left-0 right-0 z-50 bg-transparent mx-auto">
           <AnimatePresence>
             {isDrawerOpen && (
@@ -341,7 +325,7 @@ export const Dashboard = () => {
                 animate={{ y: 0 }}
                 exit={{ y: '100%' }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="bg-white shadow-lg rounded-t-xl overflow-hidden mx-auto"
+                className="bg-background shadow-lg rounded-t-xl overflow-hidden mx-auto"
                 style={{
                   width: contentRef.current ? contentRef.current.offsetWidth : '100%',
                   left: contentRef.current ? contentRef.current.offsetLeft : 0,
@@ -349,7 +333,7 @@ export const Dashboard = () => {
                 }}
                 ref={drawerRef}
               >
-                <div className="bg-white">
+                <div className="bg-background">
                   <DiscussionWithAI learningid={mylearning_id} />
                 </div>
               </motion.div>
@@ -362,7 +346,7 @@ export const Dashboard = () => {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full bg-navy text-white hover:bg-navy/90"
+                    className="rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
                     onClick={() => setIsDrawerOpen(!isDrawerOpen)}
                   >
                     {isDrawerOpen ? (

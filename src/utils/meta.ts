@@ -5,12 +5,14 @@ export function constructMetadata({
   title = `${app.name}`,
   description = `${app.description}`,
   image = '/opengraph-image.png',
+  twitter = '/twitter-image.png',
   icons = '/assets/svgs/logo.svg',
   noIndex = false,
 }: {
   title?: string;
   description?: string;
   image?: string;
+  twitter?: string;
   icons?: string;
   noIndex?: boolean;
 } = {}): Metadata {
@@ -33,7 +35,7 @@ export function constructMetadata({
       card: 'summary_large_image',
       title,
       description,
-      images: [image],
+      images: [twitter],
       creator: '@SparkMind',
     },
     icons: [
@@ -44,6 +46,7 @@ export function constructMetadata({
     ],
     manifest: '/manifest.webmanifest',
     metadataBase: new URL(app.url),
+
     other: {
       currentYear: new Date().getFullYear(),
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,

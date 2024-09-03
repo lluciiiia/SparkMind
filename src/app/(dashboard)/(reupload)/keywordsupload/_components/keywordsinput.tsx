@@ -233,6 +233,7 @@ export const ReUploadKeyword = () => {
                     <Textarea
                       id="keywords"
                       placeholder="Write your keywords / topic here"
+                      className="max-h-[200px] min-h-[100px] h-auto overflow-y-auto resize-y"
                       value={keywords}
                       onChange={handleKeywordsChange}
                     />

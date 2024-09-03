@@ -33,8 +33,8 @@ export function Sidebar() {
             <Image
               src={'/assets/images/logo.png'}
               alt="logo"
-              width={10}
-              height={10}
+              width={512}
+              height={512}
               className="w-8 h-8 mr-1"
             />
             <h1

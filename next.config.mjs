@@ -4,13 +4,13 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 const withPwa = pwa({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
+  disable: false, // Change this to false to enable PWA in all environments
   register: true,
   skipWaiting: true,
   sw: '/sw.js',
-  publicExcludes: ['!**/*'],
+  publicExcludes: ['!noprecache/**/*'],
+  buildExcludes: [/middleware-manifest\.json$/],
 });
-
 /**
  * @type {import("next/dist/server/config").NextConfig}
  */
@@ -25,7 +25,25 @@ const config = {
     },
   },
   images: {
-    domains: ['localhost', 'sparkmind.vercel.app', 'lh3.googleusercontent.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '3000',
+      },
+      {
+        protocol: 'https',
+        hostname: 'sparkmind.vercel.app',
+      },
+      {
+        protocol: 'https',
+        hostname: 'encrypted-tbn0.gstatic.com',
+      },
+    ]
   },
   experimental: {
     esmExternals: 'loose',
@@ -76,14 +94,13 @@ const config = {
       use: 'null-loader',
     });
     config.module.rules.push({
-      test: /\.png$/,
+      test: /\.(png|jpe?g|gif|svg|webp|avif)$/i,
       use: [
         {
           loader: 'file-loader',
           options: {
-            name: '[name].[ext]',
-            publicPath: '/_next/static/images/',
-            outputPath: 'static/images/',
+            publicPath: '/_next',
+            name: 'static/media/[name].[hash].[ext]',
           },
         },
       ],

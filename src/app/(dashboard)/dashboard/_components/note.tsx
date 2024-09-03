@@ -23,7 +23,7 @@ const NoteCard: React.FC<NoteCardProps> = ({ note, onDelete }) => {
         <CardDescription>
           <Textarea
             placeholder="Enter your prompt"
-            className="w-full max-h-60 overflow-y-auto resize-y mt-2"
+            className="max-h-[200px] min-h-[100px] h-auto overflow-y-auto resize-y"
             value={note.content}
             readOnly
           />
