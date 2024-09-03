@@ -2,10 +2,13 @@
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Form, FormControl, FormField } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
@@ -131,11 +134,11 @@ export const NewNoteSection: React.FC<{
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.8 }}
         transition={{ duration: 0.3 }}
-        className="w-full bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+        className="w-full bg-navy rounded-lg shadow-md hover:shadow-lg transition-shadow"
       >
         <div className="p-4 h-full flex flex-col">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold truncate flex-1 mr-2">
+            <h3 className="text-lg font-semibold truncate flex-1 mr-2 text-white">
               {note.title || 'New Note'}
             </h3>
             <Button
@@ -147,7 +150,7 @@ export const NewNoteSection: React.FC<{
               {isDeleting === note.id ? (
                 <Skeleton className="h-5 w-5 rounded-full" />
               ) : (
-                <Image src="/assets/svgs/x_icon.svg" alt="Delete" width={20} height={20} />
+                <Trash2 className="h-5 w-5" />
               )}
             </Button>
           </div>
@@ -158,7 +161,7 @@ export const NewNoteSection: React.FC<{
               setIsModalOpen(true);
             }}
           >
-            <p className="text-sm text-gray-600 break-words line-clamp-4">
+            <p className="text-sm text-muted-foreground break-words line-clamp-4">
               {note.content || 'Start typing...'}
             </p>
           </div>
@@ -171,7 +174,7 @@ export const NewNoteSection: React.FC<{
   return (
     <div className="flex flex-col items-center w-full max-w-4xl mx-auto pt-5 px-4">
       <Button
-        className="mb-5 bg-navy hover:bg-navy-dark text-white rounded-full w-12 h-12 flex items-center justify-center shadow-md hover:shadow-lg transition-all"
+        className="mb-5 bg-primary hover:bg-primary/90 text-primary-foreground rounded-full w-12 h-12 flex items-center justify-center shadow-md hover:shadow-lg transition-all"
         onClick={handleCreateNote}
         disabled={isCreating}
       >
@@ -188,7 +191,7 @@ export const NewNoteSection: React.FC<{
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
-            className="text-center text-gray-500 py-8"
+            className="text-center text-muted-foreground py-8"
           >
             No notes yet. Click the "+" button to create one!
           </motion.div>
@@ -206,27 +209,33 @@ export const NewNoteSection: React.FC<{
                 control={form.control}
                 name="title"
                 render={({ field }) => (
-                  <FormControl>
-                    <input
-                      {...field}
-                      placeholder="Title"
-                      className="w-full p-2 border rounded-md focus:ring-2 focus:ring-navy focus:border-transparent"
-                    />
-                  </FormControl>
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Title"
+                        className="w-full"
+                      />
+                    </FormControl>
+                  </FormItem>
                 )}
               />
               <FormField
                 control={form.control}
                 name="content"
                 render={({ field }) => (
-                  <FormControl>
-                    <textarea
-                      {...field}
-                      placeholder="Content"
-                      rows={7}
-                      className="w-full p-2 border rounded-md resize-none focus:ring-2 focus:ring-navy focus:border-transparent"
-                    />
-                  </FormControl>
+                  <FormItem>
+                    <FormLabel>Content</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        placeholder="Content"
+                        rows={7}
+                        className="w-full resize-none"
+                      />
+                    </FormControl>
+                  </FormItem>
                 )}
               />
               <div className="flex flex-wrap justify-between gap-2">
@@ -262,7 +271,7 @@ export const NewNoteSection: React.FC<{
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="bg-navy hover:bg-navy-dark text-white"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   {isLoading ? 'Saving...' : 'Save'}
                 </Button>

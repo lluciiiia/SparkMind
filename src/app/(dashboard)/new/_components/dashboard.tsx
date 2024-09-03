@@ -288,6 +288,7 @@ export const NewDashboard = () => {
                       id="keywords"
                       placeholder="Write your keywords / topic here"
                       value={keywords}
+                      className="max-h-[200px] min-h-[100px] h-auto overflow-y-auto resize-y"
                       onChange={handleKeywordsChange}
                     />
                   </div>
@@ -313,8 +314,8 @@ export const NewDashboard = () => {
                       <video controls src={objectURL}></video>
                     </div>
                     {isLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-20 z-50 backdrop-blur-sm">
-                        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" />
+                      <div className="absolute inset-0 flex items-center justify-center  bg-opacity-20 z-50 backdrop-blur-sm">
+                        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 " />
                       </div>
                     )}
                   </div>
