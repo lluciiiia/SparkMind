@@ -4,11 +4,11 @@ import { UserNav } from '@/components';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export const HomeNavigation = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -36,9 +36,9 @@ export const HomeNavigation = () => {
     { name: 'Home', path: '/' },
     ...(user
       ? [
-        { name: 'My Learning', path: '/my-learning' },
-        { name: 'Dashboard', path: '/dashboard' },
-      ]
+          { name: 'My Learning', path: '/my-learning' },
+          { name: 'Dashboard', path: '/dashboard' },
+        ]
       : []),
   ];
 

@@ -164,7 +164,7 @@ export default function SignIn({
         width={1440}
         height={900}
         priority
-        style={{ width: 'auto', height: 'auto' }} 
+        style={{ width: 'auto', height: 'auto' }}
       />
     </div>
   );

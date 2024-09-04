@@ -43,7 +43,7 @@ const config = {
         protocol: 'https',
         hostname: 'encrypted-tbn0.gstatic.com',
       },
-    ]
+    ],
   },
   experimental: {
     esmExternals: 'loose',

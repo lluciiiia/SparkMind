@@ -1,11 +1,11 @@
 'use client';
 
+import { Footer } from '@/components';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HomeNavigation } from './HomeNavigation';
-import { Footer } from '@/components';
 
 export default function Home() {
   const router = useRouter();

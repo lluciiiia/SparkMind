@@ -31,6 +31,7 @@ import VideoCard from './cards/VideoCard';
 import DiscussionWithAI from './discussion-with-ai';
 
 import type { FurtherInfo, Note, Output, ParsedVideoData, Question, VideoItem } from './interfaces';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 export const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -289,13 +290,16 @@ export const Dashboard = () => {
               </div>
             ) : (
               <Tabs defaultValue="summary" className="w-full">
-                <TabsList className="grid w-full grid-cols-5">
-                  <TabsTrigger value="summary">Summary</TabsTrigger>
-                  <TabsTrigger value="video">Video recommendation</TabsTrigger>
-                  <TabsTrigger value="qna">Q&A</TabsTrigger>
-                  <TabsTrigger value="further-info">Further Information</TabsTrigger>
-                  <TabsTrigger value="action-items">Action Items</TabsTrigger>
-                </TabsList>
+                <ScrollArea className="w-full">
+                  <TabsList className="inline-flex w-full min-w-max">
+                    <TabsTrigger value="summary">Summary</TabsTrigger>
+                    <TabsTrigger value="video">Video recommendation</TabsTrigger>
+                    <TabsTrigger value="qna">Q&A</TabsTrigger>
+                    <TabsTrigger value="further-info">Further Information</TabsTrigger>
+                    <TabsTrigger value="action-items">Action Items</TabsTrigger>
+                  </TabsList>
+                  <ScrollBar orientation={`horizontal`} />
+                </ScrollArea>
                 <TabsContent value="summary">
                   {summaryData && <SummaryCard summaryData={summaryData} />}
                 </TabsContent>

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import axios from 'axios';
-import { Bot, Send, User, Loader2, Copy, Check } from 'lucide-react';
+import { Bot, Check, Copy, Loader2, Send, User } from 'lucide-react';
 import type React from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -26,7 +26,10 @@ interface DiscussionWithAIProps {
 
 const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
   const [input, setInput] = useState<string>('');
-  const [responses, setResponses, removeResponses] = useLocalStorage<Message[]>(`chat-responses-${learningid}`, []);
+  const [responses, setResponses, removeResponses] = useLocalStorage<Message[]>(
+    `chat-responses-${learningid}`,
+    [],
+  );
   const [chatSession, setChatSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [basicQuestions, setBasicQuestions] = useState<string[]>([]);
@@ -156,10 +159,11 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
                 className={`flex ${response.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`p-2 rounded-lg max-w-[80%] text-sm ${response.sender === 'user'
+                  className={`p-2 rounded-lg max-w-[80%] text-sm ${
+                    response.sender === 'user'
                       ? 'bg-primary dark:text-navy text-white'
                       : 'bg-secondary text-secondary-foreground'
-                    } relative group`}
+                  } relative group`}
                 >
                   {response.sender === 'user' ? (
                     <User className="inline-block mr-2 h-4 w-4" />
@@ -210,7 +214,9 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
                   </Button>
                 ))
               ) : (
-                <div className="text-sm text-muted-foreground">No suggested questions available.</div>
+                <div className="text-sm text-muted-foreground">
+                  No suggested questions available.
+                </div>
               )}
             </div>
           </ScrollArea>

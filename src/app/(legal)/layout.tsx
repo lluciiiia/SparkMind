@@ -25,10 +25,11 @@ export default function LegalLayout({
       >
         <div className="container mx-auto px-4">
           <Link href="/" className="text-2xl font-bold">
-            <Image 
-              width={150} 
+            <Image
+              width={150}
               height={50}
-              src={`/assets/svgs/home/main-logo.svg`} alt="Home Logo" 
+              src={`/assets/svgs/home/main-logo.svg`}
+              alt="Home Logo"
             />
           </Link>
         </div>

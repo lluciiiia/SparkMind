@@ -212,11 +212,7 @@ export const NewNoteSection: React.FC<{
                   <FormItem>
                     <FormLabel>Title</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Title"
-                        className="w-full"
-                      />
+                      <Input {...field} placeholder="Title" className="w-full" />
                     </FormControl>
                   </FormItem>
                 )}

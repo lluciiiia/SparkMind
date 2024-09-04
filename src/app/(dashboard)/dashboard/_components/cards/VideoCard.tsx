@@ -72,10 +72,7 @@ const VideoCard: React.FC<VideoCardProps> = memo(({ videos }) => {
                     {he.decode(video.snippet.description)}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge
-                      variant="secondary"
-                      className={`text-xs text-navy`}
-                    >
+                    <Badge variant="secondary" className={`text-xs text-navy`}>
                       <Eye className="w-3 h-3 mr-1" />
                       {viewedVideos[video.id.videoId] ? 'Not viewed' : 'Viewed'}
                     </Badge>
