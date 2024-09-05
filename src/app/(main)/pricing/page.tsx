@@ -10,6 +10,5 @@ export default async function PricingPage() {
     getProducts(supabase),
     getSubscription(supabase),
   ]);
-
   return <Pricing user={user} products={products ?? []} subscription={subscription} />;
 }

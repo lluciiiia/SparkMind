@@ -1,4 +1,8 @@
+'use client';
+
 import { cn } from '@/lib';
+import { motion } from 'framer-motion';
+import React from 'react';
 
 export const BentoGrid = ({
   className,
@@ -8,12 +12,7 @@ export const BentoGrid = ({
   children?: React.ReactNode;
 }) => {
   return (
-    <div
-      className={cn(
-        'grid md:auto-rows-[18rem] grid-cols-1 md:grid-cols-3 gap-4 max-w-7xl mx-auto ',
-        className,
-      )}
-    >
+    <div className={cn('grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto', className)}>
       {children}
     </div>
   );
@@ -23,32 +22,41 @@ export const BentoGridItem = ({
   className,
   title,
   description,
-  header,
   icon,
 }: {
   className?: string;
   title?: string | React.ReactNode;
   description?: string | React.ReactNode;
-  header?: React.ReactNode;
   icon?: React.ReactNode;
 }) => {
   return (
-    <div
-      className={cn(
-        'row-span-1 rounded-xl group/bento hover:shadow-xl transition duration-200 shadow-input dark:shadow-none p-4 dark:bg-black dark:border-white/[0.2] bg-white border border-transparent justify-between flex flex-col space-y-4',
-        className,
-      )}
+    <motion.div
+      className={cn('rounded-xl shadow-md p-6 bg-[#003366] text-white flex flex-col', className)}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
     >
-      {header}
-      <div className="group-hover/bento:translate-x-2 transition duration-200">
-        {icon}
-        <div className="font-sans font-bold text-neutral-600 dark:text-neutral-200 mb-2 mt-2">
-          {title}
-        </div>
-        <div className="font-sans font-normal text-neutral-600 text-xs dark:text-neutral-300">
-          {description}
-        </div>
+      <div className="flex items-center justify-center w-12 h-12 bg-white rounded-lg mb-4">
+        {React.cloneElement(icon as React.ReactElement, { className: 'w-6 h-6 text-[#003366]' })}
       </div>
-    </div>
+      <motion.h3
+        className="font-semibold text-lg mb-2 text-white"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
+      >
+        {title}
+      </motion.h3>
+      <motion.p
+        className="text-sm text-white/90"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+      >
+        {description}
+      </motion.p>
+    </motion.div>
   );
 };

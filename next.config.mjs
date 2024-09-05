@@ -1,10 +1,11 @@
 import pwa from '@ducanh2912/next-pwa';
+import MillionLint from '@million/lint';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import { withSentryConfig } from '@sentry/nextjs';
 
 const withPwa = pwa({
   dest: 'public',
-  disable: false, // Change this to false to enable PWA in all environments
+  disable: false,
   register: true,
   skipWaiting: true,
   sw: '/sw.js',
@@ -46,7 +47,6 @@ const config = {
     ],
   },
   experimental: {
-    esmExternals: 'loose',
     optimizeCss: {
       preload: true,
     },
@@ -112,17 +112,22 @@ const config = {
   },
 };
 
-const millionConfig = {
-  auto: true,
-};
-
 const finalConfig = withPwa(config);
 
 const withBundleAnalyzerConfig = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 });
 
-export default withSentryConfig(withBundleAnalyzerConfig(finalConfig), {
+const withMillion = MillionLint.next({
+  rsc: true,
+  filter: {
+    include: '**/components/*.{mtsx,mjsx,tsx,jsx}',
+  },
+});
+
+const combinedConfig = withMillion(withBundleAnalyzerConfig(finalConfig));
+
+export default withSentryConfig(combinedConfig, {
   org: 'womb0comb0',
   project: 'spark-mind',
   silent: !process.env.CI,

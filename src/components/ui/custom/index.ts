@@ -4,3 +4,5 @@ export * from './wobble-card';
 export * from './infinite-moving-cards';
 export * from './background-beams';
 export * from './vortex';
+export * from './damn-good-card';
+export * from './focus-card';

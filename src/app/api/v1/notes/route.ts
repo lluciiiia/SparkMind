@@ -5,6 +5,16 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const userId = user?.id;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'User not found' }, { status: 401 });
+  }
+
   try {
     const url = new URL(req.url);
     const myLearningId = url.searchParams.get('id');

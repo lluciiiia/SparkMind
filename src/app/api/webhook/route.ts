@@ -6,6 +6,7 @@ import {
   upsertPriceRecord,
   upsertProductRecord,
 } from '@/utils/supabase/admin';
+import { NextResponse } from 'next/server';
 import type Stripe from 'stripe';
 
 const relevantEvents = new Set([
@@ -28,12 +29,13 @@ export async function POST(req: Request) {
   let event: Stripe.Event;
 
   try {
-    if (!sig || !webhookSecret) return new Response('Webhook secret not found.', { status: 400 });
+    if (!sig || !webhookSecret)
+      return NextResponse.json({ error: 'Webhook secret not found.' }, { status: 400 });
     event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
     console.log(`🔔  Webhook received: ${event.type}`);
   } catch (err: any) {
     console.log(`❌ Error message: ${err.message}`);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
   }
 
   if (relevantEvents.has(event.type)) {
@@ -79,14 +81,13 @@ export async function POST(req: Request) {
       }
     } catch (error) {
       console.log(error);
-      return new Response('Webhook handler failed. View your Next.js function logs.', {
-        status: 400,
-      });
+      return NextResponse.json(
+        { error: 'Webhook handler failed. View your Next.js function logs.' },
+        { status: 400 },
+      );
     }
   } else {
-    return new Response(`Unsupported event type: ${event.type}`, {
-      status: 400,
-    });
+    return NextResponse.json({ error: `Unsupported event type: ${event.type}` }, { status: 400 });
   }
-  return new Response(JSON.stringify({ received: true }));
+  return NextResponse.json({ received: true });
 }

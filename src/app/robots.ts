@@ -1,4 +1,4 @@
-import { app } from '@/constants';
+import { getURL } from '@/utils';
 import type { MetadataRoute } from 'next';
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -14,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/legal'],
       },
     ],
-    sitemap: `${app}/sitemap.xml`,
+    sitemap: `https://sparkmind.vercel.app/sitemap.xml`,
   };
 }

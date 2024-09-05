@@ -2,6 +2,7 @@
 
 import { UserNav } from '@/components';
 import { Button } from '@/components/ui/button';
+import { ModeToggle } from '@/providers';
 import { createClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import { Menu, X } from 'lucide-react';
@@ -9,7 +10,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
 export const HomeNavigation = () => {
   const [user, setUser] = useState<User | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -108,12 +108,10 @@ export const HomeNavigation = () => {
             ))}
           </div>
           <div className="pt-4 pb-3 border-t border-gray-200">
-            {user ? (
-              <div className="flex items-center px-5">
+            <div className="flex items-center justify-between px-5">
+              {user ? (
                 <UserNav />
-              </div>
-            ) : (
-              <div className="mt-3 px-2 space-y-1">
+              ) : (
                 <Button
                   onClick={() => {
                     router.push('/signin');
@@ -123,8 +121,8 @@ export const HomeNavigation = () => {
                 >
                   Sign In
                 </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       )}

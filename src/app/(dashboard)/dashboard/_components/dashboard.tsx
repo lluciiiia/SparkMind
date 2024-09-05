@@ -30,8 +30,8 @@ import SummaryCard from './cards/SummaryCard';
 import VideoCard from './cards/VideoCard';
 import DiscussionWithAI from './discussion-with-ai';
 
-import type { FurtherInfo, Note, Output, ParsedVideoData, Question, VideoItem } from './interfaces';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import type { FurtherInfo, Note, Output, ParsedVideoData, Question, VideoItem } from './interfaces';
 
 export const Dashboard = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -244,8 +244,9 @@ export const Dashboard = () => {
           transition={{ type: 'spring', stiffness: 100 }}
         >
           <summary
-            className={`p-2 ${isOpen ? 'rounded-l-md' : 'rounded-l-md'
-              } bg-primary text-primary-foreground flex items-center cursor-pointer`}
+            className={`p-2 ${
+              isOpen ? 'rounded-l-md' : 'rounded-l-md'
+            } bg-primary text-primary-foreground flex items-center cursor-pointer`}
           >
             {isOpen ? <FaCaretLeft size={24} /> : <FaCaretRight size={24} />}
             <PiNoteBlankFill size={24} className="ml-2" />
