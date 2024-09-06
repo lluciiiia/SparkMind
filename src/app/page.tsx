@@ -36,6 +36,7 @@ import {
   FaRobot,
 } from 'react-icons/fa';
 import { HomeNavigation } from './HomeNavigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface VideoCarouselProps {
   videos: string[];
@@ -43,9 +44,6 @@ interface VideoCarouselProps {
 
 export function VideoCarousel({ videos }: VideoCarouselProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [aspectRatio, setAspectRatio] = useState(16 / 9);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const nextVideo = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % videos.length);
@@ -55,61 +53,52 @@ export function VideoCarousel({ videos }: VideoCarouselProps) {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + videos.length) % videos.length);
   };
 
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.load();
-    }
-  }, [currentIndex]);
-
-  useEffect(() => {
-    const updateAspectRatio = () => {
-      if (videoRef.current) {
-        const { videoWidth, videoHeight } = videoRef.current;
-        if (videoWidth && videoHeight) {
-          setAspectRatio(videoWidth / videoHeight);
-        }
-      }
-    };
-
-    const video = videoRef.current;
-    if (video) {
-      video.addEventListener('loadedmetadata', updateAspectRatio);
-    }
-
-    return () => {
-      if (video) {
-        video.removeEventListener('loadedmetadata', updateAspectRatio);
-      }
-    };
-  }, [currentIndex]);
+  const getYouTubeEmbedUrl = (url: string) => {
+    const videoId = url.split('v=')[1];
+    return `https://www.youtube.com/embed/${videoId}`;
+  };
 
   return (
-    <div className="relative w-full max-w-3xl mx-auto" ref={containerRef}>
-      <div style={{ paddingBottom: `${(1 / aspectRatio) * 100}%` }} className="relative">
-        <CustomVideo
-          ref={videoRef}
-          className="absolute top-0 left-0 w-full h-full object-cover"
-          autoPlay
-          loop
-          muted
+    <div className="relative w-full h-full">
+      <iframe
+        src={getYouTubeEmbedUrl(videos[currentIndex])}
+        title="YouTube video player"
+        frameBorder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+        className="w-full h-full rounded-xl"
+      ></iframe>
+      <div className="absolute inset-0 flex items-center justify-between p-4">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={prevVideo}
+          className="rounded-full bg-white/80 hover:bg-white"
         >
-          <source src={videos[currentIndex]} type="video/mp4" />
-        </CustomVideo>
+          <ChevronLeft className="h-6 w-6" />
+          <span className="sr-only">Previous video</span>
+        </Button>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={nextVideo}
+          className="rounded-full bg-white/80 hover:bg-white"
+        >
+          <ChevronRight className="h-6 w-6" />
+          <span className="sr-only">Next video</span>
+        </Button>
       </div>
-      <button
-        onClick={prevVideo}
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 rounded-full p-2 z-10 hover:bg-opacity-75 transition-colors duration-200"
-        aria-label="Previous video"
-      >
-        <FaChevronLeft className="text-[#003366]" />
-      </button>
-      <button
-        onClick={nextVideo}
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white bg-opacity-50 rounded-full p-2 z-10 hover:bg-opacity-75 transition-colors duration-200"
-        aria-label="Next video"
-      >
-        <FaChevronRight className="text-[#003366]" />
-      </button>
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+        <div className="flex space-x-2">
+          {videos.map((_, index) => (
+            <div
+              key={index}
+              className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-white' : 'bg-white/50'
+                }`}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -193,9 +182,9 @@ export default function Component() {
   ];
 
   const demoVideos = [
-    '/assets/videos/revamp.mp4',
-    '/assets/videos/extension.mp4',
-    '/assets/videos/promotional.mov',
+    'https://www.youtube.com/watch?v=w_CGGikqydg',
+    'https://www.youtube.com/watch?v=cGZiN6gvYVg',
+    'https://www.youtube.com/watch?v=MJtmCqJjejw',
   ];
 
   const faqItems = [
@@ -262,28 +251,30 @@ export default function Component() {
           </div>
         </section>
 
-        <section id="about" className="py-16">
+        <section id={`about`} className="py-12 md:py-20 bg-white">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col lg:flex-row items-center lg:items-start gap-12">
-              <article className="w-full lg:w-1/2 bg-white rounded-xl overflow-hidden">
-                <div className="p-8">
-                  <h2 className="text-3xl font-bold text-[#003366] mb-6">
+            <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-12">
+              <div className="w-full lg:w-1/2 flex flex-col justify-between">
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-bold text-[#003366] leading-tight mb-6">
                     Revolutionize Your Learning Journey
                   </h2>
-                  <p className="text-lg text-gray-700 mb-6">
+                  <p className="text-base md:text-lg text-gray-700 mb-4">
                     SparkMind is an innovative AI-driven learning hub designed to transform education. Our platform adapts to your unique learning style, offering personalized study materials and AI-powered discussions across a wide range of subjects.
                   </p>
-                  <p className="text-lg text-gray-700 mb-8">
+                  <p className="text-base md:text-lg text-gray-700 mb-6">
                     Whether you're a student, professional, or lifelong learner, SparkMind is here to ignite your curiosity and empower your educational journey. Join us in shaping the future of learning!
                   </p>
-                  <Button className="bg-[#003366] hover:bg-[#0257AC] text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300">
-                    Start Your Journey
-                  </Button>
                 </div>
-              </article>
+                <Button className="bg-[#003366] hover:bg-[#0257AC] text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 self-start">
+                  Start Your Journey
+                </Button>
+              </div>
 
-              <div className="w-full lg:w-1/2">
-                <VideoCarousel videos={demoVideos} />
+              <div className="w-full lg:w-1/2 h-[300px] sm:h-[350px] md:h-[400px] lg:h-[450px]">
+                <div className="h-full">
+                  <VideoCarousel videos={demoVideos} />
+                </div>
               </div>
             </div>
           </div>
