@@ -128,6 +128,7 @@ export const Dashboard = () => {
     }
 
     if (output?.questions) {
+      console.log('output.questions', output);
       const parsedQuestions = JSON.parse(output.questions) as Question[];
       setQuestions(parsedQuestions);
     }

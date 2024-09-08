@@ -3,6 +3,11 @@ import { saveRecQueOutput } from '../helpers/rec-que';
 
 export const dynamic = 'force-dynamic';
 
+function truncateInput(input: string, maxLength: number = 1000): string {
+  if (input.length <= maxLength) return input;
+  return input.substring(0, maxLength - 3) + '...';
+}
+
 export async function POST(req: NextRequest) {
   try {
     const url = new URL(req.url);
@@ -18,7 +23,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const basicQuestionResponse = await saveRecQueOutput(myLearningId, input, output);
+    const truncatedInput = truncateInput(input);
+    const basicQuestionResponse = await saveRecQueOutput(myLearningId, truncatedInput, output);
     if (basicQuestionResponse.status != 200)
       return NextResponse.json({ status: basicQuestionResponse.status });
 

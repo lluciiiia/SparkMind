@@ -11,12 +11,18 @@ const customSearch = new customsearch_v1.Customsearch({
   key: API_KEY,
 });
 
+function truncateQuery(query: string, maxLength: number = 100): string {
+  if (query.length <= maxLength) return query;
+  return query.substring(0, maxLength - 3) + '...';
+}
+
 export const search = async (query: string) => {
   try {
+    const truncatedQuery = truncateQuery(query);
     const res = await customSearch.cse.list({
       key: API_KEY,
       cx: SEARCH_ENGINE_ID,
-      q: query,
+      q: truncatedQuery,
     });
     const data = res.data;
     const result = SearchRecommendationSchema.parse({
@@ -44,7 +50,8 @@ export const search = async (query: string) => {
 export const dynamic = 'force-dynamic';
 
 export async function saveFurtherInfoOutput(query: string, myLearningId: string, output: any) {
-  const response = await search(query);
+  const truncatedQuery = truncateQuery(query);
+  const response = await search(truncatedQuery);
 
   const supabase = createClient();
 

@@ -26,59 +26,44 @@ function parseQuizText(text: string): QuizItem[] {
     .filter((line) => line);
   const questions: QuizItem[] = [];
   let currentQuestion: CurrentQuestion | null = null;
-  const answers: string[] = [];
 
   lines.forEach((line) => {
-    const questionMatch = line.match(/^\d+\. \*\*(.+?)\*\*/);
+    const questionMatch = line.match(/^(\d+)\.\s*(.+)/);
     if (questionMatch) {
       if (currentQuestion) {
         questions.push({
-          id: currentQuestion.id || questions.length + 1,
-          options: currentQuestion.options,
+          id: currentQuestion.id,
           question: currentQuestion.question,
+          options: currentQuestion.options,
           answer: currentQuestion.answer,
           multipleAnswers: currentQuestion.answer.length > 1,
         });
       }
       currentQuestion = {
-        id: questions.length + 1,
-        question: questionMatch[1],
+        id: parseInt(questionMatch[1]),
+        question: questionMatch[2],
         options: [],
         answer: [],
       };
     } else if (currentQuestion) {
-      const optionMatch = line.match(/^([a-d])\) (.+)/);
+      const optionMatch = line.match(/^([a-d])\)\s*(.+)/);
       if (optionMatch) {
         currentQuestion.options.push(optionMatch[2]);
-      } else {
-        const answerMatch = line.match(/^\d+\. ([a-d])\)/);
-        if (answerMatch) {
-          answers.push(line);
-        }
+      } else if (line.match(/^[a-d]\)$/)) {
+        currentQuestion.answer.push(currentQuestion.options[line.charCodeAt(0) - 97]);
       }
     }
   });
 
   if (currentQuestion) {
     questions.push({
-      id: currentQuestion.id || questions.length + 1,
+      id: currentQuestion.id,
       question: currentQuestion.question,
       options: currentQuestion.options,
       answer: currentQuestion.answer,
       multipleAnswers: currentQuestion.answer.length > 1,
     });
   }
-
-  // Associate answers with questions
-  answers.forEach((answerLine, index) => {
-    const answerMatch = answerLine.match(/^\d+\. ([a-d])\)/);
-    if (answerMatch) {
-      const answerIndex = 'abcd'.indexOf(answerMatch[1]);
-      if (answerIndex !== -1 && questions[index].options[answerIndex]) {
-        questions[index].answer.push(questions[index].options[answerIndex]);
-      }
-    }
-  });
 
   return questions;
 }
@@ -98,6 +83,11 @@ interface CurrentQuestion {
   multipleAnswers?: boolean;
 }
 
+function truncateQuery(query: string, maxLength: number = 1000): string {
+  if (query.length <= maxLength) return query;
+  return query.substring(0, maxLength - 3) + '...';
+}
+
 async function fetchQuizData(query: string) {
   const genModel = genAI.getGenerativeModel({
     model,
@@ -114,7 +104,8 @@ async function fetchQuizData(query: string) {
 
 export async function saveQuizOutput(query: string, myLearningId: string, output: any) {
   try {
-    const systemInstruction = QNA_SYSTEM_INSTRUCTION.replace('{{query}}', query);
+    const truncatedQuery = truncateQuery(query);
+    const systemInstruction = QNA_SYSTEM_INSTRUCTION.replace('{{query}}', truncatedQuery);
     const quizData = await fetchQuizData(systemInstruction);
     const supabase = createClient();
 

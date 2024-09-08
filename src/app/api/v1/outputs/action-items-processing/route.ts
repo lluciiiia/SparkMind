@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
     const transcript = await getTranscript(supabase, myLearningId, !isVideoUploaded);
     if (!transcript) return NextResponse.json({ error: 'Transcript not found' }, { status: 404 });
 
-    const todoList = await generateTodoList(transcript);
+    const truncatedTranscript = truncateTranscript(transcript);
+    const todoList = await generateTodoList(truncatedTranscript);
     await saveTodoList(supabase, outputId, todoList);
 
     return NextResponse.json({ status: 200 });
@@ -80,6 +81,11 @@ async function getTranscript(supabase: any, videoid: string, istextinput: boolea
   }
 }
 
+function truncateTranscript(transcript: string, maxLength: number = 10000): string {
+  if (transcript.length <= maxLength) return transcript;
+  return transcript.substring(0, maxLength - 3) + '...';
+}
+
 async function generateTodoList(transcript: string): Promise<any> {
   if (!API_KEY) throw new Error('Missing API key');
 
@@ -103,7 +109,8 @@ async function generateTodoList(transcript: string): Promise<any> {
 
   const systemInstruction = ACTION_ITEMS_SYSTEM_INSTRUCTION.replace('{{timeZone}}', timeZone)
     .replace('{{formattedDate}}', formattedDate)
-    .replace('{{transcript}}', transcript);
+    .replace('{{transcript}}', transcript)
+    .replace('{{isTruncated}}', transcript.endsWith('...') ? 'true' : 'false');
 
   try {
     const result = await genModel.generateContent(systemInstruction.trim());
