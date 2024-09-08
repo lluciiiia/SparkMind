@@ -120,6 +120,7 @@ const withBundleAnalyzerConfig = withBundleAnalyzer({
 
 const withMillion = MillionLint.next({
   rsc: true,
+  production: true,
   filter: {
     include: '**/components/*.{mtsx,mjsx,tsx,jsx}',
   },

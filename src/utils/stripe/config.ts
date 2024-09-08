@@ -1,9 +1,6 @@
 import Stripe from 'stripe';
 
-const stripeSecretKey =
-  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
-    ? process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY_LIVE
-    : process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY_TEST;
+const stripeSecretKey = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY_LIVE 
 
 if (!stripeSecretKey) {
   throw new Error('Stripe secret key is not set');
@@ -17,6 +14,6 @@ export const stripe = new Stripe(stripeSecretKey, {
   appInfo: {
     name: 'SparkMind',
     version: '1.0.0',
-    url: 'https://sparkmind.vercel.app',
+    url: 'https://sparkmind-ai.com',
   },
 });

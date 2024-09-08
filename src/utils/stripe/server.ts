@@ -1,3 +1,4 @@
+import { getUrl } from './../../../node_modules/@trpc/client/src/links/internals/httpUtils';
 'use server';
 
 import type { Tables } from '@/types/supabase';
@@ -18,17 +19,36 @@ export async function checkoutWithStripe(
   currentPath: string,
 ): Promise<CheckoutResponse> {
   try {
+    const productId = price.product_id;
+
+    if (!productId) {
+      throw new Error('No product ID found');
+    }
+
+    // Fetch the appropriate price for the product based on the environment
+    const stripePrices = await stripe.prices.list({
+      product: productId,
+      active: true,
+      limit: 1,
+    });
+
+    if (stripePrices.data.length === 0) {
+      throw new Error('No active price found for the product');
+    }
+
+    const stripePrice = stripePrices.data[0];
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
         {
-          price: price.id,
+          price: stripePrice.id,
           quantity: 1,
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}${currentPath}`,
+      cancel_url: getURL(),
+      success_url: getURL('/account')
     });
 
     return { sessionId: session.id };
