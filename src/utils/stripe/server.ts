@@ -1,5 +1,4 @@
-import { getUrl } from './../../../node_modules/@trpc/client/src/links/internals/httpUtils';
-('use server');
+'use server';
 
 import type { Tables } from '@/types/supabase';
 import { calculateTrialEndUnixTimestamp, getErrorRedirect, getURL } from '@/utils/helpers';
@@ -25,7 +24,6 @@ export async function checkoutWithStripe(
       throw new Error('No product ID found');
     }
 
-    // Fetch the appropriate price for the product based on the environment
     const stripePrices = await stripe.prices.list({
       product: productId,
       active: true,
