@@ -8,8 +8,8 @@ const PrivacyPage = () => {
       <p className="mb-4">
         Your privacy is important to us. It is SparkMind's policy to respect your privacy and comply
         with any applicable law and regulation regarding any personal information we may collect
-        about you, including across our website, https://sparkmind.com, and other sites we own and
-        operate.
+        about you, including across our website, https://www.sparkmind-ai.com, and other sites we
+        own and operate.
       </p>
 
       <p className="mb-4">

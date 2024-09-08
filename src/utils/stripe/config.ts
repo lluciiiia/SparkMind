@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 
-const stripeSecretKey = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY_LIVE 
+const stripeSecretKey = process.env.NEXT_PUBLIC_STRIPE_SECRET_KEY_LIVE;
 
 if (!stripeSecretKey) {
   throw new Error('Stripe secret key is not set');

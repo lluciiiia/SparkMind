@@ -40,7 +40,7 @@ function parseQuizText(text: string): QuizItem[] {
         });
       }
       currentQuestion = {
-        id: parseInt(questionMatch[1]),
+        id: Number.parseInt(questionMatch[1]),
         question: questionMatch[2],
         options: [],
         answer: [],
@@ -83,7 +83,7 @@ interface CurrentQuestion {
   multipleAnswers?: boolean;
 }
 
-function truncateQuery(query: string, maxLength: number = 1000): string {
+function truncateQuery(query: string, maxLength = 1000): string {
   if (query.length <= maxLength) return query;
   return query.substring(0, maxLength - 3) + '...';
 }

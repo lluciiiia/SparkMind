@@ -3,7 +3,7 @@ import { saveRecQueOutput } from '../helpers/rec-que';
 
 export const dynamic = 'force-dynamic';
 
-function truncateInput(input: string, maxLength: number = 1000): string {
+function truncateInput(input: string, maxLength = 1000): string {
   if (input.length <= maxLength) return input;
   return input.substring(0, maxLength - 3) + '...';
 }

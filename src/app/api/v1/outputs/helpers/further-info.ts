@@ -11,7 +11,7 @@ const customSearch = new customsearch_v1.Customsearch({
   key: API_KEY,
 });
 
-function truncateQuery(query: string, maxLength: number = 100): string {
+function truncateQuery(query: string, maxLength = 100): string {
   if (query.length <= maxLength) return query;
   return query.substring(0, maxLength - 3) + '...';
 }

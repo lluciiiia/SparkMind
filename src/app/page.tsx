@@ -43,20 +43,20 @@ interface VideoCarouselProps {
 }
 
 export function VideoCarousel({ videos }: VideoCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const nextVideo = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % videos.length)
-  }
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % videos.length);
+  };
 
   const prevVideo = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + videos.length) % videos.length)
-  }
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + videos.length) % videos.length);
+  };
 
   const getYouTubeEmbedUrl = (url: string) => {
-    const videoId = url.split('v=')[1]
-    return `https://www.youtube.com/embed/${videoId}`
-  }
+    const videoId = url.split('v=')[1];
+    return `https://www.youtube.com/embed/${videoId}`;
+  };
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -84,8 +84,9 @@ export function VideoCarousel({ videos }: VideoCarouselProps) {
           {videos.map((_, index) => (
             <div
               key={index}
-              className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-[#003366]' : 'bg-[#003366]/50'
-                }`}
+              className={`h-2 w-2 rounded-full ${
+                index === currentIndex ? 'bg-[#003366]' : 'bg-[#003366]/50'
+              }`}
             />
           ))}
         </div>
@@ -100,7 +101,7 @@ export function VideoCarousel({ videos }: VideoCarouselProps) {
         </Button>
       </div>
     </div>
-  )
+  );
 }
 
 export default function Component() {

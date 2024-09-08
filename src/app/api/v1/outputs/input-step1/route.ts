@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { saveSummaryOutput } from '../helpers/summary';
 import { saveYoutubeOutput } from '../helpers/youtube';
 
-function truncateInput(input: string, maxLength: number = 500): string {
+function truncateInput(input: string, maxLength = 500): string {
   if (input.length <= maxLength) return input;
   return input.substring(0, maxLength - 3) + '...';
 }
@@ -29,7 +29,12 @@ export async function POST(req: NextRequest) {
     if (summaryResponse.status != 200) return NextResponse.json({ status: summaryResponse.status });
 
     const truncatedInput = truncateInput(input);
-    const youtubeResponse = await saveYoutubeOutput(truncatedInput, pageToken, myLearningId, output);
+    const youtubeResponse = await saveYoutubeOutput(
+      truncatedInput,
+      pageToken,
+      myLearningId,
+      output,
+    );
     if (youtubeResponse.status != 200) return NextResponse.json({ status: youtubeResponse.status });
 
     return NextResponse.json({ status: 200 });

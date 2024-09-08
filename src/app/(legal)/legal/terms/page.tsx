@@ -8,11 +8,11 @@ const TermsPage = () => {
       <section className="mb-8">
         <p className="mb-4">
           Welcome to SparkMind. These Terms of Service ("Terms") govern your access to and use of
-          SparkMind's services, including our website at https://sparkmind.com (the "Service"), and
-          any information, text, graphics, photos or other materials uploaded, downloaded or
-          appearing on the Service (collectively referred to as "Content"). Your access to and use
-          of the Service is conditioned on your acceptance of and compliance with these Terms. By
-          accessing or using the Service you agree to be bound by these Terms.
+          SparkMind's services, including our website at https://www.sparkmind-ai.com(the
+          "Service"), and any information, text, graphics, photos or other materials uploaded,
+          downloaded or appearing on the Service (collectively referred to as "Content"). Your
+          access to and use of the Service is conditioned on your acceptance of and compliance with
+          these Terms. By accessing or using the Service you agree to be bound by these Terms.
         </p>
       </section>
 
@@ -191,10 +191,10 @@ const TermsPage = () => {
         <h2 className="text-2xl font-semibold mb-4 text-navy">10. Changes to these Terms</h2>
         <p className="mb-4">
           We may revise these Terms from time to time. The most current version will always be at
-          https://sparkmind.com/legal/terms. If the revision, in our sole discretion, is material we
-          will notify you via an e-mail to the email associated with your account. By continuing to
-          access or use the Service after those revisions become effective, you agree to be bound by
-          the revised Terms.
+          https://www.sparkmind-ai.com/legal/terms. If the revision, in our sole discretion, is
+          material we will notify you via an e-mail to the email associated with your account. By
+          continuing to access or use the Service after those revisions become effective, you agree
+          to be bound by the revised Terms.
         </p>
       </section>
 

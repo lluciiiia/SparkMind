@@ -14,6 +14,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/api/', '/legal'],
       },
     ],
-    sitemap: `https://sparkmind.vercel.app/sitemap.xml`,
+    sitemap: `https://www.sparkmind-ai.com/sitemap.xml`,
   };
 }

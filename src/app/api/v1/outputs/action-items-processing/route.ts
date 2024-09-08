@@ -81,7 +81,7 @@ async function getTranscript(supabase: any, videoid: string, istextinput: boolea
   }
 }
 
-function truncateTranscript(transcript: string, maxLength: number = 10000): string {
+function truncateTranscript(transcript: string, maxLength = 10000): string {
   if (transcript.length <= maxLength) return transcript;
   return transcript.substring(0, maxLength - 3) + '...';
 }

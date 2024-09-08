@@ -65,7 +65,7 @@ const config = {
         source: '/api/v1/:path*',
         headers: [
           { key: 'Access-Control-Allow-Credentials', value: 'true' },
-          { key: 'Access-Control-Allow-Origin', value: 'https://sparkmind.vercel.app' },
+          { key: 'Access-Control-Allow-Origin', value: 'https://www.sparkmind-ai.com' },
           {
             key: 'Access-Control-Allow-Methods',
             value: 'GET,DELETE,PATCH,POST,PUT',

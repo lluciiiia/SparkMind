@@ -8,9 +8,9 @@ const CookiesPage = () => {
       <section className="mb-8">
         <p className="mb-4">
           This Cookies Policy explains how SparkMind ("we", "us", and "our") uses cookies and
-          similar technologies to recognize you when you visit our website at https://sparkmind.com
-          ("Website"). It explains what these technologies are and why we use them, as well as your
-          rights to control our use of them.
+          similar technologies to recognize you when you visit our website at
+          https://www.sparkmind-ai.com ("Website"). It explains what these technologies are and why
+          we use them, as well as your rights to control our use of them.
         </p>
         <p className="mb-4">
           This policy is effective as of 1 June 2023 and was last updated on 1 June 2023.

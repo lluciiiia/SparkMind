@@ -1,5 +1,5 @@
 import { getUrl } from './../../../node_modules/@trpc/client/src/links/internals/httpUtils';
-'use server';
+('use server');
 
 import type { Tables } from '@/types/supabase';
 import { calculateTrialEndUnixTimestamp, getErrorRedirect, getURL } from '@/utils/helpers';
@@ -48,7 +48,7 @@ export async function checkoutWithStripe(
       ],
       mode: 'subscription',
       cancel_url: getURL(),
-      success_url: getURL('/account')
+      success_url: getURL('/account'),
     });
 
     return { sessionId: session.id };
