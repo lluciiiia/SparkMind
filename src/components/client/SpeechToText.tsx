@@ -1,3 +1,4 @@
+'use client'; 
 import { Button } from '@/components/ui/button';
 /// <reference lib="dom" />
 import React, { useState } from 'react';
