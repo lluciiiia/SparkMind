@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui/button';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /// <reference lib="dom" />
-import React from 'react';
-import { FaMicrophone } from 'react-icons/fa';
+import React, { useState } from 'react';
+import { FaMicrophone, FaStop } from 'react-icons/fa';
 import { useIsomorphicLayoutEffect } from 'usehooks-ts';
+import { toast } from 'sonner';
 
 /*
  * Intakes a state setter where the component
@@ -15,78 +15,96 @@ function SpeechToText({
 }: {
   setContent: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const [isRecording, setIsRecording] = useState(false);
   const startButtonRef = React.useRef<HTMLButtonElement>(null);
   const resultRef = React.useRef<HTMLDivElement>(null);
-  useIsomorphicLayoutEffect(() => {
-    // Get references to HTML elements once the component is mounted
-    const startButton = document.getElementById('startBtn')! as HTMLButtonElement;
+  const recognitionRef = React.useRef<any>(null);
 
-    // Check if the browser supports the Web Speech API
+  useIsomorphicLayoutEffect(() => {
     if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-      // Create a SpeechRecognition object
       const SpeechRecognition =
         (window as any)['SpeechRecognition'] || (window as any)['webkitSpeechRecognition'];
-      const recognition = new SpeechRecognition();
+      recognitionRef.current = new SpeechRecognition();
 
-      // Create a SpeechGrammarList object (optional)
-      const SpeechGrammarList =
-        (window as any)['SpeechGrammarList'] || (window as any)['webkitSpeechGrammarList'];
-      const speechRecognitionList = new SpeechGrammarList();
-      speechRecognitionList.addFromString('command|stop', 1);
+      const recognition = recognitionRef.current;
 
-      // Set up recognition properties
       recognition.continuous = true;
-      recognition.grammars = speechRecognitionList;
+      recognition.interimResults = true;
 
-      // Event fired when speech recognition starts
       recognition.onstart = () => {
-        startButton.disabled = true;
-        // startButton.textContent = 'Listening...';
+        setIsRecording(true);
+        toast.success('Listening... Speak now!', {
+          description: 'Click the stop button to end recording.',
+          duration: 3000,
+        });
       };
 
-      // Event fired when speech recognition stops
       recognition.onend = () => {
-        startButton.disabled = false;
-        // startButton.textContent = 'Start Listening';
+        setIsRecording(false);
+        toast.info('Speech recognition ended.', {
+          description: 'Click the microphone to start again.',
+          duration: 3000,
+        });
       };
 
-      // Event fired when speech recognition results are available
       recognition.onresult = (event: any) => {
-        const transcript = event.results[event.results.length - 1][0].transcript;
-        // resultElement.textContent = transcript;
+        let finalTranscript = '';
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            finalTranscript += event.results[i][0].transcript;
+          }
+        }
 
-        // Check if the recognized speech contains the word "stop"
-        if (transcript.includes('stop')) {
-          setContent((content) => content + transcript.replace('stop', ''));
-          recognition.stop();
-        } else {
-          setContent((content) => content + transcript);
+        if (finalTranscript) {
+          if (finalTranscript.toLowerCase().includes('stop')) {
+            setContent((content) => content + ' ' + finalTranscript.replace(/stop/gi, '').trim());
+            recognition.stop();
+          } else {
+            setContent((content) => content + ' ' + finalTranscript.trim());
+          }
         }
       };
 
-      // Event fired when an error occurs in speech recognition
-      recognition.onerror = (event: Event) => {
+      recognition.onerror = (event: any) => {
         console.error('Speech recognition error:', (event as any).error);
+        toast.error('Speech recognition error', {
+          description: event.error,
+          duration: 5000,
+        });
       };
-
-      // Start recognition when the button is clicked
-      startButton.addEventListener('click', () => {
-        recognition.start();
-      });
     } else {
-      // Browser does not support speech recognition
-      alert('Just a heads up, speech recognition is not supported in this browser.');
+      toast.error('Speech recognition not supported 🥲', {
+        description: 'Your browser does not support speech recognition.',
+        duration: 5000,
+      });
 
-      startButton.disabled = true;
+      if (startButtonRef.current) {
+        startButtonRef.current.disabled = true;
+      }
     }
-  }, [setContent]); // Empty dependency array ensures this effect runs once after mounting.
+  }, [setContent]);
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+    } else {
+      recognitionRef.current?.start();
+    }
+  };
+
   return (
     <>
-      <Button ref={startButtonRef} id="startBtn" className="cursor-pointer">
-        <FaMicrophone />
+      <Button
+        ref={startButtonRef}
+        id="startBtn"
+        className="cursor-pointer"
+        onClick={toggleRecording}
+      >
+        {isRecording ? <FaStop /> : <FaMicrophone />}
       </Button>
       <div ref={resultRef} id="result" className={`hidden`}></div>
     </>
   );
 }
+
 export default SpeechToText;

@@ -710,7 +710,7 @@ export default function manifest(): ExtendedManifest {
       {
         name: 'Terms of Service',
         short_name: 'Terms',
-        url: '/terms',
+        url: '/legal/terms',
         description:
           "The fine print of our digital handshake. Understand SparkMind's Terms of Service.",
         icons: [
@@ -725,7 +725,7 @@ export default function manifest(): ExtendedManifest {
       {
         name: 'Privacy Policy',
         short_name: 'Privacy',
-        url: '/privacy',
+        url: '/legal/privacy',
         description:
           'Your privacy matters to us. Learn how SparkMind protects your personal information.',
         icons: [
@@ -739,8 +739,8 @@ export default function manifest(): ExtendedManifest {
       },
       {
         name: 'Cookie Policy',
-        short_name: 'Cookie',
-        url: '/cookie',
+        short_name: 'Cookies',
+        url: '/legal/cookies',
         description:
           'Understand how we use cookies and similar technologies to enhance your experience.',
         icons: [

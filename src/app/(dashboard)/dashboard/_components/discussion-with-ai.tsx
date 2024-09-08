@@ -47,10 +47,9 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
     if (!learningid) {
       console.error('Missing Learning ID');
       toast.error('Learning ID is missing. Please select a learning resource.');
+      return;
     }
-  }, []);
 
-  useEffect(() => {
     const fetchDiscussData = async () => {
       setIsLoadingQuestions(true);
       try {
@@ -68,9 +67,8 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
         setIsLoadingQuestions(false);
       }
     };
-    if (learningid) {
-      fetchDiscussData();
-    }
+
+    fetchDiscussData();
   }, [learningid]);
 
   useEffect(() => {
@@ -95,7 +93,7 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
       });
       setChatSession(session);
     }
-  }, [transcript]);
+  }, [transcript]); // Only re-run when transcript changes
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -161,16 +159,22 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
                 <div
                   className={`p-2 rounded-lg max-w-[80%] text-sm ${
                     response.sender === 'user'
-                      ? 'bg-primary dark:text-navy text-white'
-                      : 'bg-secondary text-secondary-foreground'
+                      ? 'bg-primary text-white'
+                      : 'bg-secondary dark:text-white text-navy'
                   } relative group`}
                 >
                   {response.sender === 'user' ? (
-                    <User className="inline-block mr-2 h-4 w-4" />
+                    <User className="inline-block mr-2 h-4 w-4 dark:text-navy" />
                   ) : (
                     <Bot className="inline-block mr-2 h-4 w-4" />
                   )}
-                  <ReactMarkdown className="inline" remarkPlugins={[remarkGfm]}>
+                  <ReactMarkdown
+                    className={`inline ${response.sender === 'user'
+                      ? '[&>p]:dark:text-navy [&>p]:text-white'
+                      : '[&>p]:dark:text-white [&>p]:text-navy'
+                      }`}
+                    remarkPlugins={[remarkGfm]}
+                  >
                     {response.text}
                   </ReactMarkdown>
                   {response.sender === 'ai' && (

@@ -72,16 +72,16 @@ const VideoCard: React.FC<VideoCardProps> = memo(({ videos }) => {
                     {he.decode(video.snippet.description)}
                   </p>
                   <div className="flex flex-wrap gap-2 mb-4">
-                    <Badge variant="secondary" className={`text-xs text-navy`}>
-                      <Eye className="w-3 h-3 mr-1" />
+                    <Badge variant="secondary" className={`text-xs text-navy dark:text-white`}>
+                      <Eye className="w-3 h-3 mr-1 dark:text-white" />
                       {viewedVideos[video.id.videoId] ? 'Not viewed' : 'Viewed'}
                     </Badge>
                     <Badge
                       variant="secondary"
-                      className={`text-xs cursor-pointer text-navy `}
+                      className={`text-xs cursor-pointer text-navy dark:text-white`}
                       onClick={() => handleLike(video.id.videoId)}
                     >
-                      <ThumbsUp className="w-3 h-3 mr-1" />
+                      <ThumbsUp className="w-3 h-3 mr-1 dark:text-white" />
                       {likedVideos[video.id.videoId] ? 'Liked' : 'Not liked'}
                     </Badge>
                   </div>

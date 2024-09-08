@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,6 +17,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import SpeechToText from '@/components/client/SpeechToText'
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -35,6 +35,7 @@ const formSchema = z.object({
 })
 
 export default function ContactPage() {
+  const [speechContent, setSpeechContent] = React.useState('');
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -112,7 +113,20 @@ export default function ContactPage() {
                       <FormItem>
                         <FormLabel>Message</FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Your message" {...field} />
+                          <div className="flex flex-col space-y-2">
+                            <Textarea 
+                              placeholder="Your message" 
+                              {...field} 
+                              value={field.value || speechContent}
+                              onChange={(e) => {
+                                field.onChange(e);
+                                setSpeechContent(e.target.value);
+                              }}
+                            />
+                            <div className="flex justify-end">
+                              <SpeechToText setContent={setSpeechContent} />
+                            </div>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>

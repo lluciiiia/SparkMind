@@ -22,7 +22,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { FaCaretLeft, FaCaretRight } from 'react-icons/fa';
 import { PiNoteBlankFill } from 'react-icons/pi';
 import { toast } from 'sonner';
-import { NewNoteSection } from '../../notes/_components';
+import { NewNoteSection } from './cards/NewNoteSection';
 import ActionCard from './cards/ActionCard';
 import FurtherInfoCard from './cards/FurtherInfo';
 import QuestionAndAnswer from './cards/QuestionAndAnswer';
@@ -97,6 +97,7 @@ export const Dashboard = () => {
           setFetchTimeout(newTimeout as NodeJS.Timeout);
         } else {
           toast.error('Failed to fetch data after multiple attempts. Please try again later.');
+          window.open('/my-learning', '_self');
         }
       } finally {
         setIsLoading(false);

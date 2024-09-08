@@ -15,8 +15,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaPlus } from 'react-icons/fa';
 import { toast } from 'sonner';
-import { getConciseNote, getGrammarNote } from '../../../_api-handlers/notes';
-import type { Note } from '../../dashboard/_components/interfaces';
+import { getConciseNote, getGrammarNote } from '../../../../_api-handlers/notes';
+import type { Note } from '../../../dashboard/_components/interfaces';
 
 export const NewNoteSection: React.FC<{
   handleCreate: () => Promise<void>;
@@ -150,7 +150,7 @@ export const NewNoteSection: React.FC<{
               {isDeleting === note.id ? (
                 <Skeleton className="h-5 w-5 rounded-full" />
               ) : (
-                <Trash2 className="h-5 w-5" />
+                <Trash2 className="h-5 w-5 text-white" />
               )}
             </Button>
           </div>
