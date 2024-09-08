@@ -169,10 +169,11 @@ const DiscussionWithAI: React.FC<DiscussionWithAIProps> = ({ learningid }) => {
                     <Bot className="inline-block mr-2 h-4 w-4" />
                   )}
                   <ReactMarkdown
-                    className={`inline ${response.sender === 'user'
-                      ? '[&>p]:dark:text-navy [&>p]:text-white'
-                      : '[&>p]:dark:text-white [&>p]:text-navy'
-                      }`}
+                    className={`inline ${
+                      response.sender === 'user'
+                        ? '[&>p]:dark:text-navy [&>p]:text-white'
+                        : '[&>p]:dark:text-white [&>p]:text-navy'
+                    }`}
                     remarkPlugins={[remarkGfm]}
                   >
                     {response.text}

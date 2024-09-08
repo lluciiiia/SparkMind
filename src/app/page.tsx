@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState, useRef, useEffect } from 'react';
@@ -36,71 +37,70 @@ import {
   FaRobot,
 } from 'react-icons/fa';
 import { HomeNavigation } from './HomeNavigation';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface VideoCarouselProps {
   videos: string[];
 }
 
 export function VideoCarousel({ videos }: VideoCarouselProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0)
 
   const nextVideo = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % videos.length);
-  };
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % videos.length)
+  }
 
   const prevVideo = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + videos.length) % videos.length);
-  };
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + videos.length) % videos.length)
+  }
 
   const getYouTubeEmbedUrl = (url: string) => {
-    const videoId = url.split('v=')[1];
-    return `https://www.youtube.com/embed/${videoId}`;
-  };
+    const videoId = url.split('v=')[1]
+    return `https://www.youtube.com/embed/${videoId}`
+  }
 
   return (
-    <div className="relative w-full h-full">
-      <iframe
-        src={getYouTubeEmbedUrl(videos[currentIndex])}
-        title="YouTube video player"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        className="w-full h-full rounded-xl"
-      ></iframe>
-      <div className="absolute inset-0 flex items-center justify-between p-4">
+    <div className="flex flex-col w-full h-full">
+      <div className="relative w-full h-[calc(100%-60px)]">
+        <iframe
+          src={getYouTubeEmbedUrl(videos[currentIndex])}
+          title="YouTube video player"
+          frameBorder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="w-full h-full rounded-xl"
+        ></iframe>
+      </div>
+      <div className="flex items-center justify-between mt-4">
         <Button
           variant="outline"
           size="icon"
           onClick={prevVideo}
-          className="rounded-full bg-white/80 hover:bg-white"
+          className="rounded-full bg-white/80 hover:bg-white text-navy"
         >
           <ChevronLeft className="h-6 w-6" />
           <span className="sr-only">Previous video</span>
         </Button>
+        <div className="flex space-x-2">
+          {videos.map((_, index) => (
+            <div
+              key={index}
+              className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-[#003366]' : 'bg-[#003366]/50'
+                }`}
+            />
+          ))}
+        </div>
         <Button
           variant="outline"
           size="icon"
           onClick={nextVideo}
-          className="rounded-full bg-white/80 hover:bg-white"
+          className="rounded-full bg-white/80 hover:bg-white text-navy"
         >
           <ChevronRight className="h-6 w-6" />
           <span className="sr-only">Next video</span>
         </Button>
       </div>
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-        <div className="flex space-x-2">
-          {videos.map((_, index) => (
-            <div
-              key={index}
-              className={`h-2 w-2 rounded-full ${index === currentIndex ? 'bg-white' : 'bg-white/50'
-                }`}
-            />
-          ))}
-        </div>
-      </div>
     </div>
-  );
+  )
 }
 
 export default function Component() {
@@ -260,10 +260,15 @@ export default function Component() {
                     Revolutionize Your Learning Journey
                   </h2>
                   <p className="text-base md:text-lg text-gray-700 mb-4">
-                    SparkMind is an innovative AI-driven learning hub designed to transform education. Our platform adapts to your unique learning style, offering personalized study materials and AI-powered discussions across a wide range of subjects.
+                    SparkMind is an innovative AI-driven learning hub designed to transform
+                    education. Our platform adapts to your unique learning style, offering
+                    personalized study materials and AI-powered discussions across a wide range of
+                    subjects.
                   </p>
                   <p className="text-base md:text-lg text-gray-700 mb-6">
-                    Whether you're a student, professional, or lifelong learner, SparkMind is here to ignite your curiosity and empower your educational journey. Join us in shaping the future of learning!
+                    Whether you're a student, professional, or lifelong learner, SparkMind is here
+                    to ignite your curiosity and empower your educational journey. Join us in
+                    shaping the future of learning!
                   </p>
                 </div>
                 <Button className="bg-[#003366] hover:bg-[#0257AC] text-white font-bold py-3 px-8 rounded-full text-lg transition duration-300 self-start">

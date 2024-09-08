@@ -81,7 +81,7 @@ const handleRedirect = ({
     '/legal/privacy',
     '/legal/terms',
     '/legal/cookies',
-    '/support'
+    '/support',
   ];
 
   if (!user && !publicRoutes.includes(req.nextUrl.pathname)) {

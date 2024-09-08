@@ -23,7 +23,10 @@ const Footer = () => {
             <nav>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/#about" className="text-white hover:text-[#0257AC] transition-colors">
+                  <Link
+                    href="/#about"
+                    className="text-white hover:text-[#0257AC] transition-colors"
+                  >
                     About Us
                   </Link>
                 </li>
@@ -108,11 +111,15 @@ const Footer = () => {
             © {new Date().getFullYear()} SparkMind. All rights reserved.
           </div>
           <div className="flex space-x-4">
-            <Link href="/#faq" className="text-sm text-white hover:text-[#0257AC] transition-colors">
+            <Link
+              href="/#faq"
+              className="text-sm text-white hover:text-[#0257AC] transition-colors"
+            >
               FAQ
             </Link>
-            <Link 
-              href="/support" className="text-sm text-white hover:text-[#0257AC] transition-colors"
+            <Link
+              href="/support"
+              className="text-sm text-white hover:text-[#0257AC] transition-colors"
             >
               Support
             </Link>

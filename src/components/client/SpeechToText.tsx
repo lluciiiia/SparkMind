@@ -1,10 +1,10 @@
-'use client'; 
+'use client';
 import { Button } from '@/components/ui/button';
 /// <reference lib="dom" />
 import React, { useState } from 'react';
 import { FaMicrophone, FaStop } from 'react-icons/fa';
-import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 import { toast } from 'sonner';
+import { useIsomorphicLayoutEffect } from 'usehooks-ts';
 
 /*
  * Intakes a state setter where the component
