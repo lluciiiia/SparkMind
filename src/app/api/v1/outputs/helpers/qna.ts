@@ -7,65 +7,87 @@ import { genAI, generationConfig, model, safetySettings } from '../../gemini-set
 
 dotenv.config();
 
-const quizSchema = z.array(
-  z.object({
-    id: z.number().optional(),
-    question: z.string(),
-    options: z.array(z.string()),
-    answer: z.array(z.string()),
-    multipleAnswers: z.boolean(),
-  }),
-);
+interface QuestionItem {
+  id?: number;
+  question: string;
+  options: string[];
+  answer: string[];
+  multipleAnswers: boolean;
+}
 
-type QuizItem = z.infer<typeof quizSchema>;
+interface CurrentQuestion {
+  id: number;
+  question: string;
+  options: string[];
+  answer: string[];
+}
 
-function parseQuizText(text: string): QuizItem[] {
+function parseQuizText(text: string): QuestionItem[] {
   const lines = text
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => line);
-  const questions: QuizItem[] = [];
+  const questions: QuestionItem[] = [];
   let currentQuestion: CurrentQuestion | null = null;
+  let parsingAnswers = false;
 
   lines.forEach((line) => {
-    const questionMatch = line.match(/^(\d+)\.\s*(.+)/);
-    if (questionMatch) {
-      if (currentQuestion) {
-        questions.push({
-          id: currentQuestion.id,
-          question: currentQuestion.question,
-          options: currentQuestion.options,
-          answer: currentQuestion.answer,
-          multipleAnswers: currentQuestion.answer.length > 1,
-        });
+    if (line.startsWith('## Answer Key:')) {
+      parsingAnswers = true;
+      return;
+    }
+
+    if (!parsingAnswers) {
+      const questionMatch = line.match(/^(\d+)\.\s*\*\*(.+)\*\*$/);
+      if (questionMatch) {
+        if (currentQuestion) {
+          questions.push({
+            id: (currentQuestion as CurrentQuestion).id,
+            question: (currentQuestion as CurrentQuestion).question,
+            options: (currentQuestion as CurrentQuestion).options,
+            answer: (currentQuestion as CurrentQuestion).answer,
+            multipleAnswers: (currentQuestion as CurrentQuestion).answer.length > 1,
+          });
+        }
+        currentQuestion = {
+          id: Number.parseInt(questionMatch[1]),
+          question: questionMatch[2],
+          options: [],
+          answer: [],
+        };
+      } else if (currentQuestion) {
+        const optionMatch = line.match(/^([a-d])\)\s*(.+)$/);
+        if (optionMatch) {
+          currentQuestion.options.push(optionMatch[2]);
+        }
       }
-      currentQuestion = {
-        id: Number.parseInt(questionMatch[1]),
-        question: questionMatch[2],
-        options: [],
-        answer: [],
-      };
-    } else if (currentQuestion) {
-      const optionMatch = line.match(/^([a-d])\)\s*(.+)/);
-      if (optionMatch) {
-        currentQuestion.options.push(optionMatch[2]);
-      } else if (line.match(/^[a-d]\)$/)) {
-        currentQuestion.answer.push(currentQuestion.options[line.charCodeAt(0) - 97]);
+    } else {
+      const answerMatch = line.match(/^(\d+)\.\s*\*\*([a-d])\)\s*(.+)\*\*$/);
+      if (answerMatch && questions[Number(answerMatch[1]) - 1]) {
+        const questionIndex = Number(answerMatch[1]) - 1;
+        const answerIndex = answerMatch[2].charCodeAt(0) - 97;
+        questions[questionIndex].answer = [questions[questionIndex].options[answerIndex]];
       }
     }
   });
 
   if (currentQuestion) {
     questions.push({
-      id: currentQuestion.id,
-      question: currentQuestion.question,
-      options: currentQuestion.options,
-      answer: currentQuestion.answer,
-      multipleAnswers: currentQuestion.answer.length > 1,
+      id: (currentQuestion as CurrentQuestion).id,
+      question: (currentQuestion as CurrentQuestion).question,
+      options: (currentQuestion as CurrentQuestion).options,
+      answer: (currentQuestion as CurrentQuestion).answer,
+      multipleAnswers: (currentQuestion as CurrentQuestion).answer.length > 1,
     });
   }
 
-  return questions;
+  return questions.map((q) => ({
+    id: q.id,
+    question: q.question,
+    options: q.options,
+    answer: q.answer,
+    multipleAnswers: q.answer.length > 1,
+  }));
 }
 
 interface QuizQuestion {
@@ -73,14 +95,6 @@ interface QuizQuestion {
   options: string[];
   answer: string[];
   id: number;
-}
-
-interface CurrentQuestion {
-  id?: number;
-  question: string;
-  options: string[];
-  answer: string[];
-  multipleAnswers?: boolean;
 }
 
 function truncateQuery(query: string, maxLength = 1000): string {
@@ -97,9 +111,10 @@ async function fetchQuizData(query: string) {
   const result = await genModel.generateContent(query);
   const response = result.response;
   const text = await response.text();
-
+  console.log('text', text);
   const parsedData = parseQuizText(text);
-  return quizSchema.parse(parsedData);
+  console.log('parsedData', JSON.stringify(parsedData, null, 2));
+  return parsedData;
 }
 
 export async function saveQuizOutput(query: string, myLearningId: string, output: any) {

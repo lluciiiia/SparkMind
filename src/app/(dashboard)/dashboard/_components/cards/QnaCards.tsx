@@ -68,7 +68,7 @@ const QnaCards: React.FC<Props> = ({ question, options, answer, multipleAnswers,
       options.map((item, index) => {
         const isCorrectOption = answer.includes(item);
         const isSelected = selectedOptions.includes(index);
-        const isOptionCorrect = isAnswered && isCorrectOption && isSelected;
+        const isOptionCorrect = isAnswered && isCorrectOption;
         const isOptionIncorrect = isAnswered && !isCorrectOption && isSelected;
 
         return (

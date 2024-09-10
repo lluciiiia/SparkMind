@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { CheckCircle, Eye, HelpCircle, XCircle } from 'lucide-react';
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState } from 'react';
 import { toast } from 'sonner';
 
 type Question = {
@@ -21,48 +21,13 @@ type Props = {
 };
 
 const QuestionAndAnswer = memo(function QuestionAndAnswer({ questions }: Props) {
-  const [processedQuestions, setProcessedQuestions] = useState<Question[]>([]);
   const [answeredQuestions, setAnsweredQuestions] = useState<Record<number, number[]>>({});
   const [revealedAnswers, setRevealedAnswers] = useState<Record<number, boolean>>({});
-
-  useEffect(() => {
-    const mergeAnswersWithQuestions = (questions: Question[]): Question[] => {
-      const questionMap: Record<number, Question> = {};
-      const answerMap: Record<number, string[]> = {};
-
-      questions.forEach((question) => {
-        if (question.options.length > 0) {
-          questionMap[question.id] = { ...question, answer: [] };
-        } else {
-          const answerMatch = question.question.match(/^([a-d])\) (.+)/);
-          if (answerMatch) {
-            const [, letter, answerText] = answerMatch;
-            const questionId = question.id - 10;
-            if (!answerMap[questionId]) {
-              answerMap[questionId] = [];
-            }
-            answerMap[questionId].push(answerText);
-          }
-        }
-      });
-
-      Object.entries(answerMap).forEach(([questionId, answers]) => {
-        const id = Number.parseInt(questionId, 10);
-        if (questionMap[id]) {
-          questionMap[id].answer = answers;
-        }
-      });
-
-      return Object.values(questionMap);
-    };
-
-    setProcessedQuestions(mergeAnswersWithQuestions(questions));
-  }, [questions]);
 
   const handleOptionClick = (questionId: number, optionIndex: number) => {
     setAnsweredQuestions((prev) => {
       const currentAnswers = prev[questionId] || [];
-      const question = processedQuestions.find((q) => q.id === questionId);
+      const question = questions.find((q) => q.id === questionId);
 
       if (question?.multipleAnswers) {
         return {
@@ -78,7 +43,7 @@ const QuestionAndAnswer = memo(function QuestionAndAnswer({ questions }: Props) 
   };
 
   const handleSubmit = (questionId: number) => {
-    const question = processedQuestions.find((q) => q.id === questionId);
+    const question = questions.find((q) => q.id === questionId);
     const selectedAnswers = answeredQuestions[questionId] || [];
 
     if (selectedAnswers.length === 0) {
@@ -87,9 +52,9 @@ const QuestionAndAnswer = memo(function QuestionAndAnswer({ questions }: Props) 
     }
 
     const selectedOptions = selectedAnswers.map((index) => question?.options[index]);
-    const isCorrect =
-      selectedOptions.every((option) => question?.answer.includes(option || '')) &&
-      selectedOptions.length === question?.answer.length;
+    const isCorrect = question?.answer.every((correctAnswer) =>
+      selectedOptions.includes(correctAnswer)
+    ) && selectedOptions.length === question?.answer.length;
 
     if (isCorrect) {
       toast.success('Correct answer!');
@@ -107,7 +72,7 @@ const QuestionAndAnswer = memo(function QuestionAndAnswer({ questions }: Props) 
     setRevealedAnswers((prev) => ({ ...prev, [questionId]: true }));
   };
 
-  if (!Array.isArray(questions) || processedQuestions.length === 0) {
+  if (!Array.isArray(questions) || questions.length === 0) {
     return (
       <Card className="w-full h-[calc(100vh-200px)] bg-background">
         <CardContent className="p-6">
@@ -127,7 +92,7 @@ const QuestionAndAnswer = memo(function QuestionAndAnswer({ questions }: Props) 
       </CardHeader>
       <CardContent className="p-0">
         <ScrollArea className="h-[calc(100vh-300px)]">
-          {processedQuestions.map((question, index) => (
+          {questions.map((question, index) => (
             <div key={question.id} className="p-6 border-b border-border last:border-b-0">
               <h3 className="text-lg font-semibold mb-4 text-primary">
                 Question {index + 1}: {question.question}
@@ -194,7 +159,7 @@ const QuestionAndAnswer = memo(function QuestionAndAnswer({ questions }: Props) 
                   </ul>
                 </div>
               )}
-              {index < processedQuestions.length - 1 && <Separator className="my-6" />}
+              {index < questions.length - 1 && <Separator className="my-6" />}
             </div>
           ))}
         </ScrollArea>
