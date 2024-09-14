@@ -13,7 +13,7 @@ const PrivacyPage = () => {
       </p>
 
       <p className="mb-4">
-        This policy is effective as of 1 June 2023 and was last updated on 1 June 2023.
+        This policy is effective as of 16 June 2024 and was last updated on 14 September 2024.
       </p>
 
       <section className="mb-8">
