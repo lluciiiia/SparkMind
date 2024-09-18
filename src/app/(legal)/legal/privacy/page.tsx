@@ -268,6 +268,21 @@ const PrivacyPage = () => {
         </p>
       </section>
 
+      <section className="mb-8">
+        <h2 className="text-2xl font-semibold mb-4 text-navy">Use of Google Workspace APIs</h2>
+        <p className="mb-4">
+          SparkMind uses Google Workspace APIs to provide certain functionalities within our service. We want to explicitly affirm that:
+        </p>
+        <ul className="list-disc list-inside mb-4 text-navy">
+          <li>We do not use data obtained through Google Workspace APIs to develop, improve, or train generalized AI and/or ML models.</li>
+          <li>Any data accessed through Google Workspace APIs is used solely for the purpose of providing and improving our specific service offerings to you.</li>
+          <li>We adhere to the Google API Services User Data Policy in all our interactions with Google Workspace APIs.</li>
+        </ul>
+        <p className="mb-4">
+          Our use of Google Workspace APIs is limited to enhancing your experience within SparkMind and does not extend to any form of generalized AI or ML model development.
+        </p>
+      </section>
+
       <section>
         <h2 className="text-2xl font-semibold mb-4 text-navy">Contact Us</h2>
         <p className="mb-4">
